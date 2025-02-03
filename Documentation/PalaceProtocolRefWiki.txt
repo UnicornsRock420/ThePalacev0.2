@@ -1,0 +1,1594 @@
+{| class="article-table"
+!Name
+!Hex value
+!Mnemonic
+!Usage
+|-
+|[[#MSG_ALTLOGONREPLY|MSG_ALTLOGONREPLY]]
+|0x72657032
+|'rep2'
+|server --> client
+|-
+|[[#MSG_ASSETNEW|MSG_ASSETNEW]]
+|0x61417374
+|'aAst'
+|server --- client
+|-
+|[[#MSG_ASSETQUERY|MSG_ASSETQUERY]]
+|0x71417374
+|'qAst'
+|server <-> client
+|-
+|[[#MSG_ASSETREGI|MSG_ASSETREGI]]
+|0x72417374
+|'rAst'
+|server <-- client
+|-
+|[[#MSG_ASSETSEND|MSG_ASSETSEND]]
+|0x73417374
+|'sAst'
+|server --> client
+|-
+|[[#MSG_AUTHENTICATE|MSG_AUTHENTICATE]]
+|0x61757468
+|'auth'
+|server --> client
+|-
+|[[#MSG_AUTHRESPONSE|MSG_AUTHRESPONSE]]
+|0x61757472
+|'autr'
+|server <-- client
+|-
+|[[#MSG_BLOWTHRU|MSG_BLOWTHRU]]
+|0x626c6f77
+|'blow'
+|server <-> client
+|-
+|[[#MSG_DISPLAYURL|MSG_DISPLAYURL]]
+|0x6475726c
+|'durl'
+|server --> client
+|-
+|[[#MSG_DIYIT|MSG_DIYIT]]
+|0x72796974
+|'ryit'
+|server --- client
+|-
+|[[#MSG_DOORLOCK|MSG_DOORLOCK]]
+|0x6c6f636b
+|'lock'
+|server <-> client
+|-
+|[[#MSG_DOORUNLOCK|MSG_DOORUNLOCK]]
+|0x756e6c6f
+|'unlo'
+|server <-> client
+|-
+|[[#MSG_DRAW|MSG_DRAW]]
+|0x64726177
+|'draw'
+|server <-> client
+|-
+|[[#MSG_EXTENDEDINFO|MSG_EXTENDEDINFO]]
+|0x73496e66
+|'sInf'
+|server <-> client
+|-
+|[[#MSG_FILENOTFND|MSG_FILENOTFND]]
+|0x666e6665
+|'fnfe'
+|server --> client
+|-
+|[[#MSG_FILEQUERY|MSG_FILEQUERY]]
+|0x7146696c
+|'qFil'
+|server <-- client
+|-
+|[[#MSG_FILESEND|MSG_FILESEND]]
+|0x7346696c
+|'sFil'
+|server --> client
+|-
+|[[#MSG_GMSG|MSG_GMSG]]
+|0x676d7367
+|'gmsg'
+|server <-- client
+|-
+|[[#MSG_HTTPSERVER|MSG_HTTPSERVER]]
+|0x676d7367
+|'HTTP'
+|server --> client
+|-
+|[[#MSG_INITCONNECTION|MSG_INITCONNECTION]]
+|0x634c6f67
+|'cLog'
+|server --- client
+|-
+|[[#MSG_KILLUSER|MSG_KILLUSER]]
+|0x6b696c6c
+|'kill'
+|server <-- client
+|-
+|[[#MSG_LISTOFALLROOMS|MSG_LISTOFALLROOMS]]
+|0x724c7374
+|'rLst'
+|server <-> client
+|-
+|[[#MSG_LISTOFALLUSERS|MSG_LISTOFALLUSERS]]
+|0x754c7374
+|'uLst'
+|server <-> client
+|-
+|[[#MSG_LOGOFF|MSG_LOGOFF]]
+|0x62796520
+|'bye '
+|server <-> client
+|-
+|[[#MSG_LOGON|MSG_LOGON]]
+|0x72656769
+|'regi'
+|server <-- client
+|-
+|[[#MSG_NAVERROR|MSG_NAVERROR]]
+|0x73457272
+|'sErr'
+|server --> client
+|-
+|[[#MSG_NOOP|MSG_NOOP]]
+|0x4e4f4f50
+|'NOOP'
+|server --- client
+|-
+|[[#MSG_PICTDEL|MSG_PICTDEL]]
+|0x46505371
+|'FPSq'
+|server <-- client
+|-
+|[[#MSG_PICTMOVE|MSG_PICTMOVE]]
+|0x704c6f63
+|'pLoc'
+|server <-> client
+|-
+|[[#MSG_PICTNEW|MSG_PICTNEW]]
+|0x6e506374
+|'nPct'
+|server <-- client
+|-
+|[[#MSG_PICTSETDESC|MSG_PICTSETDESC]]
+|0x73506374
+|'sPct'
+|server <-- client
+|-
+|[[#MSG_PING|MSG_PING]]
+|0x70696e67
+|'ping'
+|server <-> client
+|-
+|[[#MSG_PONG|MSG_PONG]]
+|0x706f6e67
+|'pong'
+|server <-> client
+|-
+|[[#MSG_PROPDEL|MSG_PROPDEL]]
+|0x64507270
+|'dPrp'
+|server <-> client
+|-
+|[[#MSG_PROPMOVE|MSG_PROPMOVE]]
+|0x6d507270
+|'mPrp'
+|server <-> client
+|-
+|[[#MSG_PROPNEW|MSG_PROPNEW]]
+|0x6e507270
+|'nPrp'
+|server <-> client
+|-
+|[[#MSG_PROPSETDESC|MSG_PROPSETDESC]]
+|0x73507270
+|'sPrp'
+|server --- client
+|-
+|[[#MSG_RESPORT|MSG_RESPORT]]
+|0x72657370
+|'resp'
+|server --- client
+|-
+|[[#MSG_RMSG|MSG_RMSG]]
+|0x726d7367
+|'rmsg'
+|server <-- client
+|-
+|[[#MSG_ROOMDESC|MSG_ROOMDESC]]
+|0x726f6f6d
+|'room'
+|server --> client
+|-
+|[[#MSG_ROOMDESCEND|MSG_ROOMDESCEND]]
+|0x656e6472
+|'endr'
+|server --> client
+|-
+|[[#MSG_ROOMGOTO|MSG_ROOMGOTO]]
+|0x6e617652
+|'navR'
+|server <-- client
+|-
+|[[#MSG_ROOMNEW|MSG_ROOMNEW]]
+|0x6e526f6d
+|'nRom'
+|server <-- client
+|-
+|[[#MSG_ROOMSETDESC|MSG_ROOMSETDESC]]
+|0x73526f6d
+|'sRom'
+|server <-> client
+|-
+|[[#MSG_SERVERDOWN|MSG_SERVERDOWN]]
+|0x646f776e
+|'down'
+|server --> client
+|-
+|[[#MSG_SERVERINFO|MSG_SERVERINFO]]
+|0x73696e66
+|'sinf'
+|server --> client
+|-
+|[[#MSG_SERVERUP|MSG_SERVERUP]]
+|0x696e6974
+|'init'
+|server --- client
+|-
+|[[#MSG_SMSG|MSG_SMSG]]
+|0x736d7367
+|'smsg'
+|server <-- client
+|-
+|[[#MSG_SPOTDEL|MSG_SPOTDEL]]
+|0x6f705364
+|'opSd'
+|server <-- client
+|-
+|[[#MSG_SPOTMOVE|MSG_SPOTMOVE]]
+|0x636f4c73
+|'coLs'
+|server <-> client
+|-
+|[[#MSG_SPOTNEW|MSG_SPOTNEW]]
+|0x6f70536e
+|'opSn'
+|server <-- client
+|-
+|[[#MSG_SPOTSETDESC|MSG_SPOTSETDESC]]
+|0x6f705373
+|'opSs'
+|server <-- client
+|-
+|[[#MSG_SPOTSTATE|MSG_SPOTSTATE]]
+|0x73537461
+|'sSta'
+|server <-> client
+|-
+|[[#MSG_SUPERUSER|MSG_SUPERUSER]]
+|0x73757372
+|'susr'
+|server <-- client
+|-
+|[[#MSG_TALK|MSG_TALK]]
+|0x74616c6b
+|'talk'
+|server <-> client
+|-
+|[[#MSG_TIMYID|MSG_TIMYID]]
+|0x74696d79
+|'timy'
+|server --- client
+|-
+|[[#MSG_TIYID|MSG_TIYID]]
+|0x74697972
+|'tiyr'
+|server --> client
+|-
+|[[#MSG_TROPSER|MSG_TROPSER]]
+|0x70736572
+|'pser'
+|server --- client
+|-
+|[[#MSG_USERCOLOR|MSG_USERCOLOR]]
+|0x75737243
+|'usrC'
+|server <-> client
+|-
+|[[#MSG_USERDESC|MSG_USERDESC]]
+|0x75737244
+|'usrD'
+|server <-> client
+|-
+|[[#MSG_USERENTER|MSG_USERENTER]]
+|0x77707273
+|'wprs'
+|server --> client
+|-
+|[[#MSG_USEREXIT|MSG_USEREXIT]]
+|0x65707273
+|'eprs'
+|server --> client
+|-
+|[[#MSG_USERFACE|MSG_USERFACE]]
+|0x75737246
+|'usrF'
+|server <-> client
+|-
+|[[#MSG_USERLIST|MSG_USERLIST]]
+|0x72707273
+|'rprs'
+|server --> client
+|-
+|[[#MSG_USERLOG|MSG_USERLOG]]
+|0x6c6f6720
+|'log '
+|server --> client
+|-
+|[[#MSG_USERMOVE|MSG_USERMOVE]]
+|0x754c6f63
+|'uLoc'
+|server <-> client
+|-
+|[[#MSG_USERNAME|MSG_USERNAME]]
+|0x7573724e
+|'usrN'
+|server <-> client
+|-
+|[[#MSG_USERNEW|MSG_USERNEW]]
+|0x6e707273
+|'nprs'
+|server --> client
+|-
+|[[#MSG_USERPROP|MSG_USERPROP]]
+|0x75737250
+|'usrP'
+|server <-> client
+|-
+|[[#MSG_USERSTATUS|MSG_USERSTATUS]]
+|0x75537461
+|'uSta'
+|server --> client
+|-
+|[[#MSG_VERSION|MSG_VERSION]]
+|0x76657273
+|'vers'
+|server --> client
+|-
+|[[#MSG_WHISPER|MSG_WHISPER]]
+|0x77686973
+|'whis'
+|server <-> client
+|-
+|[[#MSG_WMSG|MSG_WMSG]]
+|0x776d7367
+|'wmsg'
+|server <-- client
+|-
+|[[#MSG_XTALK|MSG_XTALK]]
+|0x78746c6b
+|'xtlk'
+|server <-> client
+|-
+|[[#MSG_XWHISPER|MSG_XWHISPER]]
+|0x78776973
+|'xwis'
+|server <-> client
+|}
+
+=MSG_ALTLOGONREPLY=
+
+The server may send this message to a client in response to the [[#MSG_LOGON|MSG_LOGON]] message (assuming the logon is successful, of course). It contains various information describing the situation in which newly-logged-on users find themselves. This message is not always sent, however. Currently only one circumstance triggers this, and that is when the server is running in guests-are-members mode.
+
+The refnum field is the user ID of the user logging on.
+
+The msg field is an [[NonPrimitive_Types#AuxRegistrationRec|AuxRegistrationRec]]. See [[#MSG_LOGON|MSG_LOGON]] for details on this struct:
+  struct Msg_AltLogonReply {
+    [[NonPrimitive_Types#AuxRegistrationRec|AuxRegistrationRec]] rec;
+  }
+
+=MSG_ASSETQUERY=
+
+This requests the receiver to send the sender a particular asset. The server uses it to request props from the client, and the client uses it to request arbitrary assets. Assets are identified by type, ID, and a CRC. Asset types are 4-character ASCII codes; see the description of [[NonPrimitive_Types#AssetType|AssetType]] in Non-primitive Types. Asset IDs are arbitrary 4-byte integers. Ordinarily the CRC is used to check the asset for validity, but a CRC value of 0 indicates "don't care".
+
+The only asset the server ever asks the client for is type [[NonPrimitive_Types#RT_PROP|RT_PROP]]. It is unclear what asset types the client may ask the server for. It is unclear to me what it means for the server to send this message to the client. A server normally responds to a [[#MSG_ASSETQUERY|MSG_ASSETQUERY]] with a [[#MSG_ASSETSEND|MSG_ASSETSEND]], but the server is not set up to receive a [[#MSG_ASSETSEND|MSG_ASSETSEND]] from the client.
+
+The refnum field is not used in this message and should be set to 0.
+
+The type and spec fields together describe the asset desired.
+
+The msg field is a Msg_AssetQuery struct:
+  struct Msg_AssetQuery {
+    [[NonPrimitive_Types#AssetType|AssetType]] type;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] spec;
+  }
+
+=MSG_ASSETREGI=
+=MSG_ASSETSEND=
+
+These two messages are used to transmit assets from one machine to another. The two messages are identical except for the message type. [[#MSG_ASSETREGI|MSG_ASSETREGI]] is used when the client is sending assets to the server. [[#MSG_ASSETSEND|MSG_ASSETSEND]] is used when the server is sending assets to the client.
+
+The message format is designed to enable assets to be transmitted in blocks, with each block sent in a separate message.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_AssetSend struct:
+  struct Msg_AssetSend {
+    [[NonPrimitive_Types#AssetType|AssetType]] type;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] spec;
+    [[Primitive_Types#sint32|sint32]] blockSize;
+    [[Primitive_Types#sint32|sint32]] blockOffset;
+    [[Primitive_Types#sint16|sint16]] blockNbr;
+    [[Primitive_Types#sint16|sint16]] nbrBlocks;
+    [[NonPrimitive_Types#AssetDescriptor|AssetDescriptor]] desc;
+    [[Primitive_Types#uint8|uint8]] data[blockSize];
+  }
+
+* type and spec identify the asset being sent.
+* blockSize is the size of the block being sent in this message.
+* blockOffset is the offset from the start of the asset at which the block begins.
+* blockNbr is the block number of the block being sent in this message. Blocks are numbered starting with 0.
+* data contains the actual bytes of the asset itself.
+* desc is present only in messages containing the first block of an asset (i.e., blockNbr is 0). It is an [[NonPrimitive_Types#AssetDescriptor|AssetDescriptor]] struct, giving information about the asset as a whole:
+  struct AssetDescriptor {
+    [[Primitive_Types#uint32|uint32]] flags;
+    [[Primitive_Types#uint32|uint32]] size;
+    [[NonPrimitive_Types#Str31|Str31]] name;
+  }
+* flags are various flag bits characterizing the asset. These are used by the client only.
+* size is the total size (in bytes) of the asset.
+* name is a name for the asset. The name is used by the client only. In particular, the name is used to identify the asset in scripts.
+
+In theory, as mentioned above, this message format allows an asset to be transmitted in pieces. However, the Unix server only understands assets sent whole (i.e., as a single block containing the entire asset). Thus, in practice, the message always contains an [[NonPrimitive_Types#AssetDescriptor|AssetDescriptor]], blockSize is always equal to size, blockOffset is always 0, blockNbr is always 0, and nbrBlocks is always 1.
+
+=MSG_AUTHENTICATE=
+
+The server sends this message to request the client to authenticate its user to the server. The client responds with a [[#MSG_AUTHRESPONSE|MSG_AUTHRESPONSE]] message.
+
+The refnum field is not used in this message and should be set to 0.
+
+There are no parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_Authenticate {
+  }
+
+=MSG_AUTHRESPONSE=
+
+The client sends this message in response to a [[#MSG_AUTHENTICATE|MSG_AUTHENTICATE]] request from the server. It provides a user name and password.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#PString|PString]] consisting of the concatenation of the user name, a colon (":") character, and the password, all "encrypted" with the Palace string encryption:
+  struct Msg_AuthResponse {
+    [[NonPrimitive_Types#PString|PString]] nameAndPassword;
+  }
+
+=MSG_BLOWTHRU=
+
+This message provides a way for clients to use the server to relay messages to other clients. The interpretation of the messages being relayed is not specified, but must be agreed upon in advance by the clients involved. There is a standard tag on the header of the embedded message which plugin developers are assigned by us. Plugins are expected to place this tag on messages they send; the client will use it to route received blowthru messages to installed plugins. Note: Currently, there isn't a mechanism to enforce that a plugin be well behaved in this regard.
+
+There are two forms of the [[#MSG_BLOWTHRU|MSG_BLOWTHRU]] message, one which the client sends to the server and one which the server sends to the client. The client-to-server form contains an embedded message and an encoding of who that embedded message should be relayed to. The server-to-client form actually relays the message.
+
+In the client-to-server form:
+The refnum field is an arbitrary value whose interpretation is between the clients; it gets relayed.
+
+The msg field is a Msg_blowThru_toServer struct:
+  struct Msg_blowThru_toServer {
+    [[Primitive_Types#uint32|uint32]] flags;
+    [[Primitive_Types#uint32|uint32]] nbrUsers;
+    [[NonPrimitive_Types#UserID|UserID]] userIDs[nbrUsers]; /* iff nbrUsers >= 0 */
+    [[Primitive_Types#uint32|uint32]] pluginTag;
+    [[Primitive_Types#uint8|uint8]] embedded[];
+  }
+* flags are various flag bits Note:these are unused.
+* nbrUsers indicates who to relay the blowthru message to: a negative value (canonically -1, though the server does not enforce this) means the message should be relayed to all users on the server; a value of 0 means the message should be relayed to all users in the same room with the sender; a positive value indicates a number of individual users to whom the message should be relayed, in which case userIDs is an array of that many [[NonPrimitive_Types#UserID|UserIDs]] identifying the recipients of the relay.
+* pluginTag is the assigned tag identifying the client plugin to which the message is supposed to be routed.
+* embedded contains the actual message bytes of the message that is to be relayed.
+
+In the server-to-client form:
+The refnum field contains the value of the refnum field from the corresponding client-to-server message that is being relayed.
+
+The msg field contains the bytes from the pluginTag and embedded fields from the corresponding client-to-server message that is being relayed:
+  struct Msg_blowThru_toClient {
+    [[Primitive_Types#uint32|uint32]] pluginTag;
+    [[Primitive_Types#uint8|uint8]] embedded[];
+  }
+
+=MSG_DISPLAYURL=
+
+This message directs the client to display a particular URL in association with a particular Palace window pane. This message is used with the Java client (which runs in a browser) and Palace Presents (which uses ActiveX in collusion with Internet Explorer); these clients have the ability to display web pages by commanding the browser.
+
+The refnum field contains the pane number of the pane in which the URL is to be displayed. ( a browser pane in display that uses frames)
+
+The msg field contains a [[NonPrimitive_Types#CString|CString]] that is the URL itself:
+  struct Msg_displayURL {
+    [[NonPrimitive_Types#CString|CString]] url;
+  }
+
+=MSG_DOORLOCK=
+=MSG_DOORUNLOCK=
+
+These two message are used to lock and unlock doors. The two messages are identical except for the message type. A client sends a [[#MSG_DOORLOCK|MSG_DOORLOCK]]/[[#MSG_DOORUNLOCK|MSG_DOORUNLOCK]] message to the server requesting a door to be (un)locked. If the operation is successful, the server sends a matching [[#MSG_DOORLOCK|MSG_DOORLOCK]]/[[#MSG_DOORUNLOCK|MSG_DOORUNLOCK]] message to the clients in the room with the door, informing them of the event. In either direction, the message format is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_doorLock struct:
+  struct Msg_doorLock {
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[NonPrimitive_Types#HotspotID|HotspotID]] doorID;
+  }
+* roomID is the [[NonPrimitive_Types#RoomID|RoomID]] of the room containing the door to be (un)locked.
+* doorID is the [[NonPrimitive_Types#HotspotID|HotspotID]] of hotspot in that room which is the door.
+
+=MSG_DRAW=
+
+This message is used to instruct the client to add or drawing operations to the collection of such operations describing the appearance of a room. A client sends a [[#MSG_DRAW|MSG_DRAW]] message to the server requesting that a particular drawing command be added to sender's room's set of draw commands. If the operation is successful (i.e., various format, resource limit, and permission checks succeed), the server sends a matching [[#MSG_DRAW|MSG_DRAW]] message to the clients in the room. In both directions the message format is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field contains a [[NonPrimitive_Types#DrawRecord|DrawRecord]] struct:
+  struct Msg_draw {
+    [[NonPrimitive_Types#DrawRecord|DrawRecord]] command;
+  }
+
+where a [[NonPrimitive_Types#DrawRecord|DrawRecord]] consists of:
+  struct DrawRecord {
+    [[NonPrimitive_Types#LLRec|LLRec]] link;
+    [[Primitive_Types#sint16|sint16]] drawCmd;
+    [[Primitive_Types#uint16|uint16]] cmdLength;
+    [[Primitive_Types#sint16|sint16]] dataOfst;
+    [[Primitive_Types#uint8|uint8]] cmdData[cmdLength];
+  }
+
+* cmdLength is the length of the operand data for the draw operation.
+* dataOfst is another field only used internally.
+* cmdData is an array cmdLength bytes of operand data for the draw operation.
+* link is an LLRec struct:
+  struct LLRec {
+    [[Primitive_Types#sint16|sint16]] nextOfst;
+    [[Primitive_Types#sint16|sint16]] reserved;
+  }
+
+However, the LLRec struct is only used internally and its contents are ignored in the message drawCmd is the draw operation opcode, taken from the set:
+  DC_Path 0
+  DC_Shape 1
+  DC_Text 2
+  DC_Detonate 3
+  DC_Delete 4
+  DC_Ellipse 5
+
+What goes in this field depends on what drawCmd is.
+* The DC_Delete draw command deletes the most recent draw command from the room's set. It has no operand bytes.
+* The DC_Detonate draw command deletes all draw commands from the rooms's set. It has no operand bytes.
+
+=MSG_EXTENDEDINFO=
+
+This message has two forms: a client-to-server ("request") form, in which the client requests various pieces of information from the server as well as providing various authenticating information of its own, and a server-to-client ("response") form in which the server delivers the requested information or delivers an error indication that it could not provide what was asked.
+
+In the request form, the refnum field is unused (and presumably should be set to 0).
+
+In the request form, the msg field is a Msg_extendedInfo_request struct:
+  struct Msg_extendedInfo_request {
+    [[Primitive_Types#uint32|uint32]] flags;
+    [[NonPrimitive_Types#ExtendedInfo|ExtendedInfo]] info[];
+  }
+
+* flags is a set of bit flags indicating the information desired:
+** SI_AVATAR_URL 0x00000001 default avatar URL
+** SI_SERVER_VERSION 0x00000002 server version string
+** SI_SERVER_TYPE 0x00000004 server type
+** SI_SERVER_FLAGS 0x00000008 server flags
+** SI_NUM_USERS 0x00000010 number of users
+** SI_SERVER_NAME 0x00000020 server name
+** SI_HTTP_URL 0x00000040 HTTP (picture) URL
+* info is a sequence of [[NonPrimitive_Types#ExtendedInfo|ExtendedInfo]] structs (described below).
+
+In the response form, the refnum field is the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the message is sent (the client receiving this will always see its own [[NonPrimitive_Types#UserID|UserID]]).
+
+In the response form, the msg field is just a sequence of ExtendedInfo structs:
+  struct Msg_extendedInfo_response {
+    [[NonPrimitive_Types#ExtendedInfo|ExtendedInfo]] info[];
+  }
+
+=MSG_FILENOTFND=
+
+This message is sent from the server to the client in response to a [[#MSG_FILEQUERY|MSG_FILEQUERY]] request in which the requested file was unavailable. The message name implies "file not found", but in reality this message is sent on failure regardless of the failure mode.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#PString|PString]] containing the name of the file that was not found or otherwise not obtainable:
+  struct Msg_fileNotFnd {
+    [[NonPrimitive_Types#PString|PString]] filename;
+  }
+
+=MSG_FILEQUERY=
+
+This message is sent from the client to the server to request that the server send a file to the client. If the file can be delivered to the client, it will be sent in a [[#MSG_FILESEND|MSG_FILESEND]] message; otherwise an error will be indicated via a [[#MSG_FILENOTFND|MSG_FILENOTFND]] message.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#PString|PString]] containing the name of the file that is desired:
+  struct Msg_fileQuery {
+    [[NonPrimitive_Types#PString|PString]] filename;
+  }
+
+=MSG_FILESEND=
+
+This message is sent from the server to the client in response to a [[#MSG_FILEQUERY|MSG_FILEQUERY]] request, in order to deliver the file requested. The message format is designed to enable files to be transmitted in blocks, with each block sent in a separate message. Unlike the similar [[#MSG_ASSETSEND|MSG_ASSETSEND]] message, this mechanism for sending files in pieces is actually implemented and supported.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_fileSend struct:
+  struct Msg_fileSend {
+    [[Primitive_Types#sint32|sint32]] transactionID;
+    [[Primitive_Types#sint32|sint32]] blockSize;
+    [[Primitive_Types#sint16|sint16]] blockNbr;
+    [[NonPrimitive_Types#FileDescriptor|FileDescriptor]] desc;
+    [[Primitive_Types#uint8|uint8]] data[blockSize];
+  }
+* transactionID is simply a unique identifier, assigned by the server, that allows [[#MSG_FILESEND|MSG_FILESEND]] messages for multiple files to be interleaved. All the messages associated with the response to a particular [[#MSG_FILEQUERY|MSG_FILEQUERY]] request will share a common transactionID.
+* blockSize is the size of the file data block being sent in this message.
+* blockNbr is the block number of the block being sent in this message. Blocks are numbered starting with 0
+* data contains the actual bytes of the file block itself.
+* desc is present only in messages containing the first block of a file (i.e., when blockNbr is 0).
+
+=MSG_GMSG=
+
+The client sends this message to the server to utter a global world balloon, i.e., a speech utterance that is delivered to all the users on the server. A client sends the [[#MSG_GMSG|MSG_GMSG]] message to the server with the text to be spoken. If the server is happy with this (e.g., permission checks succeed -- this is a privileged operation), it sends corresponding [[#MSG_TALK|MSG_TALK]] messages to all the users on the server.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#CString|CString]] containing the text of the utterance to be spoken:
+  struct Msg_gMsg {
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters. (Note that the speaker can't be identified by the receiving client.)
+
+=MSG_HTTPSERVER=
+
+This message is sent from the server to the client to direct the client to use a particular HTTP server for obtaining images and sounds in preference to fetching them from the Palace server via file transfers.
+
+The refnum field is the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the message is sent, or.
+
+The msg field is the URL of the HTTP server which the client should use for HTTP requests:
+  struct Msg_HTTPServer {
+    [[NonPrimitive_Types#CString|CString]] url;
+  }
+
+=MSG_KILLUSER=
+
+This message is sent from the client to the server, requesting the server to kill (i.e., forcibly logoff) a particular user. Obviously, this only works if the sender has sufficient authority.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field identifies the user who is to be bumped off:
+  struct Msg_killUser {
+    [[NonPrimitive_Types#UserID|UserID]] targetID;
+  }
+
+=MSG_LISTOFALLROOMS=
+
+This message has two forms: a client-to-server ("request") form, in which the client request the server to send it information about all the rooms on the server, and a server-to-client ("response") form, in which the server delivers this information.
+
+In the request form, the refnum field is not used and should be set to 0, and there are no parameters, so the length field should be 0 and the msg field should be empty:
+  struct Msg_listOfAllRooms_request {
+  }
+
+In the response from, the refnum field contains the number of rooms, and the msg field contains a sequence of RoomListRec structs, one for each room:
+  struct Msg_listOfAllRooms_response {
+    RoomListRec rooms[];
+  }
+
+Each RoomListRec describes one room:
+  struct RoomListRec {
+    [[Primitive_Types#sint32|sint32]] roomID;
+    [[Primitive_Types#sint16|sint16]] flags;
+    [[Primitive_Types#sint16|sint16]] nbrUsers;
+    [[NonPrimitive_Types#PString|PString]] name; /* padded to align length */
+  }
+
+* roomID is the ID number of the room. Note that even though a room ID is a 16- bit quantity, this message stores it in a 32-bit field.
+* flags are various flag bits providing information about the room:
+** RF_AuthorLocked 0x0001 non-owner can't change (member created room)
+** RF_Private 0x0002 not in room list; in user list as "private"
+** RF_NoPainting 0x0004 disables drawing commands in room
+** RF_Closed 0x0008 no entry permitted (those in can stay)
+** RF_CyborgFreeZone 0x0010 client disables cyborg.ipt scripts in room
+** RF_Hidden 0x0020 doesn't show up in goto list
+** RF_NoGuests 0x0040 guest users not permitted in room
+** RF_WizardsOnly 0x0080 only wizards permitted in room
+** RF_DropZone 0x0100 one of the rooms in which new users arrive
+* nbrUsers is the number of users currently in the room.
+* name is the name of the room. If necessary, this [[NonPrimitive_Types#PString|PString]] will have extra padding bytes added onto the end to ensure that its total length (including the length byte) is a multiple of
+
+=MSG_LISTOFALLUSERS=
+
+This message has two forms: a client-to-server ("request") form, in which the client request the server to send it information about all the users on the server, and a server-to-client ("response") form, in which the server delivers this information.
+
+In the request form, the refnum field is not used and should be set to 0, and there are no parameters, so the length field should be 0 and the msg field should be empty:
+  struct Msg_listOfAllUsers_request {
+  }
+
+In the response from, the refnum field contains the number of users, and the msg field contains a sequence of UserListRec structs, one for each user:
+  struct Msg_listOfAllUsers_response {
+    UserListRec users[];
+  }
+
+Each UserListRec describes one user:
+  struct UserListRec {
+    [[NonPrimitive_Types#UserID|UserID]] userID;
+    [[Primitive_Types#sint16|sint16]] flags;
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[NonPrimitive_Types#PString|PString]] name; /* padded to align length */
+  }
+
+* userID is the [[NonPrimitive_Types#UserID|UserID]] of the user.
+* flags are various flags bits providing information about the user:
+** U_SuperUser 0x0001 wizard
+** U_God 0x0002 total wizard
+** U_Kill 0x0004 server should drop user at first opportunity
+** U_Guest 0x0008 user is a guest (i.e., no registration code)
+** U_Banished 0x0010 redundant with U_Kill, shouldn't be used
+** U_Penalized 0x0020 historical artifact, shouldn't be used
+** U_CommError 0x0040 comm error, drop at first opportunity
+** U_Gag 0x0080 not allowed to speak
+** U_Pin 0x0100 stuck in corner and not allowed to move
+** U_Hide 0x0200 doesn't appear on user list
+** U_RejectESP 0x0400 not accepting whisper from outside room
+** U_RejectPrivate 0x0800 not accepting whisper from inside room
+** U_PropGag 0x1000 not allowed to have props
+* roomID is the ID number of the room the user is currently in.
+* name is the user's name. If necessary, this [[NonPrimitive_Types#PString|PString]] will have extra padding bytes added onto the end to ensure that its total length (including the length byte) is a multiple of
+
+=MSG_LOGOFF=
+
+This message has two forms: a client-to-server ("request") form, in which the client requests the server to log it off, and a server-to-client ("notify") form, in which the server informs (other) clients that the user has logged off.
+In the request form, the refnum field is not used and should be set to 0, and there are no parameters, so the length field should be 0 and the msg field should be empty:
+  struct Msg_logOff_request {
+  }
+
+In the notify form, the refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user who logged off and the msg field indicates the revised number of users on the server:
+  struct Msg_logoff_notify {
+    [[Primitive_Types#sint32|sint32]] nbrUsers;
+  }
+
+Normally, this message is sent to everyone who was in the same room with the user who just logged off. However, it will be sent to every user on the server if the total number of users is small enough or if a long enough time has passed since the last such global notification.
+
+=MSG_LOGON=
+
+The client sends this message to the server to initiate a session.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is an [[NonPrimitive_Types#AuxRegistrationRec|AuxRegistrationRec]]:
+  struct Msg_logon {
+    [[NonPrimitive_Types#AuxRegistrationRec|AuxRegistrationRec]] rec;
+  }
+
+An [[NonPrimitive_Types#AuxRegistrationRec|AuxRegistrationRec]] contains lots of information about the user:
+  struct AuxRegistrationRec {
+    [[Primitive_Types#uint32|uint32]] crc;
+    [[Primitive_Types#uint32|uint32]] counter;
+    [[NonPrimitive_Types#Str31|Str31]] userName;
+    [[NonPrimitive_Types#Str31|Str31]] wizPassword;
+    [[Primitive_Types#sint32|sint32]] auxFlags;
+    [[Primitive_Types#uint32|uint32]] puidCtr;
+    [[Primitive_Types#uint32|uint32]] puidCRC;
+    [[Primitive_Types#uint32|uint32]] demoElapsed;
+    [[Primitive_Types#uint32|uint32]] totalElapsed;
+    [[Primitive_Types#uint32|uint32]] demoLimit;
+    [[Primitive_Types#sint16|sint16]] desiredRoom;
+    [[Primitive_Types#char|char]] reserved[6];
+    [[Primitive_Types#uint32|uint32]] ulRequestedProtocolVersion;
+    [[Primitive_Types#uint32|uint32]] ulUploadCaps;
+    [[Primitive_Types#uint32|uint32]] ulDownloadCaps;
+    [[Primitive_Types#uint32|uint32]] ul2DEngineCaps;
+    [[Primitive_Types#uint32|uint32]] ul2DGraphicsCaps;
+    [[Primitive_Types#uint32|uint32]] ul3DEngineCaps;
+  }
+
+* crc and counter together form the registration code. counter is the registration number; crc is a hash that should validate it. puidCtr and
+* puidCRC are a client generated pseudo-random user ID. Once again, puidCtr is the ID number and puidCRC is a validation hash.
+* userName is the user's name string.
+* wizPassword is the user's wizard password, if the user is (or is claiming to be) a wizard.
+* auxFlags indicate various attributes of the user's machine:
+** LI_AUXFLAGS_UnknownMach 0
+** LI_AUXFLAGS_Mac68k 1
+** LI_AUXFLAGS_MacPPC 2
+** LI_AUXFLAGS_Win16 3
+** LI_AUXFLAGS_Win32 4
+** LI_AUXFLAGS_Java 5
+** LI_AUXFLAGS_OSMask 0x0000000F
+** LI_AUXFLAGS_Authenticate 0x80000000
+* demoElapsed, totalElapsed and demoLimit are historical artifacts. They once had something to do with restricting trial use of the client, but are not longer used (and would be trivially spoofable if still used). desiredRoom indicates the room ID of the room the user would like to enter initially.
+* reserved are used for the client's version string:
+** PalaceChat: PC4237
+* ulRequestedProtocolVersion is supposed to encode the version number of the protocol that the client is running, with the major version number in the high 16 bits and the minor version number in the low 16 bits. However, the server ignores this.
+* ulUploadCaps indicates the client's capabilities with respect to uploading assets and files (However, it is completely unused on the server.):
+** LI_ULCAPS_ASSETS_PALACE 0x00000001
+** LI_ULCAPS_ASSETS_FTP 0x00000002
+** LI_ULCAPS_ASSETS_HTTP 0x00000004
+** LI_ULCAPS_ASSETS_OTHER 0x00000008
+** LI_ULCAPS_FILES_PALACE 0x00000010
+** LI_ULCAPS_FILES_FTP 0x00000020
+** LI_ULCAPS_FILES_HTTP 0x00000040
+** LI_ULCAPS_FILES_OTHER 0x00000080
+** LI_ULCAPS_EXTEND_PKT 0x00000100
+* ulDownloadCaps indicates the client's capabilities with respect to downloading assets and files (The only bit which the Unix server examines is):
+** LI_DLCAPS_ASSETS_PALACE 0x00000001
+** LI_DLCAPS_ASSETS_FTP 0x00000002
+** LI_DLCAPS_ASSETS_HTTP 0x00000004
+** LI_DLCAPS_ASSETS_OTHER 0x00000008
+** LI_DLCAPS_FILES_PALACE 0x00000010
+** LI_DLCAPS_FILES_FTP 0x00000020
+** LI_DLCAPS_FILES_HTTP 0x00000040
+** LI_DLCAPS_FILES_OTHER 0x00000080
+** LI_DLCAPS_FILES_HTTPSrvr 0x00000100
+** LI_DLCAPS_EXTEND_PKT 0x00000200
+** LI_DLCAPS_FILES_HTTPSrvr.
+* ul2DEngineCaps allegedly indicates the client's 2-D display engine (However, it (and the flag bit values) are completely unused on the server.):
+** LI_2DENGINECAP_PALACE 0x00000001
+** LI_2DENGINECAP_DOUBLEBYTE 0x00000002
+* ul2DGraphicsCaps allegedly indicates the client's 2-D graphics capabilities (However, it (and the flag bit values) are completely unused on the server.):
+** LI_2DGRAPHCAP_GIF87 0x00000001
+** LI_2DGRAPHCAP_GIF89a 0x00000002
+** LI_2DGRAPHCAP_JPG 0x00000004
+** LI_2DGRAPHCAP_TIFF 0x00000008
+** LI_2DGRAPHCAP_TARGA 0x00000010
+** LI_2DGRAPHCAP_BMP 0x00000020
+** LI_2DGRAPHCAP_PCT 0x00000040
+* ul3DEngineCaps allegedly indicates the client's 3-D graphics capabilities (However, it (and the flag bit values) are completely unused on the server.):
+** LI_3DENGINECAP_VRML1 0x00000001
+** LI_3DENGINECAP_VRML2 0x00000002
+
+=MSG_NAVERROR=
+
+The server sends this message to the client to inform the client about a failure in moving the user's avatar from one room to another.
+
+The refnum field contains an error code indicating the nature of the problem:
+* SE_InternalError 0
+* SE_RoomUnknown 1
+* SE_RoomFull 2
+* SE_RoomClosed 3
+* SE_CantAuthor 4
+* SE_PalaceFull 5
+
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_navError {
+  }
+
+=MSG_NOOP=
+
+This message carries no information and has no effect. Presumably it is used for testing network communications, but it is not actually used in the current Unix server.
+
+The refnum field is not used in this message and should be set to 0.
+
+There are no parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_noOp {
+  }
+
+=MSG_PICTMOVE=
+
+This message is used to modify the screen location of a picture. A client sends a [[#MSG_PICTMOVE|MSG_PICTMOVE]] message to the server requesting a picture to be moved. If the operation is successful (for example, all the permission checks succeed), the server sends a matching [[#MSG_PICTMOVE|MSG_PICTMOVE]] message to the clients in the room with the picture, informing them of the event. In both directions the message is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_pictMove struct:
+  struct Msg_pictMove {
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[NonPrimitive_Types#HotspotID|HotspotID]] spotID;
+    [[NonPrimitive_Types#Point|Point]] pos;
+  }
+
+* roomID is the [[NonPrimitive_Types#RoomID|RoomID]] of the room containing the picture to be moved.
+* spotID is the [[NonPrimitive_Types#HotspotID|HotspotID]] of the picture itself, in that room.
+* pos is the new position to which the picture is to be relocated.
+
+=MSG_PING=
+
+This message enables one machine to ping another to see if the connection is still alive. It is also sent periodically by the server to each client in the absence of any other message traffic, in order to hold the connection open. The proper behavior in response to a [[#MSG_PING|MSG_PING]] message is a [[#MSG_PONG|MSG_PONG]] message.
+
+The refnum field can carry an arbitrary value. It is not used by the server directly but will be echoed in the corresponding [[#MSG_PONG|MSG_PONG]] message.
+
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_ping {
+  }
+
+=MSG_PONG=
+
+This message is the normal response to a [[#MSG_PING|MSG_PING]] message. On the server it functions as a no-op, but has the side effect of keeping the client-server communications channel active.
+
+The refnum field should echo the contents of the refnum field of the [[#MSG_PING|MSG_PING]] message to which this is a response.
+
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_pong {
+  }
+
+=MSG_PROPDEL=
+
+This message is used to delete a prop from the palace. A client sends a [[#MSG_PROPDEL|MSG_PROPDEL]] message to the server requesting a prop to be deleted. If the operation is successful (for example, all the permission checks succeed), the server sends a matching [[#MSG_PROPDEL|MSG_PROPDEL]] message to the clients in the room with the prop, informing them of the event. In both directions the message is the same.
+The refnum field is not used in this message and should be set to 0.
+The msg field is a Msg_propDel struct:
+  struct Msg_propDel {
+    [[Primitive_Types#sint32|sint32]] propNum;
+  }
+
+* propNum identifies the prop to be deleted (in the same room with the user whose client initiated the operation -- props in a room are numbered from 0 in the order they are added to room). A propNum value of -1 indicates that all props in the room should be deleted. Note that although the value is transmitted in the message as 32-bit quantity, the actual number is limited to a 16-bit quantity.
+
+=MSG_PROPMOVE=
+
+This message is used to change the screen location of a prop. A client sends a [[#MSG_PROPMOVE|MSG_PROPMOVE]] message to the server requesting a prop to be moved. If the operation is successful (for example, all the permissions check succeed), the server sends a matching [[#MSG_PROPMOVE|MSG_PROPMOVE]] message to the clients in the room with the prop, informing them of the event. In both directions the message is the same.
+The refnum field is not used in this message and should be set to 0.
+The msg field is a Msg_propMove struct:
+  struct Msg_propMove {
+    [[Primitive_Types#sint32|sint32]] propNum;
+    [[NonPrimitive_Types#Point|Point]] pos;
+  }
+
+* propNum identifies the prop to be moved (in the same room with the user whose client initiated the operation -- props in a room are numbered from 0 in the order they are added to room). Note that although the value is transmitted in the message as 32-bit quantity, the actual number is limited to a 16-bit quantity.
+* pos is the new screen position for the prop.
+
+=MSG_PROPNEW=
+
+This message is used to add a prop to a room. A client sends a [[#MSG_PROPNEW|MSG_PROPNEW]] message to the server requesting that a prop be added. If the operation is successful (for example, all the permissions check succeed), the server sends a matching [[#MSG_PROPNEW|MSG_PROPNEW]] message to the clients in the room, informing them of the event. In both directions the message is the same.
+The refnum field is not used in this message and should be set to 0.
+The msg field is a Msg_propNew struct:
+  struct Msg_propNew {
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] propSpec;
+    [[NonPrimitive_Types#Point|Point]] pos;
+  }
+
+* propSpec is an [[NonPrimitive_Types#AssetSpec|AssetSpec]] identifying the asset to be used for the prop (the
+* asset type is assumed to be RT_PROP).
+* pos is the initial screen position for the new prop.
+
+=MSG_RMSG=
+
+This message is essentially identical to the [[#MSG_TALK|MSG_TALK]] message. It is sent from the client to the server, and relayed to the other users in the sender's room as a [[#MSG_TALK|MSG_TALK]] message. However, it also sends an additional, special [[#MSG_TALK|MSG_TALK]] message to any superusers (wizards and gods) in the room, flagging the utterance for special attention.
+The refnum field is not used in this message and should be set to 0.
+The msg field is a [[NonPrimitive_Types#CString|CString]] containing the text of the utterance to be spoken:
+  struct Msg_rMsg {
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters.
+
+=MSG_ROOMDESC=
+
+The server sends this message to the client to describe a room upon entry to that room.
+The refnum field is not used in this message and should be set to 0.
+The msg field is a [[NonPrimitive_Types#RoomRec|RoomRec]] struct:
+  struct Msg_roomDesc {
+    [[NonPrimitive_Types#RoomRec|RoomRec]] rec;
+  }
+
+A [[NonPrimitive_Types#RoomRec|RoomRec]] contains lots of information about a room:
+  struct RoomRec {
+    [[Primitive_Types#sint32|sint32]] roomFlags;
+    [[Primitive_Types#sint32|sint32]] facesID;
+    [[Primitive_Types#sint16|sint16]] roomID;
+    [[Primitive_Types#sint16|sint16]] roomNameOfst;
+    [[Primitive_Types#sint16|sint16]] pictNameOfst;
+    [[Primitive_Types#sint16|sint16]] artistNameOfst;
+    [[Primitive_Types#sint16|sint16]] passwordOfst;
+    [[Primitive_Types#sint16|sint16]] nbrHotspots;
+    [[Primitive_Types#sint16|sint16]] hotspotOfst;
+    [[Primitive_Types#sint16|sint16]] nbrPictures;
+    [[Primitive_Types#sint16|sint16]] pictureOfst;
+    [[Primitive_Types#sint16|sint16]] nbrDrawCmds;
+    [[Primitive_Types#sint16|sint16]] firstDrawCmd;
+    [[Primitive_Types#sint16|sint16]] nbrPeople;
+    [[Primitive_Types#sint16|sint16]] nbrLProps;
+    [[Primitive_Types#sint16|sint16]] firstLProp;
+    [[Primitive_Types#sint16|sint16]] reserved;
+    [[Primitive_Types#sint16|sint16]] lenVars;
+    [[Primitive_Types#uint8|uint8]] varBuf[lenVars];
+  }
+
+* roomFlags are various bit flags describing attributes of the room. See the description of the RoomListRec struct (in [[#MSG_LISTOFALLROOMS|MSG_LISTOFALLROOMS]]) for descriptions of these flags.
+* facesID selects one of a preset number of client-defined avatar appearances that should be displayed for the avatar when it is not showing a prop instead.
+* roomID is the ID number of the room on the server.
+* roomNameOfst is the index into varBuf of a [[NonPrimitive_Types#PString|PString]] that is the name of the room.
+* pictNameOfst is the index into varBuf of a [[NonPrimitive_Types#PString|PString]] that is the filename of a picture to use as the room background.
+* artistNameOfst is the index into varBuf of a [[NonPrimitive_Types#PString|PString]] that is the name of the artist who created the room.
+* passwordOfst is the index into varBuf of a [[NonPrimitive_Types#PString|PString]] that is the password for the room -- member-created rooms may have passwords for controlling entry to the room.
+* nbrHotspots is the number of hotspots in the room.
+* hotspotOfst is the index into varBuf of the beginning of an array of
+* nbrHotspots [[NonPrimitive_Types#Hotspot|Hotspot]] structs (described below) that describe the hotspots in the room. Note that this array must be aligned on a 4-byte boundary.
+* nbrPictures is the number of pictures in the room
+* pictureOfst is the index into varBuf of the beginning of an array of
+* nbrPictures PictureRec structs (described below) that describe the
+* pictures in the room. Note that this array must be aligned on a 4-byte boundary.
+* nbrDrawCmds is the number of draw commands in the room's display list.
+* firstDrawCmd is the index into varBuf of the first of a packed sequence of
+* nbrDrawCmds draw commands (DrawRecord structs and attached data, see [[#MSG_DRAW|MSG_DRAW]]). Note that these records must be aligned on 4-byte boundaries.
+* nbrPeople is the number of users currently in the room.
+* nbrLProps is the number of props in the room.
+* firstLProp is the index into varBuf of the beginning of an array of
+* nbrLProps LPropRec structs (described below) that describe the props in the room. Note that this array must be aligned on a 4-byte boundary.
+* reserved is a filler block to maintain field alignment. It should be set to 0 .
+* varBuf is an array of lenVars bytes of variable-length data associated with the [[NonPrimitive_Types#RoomRec|RoomRec]], as described above
+The [[NonPrimitive_Types#Hotspot|Hotspot]] struct describes a hotspot, a clickable piece of screen real estate with a script that runs in response to various events:
+  struct Hotspot {
+    [[Primitive_Types#sint32|sint32]] scriptEventMask;
+    [[Primitive_Types#sint32|sint32]] flags;
+    [[Primitive_Types#sint32|sint32]] secureInfo;
+    [[Primitive_Types#sint32|sint32]] refCon;
+    [[NonPrimitive_Types#Point|Point]] loc;
+    [[Primitive_Types#sint16|sint16]] id;
+    [[Primitive_Types#sint16|sint16]] dest;
+    [[Primitive_Types#sint16|sint16]] nbrPts;
+    [[Primitive_Types#sint16|sint16]] ptsOfst;
+    [[Primitive_Types#sint16|sint16]] type;
+    [[Primitive_Types#sint16|sint16]] groupID;
+    [[Primitive_Types#sint16|sint16]] nbrScripts;
+    [[Primitive_Types#sint16|sint16]] scriptRecOfst;
+    [[Primitive_Types#sint16|sint16]] state;
+    [[Primitive_Types#sint16|sint16]] nbrStates;
+    [[Primitive_Types#sint16|sint16]] stateRecOfst;
+    [[Primitive_Types#sint16|sint16]] nameOfst;
+    [[Primitive_Types#sint16|sint16]] scriptTextOfst;
+    [[Primitive_Types#sint16|sint16]] alignReserved;
+  }
+
+* scriptEventMask is a set of bit flags that encode what events this hotspot responds to:
+** PE_Select 0x00000001
+** PE_Lock 0x00000002
+** PE_Unlock 0x00000004
+** PE_Hide 0x00000008
+** PE_Show 0x00000010
+** PE_Startup 0x00000020
+** PE_Alarm 0x00000040
+** PE_Custom 0x00000080
+** PE_InChat 0x00000100
+** PE_PropChange 0x00000200
+** PE_Enter 0x00000400
+** PE_Leave 0x00000800
+** PE_OutChat 0x00001000
+** PE_SignOn 0x00002000
+** PE_SignOff 0x00004000
+** PE_Macro0 0x00008000
+** PE_Macro1 0x00010000
+** PE_Macro2 0x00020000
+** PE_Macro3 0x00040000
+** PE_Macro4 0x00080000
+** PE_Macro5 0x00100000
+** PE_Macro6 0x00200000
+** PE_Macro7 0x00400000
+** PE_Macro8 0x00800000
+** PE_Macro9 0x01000000
+* flags are various flag bits characterizing the hotspot <these are unused on the server>.
+* secureInfo is a variable whose purpose in unclear. <It is not used.>
+* refCon is an arbitrary use variable. <It is not used.>
+* loc is the location of the hotspot
+* id is the hotspot's ID number.
+* dest is the [[NonPrimitive_Types#RoomID|RoomID]] of the destination when the hotspot is a door, or the [[NonPrimitive_Types#HotspotID|HotspotID]] of a door when the hotspot is a bolt. nbrPts is the number of Points which describe the outline of the hotspot's click zone.
+* ptsOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBuf array of an array of
+* nbrPts Points describing the outline of the hotspot's click zone.
+* type encodes the type of hotspot, for navigation purposes:
+** HS_Normal 0 just a script holder
+** HS_Door 1 a door
+** HS_ShutableDoor 2 a door that can be opened/closed (by clicking)
+** HS_LockableDoor 3 a door that can be locked
+** HS_Bolt 4 bolt that locks or unlocks door pointed to by dest
+** HS_NavArea 5 hotspot defines screen area where movement is allowed
+* groupID is some kind of group identification number. <It is not used.>
+* nbrScripts is the number of scripts associated with the hotspot.
+* scriptRecOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBuf array of an array of nbrScripts structs that describe the hotspot's scripts. state encodes the hotspot's state. The state selects which of the pictures associated with the hotspot should be displayed. Among other things, it encodes whether a door is locked or unlocked:
+** HS_Unlock 0
+** HS_Lock 1
+* nbrStates is the number of states (with pictures and corresponding StateRec structs) associated with the hotspot.
+* stateRecOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBuf array of an array of
+* nbrStates StateRec structs (described below). There is one entry for each of the hotspot's state pictures.
+* nameOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBuf array of a [[NonPrimitive_Types#PString|PString]] that is the hotspot's name.
+* scriptTextOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBar array of a [[NonPrimitive_Types#CString|CString]] that is the script associated with this hotspot.
+* alignReserved is a filler block to maintain field alignment. It should be set to 0 <and oughtn't be sent over the wire>.
+The StateRec struct describes one of the pictures associated with a hotspot; an array of them is pointed to by the hotspot's stateRecOfst field:
+  struct StateRec {
+    [[Primitive_Types#sint16|sint16]] pictID;
+    [[Primitive_Types#sint16|sint16]] reserved;
+    [[NonPrimitive_Types#Point|Point]] picLoc; /* offset from hotspot->loc */
+  }
+
+* pictID is a picture ID number.
+* reserved is presumably a filler block for alignment.
+* picLoc is a screen location, interpreted as an offset value from the [[NonPrimitive_Types#Point|Point]] in the hotspot's loc field.
+
+The PictureRec struct describes a picture:
+  struct PictureRec {
+    [[Primitive_Types#sint32|sint32]] refCon;
+    [[Primitive_Types#sint16|sint16]] picID;
+    [[Primitive_Types#sint16|sint16]] picNameOfst;
+    [[Primitive_Types#sint16|sint16]] transColor;
+    [[Primitive_Types#sint16|sint16]] reserved;
+  }
+
+* refCon is an arbitrary use variable. <It is not used
+* picID is the ID number for the picture.
+* picNameOfst is the index into the [[NonPrimitive_Types#RoomRec|RoomRec's]] varBuf array of a PString
+* that is the name of the picture.
+* transColor is the color value that should be interpreted as transparent in the picture.
+* reserved is a filler block to maintain field alignment. It should be set to 0, and oughtn't be sent over the wire>. The LPropRec struct describes a prop:
+  struct LPropRec {
+    [[NonPrimitive_Types#LLRec|LLRec]] link;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] propSpec;
+    [[Primitive_Types#sint32|sint32]] flags;
+    [[Primitive_Types#sint32|sint32]] refCon;
+    [[NonPrimitive_Types#Point|Point]] loc;
+  }
+
+* link is an [[NonPrimitive_Types#LLRec|LLRec]] struct, as described above. It is used internally and has no purpose when sent over wire
+* propSpec identifies the asset that should be used to represent the prop on the client's screen.
+* flags are various flag bits characterizing the prop, used on the client.
+* refCon is an arbitrary use variable, used by the client.
+* loc is the screen location at which the prop should be displayed.
+
+=MSG_ROOMDESCEND=
+
+The server sends this message to the client when it has completed transmission of a room to the client (that is, after it has send the [[#MSG_ROOMDESC|MSG_ROOMDESC]] and [[#MSG_USERLIST|MSG_USERLIST]] messages that describe the room).
+
+The refnum field is not used in this message and should be set to 0.
+
+There are no parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_roomDescEnd {
+  }
+
+=MSG_ROOMGOTO=
+
+The client sends this message to the server to request that the user move to a different room. If the operation is successful (for example, all the permission checks succeed), the server sends the following:
+* a [[#MSG_USEREXIT|MSG_USEREXIT]] message to the other users in the old room informing them of the departure
+* a [[#MSG_USERNEW|MSG_USERNEW]] message to the other users in the new room informing them of the arrival
+* a series of messages to the requestor client describing the new room (MSG_ROOMDESC, then [[#MSG_USERLIST|MSG_USERLIST]], then [[#MSG_ROOMDESCEND|MSG_ROOMDESCEND]], then possibly one or more [[#MSG_DISPLAURL|MSG_DISPLAURL]] messages).
+If the operation fails, the server responds with a [[#MSG_NAVERROR|MSG_NAVERROR]] message.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field identifies the desired destination room:
+  struct Msg_roomGoto {
+    [[NonPrimitive_Types#RoomID|RoomID]] dest;
+  }
+
+=MSG_ROOMNEW=
+
+The client sends this message to the server to request that the server create a new (empty) room. If the operation is successful (for example, all the permission checks succeed), the user is moved to the new room as if the client had issued a [[#MSG_ROOMGOTO|MSG_ROOMGOTO]] request. If the operation fails, the server responds with a [[#MSG_NAVERROR|MSG_NAVERROR]] message.
+
+The new room will have a standard default arrangement, whose details are outside the scope of this protocol.
+
+The refnum field is not used in this message and should be set to 0.
+
+There are no parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_roomNew {
+  }
+
+=MSG_ROOMSETDESC=
+
+This message is used to transmit a revised description of a room. A client sends a [[#MSG_ROOMSETDESC|MSG_ROOMSETDESC]] message to the server to request that the room description be replaced. If the operation is successful, the server sends a matching [[#MSG_ROOMSETDESC|MSG_ROOMSETDESC]] message to the clients in the room. The server also sends [[#MSG_ROOMSETDESC|MSG_ROOMSETDESC]] messages of its own in response to other events which revise or replace the description of a room. In both directions the message format is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field contains a [[NonPrimitive_Types#RoomRec|RoomRec]] struct:
+  struct Msg_roomSetDesc {
+    [[NonPrimitive_Types#RoomRec|RoomRec]] rec;
+  }
+
+The [[NonPrimitive_Types#RoomRec|RoomRec]] struct is described above in [[#MSG_ROOMDESC|MSG_ROOMDESC]].
+
+=MSG_SERVERDOWN=
+
+The server sends this message to the client to inform the client that the server is dropping the connection. From the message name you would think this is used to inform the user that the server is going down, but it is actually used when users are kicked of the system for some reason.
+
+The refnum field contains an encoding of the reason the connection is being dropped:
+* K_Unknown 0
+* K_LoggedOff 1
+* K_CommError 2
+* K_Flood 3
+* K_KilledByPlayer 4
+* K_ServerDown 5
+* K_Unresponsive 6
+* K_KilledBySysop 7
+* K_ServerFull 8
+* K_InvalidSerialNumber 9
+* K_DuplicateUser 10
+* K_DeathPenaltyActive 11
+* K_Banished 12
+* K_BanishKill 13
+* K_NoGuests 14
+* K_DemoExpired 15
+* K_Verbose 16
+
+If the refnum value is K_Verbose, the msg field contains a [[NonPrimitive_Types#CString|CString]] with a textual message. Otherwise, the length field should be 0 and the msg field should be empty:
+  struct Msg_serverDown {
+    [[NonPrimitive_Types#CString|CString]] whyMessage;
+  }
+
+=MSG_SERVERINFO=
+
+The server sends this message to the client to describe various characteristics of the server to it. It is sent as part of the series of messages that the server sends during logon. It can also be sent as a result of an operator directive (god command).
+
+The refnum field is the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the message is sent.
+
+The msg field is a Msg_serverInfo struct:
+  struct Msg_serverInfo {
+    [[Primitive_Types#sint32|sint32]] serverPermissions;
+    [[NonPrimitive_Types#Str63|Str63]] serverName;
+    [[Primitive_Types#uint32|uint32]] serverOptions;
+    [[Primitive_Types#uint32|uint32]] ulUploadCaps;
+    [[Primitive_Types#uint32|uint32]] ulDownloadCaps;
+  }
+
+* serverPermissions are various bits describing the "rules" that the server currently has in force:
+** PM_AllowGuests 0x0001 guests may use this server
+** PM_AllowCyborgs 0x0002 clients can use cyborg.ipt scripts
+** PM_AllowPainting 0x0004 clients may issue draw commands
+** PM_AllowCustomProps 0x0008 clients may select custom props
+** PM_AllowWizards 0x0010 wizards can use this server
+** PM_WizardsMayKill 0x0020 wizards can kick off users
+** PM_WizardsMayAuthor 0x0040 wizards can create rooms
+** PM_PlayersMayKill 0x0080 normal users can kick each other off
+** PM_CyborgsMayKill 0x0100 scripts can kick off users
+** PM_DeathPenalty 0x0200
+** PM_PurgeInactiveProps 0x0400 server discards unused props
+** PM_KillFlooders 0x0800 users dropped if they do too much too fast
+** PM_NoSpoofing 0x1000 command to speak as another is disabled
+** PM_MemberCreatedRooms 0x2000 users can create rooms
+* serverName is the name of the server.
+* serverOptions are various bits describing the configuration of the server:
+** SO_SaveSessionKeys 0x00000001 server logs regcodes of users (obsolete)
+** SO_PasswordSecurity 0x00000002 you need a password to use this server
+** SO_ChatLog 0x00000004 server logs all chat
+** SO_NoWhisper 0x00000008 whisper command disabled
+** SO_AllowDemoMembers 0x00000010 obsolete
+** SO_Authenticate 0x00000020
+** SO_PoundProtect 0x00000040 server employs heuristics to evade hackers
+** SO_SortOptions 0x00000080
+** SO_AuthTrackLogoff 0x00000100 server logs logoffs
+** SO_JavaSecure 0x00000200 server supports Java client's auth. scheme
+* ulUploadCaps indicates the server's capabilities with respect to uploading assets and files. See the description of the identically named field of the AuxRegistrationRec struct above in [[#MSG_LOGON|MSG_LOGON]] for information on the values that go in this field.
+* ulDownloadCaps indicates the server's capabilities with respect to downloading assets and files. See the description of the identically named field of the AuxRegistrationRec struct above in [[#MSG_LOGON|MSG_LOGON]] for information on the values that go in this field.
+
+=MSG_SMSG=
+
+The client sends this message to communicate with the superuser(s) (gods and wizards), i.e., a speech utterance is delivered to all the superusers on the system, together with the identity and room name of the sender. The server relays the text to the superusers using [[#MSG_TALK|MSG_TALK]] messages.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#CString|CString]] containing the text of the utterance to be spoken:
+  struct Msg_sMsg {
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters. Moreover, the superusers will only see the first 168 characters due to the space needed for identification text which the server inserts.
+
+=MSG_SPOTDEL=
+
+The client sends this message to the server to request that a hotspot be deleted from the current room. If the operation is successful (for example, all the permission checks succeed), the server replaces the room with a new room that lacks the indicated hotspot.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field identifies hotspot whose demise is desired:
+  struct Msg_spotDel {
+    [[NonPrimitive_Types#HotspotID|HotspotID]] spotID;
+  }
+
+=MSG_SPOTMOVE=
+
+This message is used to modify the screen location of a hotspot. A client sends a [[#MSG_SPOTMOVE|MSG_SPOTMOVE]] message to the server requesting a hotspot be moved. If the operation is successful (for example, all the permission checks succeed), the server sends a matching [[#MSG_SPOTMOVE|MSG_SPOTMOVE]] message to the clients in the room with the hotspot, informing them of the event. In both directions the message is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_spotMove struct:
+  struct Msg_spotMove {
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[NonPrimitive_Types#HotspotID|HotspotID]] spotID;
+    [[NonPrimitive_Types#Point|Point]] pos;
+  }
+
+* roomID is the [[NonPrimitive_Types#RoomID|RoomID]] of the room containing the hotspot to be moved.
+* spotID is the [[NonPrimitive_Types#HotspotID|HotspotID]] of the hotspot itself, in that room.
+* pos is the new position to which the hotspot is to be relocated.
+
+=MSG_SPOTNEW=
+
+The client sends this message to the server to request that a hotspot be created in the current room. If the operation is successful (for example, all the permission checks succeed), the server replaces the room with a new room that contains the new hotspot.
+
+The new hotspot will have a standard, default configuration, whose details are outside the scope of this protocol.
+
+The refnum field is not used in this message and should be set to 0.
+
+There are no parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_spotNew {
+  }
+
+=MSG_SPOTSTATE=
+
+This message is used to modify the state field of a hotspot. A client sends a [[#MSG_SPOTSTATE|MSG_SPOTSTATE]] message to the server requesting the change. If the oepration is successful, the server sends a matching [[#MSG_SPOTSTATE|MSG_SPOTSTATE]] message to the clients in the room with the hotspot, informing them of the event. In both directions the message is the same.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a Msg_spotState struct:
+  struct Msg_spotState {
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[NonPrimitive_Types#HotspotID|HotspotID]] spotID;
+    [[Primitive_Types#sint16|sint16]] state;
+  }
+
+* roomID is the [[NonPrimitive_Types#RoomID|RoomID]] of the room containing the hotspot whose state is to be changed.
+* spotID is the [[NonPrimitive_Types#HotspotID|HotspotID]] of the hotspot itself, in that room. state is the new value for the hotspot's state field.
+
+=MSG_SUPERUSER=
+
+The client sends this message to the server in order to enter superuser (wizard or god) mode, providing the password to do so. If the password matches (and the server distinguishes between wizard and god mode by which password it matches), the server notifies the client of success with a [[#MSG_USERSTATUS|MSG_USERSTATUS]] message.
+
+The refnum field is not used in this message and should be set to 0.
+
+The msg field is a [[NonPrimitive_Types#PString|PString]] containing the password for the superuser mode desired:
+  struct Msg_superuser {
+    [[NonPrimitive_Types#PString|PString]] password;
+  }
+
+=MSG_TALK=
+
+This message is used to utter word balloon speech in the Palace. A client sends a [[#MSG_TALK|MSG_TALK]] message to the server with text to be spoken. If the server is happy with the text, it sends a matching [[#MSG_TALK|MSG_TALK]] message to the clients in the room with the speaker. In both directions the message format is the same. The [[#MSG_TALK|MSG_TALK]] message is also used by the server to issue spoken text of a variety of different kinds in a variety of different circumstances.
+
+The refnum field can carry an arbitrary value. It is not used by the server directly but will be echoed in the relayed [[#MSG_TALK|MSG_TALK]] message. [[#MSG_TALK|MSG_TALK]] messages generated by the server endogenously will set this field to 0. Clients which receive [[#MSG_TALK|MSG_TALK]] message interpret the refnum field as the [[NonPrimitive_Types#UserID|UserID]] of the person who is talking.
+
+The msg field is a [[NonPrimitive_Types#CString|CString]] containing the text of the utterance to be spoken:
+  struct Msg_talk {
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters.
+
+=MSG_TIYID=
+
+When a client connects to the server, the first thing the server does is send a [[#MSG_TIYID|MSG_TIYID]] message. The message informs the client as to its [[NonPrimitive_Types#UserID|UserID]] ("TIYID" stands for "This Is Your ID"). The byte ordering of the eventType field also informs the client as to the server's native endianess, so that it can adapt appropriately -- the client is responsible for all the work of coping with client/server endianess mismatch.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] that the client should use.
+
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_tiyid {
+  }
+
+=MSG_USERCOLOR=
+
+This message is used to change the color of a user's avatar. A client sends a [[#MSG_USERCOLOR|MSG_USERCOLOR]] message to the server requesting the change. If the operation is successful, the server sends a matching [[#MSG_USERCOLOR|MSG_USERCOLOR]] message to the other clients in the room, informing them of the event. In both directions the message format is the same.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user whose color is being changed (this is ignored by the server but meaningful when received by the client).
+
+The msg field indicates what the new color is supposed to be:
+  struct Msg_userColor {
+    [[Primitive_Types#sint16|sint16]] colorNbr;
+  }
+
+* colorNbr is a number in the range 0-15.
+
+=MSG_USERDESC=
+
+This message is used to change a number of aspects of a user's appearance all at once. A client sends a [[#MSG_USERDESC|MSG_USERDESC]] message to the server requesting the changes. If the operation is successful, the server sends a matching [[#MSG_USERDESC|MSG_USERDESC]] message to the other clients in the room, informing them of the event. In both directions the message format is the same.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user whose appearance is being changed (this is ignored by the server but meaningful when received by the client).
+
+The msg field is a Msg_userDesc struct:
+  struct Msg_userDesc {
+    [[Primitive_Types#sint16|sint16]] faceNbr;
+    [[Primitive_Types#sint16|sint16]] colorNbr;
+    [[Primitive_Types#sint32|sint32]] nbrProps;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] props[nbrProps];
+  }
+
+* faceNbr is a number in the range 0-15 that indicates which face the user wishes to display (see 3.48 [[#MSG_USERFACE|MSG_USERFACE]]).
+* colorNbr is a number in the range 0-15 that indicates the user's color (see [[#MSG_USERCOLOR|MSG_USERCOLOR]]).
+* nbrProps is a number in the range 0-9 that indicates how many props the user has.
+* props is an array of nbrProps AssetSpecs which indicates the assets (RT_PROPs, in this case) to use for the props.
+
+=MSG_USEREXIT=
+
+This message is sent from the server to the client to inform the client that a (different) user has left the room that the client is in.
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user who left the room.
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_userExit {
+  }
+
+=MSG_USERFACE=
+
+This message is used to change the face that a user's avatar is displaying. A client sends a [[#MSG_USERFACE|MSG_USERFACE]] message to the server requesting the change. If the operation is successful, the server sends a matching [[#MSG_USERFACE|MSG_USERFACE]] message to the other clients in the room, informing them of the event. In both directions the message format is the same. The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user whose face is being changed (this is ignored by the server but meaningful when received by the client).
+
+The msg field indicates what the new face is supposed to be:
+  struct Msg_userFace {
+    [[Primitive_Types#sint16|sint16]] faceNbr;
+  }
+
+* faceNbr is a number in the range 0-15 selecting the face that is desired.
+
+=MSG_USERLIST=
+
+This message is sent from the server to the client as part of the process of entry to a room. It informs the client about the users in a room.
+
+The refnum fields contains the number of users in the room.
+
+The msg field contains an array of [[NonPrimitive_Types#UserRec|UserRec]] structs, one for each user:
+  struct Msg_userList {
+    [[NonPrimitive_Types#UserRec|UserRec]] users[];
+  }
+
+The UserRec struct describes a user in the room:
+  struct UserRec {
+    [[NonPrimitive_Types#UserID|UserID]] userID;
+    [[NonPrimitive_Types#Point|Point]] roomPos;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] propSpec[9];
+    [[NonPrimitive_Types#RoomID|RoomID]] roomID;
+    [[Primitive_Types#sint16|sint16]] faceNbr;
+    [[Primitive_Types#sint16|sint16]] colorNbr;
+    [[Primitive_Types#sint16|sint16]] awayFlag;
+    [[Primitive_Types#sint16|sint16]] openToMsgs;
+    [[Primitive_Types#sint16|sint16]] nbrProps;
+    [[NonPrimitive_Types#Str31|Str31]] name;
+  }
+
+* userID is the user's [[NonPrimitive_Types#UserID|UserID]].
+* roomPos is the screen location of the user.
+* propSpec is an array of [[NonPrimitive_Types#AssetSpec|AssetSpecs]] pointing to the props that the user
+* holds <note that the maximal-length array is sent, even though it needn't be>.
+* roomID is the [[NonPrimitive_Types#RoomID|RoomID]] of the room
+* faceNbr is a number in the range 0-15 that indicates the user's face.
+* colorNbr is a number in the range 0-15 that indicates the user's color.
+* awayFlag is a flag that is not used. <not used>
+* openToMsgs is another flag that is not used.
+* nbrProps is the number of props that the user holds (i.e., the length of the part of propSpec that is actually used).
+* name is the user's name.
+
+=MSG_USERLOG=
+
+This message is sent from the server to the client to notify the client that a new
+user has logged onto the server.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user who logged on.
+
+The msg field indicates the revised number of users on the server:
+  struct Msg_userLog {
+    [[Primitive_Types#sint32|sint32]] nbrUsers;
+  }
+
+Normally, this message is sent to everyone in the room with the new user (including the new user). However, it will be sent to every user on the server if the total number of users is small enough or if a long enough time has passed since the last such global notification.
+
+=MSG_USERMOVE=
+
+This message is used to screen location of a user's avatar. A client sends a [[#MSG_USERMOVE|MSG_USERMOVE]] message to the server requesting the change. If the operation is successful, the server sends a matching [[#MSG_USERMOVE|MSG_USERMOVE]] message to the other clients in the room, informing them of the event. In both directions the message format is the same.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user who is moving (this is ignored by the server but meaningful when received by the client).
+
+The msg field indicates what the new position is supposed to be:
+  struct Msg_userMove {
+    [[NonPrimitive_Types#Point|Point]] pos;
+  }
+
+=MSG_USERNAME=
+
+This message is used to change the a user's name. A client sends a [[#MSG_USERNAME|MSG_USERNAME]] message to the server requesting the change. If the operation is successful, the server sends a matching [[#MSG_USERNAME|MSG_USERNAME]] message to the other clients in the room, informing them of the event. If the operation fails, the server sends a [[#MSG_USERNAME|MSG_USERNAME]] back to the requesting client, instructing it to set the user name back to its previous value. In all cases the message format is the same.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user whose face is being changed (this is ignored by the server but meaningful when received by the client).
+
+The msg field contains a [[NonPrimitive_Types#PString|PString]] with the new name:
+  struct Msg_userName {
+    [[NonPrimitive_Types#PString|PString]] name;
+  }
+
+=MSG_USERNEW=
+
+This message is sent from the server to the client to describe a new user who has entered the room.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the new user.
+
+The msg field contains a UserRec struct describing the new user:
+  struct Msg_userNew {
+    UserRec newUser;
+  }
+
+See [[#MSG_USERLIST|MSG_USERLIST]] for a detailed description of the UserRec struct.
+
+=MSG_USERPROP=
+
+This message is used to change a user's props. A client sends a [[#MSG_USERPROP|MSG_USERPROP]] message to the server requesting the change. If the operation is successful, the server sends a matching [[#MSG_USERPROP|MSG_USERPROP]] message to the other clients in the room, informing them of the event. In both directions the message format is the same.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user whose props are being changed (this is ignored by the server but meaningful when received by the client).
+
+The msg field indicates what the new props are supposed to be:
+  struct Msg_userProp {
+    [[Primitive_Types#sint32|sint32]] nbrProps;
+    [[NonPrimitive_Types#AssetSpec|AssetSpec]] props[nbrProps];
+  }
+
+* nbrProps is a number in the range 0-9 that indicates how many props the user now has.
+* props is an array of nbrProps AssetSpecs which indicates the assets (RT_PROPs, in this case) to use for these props.
+
+=MSG_USERSTATUS=
+
+This message is sent from the server to the client to update the client as to the user's status.
+
+The refnum field contains the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the message is sent.
+
+The msg field indicates the new status information:
+  struct Msg_userStatus {
+    [[Primitive_Types#sint16|sint16]] flags;
+  }
+
+* flags is a set of bit flags providing the status information. See the description of the flags field of the UserListRec struct in [[#MSG_LISTOFALLUSERS|MSG_LISTOFALLUSERS]] for a detailed description of the flag bits themselves.
+
+=MSG_VERSION=
+
+This server sends this message to the client to identify the server's version number. It is sent as part of the series of messages that the server sends during logon.
+
+The refnum field contains the server version number. It is encoded with the major version number in the high 16 bits and the minor version number in the low 16 bits.
+
+There are no other parameters in this message, so the length field should be 0 and the msg field should be empty:
+  struct Msg_version {
+  }
+
+=MSG_WHISPER=
+
+This message is similar to the [[#MSG_TALK|MSG_TALK]] message, except that conversation is between individual users. This message has two forms: a client-to-server ("request") form, in which the client requests the server to send speech on its behalf to a particular chosen other user, and a server-to-client ("action") form, in which the server does this. The [[#MSG_WHISPER|MSG_WHISPER]] message is also used by the server to issue private, spoken text of a variety of different kinds in a variety of different circumstances.
+
+In the request form, the refnum field can carry an arbitrary value. It is not used by the server directly but will be echoed in the refnum field of the resulting action form message.
+
+In the request form, the msg field is a Msg_whisper_request struct:
+  struct Msg_whisper_request {
+    [[NonPrimitive_Types#UserID|UserID]] target;
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+* target is the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the whisper should be directed.
+* text is a [[NonPrimitive_Types#CString|CString]] containing the text to be whispered. Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to maximum of 255 characters.
+
+In the action form, the refnum field contains the value of the refnum field from the request which generated the action.The receiving client will interpet this as the [[NonPrimitive_Types#UserID|UserID]] of the person who is whispering [[#MSG_WHISPER|MSG_WHISPER]] messages generated by the server endogenously will set this field to 0.
+
+In the action form, the msg field is simply the [[NonPrimitive_Types#CString|CString]] containing the text to be whispered, omitting the target field:
+  struct Msg_whisper_action {
+    [[NonPrimitive_Types#CString|CString]] text;
+  }
+
+=MSG_XTALK=
+
+This message is used to utter word balloon speech in the Palace, similar to the [[#MSG_TALK|MSG_TALK]] message. The difference is that the text is "encrypted" to inhibit sniffing of the speech over the wire. A client sends a [[#MSG_XTALK|MSG_XTALK]] message to the server with (encrypted) text to be spoken. If the server is happy with the text, it sends a matching [[#MSG_XTALK|MSG_XTALK]] message to the clients in the room with the speaker. In both directions the message format is the same.
+
+The refnum field can carry an arbitrary value. It is not used by the server directly but will be echoed in the relayed [[#MSG_XTALK|MSG_XTALK]] message. Clients which receive [[#MSG_XTALK|MSG_XTALK]] message interpret the refnum field as the [[NonPrimitive_Types#UserID|UserID]] of the person who is talking.
+
+The msg field is a Msg_XTalk struct:
+  struct Msg_xTalk {
+    [[Primitive_Types#sint16|sint16]] len;
+    [[Primitive_Types#char|char]] text[len];
+  }
+
+* len is the length of the text to be spoken.
+* text is the text itself, a [[NonPrimitive_Types#CString|CString]] "encrypted" with the Palace string "encryption" algorithm. Note that although [[NonPrimitive_Types#CString|CStrings]] are self-delimiting, the len field is required because the "encryption" can generated embedded 0 bytes. Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters.
+
+=MSG_XWHISPER=
+
+This message is similar to the [[#MSG_WHISPER|MSG_WHISPER]] message for private conversation between individual users, except that the text is "encrypted" to inhibit sniffing of the speech over the wire. This message has two forms: a client-to-server ("request") form, in which the client requests the server to send speech on its behalf to a particular chosen other user, and a server-to-client ("action") form, in which the server does this.
+
+In the request form, the refnum field can carry an arbitrary value. It is not used by the server directly but will be echoed in the refnum field of the resulting action form message.
+
+In the request form, the msg field is a Msg_xWhisper_request struct:
+  struct Msg_xWhisper_request {
+    [[NonPrimitive_Types#UserID|UserID]] target;
+    [[Primitive_Types#sint16|sint16]] len;
+    [[Primitive_Types#char|char]] text[len];
+  }
+
+* target is the [[NonPrimitive_Types#UserID|UserID]] of the user to whom the whisper should be directed.
+* len is the length of the text to be whispered.
+* text is the text itself, a [[NonPrimitive_Types#CString|CString]] "encrypted" with the Palace string "encryption" algorithm. Note that although [[NonPrimitive_Types#CString|CStrings]] are self-delimiting, the len field is required because the "encryption" can generated embedded 0 bytes.
+
+Although it is a [[NonPrimitive_Types#CString|CString]], the text is limited to a maximum of 255 characters.
+In the action form, the refnum field contains the value of the refnum field from the request which generated the action.The receiving client will interpet this as the [[NonPrimitive_Types#UserID|UserID]] of the person who is whispering.
+
+In the action form, the msg field is similar to the request form, but omits the target field:
+  struct Msg_xWhisper_action {
+    [[Primitive_Types#sint16|sint16]] len;
+    [[Primitive_Types#char|char]] text[len];
+  }
+
+The meanings of the len and text fields are the same as in the request form.

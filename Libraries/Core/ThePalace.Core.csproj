@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_NOOP.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_PICTDEL.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_PICTNEW.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_PICTSETDESC.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_PROPSETDESC.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_RESPORT.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_SERVERUP.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_SPOTSETDESC.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
+    <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
+    <Compile Remove="Types\PatStream.cs" />
+    <Compile Remove="Types\PropPIDSStream.cs" />
+    <Compile Remove="Types\PropPROPSStream.cs" />
+    <Compile Remove="Types\PropPRPStream.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
+    <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
+    <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
+    <None Include="Entities\Network\Unused\MSG_NOOP.cs" />
+    <None Include="Entities\Network\Unused\MSG_PICTDEL.cs" />
+    <None Include="Entities\Network\Unused\MSG_PICTNEW.cs" />
+    <None Include="Entities\Network\Unused\MSG_PICTSETDESC.cs" />
+    <None Include="Entities\Network\Unused\MSG_PROPSETDESC.cs" />
+    <None Include="Entities\Network\Unused\MSG_RESPORT.cs" />
+    <None Include="Entities\Network\Unused\MSG_SERVERUP.cs" />
+    <None Include="Entities\Network\Unused\MSG_SPOTSETDESC.cs" />
+    <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
+    <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
+    <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
+    <None Include="Factories\LockContext.cs" />
+    <None Include="Factories\Singleton.cs" />
+    <None Include="Factories\Tree.cs" />
+    <None Include="Types\PatStream.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.35" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="System.Runtime.Caching" Version="9.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Types\PropPIDSStream.cs" />
+    <None Include="Types\PropPROPSStream.cs" />
+    <None Include="Types\PropPRPStream.cs" />
+  </ItemGroup>
+
+</Project>

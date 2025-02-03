@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Apps", "Apps", "{37029653-83BE-40AF-98EB-C8D7260DDF97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{87223E69-EE01-447D-9200-5A4F0C4472B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{767FC4B6-0F2E-41D2-A031-D1799D08288C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Apps\Sandbox\Sandbox.csproj", "{C8F6B766-480D-47B8-960D-56AE01F1D745}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Network", "Libraries\Network\ThePalace.Network.csproj", "{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\PalaceProtocolRef.pdf = Documentation\PalaceProtocolRef.pdf
+		Documentation\PalaceProtocolRef.txt = Documentation\PalaceProtocolRef.txt
+		Documentation\PalaceProtocolRefWiki.txt = Documentation\PalaceProtocolRefWiki.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Core", "Libraries\Core\ThePalace.Core.csproj", "{957F2D34-5236-46AF-A517-637D1E5A6555}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8F6B766-480D-47B8-960D-56AE01F1D745}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8F6B766-480D-47B8-960D-56AE01F1D745}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8F6B766-480D-47B8-960D-56AE01F1D745}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8F6B766-480D-47B8-960D-56AE01F1D745}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}.Release|Any CPU.Build.0 = Release|Any CPU
+		{957F2D34-5236-46AF-A517-637D1E5A6555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957F2D34-5236-46AF-A517-637D1E5A6555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957F2D34-5236-46AF-A517-637D1E5A6555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957F2D34-5236-46AF-A517-637D1E5A6555}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C8F6B766-480D-47B8-960D-56AE01F1D745} = {37029653-83BE-40AF-98EB-C8D7260DDF97}
+		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
+		{957F2D34-5236-46AF-A517-637D1E5A6555} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
+	EndGlobalSection
+EndGlobal
