@@ -1,6 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces;
 using sint32 = System.Int32;
 
@@ -27,11 +28,11 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
         {
             this.Rooms = [];
 
-            while ((reader.Length - reader.Position) >= 9)
+            while ((reader.Length - reader.Position) >= 12)
             {
-                var item = new ListRec();
-                item.Deserialize(refNum, reader, opts);
-                this.Rooms.Add(item);
+                var room = new ListRec();
+                reader.PalaceDeserialize(room, typeof(ListRec), refNum, opts);
+                this.Rooms.Add(room);
             }
 
             if (this.Rooms.Count != refNum)
@@ -42,7 +43,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
         {
             if ((this.Rooms?.Count ?? 0) > 0)
                 foreach (var room in this.Rooms)
-                    room.Serialize(writer, opts);
+                    writer.PalaceSerialize(room, typeof(ListRec), 0, opts);
         }
     }
 }
