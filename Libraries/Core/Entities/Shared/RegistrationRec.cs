@@ -5,7 +5,6 @@ using RoomID = System.Int16;
 using sint32 = System.Int32;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;
-using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
@@ -30,7 +29,7 @@ namespace ThePalace.Core.Entities.Shared
         public RoomID DesiredRoom;
 
         [ByteSize(6)]
-        public uint8[] Reserved;
+        public string? Reserved;
 
         public uint16 UlRequestedProtocolVersionMajorVersion;
         public uint16 UlRequestedProtocolVersionMinorVersion;

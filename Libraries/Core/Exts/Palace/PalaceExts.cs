@@ -520,7 +520,9 @@ namespace ThePalace.Core.Exts.Palace
                             if (byteSize > 0)
                             {
                                 buffer = new byte[byteSize];
-                                reader.Read(buffer, 0, buffer.Length);
+                                var readCount = reader.Read(buffer, 0, buffer.Length);
+                                if (readCount < 1) continue;
+
 
                                 if (pString is EncryptedStringAttribute)
                                 {
@@ -533,7 +535,8 @@ namespace ThePalace.Core.Exts.Palace
                             if (pString.PaddingModulo > 0 && ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
                             {
                                 buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
-                                reader.Read(buffer, 0, buffer.Length);
+                                var readCount = reader.Read(buffer, 0, buffer.Length);
+                                if (readCount < 1) continue;
                             }
                         }
                         else if (_attrs.Any(a => a is CStringAttribute))
@@ -543,10 +546,9 @@ namespace ThePalace.Core.Exts.Palace
                                 .Select(a => a as CStringAttribute)
                                 .LastOrDefault();
 
-                            var byteCount = 0;
-
                             var stringBytes = new List<byte>();
                             buffer = new byte[1];
+
                             do
                             {
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
@@ -555,13 +557,20 @@ namespace ThePalace.Core.Exts.Palace
 
                                 stringBytes.Add(buffer[0]);
 
-                                byteCount++;
-                            } while (byteCount <= cString.MaxStringLength);
+                            } while (stringBytes.Count <= cString.MaxStringLength);
 
                             if (byteSize > 0)
                             {
                                 _cb(member, stringBytes.GetString());
                             }
+                        }
+                        else if (byteSize > 0)
+                        {
+                            buffer = new byte[byteSize];
+                            var readCount = reader.Read(buffer, 0, buffer.Length);
+                            if (readCount < 1) continue;
+
+                            _cb(member, buffer.GetString());
                         }
 
                         continue;
@@ -570,7 +579,8 @@ namespace ThePalace.Core.Exts.Palace
                         if (byteSize > 0)
                         {
                             buffer = new byte[byteSize];
-                            reader.Read(buffer, 0, buffer.Length);
+                            var readCount = reader.Read(buffer, 0, buffer.Length);
+                            if (readCount < 1) continue;
 
                             _cb(member, buffer);
                         }
@@ -787,6 +797,12 @@ namespace ThePalace.Core.Exts.Palace
                             buffer = _str.GetBytes();
                             writer.Write(buffer, 0, buffer.Length);
                             writer.Write([(byte)0]);
+                        }
+                        else if (byteSize > 0)
+                        {
+                            buffer = _str.GetBytes(byteSize);
+
+                            writer.Write(buffer, 0, buffer.Length);
                         }
 
                         continue;

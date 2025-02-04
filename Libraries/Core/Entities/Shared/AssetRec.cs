@@ -27,14 +27,15 @@ namespace ThePalace.Core.Entities.Shared
 
         public LegacyAssetTypes Type;
         public AssetSpec AssetSpec;
-        public sint32 RHandle;
         public sint32 BlockOffset;
         public uint32 BlockSize;
-        public sint32 LastUseTime;
-        public sint32 NameOffset;
         public uint16 BlockNbr;
         public uint16 NbrBlocks;
         public AssetDescriptorRec Desc;
+
+        //public sint32 RHandle;
+        //public sint32 LastUseTime;
+        //public sint32 NameOffset;
 
         public bool ValidateCrc() => (Data?.Length ?? 0) < 1 ? false : Cipher.ComputeCrc(Data, 0, true) == AssetSpec.Crc;
         public bool ValidateCrc(uint crc) => Cipher.ComputeCrc(Data, 0, true) == crc;

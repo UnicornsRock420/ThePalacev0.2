@@ -4,32 +4,32 @@ using ThePalace.Core.Attributes;
 namespace ThePalace.Core.Enums
 {
     [Flags]
-    [ByteSize(2)]
-    public enum RoomFlags : short
+    [ByteSize(4)]
+    public enum RoomFlags : int
     {
         None = 0,
-        RF_AuthorLocked = 0x0001,
+        AuthorLocked = 0x0001,
         [Description("PRIVATE")]
-        RF_Private = 0x0002,
+        Private = 0x0002,
         [Description("NOPAINTING")]
-        RF_NoPainting = 0x0004,
-        RF_Closed = 0x0008,
+        NoPainting = 0x0004,
+        Closed = 0x0008,
         [Description("NOCYBORGS")]
-        RF_CyborgFreeZone = 0x0010,
+        CyborgFreeZone = 0x0010,
         [Description("HIDDEN")]
-        RF_Hidden = 0x0020,
+        Hidden = 0x0020,
         [Description("NOGUESTS")]
-        RF_NoGuests = 0x0040,
+        NoGuests = 0x0040,
         [Description("OPERATORSONLY")]
-        RF_WizardsOnly = 0x0080,
+        WizardsOnly = 0x0080,
         [Description("DROPZONE")]
-        RF_DropZone = 0x0100,
+        DropZone = 0x0100,
         [Description("NOLOOSEPROPS")]
         RF_NoLooseProps = 0x0200,
     };
 
     [ByteSize(4)]
-    public enum NavErrors : uint
+    public enum NavErrors : int
     {
         SE_InternalError = 0,
         SE_RoomUnknown = 1,

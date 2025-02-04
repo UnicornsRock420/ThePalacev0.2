@@ -2,7 +2,7 @@
 
 namespace ThePalace.Core.Attributes
 {
-    public class CStringAttribute(sint32 maxStringLength = 0) : Attribute
+    public class CStringAttribute(sint32 maxStringLength = 0x7FFF) : Attribute
     {
         private readonly sint32 _maxStringLength = maxStringLength;
 
