@@ -8,7 +8,7 @@ using uint8 = System.Byte;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(10)]
-    public partial class DrawCmdRec : RawData, IDisposable, IData
+    public partial class DrawCmdRec : RawData, IStruct
     {
         public DrawCmdRec()
         {

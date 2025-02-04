@@ -1,7 +1,7 @@
 ﻿namespace ThePalace.Core.Enums
 {
     [Flags]
-    public enum EncryptedStringOptions : byte
+    public enum EncryptedStringOptions : short
     {
         None = 0,
         EncryptString = 0x01,

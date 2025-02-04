@@ -153,17 +153,11 @@ namespace System
             return true;
         }
 
-        public static TCast As<TCast>(this object obj, TCast defaultValue = default(TCast))
-        {
-            try
-            {
-                return (TCast)obj;
-            }
-            catch
-            {
-                return defaultValue;
-            }
-        }
+        //public static IEnumerable<TCast> As<TCast>(this object[] obj) => obj.Cast<TCast>();
+        //public static TCast As<TCast>(this object obj) =>
+        //    (new object[] { obj })
+        //        .Cast<TCast>()
+        //        .FirstOrDefault() ?? default(TCast);
 
         public static T Clone<T>(this T obj, params string[]? ignorePropertyNames)
         {

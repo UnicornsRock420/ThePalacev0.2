@@ -6,7 +6,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(40)]
-    public partial class AssetDescriptorRec : IProtocol
+    public partial class AssetDescriptorRec : IStruct
     {
         public uint16 AssetFlags;
         public uint16 PropFlags;

@@ -68,9 +68,9 @@ namespace System
             var type = typeof(T);
             switch (type)
             {
-                case Type _t when _t == StringExts.Types.String: return value.As<T>();
+                case Type _t when _t == StringExts.Types.String: return (T)(object)value;
                 case Type _t when _t == EnumExts.Types.Enum:
-                    if (Enum.TryParse(type, value, true, out var enumValue)) return enumValue.As<T>();
+                    if (Enum.TryParse(type, value, true, out var enumValue)) return (T)(object)enumValue;
                     else if (!DICTIONARY_ENUM_TYPE_CONVERSION_CACHE.ContainsKey(type))
                     {
                         var enumValues = Enum
@@ -85,10 +85,10 @@ namespace System
                         else DICTIONARY_ENUM_TYPE_CONVERSION_CACHE.Add(type, enumValues);
                     }
                     if (!DICTIONARY_ENUM_TYPE_CONVERSION_CACHE[type].ContainsKey(value)) return defaultValue;
-                    else return DICTIONARY_ENUM_TYPE_CONVERSION_CACHE[type][value].As<T>();
+                    else return (T)(object)DICTIONARY_ENUM_TYPE_CONVERSION_CACHE[type][value];
                 case Type _t when _t == DateTimeExts.Types.DateTime:
                     if (!s.IsNullOrWhiteSpace(format) &&
-                        DateTime.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var datetimeValue)) return datetimeValue.As<T>();
+                        DateTime.TryParseExact(value, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var datetimeValue)) return (T)(object)datetimeValue;
                     goto default;
                 case Type _t when _t == TimeSpanExts.Types.TimeSpan:
                     var chars = value.Trim().ToLowerInvariant().ToCharArray();
@@ -99,23 +99,23 @@ namespace System
                     if (uLength < 1) goto default;
                     var units0 = units[0];
                     value = chars[0..(cLength - 1)].TakeWhile(c => (units0 != 't' && c == '.') || char.IsDigit(c)).GetString();
-                    if (units0 == 't' && l.TryParse(value, out var longValue)) return ts.FromTicks(longValue).As<T>();
+                    if (units0 == 't' && l.TryParse(value, out var longValue)) return (T)(object)ts.FromTicks(longValue);
                     if (db.TryParse(value, out var doubleValue))
                         switch (units0)
                         {
-                            case 'd': return ts.FromDays(doubleValue).As<T>();
-                            case 'h': return ts.FromHours(doubleValue).As<T>();
+                            case 'd': return (T)(object)ts.FromDays(doubleValue);
+                            case 'h': return (T)(object)ts.FromHours(doubleValue);
                             case 'm':
-                                if (uLength > 1 && units[1] == 's') return ts.FromMilliseconds(doubleValue).As<T>();
-                                else return ts.FromMinutes(doubleValue).As<T>();
-                            case 's': return ts.FromSeconds(doubleValue).As<T>();
-                            case 'w': return ts.FromDays(doubleValue * 7).As<T>();
+                                if (uLength > 1 && units[1] == 's') return (T)(object)ts.FromMilliseconds(doubleValue);
+                                else return (T)(object)ts.FromMinutes(doubleValue);
+                            case 's': return (T)(object)ts.FromSeconds(doubleValue);
+                            case 'w': return (T)(object)ts.FromDays(doubleValue * 7);
                         }
                     goto default;
                 default:
                     var typeID = type.TypeID();
-                    if (IREADONLYDICTIONARY_CONVERT_DELEGATES.ContainsKey(typeID)) foreach (var func in IREADONLYDICTIONARY_CONVERT_DELEGATES[typeID]) try { return func(value).As<T>(); } catch { }
-                    try { return c.ChangeType(value, type, CultureInfo.InvariantCulture).As<T>(); } catch { }
+                    if (IREADONLYDICTIONARY_CONVERT_DELEGATES.ContainsKey(typeID)) foreach (var func in IREADONLYDICTIONARY_CONVERT_DELEGATES[typeID]) try { return (T)(object)func(value); } catch { }
+                    try { return (T)(object)c.ChangeType(value, type, CultureInfo.InvariantCulture); } catch { }
                     return defaultValue;
             }
         }

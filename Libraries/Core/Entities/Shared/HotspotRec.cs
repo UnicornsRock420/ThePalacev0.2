@@ -9,7 +9,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(48)]
-    public partial class HotspotRec : IProtocol
+    public partial class HotspotRec : IStruct
     {
         public HotSpotEventMask ScriptEventMask;
         public HotspotFlags Flags;

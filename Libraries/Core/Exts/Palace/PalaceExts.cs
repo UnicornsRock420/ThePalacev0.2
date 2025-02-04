@@ -406,9 +406,9 @@ namespace ThePalace.Core.Exts.Palace
         {
             if (obj == null ||
                 objType == null ||
-                !(obj is IProtocol)) return;
+                !(obj is IStruct)) return;
 
-            if (obj.Is<IProtocolSerializer>(out var serializer))
+            if (obj.Is<IStructSerializer>(out var serializer))
             {
                 serializer.Deserialize(refNum, reader, opts);
 
@@ -419,10 +419,10 @@ namespace ThePalace.Core.Exts.Palace
 
             var members = objType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .As<MemberInfo[]>()
+                .Cast<MemberInfo>()
                 .Union(objType
                     .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                    .As<MemberInfo[]>())
+                    .Cast<MemberInfo>())
                 .ToList();
 
             foreach (var member in members)
@@ -523,10 +523,26 @@ namespace ThePalace.Core.Exts.Palace
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
                                 if (readCount < 1) continue;
 
-
-                                if (pString is EncryptedStringAttribute)
+                                if (pString is EncryptedStringAttribute _esAttrib)
                                 {
-                                    buffer = buffer.DecryptBytes();
+                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    {
+                                        buffer = buffer.GetString().FromHex();
+                                    }
+
+                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    {
+                                        buffer = buffer.DecryptBytes();
+                                    }
+                                    else if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    {
+                                        buffer = buffer.EncryptBytes();
+                                    }
+
+                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    {
+                                        buffer = buffer.ToHex().GetBytes();
+                                    }
                                 }
 
                                 _cb(member, buffer.GetString());
@@ -587,7 +603,7 @@ namespace ThePalace.Core.Exts.Palace
 
                         continue;
 
-                    case Type _t when _t is IProtocol:
+                    case Type _t when _t is IStruct:
                         {
                             result = _t.GetInstance();
 
@@ -597,7 +613,7 @@ namespace ThePalace.Core.Exts.Palace
                             }
                             else
                             {
-                                reader.PalaceDeserialize(refNum, result, _type);
+                                reader.PalaceDeserialize(refNum, result, _type, opts);
                             }
                         }
 
@@ -648,13 +664,13 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceDeserialize<TProtocol>(this Stream reader, int refNum, TProtocol? obj, SerializerOptions opts = SerializerOptions.None)
-            where TProtocol : IProtocol
+        public static void PalaceDeserialize<TStruct>(this Stream reader, int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+            where TStruct : IStruct
         {
             if (obj == null) return;
 
             var objType = obj.GetType();
-            reader.PalaceDeserialize(refNum, obj, objType);
+            reader.PalaceDeserialize(refNum, obj, objType, opts);
         }
 
         public static void PalaceSerialize(this Stream writer, out int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
@@ -663,16 +679,16 @@ namespace ThePalace.Core.Exts.Palace
 
             if (obj == null ||
                 objType == null ||
-                !(obj is IProtocol)) return;
+                !(obj is IStruct)) return;
 
             var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
             var members = objType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .As<MemberInfo[]>()
+                .Cast<MemberInfo>()
                 .Union(objType
                     .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                    .As<MemberInfo[]>())
+                    .Cast<MemberInfo>())
                 .ToList();
 
             foreach (var member in members)
@@ -773,9 +789,26 @@ namespace ThePalace.Core.Exts.Palace
                             {
                                 buffer = _str.GetBytes();
 
-                                if (pString is EncryptedStringAttribute)
+                                if (pString is EncryptedStringAttribute _esAttrib)
                                 {
-                                    buffer = buffer.EncryptBytes();
+                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    {
+                                        buffer = buffer.GetString().FromHex();
+                                    }
+
+                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    {
+                                        buffer = buffer.DecryptBytes();
+                                    }
+                                    else if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    {
+                                        buffer = buffer.EncryptBytes();
+                                    }
+
+                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    {
+                                        buffer = buffer.ToHex().GetBytes();
+                                    }
                                 }
 
                                 writer.Write(buffer, 0, buffer.Length);
@@ -810,13 +843,13 @@ namespace ThePalace.Core.Exts.Palace
                     case Type _t when _t == ByteExts.Types.ByteArray:
                         if (byteSize < 1)
                         {
-                            result = _value.As<byte[]>();
+                            result = (byte[])(object)_value;
                             byteSize = result.Length;
                         }
 
                         break;
 
-                    case Type _t when _t is IProtocol:
+                    case Type _t when _t is IStruct:
                         writer.PalaceSerialize(out refNum, _value, _type);
 
                         continue;
@@ -837,20 +870,20 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceSerialize<TProtocol>(this Stream writer, out int refNum, TProtocol? obj, SerializerOptions opts = SerializerOptions.None)
-            where TProtocol : IProtocol
+        public static void PalaceSerialize<TStruct>(this Stream writer, out int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+            where TStruct : IStruct
         {
             refNum = 0;
 
             if (obj == null) return;
 
-            var typeName = typeof(TProtocol).Name;
+            var typeName = typeof(TStruct).Name;
             if (string.IsNullOrWhiteSpace(typeName)) return;
 
             var msgBytes = (byte[]?)null;
             using (var ms = new MemoryStream())
             {
-                if (obj.Is<IProtocolSerializer>(out var serializer))
+                if (obj.Is<IStructSerializer>(out var serializer))
                 {
                     serializer.Serialize(out refNum, ms, opts);
                 }
@@ -868,7 +901,7 @@ namespace ThePalace.Core.Exts.Palace
                 EventType = Enum.Parse<EventTypes>(typeName),
                 Length = (uint)(msgBytes?.Length ?? 0),
             };
-            if (obj.Is<IProtocolRefNumOverride>())
+            if (obj.Is<IStructRefNum>())
             {
                 hdr.RefNum = refNum;
             }
@@ -878,7 +911,7 @@ namespace ThePalace.Core.Exts.Palace
                 var hdrBytes = (byte[]?)null;
                 using (var ms = new MemoryStream())
                 {
-                    if (hdr.Is<IProtocolSerializer>(out var serializer))
+                    if (hdr.Is<IStructSerializer>(out var serializer))
                     {
                         serializer.Serialize(out refNum, ms, opts);
                     }

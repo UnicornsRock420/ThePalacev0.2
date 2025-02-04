@@ -9,7 +9,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(128)]
-    public partial class RegistrationRec : IProtocol
+    public partial class RegistrationRec : IStruct
     {
         public uint32 Crc;
         public uint32 Counter;

@@ -64,47 +64,6 @@ namespace System
             return null;
         }
 
-        //public static T ClearBit<T>(this T value, byte bitIndex) where T : struct =>
-        //    ClearBit<T>(value, (int)(1 << bitIndex));
-        //public static T ClearBit<T>(this T value, long bitValue)
-        //    where T : struct
-        //{
-        //    var type = typeof(T);
-        //    switch (type)
-        //    {
-        //        case Type _t when _t == ByteExts.Types.Byte: goto default;
-        //        case Type _t when _t == SByteExts.Types.SByte: goto default;
-        //        case Type _t when _t == Int16Exts.Types.Int16: goto default;
-        //        case Type _t when _t == UInt16Exts.Types.UInt16: goto default;
-        //        case Type _t when _t == Int32Exts.Types.Int32: goto default;
-        //        case Type _t when _t == UInt32Exts.Types.UInt32: goto default;
-        //        case Type _t when _t == Int64Exts.Types.Int64: goto default;
-        //        case Type _t when _t == UInt64Exts.Types.UInt64: goto default;
-        //        default: return (value.As<long>() & ~bitValue).As<T>();
-        //    }
-        //    throw new NotSupportedException($"Type '{type.Name}' is not supported");
-        //}
-        //public static bool IsBitSet<T>(this T value, byte bitIndex) where T : struct =>
-        //    IsBitSet<T>(value, (int)(1 << bitIndex));
-        //public static bool IsBitSet<T>(this T value, long bitValue)
-        //    where T : struct
-        //{
-        //    var type = typeof(T);
-        //    switch (type)
-        //    {
-        //        case Type _t when _t == ByteExts.Types.Byte: goto default;
-        //        case Type _t when _t == SByteExts.Types.SByte: goto default;
-        //        case Type _t when _t == Int16Exts.Types.Int16: goto default;
-        //        case Type _t when _t == UInt16Exts.Types.UInt16: goto default;
-        //        case Type _t when _t == Int32Exts.Types.Int32: goto default;
-        //        case Type _t when _t == UInt32Exts.Types.UInt32: goto default;
-        //        case Type _t when _t == Int64Exts.Types.Int64: goto default;
-        //        case Type _t when _t == UInt64Exts.Types.UInt64: goto default;
-        //        default: return (value.As<long>() & bitValue) == bitValue;
-        //    }
-        //    throw new NotSupportedException($"Type '{type.Name}' is not supported");
-        //}
-
         public static int TypeID<T>() =>
             (int)TypeCode(typeof(T));
         public static int TypeID<T>(this T _) =>
@@ -125,7 +84,7 @@ namespace System
             TypeCode(typeof(T));
         public static TypeCodeEnum TypeCode(this Type type)
         {
-            var result = Type.GetTypeCode(type).As<TypeCodeEnum>();
+            var result = (TypeCodeEnum)Type.GetTypeCode(type);
             switch (result)
             {
                 case TypeCodeEnum.Object:

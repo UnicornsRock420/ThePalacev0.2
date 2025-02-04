@@ -5,7 +5,7 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Network.Shared.Core
 {
-    public partial class RawData : IDisposable, IRawData, IProtocol
+    public partial class RawData : IDisposable, IData, IStruct
     {
         [Flags]
         public enum RawDataOptions : uint
@@ -27,9 +27,11 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             _data = [];
         public RawData(IEnumerable<uint8>? data = null) =>
             _data = new List<uint8>(data ?? []);
-        public RawData(uint8[]? data = null) =>
+        public RawData(IEnumerable<char>? data = null) =>
+            _data = new List<uint8>(data?.GetBytes() ?? []);
+        public RawData(params uint8[] data) =>
             _data = new List<uint8>(data ?? []);
-        public RawData(char[]? data = null) =>
+        public RawData(params char[] data) =>
             _data = new List<uint8>(data?.GetBytes() ?? []);
 
         public virtual void Dispose()
@@ -44,6 +46,8 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             new();
         public static RawData FromEnumerable(IEnumerable<uint8>? data = null) =>
             new(data);
+        public static RawData FromEnumerable(IEnumerable<char>? data = null) =>
+            new(data);
         public static RawData FromBytes(uint8[]? data = null) =>
             new(data);
         public static RawData FromChars(char[]? data = null) =>
@@ -55,7 +59,10 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             get => _data?.ToArray() ?? [];
             set => _data = new List<uint8>(value ?? []);
         }
+
         public virtual sint32 Count =>
+            _data?.Count ?? 0;
+        public virtual sint32 Length =>
             _data?.Count ?? 0;
 
         #region Read Methods

@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Events
     public class ScriptEventArgs : EventArgs
     {
         public IptEventTypes EventType;
-        public IProtocol Packet;
+        public IStruct Packet;
         public object ScriptState;
     }
 }

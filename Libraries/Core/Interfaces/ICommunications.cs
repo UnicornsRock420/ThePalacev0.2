@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Core.Interfaces
 {
-    public interface IProtocolCommunications : IProtocol
+    public interface ICommunications : IStruct
     {
         public string? Text { get; set; }
     }

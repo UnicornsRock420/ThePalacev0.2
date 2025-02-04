@@ -23,7 +23,7 @@ namespace Sandbox
 
             var packetBytes = (byte[]?)null;
             var hdr = new MSG_Header();
-            var msg = (IProtocol?)null;
+            var msg = (IStruct?)null;
             var refNum = 0;
 
             using (var ms = new MemoryStream())
@@ -71,7 +71,7 @@ namespace Sandbox
                     .FirstOrDefault();
                 if (msgType != null)
                 {
-                    msg = (IProtocol?)msgType.GetInstance();
+                    msg = (IStruct?)msgType.GetInstance();
 
                     ms.PalaceDeserialize(
                         hdr.RefNum,

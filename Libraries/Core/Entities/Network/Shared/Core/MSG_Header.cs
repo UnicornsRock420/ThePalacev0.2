@@ -7,7 +7,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Entities.Network.Shared.Core
 {
     [ByteSize(12)]
-    public partial class MSG_Header : IProtocol
+    public partial class MSG_Header : IStruct
     {
         // Mnemonic
         public EventTypes EventType;

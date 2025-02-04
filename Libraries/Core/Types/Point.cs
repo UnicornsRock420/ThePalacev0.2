@@ -7,7 +7,7 @@ using sint16 = System.Int16;
 namespace ThePalace.Core.Types
 {
     [ByteSize(4)]
-    public partial class Point : IProtocolSerializer
+    public partial class Point : IStructSerializer
     {
         public Point()
         {

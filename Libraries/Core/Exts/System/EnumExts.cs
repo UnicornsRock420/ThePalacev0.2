@@ -243,7 +243,7 @@
             where TStruct : struct
         {
             if (bits == null ||
-                (ulong)(object)bits == 0) return 0.As<TStruct>();
+                (ulong)(object)bits == 0) return (TStruct)(object)0;
 
             var _b = (object)bits ?? default(TStruct);
 
@@ -273,7 +273,7 @@
             where TResult : struct
         {
             if (bits == null ||
-                (ulong)(object)bits == 0) return 0.As<TResult>();
+                (ulong)(object)bits == 0) return (TResult)(object)0;
 
             var _b = (object)bits ?? default(TStruct);
 
@@ -303,7 +303,7 @@
             where TCast : struct
         {
             if (bits == null ||
-                (ulong)(object)bits == 0) return 0.As<TEnum>();
+                (ulong)(object)bits == 0) return (TEnum)(object)0;
 
             var _b = (object)bits ?? default(TEnum);
 
@@ -334,7 +334,7 @@
             where TResult : struct
         {
             if (bits == null ||
-                (ulong)(object)bits == 0) return 0.As<TResult>();
+                (ulong)(object)bits == 0) return (TResult)(object)0;
 
             var _b = (object)bits ?? default(TEnum);
 
@@ -366,7 +366,7 @@
             where TResult : struct
         {
             if (bits == null ||
-                (ulong)(object)bits == 0) return 0.As<TResult>();
+                (ulong)(object)bits == 0) return (TResult)(object)0;
 
             var _b = (object)bits ?? default(TEnum);
 
