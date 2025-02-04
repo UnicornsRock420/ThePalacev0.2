@@ -664,15 +664,6 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceDeserialize<TStruct>(this Stream reader, int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
-            where TStruct : IStruct
-        {
-            if (obj == null) return;
-
-            var objType = obj.GetType();
-            reader.PalaceDeserialize(refNum, obj, objType, opts);
-        }
-
         public static void PalaceSerialize(this Stream writer, out int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             refNum = 0;
@@ -769,20 +760,19 @@ namespace ThePalace.Core.Exts.Palace
 
                             switch (pString.LengthByteSize)
                             {
-                                case 4:
-                                    if (doSwap)
-                                        writer.Write(((uint)byteSize).GetBytes().Reverse().ToArray());
-                                    else
-                                        writer.Write(((uint)byteSize).GetBytes());
-                                    break;
+                                case 1: writer.Write([(byte)byteSize]); break;
                                 case 2:
                                     if (doSwap)
                                         writer.Write(((ushort)byteSize).GetBytes().Reverse().ToArray());
                                     else
                                         writer.Write(((ushort)byteSize).GetBytes());
                                     break;
-                                case 1:
-                                    writer.Write([(byte)byteSize]); break;
+                                case 4:
+                                    if (doSwap)
+                                        writer.Write(((uint)byteSize).GetBytes().Reverse().ToArray());
+                                    else
+                                        writer.Write(((uint)byteSize).GetBytes());
+                                    break;
                             }
 
                             if (byteSize > 0)
@@ -859,10 +849,10 @@ namespace ThePalace.Core.Exts.Palace
 
                 switch (byteSize)
                 {
-                    case 8: result = doSwap ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt64(_value).GetBytes(); break;
-                    case 4: result = doSwap ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt32(_value).GetBytes(); break;
-                    case 2: result = doSwap ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt16(_value).GetBytes(); break;
                     case 1: result = [(byte)_value]; break;
+                    case 2: result = doSwap ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt16(_value).GetBytes(); break;
+                    case 4: result = doSwap ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt32(_value).GetBytes(); break;
+                    case 8: result = doSwap ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt64(_value).GetBytes(); break;
                 }
 
                 if ((result?.Length ?? 0) > 0)
