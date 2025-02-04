@@ -7,9 +7,9 @@ using UserID = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Client.Network
 {
-    [Mnemonic("blow")]
     [DynamicSize]
-    public partial class MSG_BLOWTHRU : IProtocolC2S, IStructSerializer
+    [Mnemonic("blow")]
+    public partial class MSG_BLOWTHRU : IStructSerializer, IProtocolC2S
     {
         public uint32 Flags;
         public uint32 NbrUsers;

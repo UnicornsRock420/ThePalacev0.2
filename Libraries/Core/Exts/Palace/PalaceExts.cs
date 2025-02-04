@@ -427,9 +427,8 @@ namespace ThePalace.Core.Exts.Palace
 
             foreach (var member in members)
             {
-                var _attrs = objType
+                var _attrs = (List<Attribute>)objType
                     .GetCustomAttributes()
-                    .Cast<Attribute>()
                     .ToList();
                 var _type = (Type?)null;
                 var _name = (string?)null;
@@ -473,17 +472,28 @@ namespace ThePalace.Core.Exts.Palace
                     _cb == null ||
                     _attrs.Any(a => a is IgnoreDataMemberAttribute))
                 {
-                    //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
+                    //throw new Exception(string.Format("Member (t:{0}, n:{1})", _type.Name, _name));
+                    Console.WriteLine("Member (t:{0}, n:{1})", _type.Name, _name);
                     continue;
                 }
 
                 var byteSize = _attrs
                     .Where(a => a is ByteSizeAttribute)
                     .Select(a => a as ByteSizeAttribute)
-                    .Select(a => a.ByteSize)
+                    .Select(a => a?.ByteSize ?? 0)
                     .LastOrDefault();
 
-                Console.WriteLine("Member (t:{0}, n:{1})", _type.Name, _name);
+                //var minByteSize = 0;
+                //var maxByteSize = 0;
+                //var dynamicSize = _attrs
+                //    .Where(a => a is DynamicSizeAttribute)
+                //    .Select(a => a as DynamicSizeAttribute)
+                //    .LastOrDefault();
+                //if (dynamicSize != null)
+                //{
+                //    minByteSize = dynamicSize.MinByteSize;
+                //    maxByteSize = dynamicSize.MaxByteSize;
+                //}
 
                 var buffer = (byte[]?)null;
                 var result = (object?)null;
@@ -507,9 +517,9 @@ namespace ThePalace.Core.Exts.Palace
 
                             switch (pString.LengthByteSize)
                             {
-                                case 4: byteSize = doSwap ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32() : reader.ReadInt32(); break;
-                                case 2: byteSize = doSwap ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16() : reader.ReadInt16(); break;
                                 case 1: byteSize = reader.ReadByte(); break;
+                                case 2: byteSize = doSwap ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16() : reader.ReadInt16(); break;
+                                case 4: byteSize = doSwap ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32() : reader.ReadInt32(); break;
                             }
 
                             if (byteSize > pString.MaxStringLength)
@@ -521,7 +531,7 @@ namespace ThePalace.Core.Exts.Palace
                             {
                                 buffer = new byte[byteSize];
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
-                                if (readCount < 1) continue;
+                                if (readCount < 1) return;
 
                                 if (pString is EncryptedStringAttribute encryptedString)
                                 {
@@ -552,7 +562,7 @@ namespace ThePalace.Core.Exts.Palace
                             {
                                 buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
-                                if (readCount < 1) continue;
+                                if (readCount < 1) return;
                             }
                         }
                         else if (_attrs.Any(a => a is CStringAttribute))
@@ -568,14 +578,15 @@ namespace ThePalace.Core.Exts.Palace
                             do
                             {
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
-                                if (readCount < 1 ||
-                                    buffer[0] == 0) break;
+                                if (readCount < 1) return;
+
+                                if (buffer[0] == 0) break;
 
                                 stringBytes.Add(buffer[0]);
 
                             } while (stringBytes.Count <= cString.MaxStringLength);
 
-                            if (byteSize > 0)
+                            if (stringBytes.Count > 0)
                             {
                                 _cb(member, stringBytes.GetString());
                             }
@@ -584,7 +595,7 @@ namespace ThePalace.Core.Exts.Palace
                         {
                             buffer = new byte[byteSize];
                             var readCount = reader.Read(buffer, 0, buffer.Length);
-                            if (readCount < 1) continue;
+                            if (readCount < 1) return;
 
                             _cb(member, buffer.GetString());
                         }
@@ -596,7 +607,7 @@ namespace ThePalace.Core.Exts.Palace
                         {
                             buffer = new byte[byteSize];
                             var readCount = reader.Read(buffer, 0, buffer.Length);
-                            if (readCount < 1) continue;
+                            if (readCount < 1) return;
 
                             _cb(member, buffer);
                         }
@@ -607,7 +618,7 @@ namespace ThePalace.Core.Exts.Palace
                         {
                             result = _t.GetInstance();
 
-                            if (result.Is(out serializer))
+                            if (result.Is<IStructSerializer>(out serializer))
                             {
                                 serializer.Deserialize(refNum, reader, opts);
                             }
@@ -626,19 +637,12 @@ namespace ThePalace.Core.Exts.Palace
                 {
                     switch (byteSize)
                     {
-                        case 8:
+                        case 1:
                             if (_type.IsEnum ||
-                                _type == UInt64Exts.Types.UInt64)
-                                result = doSwap ? reader.ReadUInt64().SwapUInt64() : reader.ReadUInt64();
-                            else if (_type == Int64Exts.Types.Int64)
-                                result = doSwap ? reader.ReadInt64().SwapInt64() : reader.ReadInt64();
-                            break;
-                        case 4:
-                            if (_type.IsEnum ||
-                                _type == UInt32Exts.Types.UInt32)
-                                result = doSwap ? reader.ReadUInt32().SwapUInt32() : reader.ReadUInt32();
-                            else if (_type == Int32Exts.Types.Int32)
-                                result = doSwap ? reader.ReadInt32().SwapInt32() : reader.ReadInt32();
+                                _type == ByteExts.Types.Byte)
+                                result = reader.ReadByte();
+                            else if (_type == SByteExts.Types.SByte)
+                                result = reader.ReadSByte();
                             break;
                         case 2:
                             if (_type.IsEnum ||
@@ -647,12 +651,19 @@ namespace ThePalace.Core.Exts.Palace
                             else if (_type == Int16Exts.Types.Int16)
                                 result = doSwap ? reader.ReadInt16().SwapInt16() : reader.ReadInt16();
                             break;
-                        case 1:
+                        case 4:
                             if (_type.IsEnum ||
-                                _type == ByteExts.Types.Byte)
-                                result = reader.ReadByte();
-                            else if (_type == SByteExts.Types.SByte)
-                                result = reader.ReadSByte();
+                                _type == UInt32Exts.Types.UInt32)
+                                result = doSwap ? reader.ReadUInt32().SwapUInt32() : reader.ReadUInt32();
+                            else if (_type == Int32Exts.Types.Int32)
+                                result = doSwap ? reader.ReadInt32().SwapInt32() : reader.ReadInt32();
+                            break;
+                        case 8:
+                            if (_type.IsEnum ||
+                                _type == UInt64Exts.Types.UInt64)
+                                result = doSwap ? reader.ReadUInt64().SwapUInt64() : reader.ReadUInt64();
+                            else if (_type == Int64Exts.Types.Int64)
+                                result = doSwap ? reader.ReadInt64().SwapInt64() : reader.ReadInt64();
                             break;
                     }
                 }
@@ -672,6 +683,8 @@ namespace ThePalace.Core.Exts.Palace
                 objType == null ||
                 !(obj is IStruct)) return;
 
+            var streamPosition = writer.Length - writer.Position;
+
             var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
             var members = objType
@@ -681,6 +694,9 @@ namespace ThePalace.Core.Exts.Palace
                     .GetFields(BindingFlags.Public | BindingFlags.Instance)
                     .Cast<MemberInfo>())
                 .ToList();
+
+            var minByteSize = 0;
+            var maxByteSize = 0;
 
             foreach (var member in members)
             {
@@ -719,18 +735,38 @@ namespace ThePalace.Core.Exts.Palace
                     _attrs.Any(a => a is IgnoreDataMemberAttribute))
                 {
                     //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
+                    Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value);
                     continue;
                 }
 
-                Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value);
-
-                var buffer = (byte[]?)null;
-                var result = (byte[]?)null;
                 var byteSize = _attrs
                     .Where(a => a is ByteSizeAttribute)
-                    .Select(a => (a as ByteSizeAttribute)?.ByteSize ?? 0)
-                    .Where(b => b > 0)
+                    .Select(a => a as ByteSizeAttribute)
+                    .Select(a => a?.ByteSize ?? 0)
                     .LastOrDefault();
+
+                if (maxByteSize == 0)
+                {
+                    var dynamicSize = _attrs
+                        .Where(a => a is DynamicSizeAttribute)
+                        .Select(a => a as DynamicSizeAttribute)
+                        .LastOrDefault();
+                    if (dynamicSize != null)
+                    {
+                        minByteSize = dynamicSize.MinByteSize;
+                        maxByteSize = dynamicSize.MaxByteSize;
+                    }
+                }
+
+                if (maxByteSize > 0)
+                {
+                    var bytesWritten = (writer.Length - (streamPosition - writer.Position));
+
+                    if (bytesWritten > maxByteSize) throw new EndOfStreamException(nameof(writer));
+                    if (bytesWritten == maxByteSize) return;
+                }
+
+                var buffer = (byte[]?)null;
 
                 switch (_type)
                 {
@@ -833,8 +869,8 @@ namespace ThePalace.Core.Exts.Palace
                     case Type _t when _t == ByteExts.Types.ByteArray:
                         if (byteSize < 1)
                         {
-                            result = (byte[])(object)_value;
-                            byteSize = result.Length;
+                            buffer = (byte[])(object)_value;
+                            byteSize = buffer.Length;
                         }
 
                         break;
@@ -849,15 +885,17 @@ namespace ThePalace.Core.Exts.Palace
 
                 switch (byteSize)
                 {
-                    case 1: result = [(byte)_value]; break;
-                    case 2: result = doSwap ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt16(_value).GetBytes(); break;
-                    case 4: result = doSwap ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt32(_value).GetBytes(); break;
-                    case 8: result = doSwap ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt64(_value).GetBytes(); break;
+                    case 1: buffer = [(byte)_value]; break;
+                    case 2: buffer = doSwap ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt16(_value).GetBytes(); break;
+                    case 4: buffer = doSwap ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt32(_value).GetBytes(); break;
+                    case 8: buffer = doSwap ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt64(_value).GetBytes(); break;
                 }
 
-                if ((result?.Length ?? 0) > 0)
-                    writer.Write(result);
+                if ((buffer?.Length ?? 0) > 0)
+                    writer.Write(buffer, 0, buffer.Length);
             }
+
+            if (minByteSize > 0 && (writer.Length - (streamPosition - writer.Position)) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
         public static void PalaceSerialize<TStruct>(this Stream writer, out int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)

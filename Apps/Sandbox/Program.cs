@@ -1,3 +1,4 @@
+using System.Linq;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Core;
 using ThePalace.Core.Entities.Shared;
@@ -32,9 +33,9 @@ namespace Sandbox
                     out refNum,
                     new MSG_LISTOFALLROOMS
                     {
-                        Rooms = new List<ListRec>
+                        Rooms = new()
                         {
-                            new ListRec
+                            new()
                             {
                                 PrimaryID = 1,
                                 Flags = 0,
@@ -42,7 +43,7 @@ namespace Sandbox
 
                                 Name = "Testing 123",
                             },
-                            new ListRec
+                            new()
                             {
                                 PrimaryID = 2,
                                 Flags = (sint16)RoomFlags.WizardsOnly,
@@ -55,6 +56,7 @@ namespace Sandbox
                     SerializerOptions.IncludeHeader);
 
                 packetBytes = ms.ToArray();
+                var msgHex = packetBytes.ToHex();
 
                 ms.Seek(0, SeekOrigin.Begin);
 
@@ -80,7 +82,10 @@ namespace Sandbox
                 }
             }
 
-            var msgHex = packetBytes.ToHex();
+            Func<string, bool>? where = l => l == "123";
+            var test = new List<string> { "Test", "123" }
+                .Where(where)
+                .ToList();
         }
 
         public Program()

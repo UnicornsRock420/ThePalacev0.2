@@ -4,8 +4,8 @@ using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Shared.Communications
 {
-    [Mnemonic("xwis")]
     [DynamicSize(260, 258)]
+    [Mnemonic("xwis")]
     public partial class MSG_XWHISPER : IProtocolC2S, IProtocolS2C, ICommunications
     {
         public sint32 TargetID;

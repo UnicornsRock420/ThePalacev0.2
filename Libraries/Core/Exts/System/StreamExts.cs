@@ -10,12 +10,25 @@
         //{
         //}
 
+        public static sbyte ReadSByte(this Stream stream)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+
+            var buffer = new byte[1];
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
+            return (sbyte)buffer[0];
+        }
+
         public static short ReadInt16(this Stream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToInt16(buffer);
         }
 
@@ -24,7 +37,9 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToInt32(buffer);
         }
 
@@ -33,16 +48,21 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[8];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToInt64(buffer);
         }
 
-        public static sbyte ReadSByte(this Stream stream)
+        public static byte ReadByte(this Stream stream)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[1];
-            return (sbyte)stream.ReadByte();
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
+            return buffer[0];
         }
 
         public static ushort ReadUInt16(this Stream stream)
@@ -50,7 +70,9 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[2];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToUInt16(buffer);
         }
 
@@ -59,7 +81,9 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[4];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToUInt32(buffer);
         }
 
@@ -68,7 +92,9 @@
             if (stream == null) throw new ArgumentNullException(nameof(stream));
 
             var buffer = new byte[8];
-            stream.Read(buffer, 0, buffer.Length);
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException(nameof(stream));
+
             return BitConverter.ToUInt64(buffer);
         }
 

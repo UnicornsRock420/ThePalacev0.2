@@ -6,9 +6,9 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Network.Server.Network
 {
-    [Mnemonic("blow")]
     [DynamicSize]
-    public partial class MSG_BLOWTHRU : IProtocolS2C, IStructSerializer
+    [Mnemonic("blow")]
+    public partial class MSG_BLOWTHRU : IStructSerializer, IProtocolS2C
     {
         public uint32 PluginTag;
         public uint8[] Embedded;

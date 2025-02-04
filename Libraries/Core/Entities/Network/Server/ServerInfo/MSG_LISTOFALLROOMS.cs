@@ -7,9 +7,9 @@ using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
-    [Mnemonic("rLst")]
     [DynamicSize]
-    public partial class MSG_LISTOFALLROOMS : IStructRefNum, IProtocolS2C, IStructSerializer
+    [Mnemonic("rLst")]
+    public partial class MSG_LISTOFALLROOMS : IStructRefNum, IStructSerializer, IProtocolS2C
     {
         [RefNum]
         public sint32 RefNum
@@ -42,11 +42,11 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 
         public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            if ((this.Rooms?.Count ?? 0) > 0)
+            refNum = this.Rooms?.Count ?? 0;
+
+            if (refNum > 0)
                 foreach (var room in this.Rooms)
                     writer.PalaceSerialize(out refNum, room, typeof(ListRec), opts);
-
-            refNum = this.Rooms?.Count ?? 0;
         }
     }
 }
