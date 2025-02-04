@@ -523,23 +523,23 @@ namespace ThePalace.Core.Exts.Palace
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
                                 if (readCount < 1) continue;
 
-                                if (pString is EncryptedStringAttribute _esAttrib)
+                                if (pString is EncryptedStringAttribute encryptedString)
                                 {
-                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
                                     {
                                         buffer = buffer.GetString().FromHex();
                                     }
 
-                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
                                     {
                                         buffer = buffer.DecryptBytes();
                                     }
-                                    else if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    else if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
                                     {
                                         buffer = buffer.EncryptBytes();
                                     }
 
-                                    if (_esAttrib.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
                                     {
                                         buffer = buffer.ToHex().GetBytes();
                                     }
@@ -789,23 +789,23 @@ namespace ThePalace.Core.Exts.Palace
                             {
                                 buffer = _str.GetBytes();
 
-                                if (pString is EncryptedStringAttribute _esAttrib)
+                                if (pString is EncryptedStringAttribute encryptedString)
                                 {
-                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
                                     {
                                         buffer = buffer.GetString().FromHex();
                                     }
 
-                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
                                     {
                                         buffer = buffer.DecryptBytes();
                                     }
-                                    else if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    else if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
                                     {
                                         buffer = buffer.EncryptBytes();
                                     }
 
-                                    if (_esAttrib.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
                                     {
                                         buffer = buffer.ToHex().GetBytes();
                                     }
