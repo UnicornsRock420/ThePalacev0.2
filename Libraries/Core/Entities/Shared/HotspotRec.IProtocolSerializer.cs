@@ -3,7 +3,7 @@ using ThePalace.Core.Interfaces;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class AssetRec : IProtocolSerializer
+    public partial class HotspotRec : IProtocolSerializer
     {
         public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {

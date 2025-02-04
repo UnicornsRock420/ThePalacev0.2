@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces;
 using ThePalace.Core.Types;
@@ -32,14 +31,12 @@ namespace ThePalace.Core.Entities.Shared
         public sint16 ScriptTextOfst;
         public sint16 AlignReserved;
 
-        [IgnoreDataMember]
         public List<HotspotStateRec>? States;
-        [IgnoreDataMember]
         public List<Point>? Vortexes;
 
-        [IgnoreDataMember]
+        [CString]
         public string? Name;
-        [IgnoreDataMember]
+        [CString]
         public string? Script;
     }
 }

@@ -12,12 +12,10 @@ namespace ThePalace.Core.Entities.Shared
     {
         public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            var bytes = new byte[reader.Length];
+            var bytes = new byte[reader.Length - reader.Position];
             reader.Read(bytes, 0, bytes.Length);
 
-            _data = new RawData(bytes);
-
-            var result = new RoomRec();
+            _data = new List<byte>(bytes);
 
             var roomNameOfst = (short)0;
             var pictNameOfst = (short)0;
@@ -37,9 +35,9 @@ namespace ThePalace.Core.Entities.Shared
 
             try
             {
-                result.RoomFlags = (RoomFlags)_data.ReadSInt32();
-                result.FacesID = _data.ReadSInt32();
-                result.RoomID = _data.ReadSInt16();
+                this.RoomFlags = (RoomFlags)_data.ReadSInt32();
+                this.FacesID = _data.ReadSInt32();
+                this.RoomID = _data.ReadSInt16();
                 roomNameOfst = _data.ReadSInt16();
                 pictNameOfst = _data.ReadSInt16();
                 artistNameOfst = _data.ReadSInt16();
@@ -57,10 +55,10 @@ namespace ThePalace.Core.Entities.Shared
                 lenVars = _data.ReadSInt16();
 
                 // Get the strings
-                result.Name = _data.PeekPString(32, 1, roomNameOfst);
-                result.Picture = _data.PeekPString(32, 1, pictNameOfst);
-                result.Artist = _data.PeekPString(32, 1, artistNameOfst);
-                result.Password = _data.PeekPString(32, 1, passwordOfst);
+                this.Name = this.PeekPString(32, 1, roomNameOfst);
+                this.Picture = this.PeekPString(32, 1, pictNameOfst);
+                this.Artist = this.PeekPString(32, 1, artistNameOfst);
+                this.Password = this.PeekPString(32, 1, passwordOfst);
             }
             catch (Exception ex)
             {
@@ -73,50 +71,50 @@ namespace ThePalace.Core.Entities.Shared
             {
                 for (var i = 0; i < nbrHotspots; i++)
                 {
-                    _data.Seek(hotspotOfst + Exts.Palace.AttributeExts.GetByteSize<HotspotRec>(null) * i);
+                    this.Seek(hotspotOfst + Exts.Palace.AttributeExts.GetByteSize<HotspotRec>() * i);
 
                     var h = new HotspotRec
                     {
                         Vortexes = new(),
                         States = new(),
                     };
-                    _data.PeekSInt32(); //scriptEventMask
-                    h.Flags = _data.PeekSInt32();
-                    _data.PeekSInt32(); //secureInfo
-                    _data.PeekSInt32(); //refCon
+                    this.PeekSInt32(); //scriptEventMask
+                    h.Flags = this.PeekSInt32();
+                    this.PeekSInt32(); //secureInfo
+                    this.PeekSInt32(); //refCon
 
-                    var vAxis = _data.PeekSInt16();
-                    var hAxis = _data.PeekSInt16();
+                    var vAxis = this.PeekSInt16();
+                    var hAxis = this.PeekSInt16();
                     h.Loc = new Types.Point(hAxis, vAxis);
 
-                    h.HotspotID = _data.PeekSInt16();
-                    h.Dest = _data.PeekSInt16();
-                    h.NbrPts = _data.PeekSInt16();
-                    h.PtsOfst = _data.PeekSInt16();
-                    h.Type = (HotspotTypes)_data.PeekSInt16();
-                    _data.PeekSInt16(); //groupID
-                    _data.PeekSInt16(); //nbrScripts
-                    _data.PeekSInt16(); //scriptRecOfst
-                    h.State = _data.PeekSInt16();
-                    h.NbrStates = _data.PeekSInt16();
-                    h.StateRecOfst = _data.PeekSInt16();
-                    h.NameOfst = _data.PeekSInt16();
-                    h.ScriptTextOfst = _data.PeekSInt16();
-                    _data.PeekSInt16(); //alignReserved
+                    h.HotspotID = this.PeekSInt16();
+                    h.Dest = this.PeekSInt16();
+                    h.NbrPts = this.PeekSInt16();
+                    h.PtsOfst = this.PeekSInt16();
+                    h.Type = (HotspotTypes)this.PeekSInt16();
+                    this.PeekSInt16(); //groupID
+                    this.PeekSInt16(); //nbrScripts
+                    this.PeekSInt16(); //scriptRecOfst
+                    h.State = this.PeekSInt16();
+                    h.NbrStates = this.PeekSInt16();
+                    h.StateRecOfst = this.PeekSInt16();
+                    h.NameOfst = this.PeekSInt16();
+                    h.ScriptTextOfst = this.PeekSInt16();
+                    this.PeekSInt16(); //alignReserved
 
                     if (h.NameOfst > 0 && h.NameOfst < _data.Count)
-                        h.Name = _data.PeekPString(32, 1, h.NameOfst);
+                        h.Name = this.PeekPString(32, 1, h.NameOfst);
 
                     if (h.ScriptTextOfst > 0 && h.ScriptTextOfst < _data.Count)
-                        h.Script = _data.ReadCString(h.ScriptTextOfst, true);
+                        h.Script = this.ReadCString(h.ScriptTextOfst, true);
 
-                    if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < _data.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>(null) * h.NbrPts)
+                    if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < _data.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.NbrPts)
                         for (var s = 0; s < h.NbrPts; s++)
                         {
-                            _data.Seek(h.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>(null));
+                            this.Seek(h.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
 
-                            vAxis = _data.PeekSInt16();
-                            hAxis = _data.PeekSInt16();
+                            vAxis = this.PeekSInt16();
+                            hAxis = this.PeekSInt16();
                             var p = new Types.Point(hAxis, vAxis);
 
                             h.Vortexes.Add(p);
@@ -124,20 +122,20 @@ namespace ThePalace.Core.Entities.Shared
 
                     for (var s = 0; s < h.NbrStates; s++)
                     {
-                        _data.Seek(h.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>(null));
+                        this.Seek(h.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>());
 
                         var hs = new HotspotStateRec();
-                        hs.PictID = _data.PeekSInt16();
-                        _data.PeekSInt16(); //reserved
+                        hs.PictID = this.PeekSInt16();
+                        this.PeekSInt16(); //reserved
 
-                        vAxis = _data.PeekSInt16();
-                        hAxis = _data.PeekSInt16();
+                        vAxis = this.PeekSInt16();
+                        hAxis = this.PeekSInt16();
                         hs.PicLoc = new Types.Point(hAxis, vAxis);
 
                         h.States.Add(hs);
                     }
 
-                    result.HotSpots.Add(h);
+                    this.HotSpots.Add(h);
                 }
             }
             catch (Exception ex)
@@ -153,21 +151,21 @@ namespace ThePalace.Core.Entities.Shared
             {
                 for (var i = 0; i < nbrPictures; i++)
                 {
-                    _data.Seek(pictureOfst + Exts.Palace.AttributeExts.GetByteSize<PictureRec>(null) * i);
+                    this.Seek(pictureOfst + Exts.Palace.AttributeExts.GetByteSize<PictureRec>() * i);
 
                     var pict = new PictureRec();
-                    pict.RefCon = _data.PeekSInt32();
-                    pict.PicID = _data.PeekSInt16();
-                    pict.PicNameOfst = _data.PeekSInt16();
-                    pict.TransColor = _data.PeekSInt16();
-                    _data.PeekSInt16(); //reserved
+                    pict.RefCon = this.PeekSInt32();
+                    pict.PicID = this.PeekSInt16();
+                    pict.PicNameOfst = this.PeekSInt16();
+                    pict.TransColor = this.PeekSInt16();
+                    this.PeekSInt16(); //reserved
 
                     if (pict.PicNameOfst > 0 &&
                         pict.PicNameOfst < _data.Count)
                     {
-                        pict.Name = _data.PeekPString(32, 1, pict.PicNameOfst);
+                        pict.Name = this.PeekPString(32, 1, pict.PicNameOfst);
 
-                        result.Pictures.Add(pict);
+                        this.Pictures.Add(pict);
                     }
                 }
             }
@@ -186,21 +184,21 @@ namespace ThePalace.Core.Entities.Shared
 
                 for (var i = 0; i < nbrDrawCmds; i++)
                 {
-                    _data.Seek(ofst);
+                    this.Seek(ofst);
 
                     var drawCmd = new DrawCmdRec();
-                    ofst = drawCmd.NextOfst = _data.PeekSInt16();
-                    _data.PeekSInt16(); //reserved
-                    drawCmd.DrawCmd = _data.PeekSInt16();
-                    drawCmd.CmdLength = _data.PeekUInt16();
-                    drawCmd.DataOfst = _data.PeekSInt16();
-                    drawCmd.Data = _data.Data
+                    ofst = drawCmd.NextOfst = this.PeekSInt16();
+                    this.PeekSInt16(); //reserved
+                    drawCmd.DrawCmd = this.PeekSInt16();
+                    drawCmd.CmdLength = this.PeekUInt16();
+                    drawCmd.DataOfst = this.PeekSInt16();
+                    drawCmd.Data = this.Data
                         .Skip(drawCmd.DataOfst)
                         .Take(drawCmd.CmdLength)
                         .ToArray();
                     //drawCmd.DeserializeData();
 
-                    result.DrawCmds.Add(drawCmd);
+                    this.DrawCmds.Add(drawCmd);
                 }
             }
             catch (Exception ex)
@@ -218,24 +216,24 @@ namespace ThePalace.Core.Entities.Shared
 
                 for (var i = 0; i < nbrLProps; i++)
                 {
-                    _data.Seek(ofst);
+                    this.Seek(ofst);
 
                     var prop = new LoosePropRec();
-                    ofst = prop.NextOfst = _data.PeekSInt16();
-                    _data.PeekSInt16(); //reserved
+                    ofst = prop.NextOfst = this.PeekSInt16();
+                    this.PeekSInt16(); //reserved
 
-                    var id = _data.PeekSInt32();
-                    var crc = (uint)_data.PeekSInt32();
+                    var id = this.PeekSInt32();
+                    var crc = (uint)this.PeekSInt32();
                     prop.AssetSpec = new AssetSpec(id, crc);
 
-                    prop.Flags = _data.PeekSInt32();
-                    _data.PeekSInt32(); //refCon
+                    prop.Flags = this.PeekSInt32();
+                    this.PeekSInt32(); //refCon
 
-                    var vAxis = _data.PeekSInt16();
-                    var hAxis = _data.PeekSInt16();
+                    var vAxis = this.PeekSInt16();
+                    var hAxis = this.PeekSInt16();
                     prop.Loc = new Types.Point(hAxis, vAxis);
 
-                    result.LooseProps.Add(prop);
+                    this.LooseProps.Add(prop);
                 }
             }
             catch (Exception ex)
@@ -248,8 +246,10 @@ namespace ThePalace.Core.Entities.Shared
             return;
         }
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
+            refNum = 0;
+
             using (var _data = new RawData())
             using (var _blobData = new RawData())
             {
@@ -301,7 +301,7 @@ namespace ThePalace.Core.Entities.Shared
                                 {
                                     foreach (var state in spot.States)
                                     {
-                                        state.Serialize(ms);
+                                        state.Serialize(out refNum, ms, opts);
 
                                         //_blobData.WriteInt16(state.PictID);
                                         //_blobData.WriteInt16(0); //reserved
@@ -413,8 +413,8 @@ namespace ThePalace.Core.Entities.Shared
                         for (var i = 0; i < (DrawCmds?.Count ?? 0); i++)
                         {
                             DrawCmds[i].CmdLength = (ushort)DrawCmds[i].Data.Length;
-                            DrawCmds[i].DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>(null) * DrawCmds.Count);
-                            DrawCmds[i].NextOfst = (short)(i == DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>(null));
+                            DrawCmds[i].DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * DrawCmds.Count);
+                            DrawCmds[i].NextOfst = (short)(i == DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
 
                             tmp1.WriteInt16(DrawCmds[i].NextOfst);
                             tmp1.WriteInt16(0); //reserved
@@ -435,11 +435,11 @@ namespace ThePalace.Core.Entities.Shared
 
                 for (var i = 0; i < (LooseProps?.Count ?? 0); i++)
                 {
-                    LooseProps[i].NextOfst = (short)(i == LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.Palace.AttributeExts.GetByteSize<LoosePropRec>(null));
+                    LooseProps[i].NextOfst = (short)(i == LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.Palace.AttributeExts.GetByteSize<LoosePropRec>());
 
                     using (var ms = new MemoryStream())
                     {
-                        LooseProps[i].Serialize(ms);
+                        LooseProps[i].Serialize(out refNum, ms);
 
                         _blobData.WriteBytes(ms.ToArray());
                     }

@@ -18,15 +18,16 @@ namespace ThePalace.Core.Entities.Shared
         {
             this.PictID = reader.ReadInt16();
             this.Reserved = reader.ReadInt16();
+
             this.PicLoc = new Point(reader);
         }
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             writer.WriteInt16(this.PictID);
             writer.WriteInt16(this.Reserved);
 
-            writer.PalaceSerialize<Point>(this.PicLoc);
+            this.PicLoc.Serialize(out refNum, writer);
         }
     }
 }

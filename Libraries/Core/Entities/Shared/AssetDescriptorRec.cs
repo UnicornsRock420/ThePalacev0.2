@@ -1,6 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Interfaces;
-using ThePalace.Core.Types;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;
 
@@ -12,6 +11,8 @@ namespace ThePalace.Core.Entities.Shared
         public uint16 AssetFlags;
         public uint16 PropFlags;
         public uint32 Size;
-        public Str31 Name;
+
+        [PString(1, 31)]
+        public string? Name;
     }
 }

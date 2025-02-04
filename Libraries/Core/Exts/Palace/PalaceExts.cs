@@ -6,6 +6,7 @@ using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Network.Shared.Core;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces;
 
 namespace ThePalace.Core.Exts.Palace
@@ -401,7 +402,7 @@ namespace ThePalace.Core.Exts.Palace
             return results.ToArray();
         }
 
-        public static void PalaceDeserialize(this Stream reader, object? obj, Type? objType, int refNum = 0, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceDeserialize(this Stream reader, int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             if (obj == null ||
                 objType == null ||
@@ -521,6 +522,11 @@ namespace ThePalace.Core.Exts.Palace
                                 buffer = new byte[byteSize];
                                 reader.Read(buffer, 0, buffer.Length);
 
+                                if (pString is EncryptedStringAttribute)
+                                {
+                                    buffer = buffer.DecryptBytes();
+                                }
+
                                 _cb(member, buffer.GetString());
                             }
 
@@ -581,7 +587,7 @@ namespace ThePalace.Core.Exts.Palace
                             }
                             else
                             {
-                                reader.PalaceDeserialize(result, _type, refNum);
+                                reader.PalaceDeserialize(refNum, result, _type);
                             }
                         }
 
@@ -632,17 +638,19 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceDeserialize<TProtocol>(this Stream reader, TProtocol? obj, int refNum = 0, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceDeserialize<TProtocol>(this Stream reader, int refNum, TProtocol? obj, SerializerOptions opts = SerializerOptions.None)
             where TProtocol : IProtocol
         {
             if (obj == null) return;
 
             var objType = obj.GetType();
-            reader.PalaceDeserialize(obj, objType, refNum);
+            reader.PalaceDeserialize(refNum, obj, objType);
         }
 
-        public static void PalaceSerialize(this Stream writer, object? obj, Type? objType, int refNum = 0, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize(this Stream writer, out int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
+            refNum = 0;
+
             if (obj == null ||
                 objType == null ||
                 !(obj is IProtocol)) return;
@@ -754,6 +762,12 @@ namespace ThePalace.Core.Exts.Palace
                             if (byteSize > 0)
                             {
                                 buffer = _str.GetBytes();
+
+                                if (pString is EncryptedStringAttribute)
+                                {
+                                    buffer = buffer.EncryptBytes();
+                                }
+
                                 writer.Write(buffer, 0, buffer.Length);
                             }
 
@@ -787,7 +801,7 @@ namespace ThePalace.Core.Exts.Palace
                         break;
 
                     case Type _t when _t is IProtocol:
-                        writer.PalaceSerialize(_value, _type, refNum);
+                        writer.PalaceSerialize(out refNum, _value, _type);
 
                         continue;
 
@@ -807,9 +821,11 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceSerialize<TProtocol>(this Stream writer, TProtocol? obj, int refNum = 0, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize<TProtocol>(this Stream writer, out int refNum, TProtocol? obj, SerializerOptions opts = SerializerOptions.None)
             where TProtocol : IProtocol
         {
+            refNum = 0;
+
             if (obj == null) return;
 
             var typeName = typeof(TProtocol).Name;
@@ -820,11 +836,11 @@ namespace ThePalace.Core.Exts.Palace
             {
                 if (obj.Is<IProtocolSerializer>(out var serializer))
                 {
-                    serializer.Serialize(ms, opts);
+                    serializer.Serialize(out refNum, ms, opts);
                 }
                 else
                 {
-                    ms.PalaceSerialize(obj, refNum, opts);
+                    ms.PalaceSerialize(out refNum, obj, opts);
                 }
 
                 msgBytes = ms.ToArray();
@@ -836,11 +852,7 @@ namespace ThePalace.Core.Exts.Palace
                 EventType = Enum.Parse<EventTypes>(typeName),
                 Length = (uint)(msgBytes?.Length ?? 0),
             };
-            if (obj.Is<IProtocolRefNumOverride>(out var hdrResult))
-            {
-                hdr.RefNum = hdrResult.RefNum;
-            }
-            else
+            if (obj.Is<IProtocolRefNumOverride>())
             {
                 hdr.RefNum = refNum;
             }
@@ -852,11 +864,11 @@ namespace ThePalace.Core.Exts.Palace
                 {
                     if (hdr.Is<IProtocolSerializer>(out var serializer))
                     {
-                        serializer.Serialize(ms, opts);
+                        serializer.Serialize(out refNum, ms, opts);
                     }
                     else
                     {
-                        ms.PalaceSerialize(hdr, typeof(MSG_Header), refNum, opts);
+                        ms.PalaceSerialize(out refNum, hdr, typeof(MSG_Header), opts);
                     }
 
                     hdrBytes = ms.ToArray();

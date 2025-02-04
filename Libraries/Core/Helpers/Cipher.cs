@@ -58,65 +58,65 @@ namespace ThePalace.Core.Helpers
         }
         public static byte[] EncryptBytes(this byte[] inStr)
         {
-            var outStr = new byte[inStr.Length];
+            var outBytes = new byte[inStr.Length];
 
             int rc = 0;
             byte lastChar = 0;
 
             for (var i = inStr.Length - 1; i >= 0; --i)
             {
-                outStr[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
-                lastChar = (byte)(outStr[i] ^ _gEncryptTable[rc++]);
+                outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+                lastChar = (byte)(outBytes[i] ^ _gEncryptTable[rc++]);
             }
 
-            return outStr;
+            return outBytes;
         }
 
         public static string DecryptString(this string value)
         {
             var inStr = value.GetBytes();
-            var outStr = new byte[inStr.Length];
+            var outBytes = new byte[inStr.Length];
 
             var lastChar = (byte)0;
             var rc = 0;
 
             for (var i = inStr.Length - 1; i >= 0; --i)
             {
-                outStr[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+                outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
                 lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
             }
 
-            return outStr.GetString();
+            return outBytes.GetString();
         }
         public static string DecryptString(this byte[] inStr)
         {
-            var outStr = new byte[inStr.Length];
+            var outBytes = new byte[inStr.Length];
 
             var lastChar = (byte)0;
             var rc = 0;
 
             for (var i = inStr.Length - 1; i >= 0; --i)
             {
-                outStr[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+                outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
                 lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
             }
 
-            return outStr.GetString();
+            return outBytes.GetString();
         }
         public static byte[] DecryptBytes(this byte[] inStr)
         {
-            var outStr = new byte[inStr.Length];
+            var outBytes = new byte[inStr.Length];
 
             var lastChar = (byte)0;
             var rc = 0;
 
             for (var i = inStr.Length - 1; i >= 0; --i)
             {
-                outStr[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+                outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
                 lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
             }
 
-            return outStr;
+            return outBytes;
         }
 
         public static int GetSeedFromReg(uint counter, uint crc) =>

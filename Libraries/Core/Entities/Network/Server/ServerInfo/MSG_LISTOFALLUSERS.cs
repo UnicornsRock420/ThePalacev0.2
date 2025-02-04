@@ -11,6 +11,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
     [DynamicSize]
     public partial class MSG_LISTOFALLUSERS : IProtocolRefNumOverride, IProtocolS2C, IProtocolSerializer
     {
+        [RefNum]
         public sint32 RefNum
         {
             get => this.Users?.Count ?? 0;
@@ -31,7 +32,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
             while ((reader.Length - reader.Position) >= 12)
             {
                 var user = new ListRec();
-                reader.PalaceDeserialize(user, typeof(ListRec), refNum, opts);
+                reader.PalaceDeserialize(refNum, user, typeof(ListRec), opts);
                 this.Users.Add(user);
             }
 
@@ -39,11 +40,13 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
                 throw new InvalidDataException(nameof(MSG_LISTOFALLUSERS) + "-S2C: Deserialization Error!");
         }
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             if ((this.Users?.Count ?? 0) > 0)
                 foreach (var user in this.Users)
-                    writer.PalaceSerialize(user, typeof(ListRec), 0, opts);
+                    writer.PalaceSerialize(out refNum, user, typeof(ListRec), opts);
+
+            refNum = this.Users?.Count ?? 0;
         }
     }
 }

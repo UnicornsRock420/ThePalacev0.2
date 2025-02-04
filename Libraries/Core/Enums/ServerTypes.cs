@@ -7,7 +7,7 @@ namespace ThePalace.Core.Enums
 {
     [Flags]
     [ByteSize(2)]
-    public enum ServerPermissions : sint16
+    public enum ServerPermissions : sint32
     {
         PM_AllowGuests = 0x0001,
         PM_AllowCyborgs = 0x0002,

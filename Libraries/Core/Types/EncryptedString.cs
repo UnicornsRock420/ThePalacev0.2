@@ -9,7 +9,7 @@ namespace ThePalace.Core.Types
     [ComVisible(true)]
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public struct EncryptedString : IString, IComparable, IFormattable, IConvertible
+    public struct EncryptedString : IString, IComparable
     {
         public static explicit operator uint8[](EncryptedString p) => p.Value ?? [];
         public static explicit operator char[](EncryptedString p) => p.ToString()?.ToCharArray() ?? [];
@@ -18,6 +18,7 @@ namespace ThePalace.Core.Types
         public static explicit operator EncryptedString(char[] v) => new(v);
         public static explicit operator EncryptedString(string v) => new(v);
 
+        #region cStr
         public EncryptedString(uint8[] value, EncryptedStringOptions opts = EncryptedStringOptions.None)
         {
             if (value != null &&
@@ -25,11 +26,7 @@ namespace ThePalace.Core.Types
             {
                 this._value = value;
 
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.EncryptString))
-                    Encrypt();
-
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.DecryptString))
-                    Decrypt();
+                Options(opts);
             }
         }
         public EncryptedString(char[] value, EncryptedStringOptions opts = EncryptedStringOptions.None)
@@ -39,11 +36,7 @@ namespace ThePalace.Core.Types
             {
                 this._value = value.GetBytes();
 
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.EncryptString))
-                    Encrypt();
-
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.DecryptString))
-                    Decrypt();
+                Options(opts);
             }
         }
         public EncryptedString(string value, EncryptedStringOptions opts = EncryptedStringOptions.None)
@@ -56,14 +49,12 @@ namespace ThePalace.Core.Types
                 else
                     this._value = value.GetBytes();
 
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.EncryptString))
-                    Encrypt();
-
-                if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.DecryptString))
-                    Decrypt();
+                Options(opts);
             }
         }
+        #endregion
 
+        #region Fields & Properties
         public readonly uint8 Length => (uint8)(_value?.Length ?? 0);
 
         private uint8[]? _value = [];
@@ -80,19 +71,21 @@ namespace ThePalace.Core.Types
                 _value = value;
             }
         }
+        #endregion
 
-        public void Encrypt()
+        #region Methods
+        public void Options(EncryptedStringOptions opts = EncryptedStringOptions.None)
         {
-            this._value = this._value.EncryptBytes();
+            if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.EncryptString))
+            {
+                this._value = this._value.EncryptBytes();
+            }
+            else if (opts.IsBit<EncryptedStringOptions, EncryptedStringOptions>(EncryptedStringOptions.DecryptString))
+            {
+                this._value = this._value.DecryptBytes();
+            }
         }
 
-        public void Decrypt()
-        {
-            this._value = this._value.DecryptBytes();
-        }
-
-        public string? ToString(string? format, IFormatProvider? formatProvider) => string.Concat(_value?.DecryptString());
-        public string? ToString(IFormatProvider? provider) => string.Concat(_value?.DecryptString());
         public string? ToString(EncryptedStringOptions opts = EncryptedStringOptions.DecryptString)
         {
             var result = (string?)null;
@@ -122,17 +115,7 @@ namespace ThePalace.Core.Types
 
         public readonly bool ToBoolean(IFormatProvider? provider) => true;
 
-        public DateTime ToDateTime(IFormatProvider? provider)
-        {
-            try
-            {
-                return DateTime.Parse(string.Concat(_value?.DecryptString()));
-            }
-            catch
-            {
-                return DateTime.UnixEpoch;
-            }
-        }
+        public DateTime ToDateTime(IFormatProvider? provider) => DateTime.UnixEpoch;
 
         public byte ToByte(IFormatProvider? provider) => (byte)(_value?.FirstOrDefault() ?? 0);
 
@@ -157,5 +140,6 @@ namespace ThePalace.Core.Types
         public uint ToUInt32(IFormatProvider? provider) => (uint)(_value?.FirstOrDefault() ?? 0);
 
         public ulong ToUInt64(IFormatProvider? provider) => (ulong)(_value?.FirstOrDefault() ?? 0);
+        #endregion
     }
 }

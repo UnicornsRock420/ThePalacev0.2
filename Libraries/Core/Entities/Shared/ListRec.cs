@@ -1,6 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Interfaces;
-using ThePalace.Core.Types;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 

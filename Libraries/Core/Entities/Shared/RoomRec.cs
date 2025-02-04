@@ -10,7 +10,7 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomRec : IDisposable, IData, IProtocolSerializer
+    public partial class RoomRec : RawData, IDisposable, IData, IProtocolSerializer
     {
         public RoomRec()
         {
@@ -31,9 +31,9 @@ namespace ThePalace.Core.Entities.Shared
             LooseProps = new();
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            _data?.Dispose();
+            _data?.Clear();
             _data = null;
 
             HotSpots?.Clear();
@@ -48,16 +48,9 @@ namespace ThePalace.Core.Entities.Shared
             LooseProps?.Clear();
             LooseProps = null;
 
-            GC.SuppressFinalize(this);
-        }
+            base.Dispose();
 
-        [IgnoreDataMember]
-        private RawData? _data;
-        [IgnoreDataMember]
-        public uint8[]? Data
-        {
-            get => _data.Data;
-            set => _data.Data = value;
+            GC.SuppressFinalize(this);
         }
 
         [ByteSize(4)]

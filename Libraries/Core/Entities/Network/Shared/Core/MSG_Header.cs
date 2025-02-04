@@ -11,6 +11,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
     {
         // Mnemonic
         public EventTypes EventType;
+
         public uint32 Length;
         public sint32 RefNum;
     }

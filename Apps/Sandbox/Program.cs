@@ -24,10 +24,12 @@ namespace Sandbox
             var packetBytes = (byte[]?)null;
             var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
+            var refNum = 0;
 
             using (var ms = new MemoryStream())
             {
                 ms.PalaceSerialize(
+                    out refNum,
                     new MSG_LISTOFALLROOMS
                     {
                         Rooms = new List<ListRec>
@@ -50,14 +52,13 @@ namespace Sandbox
                             },
                         }
                     },
-                    456,
                     SerializerOptions.IncludeHeader);
 
                 packetBytes = ms.ToArray();
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                ms.PalaceDeserialize(hdr, typeof(MSG_Header));
+                ms.PalaceDeserialize(hdr.RefNum, hdr, typeof(MSG_Header));
 
                 if ((ms.Length - ms.Position) != hdr.Length)
                     throw new InvalidDataException(nameof(hdr));
@@ -73,9 +74,9 @@ namespace Sandbox
                     msg = (IProtocol?)msgType.GetInstance();
 
                     ms.PalaceDeserialize(
+                        hdr.RefNum,
                         msg,
-                        msgType,
-                        hdr.RefNum);
+                        msgType);
                 }
             }
 

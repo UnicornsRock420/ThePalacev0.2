@@ -1,6 +1,4 @@
-﻿using Mapster.Utils;
-
-namespace System
+﻿namespace System
 {
     public static class EnumExts
     {

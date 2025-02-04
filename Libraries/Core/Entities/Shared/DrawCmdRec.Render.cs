@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.Serialization;
+using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Types;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
 
@@ -43,7 +43,9 @@ namespace ThePalace.Core.Entities.Shared
         public List<Types.Point>? Points;
         [IgnoreDataMember]
         public Rectangle Rect;
+
         [IgnoreDataMember]
-        public CString Text { get; set; }
+        [CString]
+        public string Text;
     }
 }

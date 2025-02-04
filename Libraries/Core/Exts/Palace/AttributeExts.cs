@@ -11,9 +11,9 @@ namespace ThePalace.Core.Exts.Palace
             public static readonly Type ByteWidthAttribute = typeof(ByteSizeAttribute);
         }
 
-        public static string? GetMnemonic<T>(this T? value)
+        public static string? GetMnemonic<T>()
         {
-            var type = value?.GetType() ?? typeof(T);
+            var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:
@@ -37,9 +37,10 @@ namespace ThePalace.Core.Exts.Palace
             return null;
         }
 
-        public static uint GetHexValue<T>(this T? value)
+        public static uint GetHexValue<T>()
         {
-            switch (value)
+            var type = typeof(T);
+            switch (type)
             {
                 case Type _t when _t is Type:
                     return _t
@@ -62,7 +63,7 @@ namespace ThePalace.Core.Exts.Palace
             return 0;
         }
 
-        public static int GetBitSize<T>(this T? value)
+        public static int GetBitSize<T>()
         {
             var type = typeof(T);
             switch (type)
@@ -97,9 +98,9 @@ namespace ThePalace.Core.Exts.Palace
             return 0;
         }
 
-        public static int GetByteSize<T>(this T? value)
+        public static int GetByteSize<T>()
         {
-            var type = value?.GetType() ?? typeof(T);
+            var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:

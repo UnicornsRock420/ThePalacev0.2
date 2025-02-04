@@ -22,7 +22,7 @@ namespace ThePalace.Core.Entities.Network.Client.Network
             throw new NotImplementedException();
         }
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }

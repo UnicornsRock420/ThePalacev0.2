@@ -12,6 +12,11 @@ namespace ThePalace.Core.Entities.Shared
 {
     public partial class UserRec : IDisposable, IProtocol
     {
+        public UserRec()
+        {
+            this.PropSpec = new AssetSpec[9];
+        }
+
         public void Dispose()
         {
             PropSpec = null;
@@ -33,15 +38,19 @@ namespace ThePalace.Core.Entities.Shared
 
         public UserID UserID;
         public Point RoomPos;
-        [DynamicSize(8 * 9)]
+
+        [ByteSize(8 * 9)]
         public AssetSpec[] PropSpec;
+
         public RoomID RoomID;
         public sint16 FaceNbr;
         public sint16 ColorNbr;
         public sint16 AwayFlag;
         public sint16 OpenToMsgs;
         public sint16 NbrProps;
-        public Str31 Name;
+
+        [PString(1, 31)]
+        public string? Name;
 
         [IgnoreDataMember]
         public ConcurrentDictionary<string, object> Extended;

@@ -21,6 +21,7 @@
     <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
+    <Compile Remove="Types\EncryptedString.cs" />
     <Compile Remove="Types\PatStream.cs" />
     <Compile Remove="Types\PropPIDSStream.cs" />
     <Compile Remove="Types\PropPROPSStream.cs" />
@@ -45,6 +46,7 @@
     <None Include="Factories\LockContext.cs" />
     <None Include="Factories\Singleton.cs" />
     <None Include="Factories\Tree.cs" />
+    <None Include="Types\EncryptedString.cs" />
     <None Include="Types\PatStream.cs" />
   </ItemGroup>
 
