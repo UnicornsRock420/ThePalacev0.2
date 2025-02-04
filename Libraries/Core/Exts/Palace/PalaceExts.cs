@@ -683,7 +683,7 @@ namespace ThePalace.Core.Exts.Palace
                 objType == null ||
                 !(obj is IStruct)) return;
 
-            var streamPosition = writer.Length - writer.Position;
+            var streamPosition = writer.Position;
 
             var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
@@ -760,7 +760,7 @@ namespace ThePalace.Core.Exts.Palace
 
                 if (maxByteSize > 0)
                 {
-                    var bytesWritten = (writer.Length - (streamPosition - writer.Position));
+                    var bytesWritten = writer.Position - streamPosition;
 
                     if (bytesWritten > maxByteSize) throw new EndOfStreamException(nameof(writer));
                     if (bytesWritten == maxByteSize) return;
@@ -895,7 +895,7 @@ namespace ThePalace.Core.Exts.Palace
                     writer.Write(buffer, 0, buffer.Length);
             }
 
-            if (minByteSize > 0 && (writer.Length - (streamPosition - writer.Position)) < minByteSize) throw new EndOfStreamException(nameof(writer));
+            if (minByteSize > 0 && (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
         public static void PalaceSerialize<TStruct>(this Stream writer, out int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)

@@ -42,11 +42,11 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 
         public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            refNum = this.Users?.Count ?? 0;
-
-            if (refNum > 0)
+            if ((this.Users?.Count ?? 0) > 0)
                 foreach (var user in this.Users)
                     writer.PalaceSerialize(out refNum, user, typeof(ListRec), opts);
+
+            refNum = this.Users?.Count ?? 0;
         }
     }
 }

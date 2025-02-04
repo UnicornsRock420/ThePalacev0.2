@@ -1,7 +1,6 @@
-using System.Linq;
+using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Core;
-using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces;
@@ -24,7 +23,8 @@ namespace Sandbox
 
             var packetBytes = (byte[]?)null;
             var hdr = new MSG_Header();
-            var msg = (IStruct?)null;
+            var msg = (IProtocol?)null;
+            var msgType = (Type?)null;
             var refNum = 0;
 
             using (var ms = new MemoryStream())
@@ -66,14 +66,14 @@ namespace Sandbox
                     throw new InvalidDataException(nameof(hdr));
 
                 var eventType = hdr.EventType.ToString();
-                var msgType = AppDomain.CurrentDomain
-                    .GetAssemblies()
-                    .SelectMany(t => t.GetTypes())
-                    .Where(t => t.Name == eventType)
-                    .FirstOrDefault();
+                msgType = AppDomain.CurrentDomain
+                   .GetAssemblies()
+                   .SelectMany(t => t.GetTypes())
+                   .Where(t => t.Name == eventType)
+                   .FirstOrDefault();
                 if (msgType != null)
                 {
-                    msg = (IStruct?)msgType.GetInstance();
+                    msg = (IProtocol?)msgType.GetInstance();
 
                     ms.PalaceDeserialize(
                         hdr.RefNum,
@@ -82,10 +82,44 @@ namespace Sandbox
                 }
             }
 
-            Func<string, bool>? where = l => l == "123";
-            var test = new List<string> { "Test", "123" }
-                .Where(where)
-                .ToList();
+            var obj = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t => !t.IsInterface)
+                .Where(t =>
+                {
+                    var itrfs = t.GetInterfaces();
+
+                    return
+                        itrfs.Contains(typeof(IProtocolHandler)) &&
+                        itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType));
+                })
+                .Select(t =>
+                {
+                    foreach (var i in t.GetInterfaces() ?? [])
+                        if (i == typeof(IProtocolHandler))
+                            return t;
+
+                    return null;
+                })
+                .FirstOrDefault();
+
+            var boObj = obj?.GetInstance<IProtocolHandler>();
+            if (boObj != null)
+            {
+                boObj.Handle(new ProtocolEventArgs
+                {
+                    SourceID = 0,
+                    RefNum = hdr.RefNum,
+                    Request = msg,
+                    SessionState = null,
+                });
+            }
+
+            //Func<string, bool>? where = l => l == "123";
+            //var test = new List<string> { "Test", "123" }
+            //    .Where(where)
+            //    .ToList();
         }
 
         public Program()
