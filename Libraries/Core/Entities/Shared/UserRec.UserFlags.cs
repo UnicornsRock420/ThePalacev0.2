@@ -1,15 +1,12 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
 using uint16 = System.UInt16;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class UserRec : IDisposable, IProtocol
+    public partial class UserRec
     {
         [IgnoreDataMember]
-        [ByteSize(2)]
         public UserFlags UserFlags;
         [IgnoreDataMember]
         public bool IsGagged

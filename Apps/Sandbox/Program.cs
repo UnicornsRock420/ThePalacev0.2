@@ -45,7 +45,7 @@ namespace Sandbox
                             new ListRec
                             {
                                 PrimaryID = 2,
-                                Flags = (sint16)RoomFlags.RF_WizardsOnly,
+                                Flags = (sint16)RoomFlags.WizardsOnly,
                                 RefNum = 24,
 
                                 Name = "Testing 456",

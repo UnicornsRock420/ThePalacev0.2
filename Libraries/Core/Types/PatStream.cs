@@ -1,8 +1,9 @@
-﻿using System.Text;
+﻿using System.ComponentModel;
+using System.Text;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
+using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Types;
 
@@ -11,14 +12,14 @@ namespace ThePalace.Core.Factories
     public sealed class PatStream : StreamBase
     {
         private const string CONST_ROOMFLAGS_FORMAT = "\t{0}";
-        private static readonly string CONST_ROOMFLAGS_NOCYBORGS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_CyborgFreeZone.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_DROPZONE = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_DropZone.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_HIDDEN = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_Hidden.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_NOGUESTS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_NoGuests.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_NOCYBORGS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.CyborgFreeZone.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_DROPZONE = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.DropZone.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_HIDDEN = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.Hidden.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_NOGUESTS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.NoGuests.GetDescription());
         private static readonly string CONST_ROOMFLAGS_NOLOOSEPROPS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_NoLooseProps.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_NOPAINTING = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_NoPainting.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_PRIVATE = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_Private.GetDescription());
-        private static readonly string CONST_ROOMFLAGS_OPERATORSONLY = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.RF_WizardsOnly.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_NOPAINTING = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.NoPainting.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_PRIVATE = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.Private.GetDescription());
+        private static readonly string CONST_ROOMFLAGS_OPERATORSONLY = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.WizardsOnly.GetDescription());
         private const string CONST_HOTSPOTFLAGS_FORMAT = "\t\t{0}";
         private static readonly string CONST_HOTSPOTFLAGS_DONTMOVEHERE = string.Format(CONST_HOTSPOTFLAGS_FORMAT, HotspotFlags.HS_DontMoveHere.GetDescription());
         private static readonly string CONST_HOTSPOTFLAGS_DRAGGABLE = string.Format(CONST_HOTSPOTFLAGS_FORMAT, HotspotFlags.HS_Draggable.GetDescription());
@@ -330,7 +331,7 @@ namespace ThePalace.Core.Factories
 
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID && !string.IsNullOrWhiteSpace(value))
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_AuthorLocked;
+                                workingRoom.RoomFlags |= RoomFlags.AuthorLocked;
                                 workingRoom.Password = value.GetBytes().ReadCString().GetBytes().DecryptString();
                             }
 
@@ -362,49 +363,49 @@ namespace ThePalace.Core.Factories
                         case "DROPZONE":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_DropZone;
+                                workingRoom.RoomFlags |= RoomFlags.DropZone;
                             }
 
                             break;
                         case "NOLOOSEPROPS":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_NoLooseProps;
+                                workingRoom.RoomFlags |= RoomFlags.RF_NoLooseProps;
                             }
 
                             break;
                         case "PRIVATE":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_Private;
+                                workingRoom.RoomFlags |= RoomFlags.Private;
                             }
 
                             break;
                         case "NOPAINTING":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_NoPainting;
+                                workingRoom.RoomFlags |= RoomFlags.NoPainting;
                             }
 
                             break;
                         case "NOCYBORGS":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_CyborgFreeZone;
+                                workingRoom.RoomFlags |= RoomFlags.CyborgFreeZone;
                             }
 
                             break;
                         case "HIDDEN":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_Hidden;
+                                workingRoom.RoomFlags |= RoomFlags.Hidden;
                             }
 
                             break;
                         case "NOGUESTS":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_NoGuests;
+                                workingRoom.RoomFlags |= RoomFlags.NoGuests;
                             }
 
                             break;
@@ -412,7 +413,7 @@ namespace ThePalace.Core.Factories
                         case "OPERATORSONLY":
                             if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             {
-                                workingRoom.RoomFlags |= (int)RoomFlags.RF_WizardsOnly;
+                                workingRoom.RoomFlags |= RoomFlags.WizardsOnly;
                             }
 
                             break;
@@ -427,70 +428,70 @@ namespace ThePalace.Core.Factories
                         case "DRAGGABLE":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Draggable;
+                                workingHotspot.Flags |= HotspotFlags.HS_Draggable;
                             }
 
                             break;
                         case "FORBIDDEN":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Forbidden;
+                                workingHotspot.Flags |= HotspotFlags.HS_Forbidden;
                             }
 
                             break;
                         case "MANDATORY":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Mandatory;
+                                workingHotspot.Flags |= HotspotFlags.HS_Mandatory;
                             }
 
                             break;
                         case "LANDINGPAD":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_LandingPad;
+                                workingHotspot.Flags |= HotspotFlags.HS_LandingPad;
                             }
 
                             break;
                         case "DONTMOVEHERE":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_DontMoveHere;
+                                workingHotspot.Flags |= HotspotFlags.HS_DontMoveHere;
                             }
 
                             break;
                         case "INVISIBLE":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Invisible;
+                                workingHotspot.Flags |= HotspotFlags.HS_Invisible;
                             }
 
                             break;
                         case "SHOWNAME":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_ShowName;
+                                workingHotspot.Flags |= HotspotFlags.HS_ShowName;
                             }
 
                             break;
                         case "SHOWFRAME":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_ShowFrame;
+                                workingHotspot.Flags |= HotspotFlags.HS_ShowFrame;
                             }
 
                             break;
                         case "SHADOW":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Shadow;
+                                workingHotspot.Flags |= HotspotFlags.HS_Shadow;
                             }
 
                             break;
                         case "FILL":
                             if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             {
-                                workingHotspot.Flags |= (int)HotspotFlags.HS_Fill;
+                                workingHotspot.Flags |= HotspotFlags.HS_Fill;
                             }
 
                             break;
@@ -621,7 +622,7 @@ namespace ThePalace.Core.Factories
                 if (printHeader)
                 {
                     var entrance = rooms
-                        .Where(r => (r.RoomFlags & (int)RoomFlags.RF_DropZone) != 0)
+                        .Where(r => RoomFlags.DropZone.IsBit<RoomFlags, RoomFlags, short>(r.RoomFlags))
                         .OrderBy(r => r.RoomID)
                         .FirstOrDefault();
 
@@ -644,14 +645,14 @@ namespace ThePalace.Core.Factories
 
                         if (r.MaxOccupancy > 0) writer.WriteLine($"\tMAXMEMBERS {r.MaxOccupancy}");
 
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_CyborgFreeZone) == RoomFlags.RF_CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_DropZone) == RoomFlags.RF_DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_Hidden) == RoomFlags.RF_Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_NoGuests) == RoomFlags.RF_NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
                         if (((RoomFlags)r.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps) writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_NoPainting) == RoomFlags.RF_NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_Private) == RoomFlags.RF_Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_WizardsOnly) == RoomFlags.RF_WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.Private) == RoomFlags.Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
+                        if (((RoomFlags)r.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
 
                         writer.WriteLine($"\tNAME \"{r.Name}\"");
                         if (!string.IsNullOrWhiteSpace(r.Picture?.ToString())) writer.WriteLine($"\tPICT \"{r.Picture?.ToString()}\"");

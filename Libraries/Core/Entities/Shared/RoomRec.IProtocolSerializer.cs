@@ -79,7 +79,7 @@ namespace ThePalace.Core.Entities.Shared
                         States = new(),
                     };
                     this.PeekSInt32(); //scriptEventMask
-                    h.Flags = this.PeekSInt32();
+                    h.Flags = (HotspotFlags)this.PeekSInt32();
                     this.PeekSInt32(); //secureInfo
                     this.PeekSInt32(); //refCon
 
@@ -341,8 +341,8 @@ namespace ThePalace.Core.Entities.Shared
                                 spot.NameOfst = 0;
 
                             //Buffer spotrecs
-                            tmp.WriteInt32(spot.ScriptEventMask);
-                            tmp.WriteInt32(spot.Flags);
+                            tmp.WriteInt32((int)spot.ScriptEventMask);
+                            tmp.WriteInt32((int)spot.Flags);
                             tmp.WriteInt32(0); //secureInfo
                             tmp.WriteInt32(0); //refCon
 

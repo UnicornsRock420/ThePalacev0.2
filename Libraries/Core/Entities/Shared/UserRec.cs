@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Factories;
 using ThePalace.Core.Interfaces;
 using ThePalace.Core.Types;
@@ -39,7 +37,7 @@ namespace ThePalace.Core.Entities.Shared
         public UserID UserID;
         public Point RoomPos;
 
-        [ByteSize(8 * 9)]
+        [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)
         public AssetSpec[] PropSpec;
 
         public RoomID RoomID;
@@ -51,8 +49,5 @@ namespace ThePalace.Core.Entities.Shared
 
         [PString(1, 31)]
         public string? Name;
-
-        [IgnoreDataMember]
-        public ConcurrentDictionary<string, object> Extended;
     }
 }

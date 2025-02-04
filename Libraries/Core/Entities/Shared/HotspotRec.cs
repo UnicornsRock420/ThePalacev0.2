@@ -11,8 +11,8 @@ namespace ThePalace.Core.Entities.Shared
     [ByteSize(48)]
     public partial class HotspotRec : IProtocol
     {
-        public sint32 ScriptEventMask;
-        public sint32 Flags;
+        public HotSpotEventMask ScriptEventMask;
+        public HotspotFlags Flags;
         public sint32 SecureInfo;
         public sint32 RefCon;
         public Point Loc;
@@ -30,13 +30,5 @@ namespace ThePalace.Core.Entities.Shared
         public sint16 NameOfst;
         public sint16 ScriptTextOfst;
         public sint16 AlignReserved;
-
-        public List<HotspotStateRec>? States;
-        public List<Point>? Vortexes;
-
-        [CString]
-        public string? Name;
-        [CString]
-        public string? Script;
     }
 }
