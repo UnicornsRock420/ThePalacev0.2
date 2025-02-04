@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Core.Interfaces
 {
-    public interface IProtocolS2C : IStruct
+    public interface IStruct
     {
     }
 }

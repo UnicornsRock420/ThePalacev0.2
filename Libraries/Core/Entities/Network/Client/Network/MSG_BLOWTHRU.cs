@@ -9,7 +9,7 @@ namespace ThePalace.Core.Entities.Network.Client.Network
 {
     [Mnemonic("blow")]
     [DynamicSize]
-    public partial class MSG_BLOWTHRU : IProtocolC2S, IProtocolSerializer
+    public partial class MSG_BLOWTHRU : IProtocolC2S, IStructSerializer
     {
         public uint32 Flags;
         public uint32 NbrUsers;

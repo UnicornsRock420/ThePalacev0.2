@@ -4,6 +4,7 @@ using ThePalace.Core.Interfaces;
 
 namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
+    [DynamicSize]
     [Mnemonic("sinf")]
     public partial class MSG_SERVERINFO : IProtocolS2C
     {

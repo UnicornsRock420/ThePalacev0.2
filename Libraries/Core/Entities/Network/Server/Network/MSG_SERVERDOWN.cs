@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [ByteSize(4)]
     [Mnemonic("down")]
-    public partial class MSG_SERVERDOWN : IProtocolRefNumOverride, IProtocolS2C
+    public partial class MSG_SERVERDOWN : IStructRefNum, IProtocolS2C
     {
         [RefNum]
         public ServerDownFlags ServerDownFlags;

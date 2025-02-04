@@ -4,9 +4,9 @@ using ThePalace.Core.Interfaces;
 namespace ThePalace.Core.Entities.Network.Client.Communications
 {
     [Mnemonic("rmsg")]
-    public partial class MSG_RMSG : IProtocolCommunications, IProtocolC2S
+    public partial class MSG_RMSG : ICommunications, IProtocolC2S
     {
-        [CString]
+        [CString(255)]
         public string Text { get; set; }
     }
 }

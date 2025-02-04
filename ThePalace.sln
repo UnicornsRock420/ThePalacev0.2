@@ -14,13 +14,21 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Network", "Libraries\Network\ThePalace.Network.csproj", "{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}"
-	ProjectSection(SolutionItems) = preProject
-		Documentation\PalaceProtocolRef.pdf = Documentation\PalaceProtocolRef.pdf
-		Documentation\PalaceProtocolRef.txt = Documentation\PalaceProtocolRef.txt
-		Documentation\PalaceProtocolRefWiki.txt = Documentation\PalaceProtocolRefWiki.txt
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Core", "Libraries\Core\ThePalace.Core.csproj", "{957F2D34-5236-46AF-A517-637D1E5A6555}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PalaceProtocolRef", "PalaceProtocolRef", "{6E2D5C89-7D49-4DF2-AA66-CDECDB95EE19}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\PalaceProtocolRef\Manual.pdf = Documentation\PalaceProtocolRef\Manual.pdf
+		Documentation\PalaceProtocolRef\Manual.txt = Documentation\PalaceProtocolRef\Manual.txt
+		Documentation\PalaceProtocolRef\Wiki.txt = Documentation\PalaceProtocolRef\Wiki.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Iptscrae", "Iptscrae", "{D721B88A-2F58-4105-A421-FD625D1A40DB}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\Iptscrae\Manual.pdf = Documentation\Iptscrae\Manual.pdf
+		Documentation\Iptscrae\PalaceChat - Extended Scripting.html = Documentation\Iptscrae\PalaceChat - Extended Scripting.html
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +56,7 @@ Global
 		{C8F6B766-480D-47B8-960D-56AE01F1D745} = {37029653-83BE-40AF-98EB-C8D7260DDF97}
 		{8FCC1942-F3D9-4C5B-A47A-EBAA3A399059} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
 		{957F2D34-5236-46AF-A517-637D1E5A6555} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
+		{6E2D5C89-7D49-4DF2-AA66-CDECDB95EE19} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
+		{D721B88A-2F58-4105-A421-FD625D1A40DB} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
 	EndGlobalSection
 EndGlobal

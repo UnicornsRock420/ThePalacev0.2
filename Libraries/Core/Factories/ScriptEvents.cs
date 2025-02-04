@@ -35,7 +35,7 @@ namespace ThePalace.Core.Factories
             _events = null;
         }
 
-        public void Invoke(IptEventTypes eventType, ISessionState sessionState, IProtocol packet, object? scriptState = null)
+        public void Invoke(IptEventTypes eventType, ISessionState sessionState, IStruct packet, object? scriptState = null)
         {
             var scriptEvent = new ScriptEventArgs
             {

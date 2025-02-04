@@ -1,5 +1,6 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Interfaces;
 using RoomID = System.Int16;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
@@ -7,7 +8,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Shared
 {
     [DynamicSize]
-    public partial class RoomRec
+    public partial class RoomRec : IStruct
     {
         public RoomFlags RoomFlags;
         public sint32 FacesID;

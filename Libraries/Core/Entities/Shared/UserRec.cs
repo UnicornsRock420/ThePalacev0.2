@@ -8,7 +8,7 @@ using UserID = System.Int32;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class UserRec : IDisposable, IProtocol
+    public partial class UserRec : IDisposable, IStruct
     {
         public UserRec()
         {

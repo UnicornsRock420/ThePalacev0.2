@@ -9,7 +9,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
     [Mnemonic("rLst")]
     [DynamicSize]
-    public partial class MSG_LISTOFALLROOMS : IProtocolRefNumOverride, IProtocolS2C, IProtocolSerializer
+    public partial class MSG_LISTOFALLROOMS : IStructRefNum, IProtocolS2C, IStructSerializer
     {
         [RefNum]
         public sint32 RefNum

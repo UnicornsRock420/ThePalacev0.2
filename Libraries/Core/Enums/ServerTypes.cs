@@ -1,5 +1,4 @@
 ﻿using ThePalace.Core.Attributes;
-using sint16 = System.Int16;
 using sint32 = System.Int32;
 using uint32 = System.UInt32;
 

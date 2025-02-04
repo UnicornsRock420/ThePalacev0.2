@@ -4,7 +4,7 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class LoosePropRec : IProtocolSerializer
+    public partial class LoosePropRec : IStructSerializer
     {
         public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {

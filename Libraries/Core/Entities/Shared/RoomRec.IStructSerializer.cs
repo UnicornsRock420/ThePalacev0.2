@@ -8,7 +8,7 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomRec : IDisposable, IData, IProtocolSerializer
+    public partial class RoomRec : IDisposable, IData, IStructSerializer
     {
         public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {

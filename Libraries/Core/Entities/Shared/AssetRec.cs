@@ -11,7 +11,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(32)]
-    public partial class AssetRec : RawData, IDisposable, IData
+    public partial class AssetRec : RawData, IStruct
     {
         public override void Dispose()
         {

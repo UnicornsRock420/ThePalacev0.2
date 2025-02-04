@@ -7,7 +7,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Shared
 {
     [ByteSize(12)]
-    public partial class PictureRec : IProtocol
+    public partial class PictureRec : IStruct
     {
         public sint32 RefCon;
         public sint16 PicID;

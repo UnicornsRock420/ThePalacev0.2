@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using ThePalace.Core.Attributes;
 using sint16 = System.Int16;
 
 namespace ThePalace.Core.Entities.Shared
@@ -15,7 +16,9 @@ namespace ThePalace.Core.Entities.Shared
         public string? Picture;
         [IgnoreDataMember]
         public string? Artist;
+
         [IgnoreDataMember]
+        [EncryptedString(1, 255)]
         public string? Password;
 
         [IgnoreDataMember]

@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms
 {
     [Mnemonic("room")]
     [DynamicSize]
-    public partial class MSG_ROOMDESC : IProtocolS2C, IProtocolSerializer
+    public partial class MSG_ROOMDESC : IProtocolS2C, IStructSerializer
     {
         public RoomRec? RoomInfo;
 

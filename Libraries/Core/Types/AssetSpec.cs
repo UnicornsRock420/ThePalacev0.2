@@ -7,7 +7,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Types
 {
     [ByteSize(8)]
-    public partial class AssetSpec : IProtocolSerializer
+    public partial class AssetSpec : IStructSerializer
     {
         public AssetSpec()
         {

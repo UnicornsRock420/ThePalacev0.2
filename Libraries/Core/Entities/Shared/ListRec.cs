@@ -6,7 +6,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Shared
 {
     [DynamicSize(40, 12)]
-    public partial class ListRec : IProtocol
+    public partial class ListRec : IStruct
     {
         public ListRec()
         {

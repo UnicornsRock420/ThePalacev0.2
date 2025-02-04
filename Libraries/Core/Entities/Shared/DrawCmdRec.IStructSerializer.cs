@@ -3,7 +3,7 @@ using ThePalace.Core.Interfaces;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class DrawCmdRec : IProtocolSerializer
+    public partial class DrawCmdRec : IStructSerializer
     {
         public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {

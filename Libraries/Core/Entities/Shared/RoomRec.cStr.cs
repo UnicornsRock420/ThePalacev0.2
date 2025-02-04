@@ -1,10 +1,9 @@
 ﻿using ThePalace.Core.Entities.Network.Shared.Core;
-using ThePalace.Core.Interfaces;
 using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomRec : RawData, IDisposable, IData
+    public partial class RoomRec : RawData
     {
         public RoomRec()
         {
