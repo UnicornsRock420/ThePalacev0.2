@@ -2,6 +2,6 @@
 {
     public interface ISessionState
     {
-        object ScriptState { get; set; }
+        //object ScriptState { get; set; }
     }
 }
