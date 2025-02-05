@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ThePalace.Core.Factories
+﻿namespace ThePalace.Core.Helpers
 {
     public class Tree<T> : List<T>, IDisposable
     {
@@ -9,15 +6,13 @@ namespace ThePalace.Core.Factories
 
         public Tree<T> Children = [];
 
-        public Tree() { }
-        ~Tree() =>
-            this.Dispose(false);
+        ~Tree() => this.Dispose(false);
 
         public void Dispose()
         {
             if (this.IsDisposed) return;
 
-            Dispose(true);
+            this.Dispose(true);
 
             GC.SuppressFinalize(this);
         }
@@ -25,16 +20,24 @@ namespace ThePalace.Core.Factories
         // The bulk of the clean-up code is implemented in Dispose(bool)
         protected virtual void Dispose(bool disposing)
         {
-            if (IsDisposed) return;
+            if (this.IsDisposed) return;
 
             if (disposing)
             {
+                if (typeof(T).GetInterfaces().Contains(typeof(IDisposable)))
+                {
+                    this.Children
+                        ?.Cast<IDisposable>()
+                        ?.ToList()
+                        ?.ForEach(c => { try { c?.Dispose(); } catch { } });
+                }
+
                 this.Children?.Clear();
-                this.Children?.Dispose();
+                this.Children?.Dispose(true);
                 this.Children = null;
             }
 
-            IsDisposed = true;
+            this.IsDisposed = true;
         }
     }
 }

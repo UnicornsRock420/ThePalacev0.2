@@ -1,4 +1,5 @@
-﻿using uint8 = System.Byte;
+﻿using ThePalace.Core.Helpers;
+using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {

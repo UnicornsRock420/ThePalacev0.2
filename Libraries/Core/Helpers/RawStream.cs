@@ -1,10 +1,10 @@
-﻿using System;
+﻿using System.Reflection.PortableExecutable;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Factories
+namespace ThePalace.Core.Helpers
 {
     public partial class RawStream : IDisposable, IData, IStruct
     {
@@ -103,9 +103,17 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            var result = (sbyte)_stream[offset];
+            if (offset > 0)
+            {
+                _stream.Position = offset;
+            }
 
-            _stream.RemoveAt(offset);
+            var result = (sbyte)_stream.ReadByte();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                _stream.Position--;
+            }
 
             return result;
         }
@@ -123,9 +131,17 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            var result = _stream.ReadSInt16(offset);
+            if (offset > 0)
+            {
+                _stream.Position = offset;
+            }
 
-            _stream.Position += 2;
+            var result = (short)_stream.ReadUInt16();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                _stream.Position -= 2;
+            }
 
             return result;
         }
@@ -143,11 +159,16 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            var result = _stream.ReadInt32(offset);
-
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            if (offset > 0)
             {
-                _stream.Position += 4;
+                _stream.Position = offset;
+            }
+
+            var result = _stream.ReadInt32();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                _stream.Position -= 4;
             }
 
             return result;
@@ -166,13 +187,16 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            _stream.Position = offset;
+            if (offset > 0)
+            {
+                _stream.Position = offset;
+            }
 
             var result = (byte)_stream.ReadByte();
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position++;
+                _stream.Position--;
             }
 
             return result;
@@ -191,11 +215,16 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            var result = _stream.ReadUInt16(offset);
-
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            if (offset > 0)
             {
-                _stream.Position += 2;
+                _stream.Position = offset;
+            }
+
+            var result = _stream.ReadUInt16();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                _stream.Position -= 2;
             }
 
             return result;
@@ -214,11 +243,16 @@ namespace ThePalace.Core.Factories
                 return 0;
             }
 
-            var result = _stream.ReadUInt32(offset);
-
-            if ((opts & RawStreamOptions.IncrementPosition) == RawStreamOptions.IncrementPosition)
+            if (offset > 0)
             {
-                _stream.Position += 4;
+                _stream.Position = offset;
+            }
+
+            var result = _stream.ReadUInt32();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                _stream.Position -= 4;
             }
 
             return result;
@@ -231,6 +265,11 @@ namespace ThePalace.Core.Factories
             if (offset < 1)
             {
                 offset = 0;
+            }
+
+            if (offset > 0)
+            {
+                _stream.Position = offset;
             }
 
             if (size < 1)
@@ -267,25 +306,16 @@ namespace ThePalace.Core.Factories
                 length = max;
             }
 
-            var data = _stream
-                .ToList()
-                .Skip(offset)
-                .Take(length)
-                .ToArray();
+            var buffer = new byte[max];
+            var readCount = _stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) return null;
 
-            max -= size;
-
-            if (max > Count)
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                max = Count;
+                _stream.Position -= max;
             }
 
-            if (max > 0)
-            {
-                _stream.RemoveRange(offset, length);
-            }
-
-            return (data.GetString() ?? string.Empty).TrimEnd('\0');
+            return (buffer.GetString() ?? string.Empty).TrimEnd('\0');
         }
 
         public string? ReadCString(long offset = 0, bool? peek = false)
@@ -295,6 +325,11 @@ namespace ThePalace.Core.Factories
             if (offset < 1)
             {
                 offset = 0;
+            }
+
+            if (offset > 0)
+            {
+                _stream.Position = offset;
             }
 
             var length = _stream

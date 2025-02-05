@@ -3,7 +3,7 @@ using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities
+namespace ThePalace.Core.Helpers
 {
     public partial class RawData : IDisposable, IData, IStruct
     {
