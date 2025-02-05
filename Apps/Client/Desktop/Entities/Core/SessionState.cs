@@ -1,6 +1,6 @@
 ﻿using ThePalace.Client.Desktop.Interfaces;
 
-namespace ThePalace.Core.Desktop.Core.Models
+namespace ThePalace.Client.Desktop.Entities.Core
 {
     public sealed partial class SessionState : IUISessionState
     {

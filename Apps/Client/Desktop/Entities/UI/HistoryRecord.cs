@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Client.Desktop.Entities.UI
 {
-    public sealed class HistoryRecord
+    public partial class HistoryRecord
     {
         public DateTime Created { get; private set; }
-        public string Title { get; set; } = null;
+        public string Title;
         public Uri Url { get; private set; } = null;
 
         private HistoryRecord()

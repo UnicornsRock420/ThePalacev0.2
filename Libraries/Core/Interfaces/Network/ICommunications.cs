@@ -4,6 +4,6 @@ namespace ThePalace.Core.Interfaces.Network
 {
     public interface ICommunications : IStruct
     {
-        public string? Text { get; set; }
+        string? Text { get; set; }
     }
 }

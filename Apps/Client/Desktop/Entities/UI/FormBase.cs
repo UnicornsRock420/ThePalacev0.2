@@ -1,8 +1,10 @@
-﻿namespace ThePalace.Client.Desktop.Entities
+﻿using ThePalace.Client.Desktop.Interfaces;
+
+namespace ThePalace.Client.Desktop.Entities.UI
 {
     public class FormBase : Form
     {
-        //public IUISessionState SessionState { get; set; } = null;
+        public IUISessionState SessionState;
 
         public FormBase() { }
         ~FormBase() =>
@@ -11,7 +13,7 @@
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             //if (HotKeyManager.Current.Invoke(SessionState, keyData, this))
-                //return true;
+            //return true;
             return base.ProcessCmdKey(ref msg, keyData);
         }
     }

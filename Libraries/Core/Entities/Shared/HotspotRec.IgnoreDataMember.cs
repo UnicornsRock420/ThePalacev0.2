@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using ThePalace.Core.Attributes;
 using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
@@ -11,10 +12,10 @@ namespace ThePalace.Core.Entities.Shared
         public List<Point>? Vortexes;
 
         [IgnoreDataMember]
-        //[PString]
+        [PString]
         public string? Name;
         [IgnoreDataMember]
-        //[CString]
+        [CString]
         public string? Script;
     }
 }

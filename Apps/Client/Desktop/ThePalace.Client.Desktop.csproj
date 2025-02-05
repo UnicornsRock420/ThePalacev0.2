@@ -9,69 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Entities\Ribbon\Bookmarks.cs" />
-    <Compile Remove="Entities\Ribbon\BooleanItem.cs" />
-    <Compile Remove="Entities\Ribbon\Chatlog.cs" />
-    <Compile Remove="Entities\Ribbon\Connection.cs" />
-    <Compile Remove="Entities\Ribbon\DoorOutlines.cs" />
-    <Compile Remove="Entities\Ribbon\Draw.cs" />
-    <Compile Remove="Entities\Ribbon\GoBack.cs" />
-    <Compile Remove="Entities\Ribbon\GoForward.cs" />
-    <Compile Remove="Entities\Ribbon\ItemBase.cs" />
-    <Compile Remove="Entities\Ribbon\LiveDirectory.cs" />
-    <Compile Remove="Entities\Ribbon\RoomsList.cs" />
-    <Compile Remove="Entities\Ribbon\Separator.cs" />
-    <Compile Remove="Entities\Ribbon\Sounds.cs" />
-    <Compile Remove="Entities\Ribbon\StandardItem.cs" />
-    <Compile Remove="Entities\Ribbon\SuperUser.cs" />
-    <Compile Remove="Entities\Ribbon\Tabs.cs" />
-    <Compile Remove="Entities\Ribbon\Terminal.cs" />
-    <Compile Remove="Entities\Ribbon\UserNametags.cs" />
-    <Compile Remove="Entities\Ribbon\UsersList.cs" />
-    <Compile Remove="Entities\UI\ComboboxItem.cs" />
-    <Compile Remove="Entities\UI\ControlCfg.cs" />
-    <Compile Remove="Entities\UI\FormCfg.cs" />
-    <Compile Remove="Entities\UI\FormDialog.cs" />
-    <Compile Remove="Entities\UI\ModalDialog.cs" />
-    <Compile Remove="Entities\UI\SessionState.cs" />
-    <Compile Remove="Entities\UI\SessionState.UIControls.cs" />
-    <Compile Remove="Entities\UI\SessionState.UILayers.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Entities\Ribbon\Bookmarks.cs" />
-    <None Include="Entities\Ribbon\BooleanItem.cs" />
-    <None Include="Entities\Ribbon\Chatlog.cs" />
-    <None Include="Entities\Ribbon\Connection.cs" />
-    <None Include="Entities\Ribbon\DoorOutlines.cs" />
-    <None Include="Entities\Ribbon\Draw.cs" />
-    <None Include="Entities\Ribbon\GoBack.cs" />
-    <None Include="Entities\Ribbon\GoForward.cs" />
-    <None Include="Entities\Ribbon\ItemBase.cs" />
-    <None Include="Entities\Ribbon\LiveDirectory.cs" />
-    <None Include="Entities\Ribbon\RoomsList.cs" />
-    <None Include="Entities\Ribbon\Separator.cs" />
-    <None Include="Entities\Ribbon\Sounds.cs" />
-    <None Include="Entities\Ribbon\StandardItem.cs" />
-    <None Include="Entities\Ribbon\SuperUser.cs" />
-    <None Include="Entities\Ribbon\Tabs.cs" />
-    <None Include="Entities\Ribbon\Terminal.cs" />
-    <None Include="Entities\Ribbon\UserNametags.cs" />
-    <None Include="Entities\Ribbon\UsersList.cs" />
-    <None Include="Entities\UI\ComboboxItem.cs" />
-    <None Include="Entities\UI\ControlCfg.cs" />
-    <None Include="Entities\UI\FormCfg.cs" />
-    <None Include="Entities\UI\FormDialog.cs" />
-    <None Include="Entities\UI\ModalDialog.cs" />
-    <None Include="Entities\UI\SessionState.cs" />
-    <None Include="Entities\UI\SessionState.UIControls.cs" />
-    <None Include="Entities\UI\SessionState.UILayers.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj" />
     <ProjectReference Include="..\..\..\Libraries\Network\ThePalace.Network.csproj" />
     <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

@@ -2,6 +2,6 @@
 {
     public interface IConnectionState
     {
-        //object ConnectionState { get; set; }
+        //object ConnectionState;
     }
 }

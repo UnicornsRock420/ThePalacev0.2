@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\Core\RawStream.cs" />
     <Compile Remove="Entities\Events\ScriptEventArgs.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
@@ -22,13 +23,13 @@
     <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
-    <Compile Remove="Helpers\RawStream.cs" />
     <Compile Remove="Types\PropPIDSStream.cs" />
     <Compile Remove="Types\PropPROPSStream.cs" />
     <Compile Remove="Types\PropPRPStream.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Entities\Core\RawStream.cs" />
     <None Include="Entities\Events\ScriptEventArgs.cs" />
     <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
@@ -45,7 +46,6 @@
     <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
     <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
     <None Include="Helpers\LockContext.cs" />
-    <None Include="Helpers\RawStream.cs" />
     <None Include="Helpers\Singleton.cs" />
   </ItemGroup>
 
@@ -63,6 +63,8 @@
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.1" />
     <PackageReference Include="System.Runtime.Caching" Version="9.0.1" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.1" />
+    <PackageReference Include="System.Threading.Extensions" Version="2.0.105" />
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

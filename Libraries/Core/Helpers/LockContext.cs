@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Core.Factories
 {
-    public sealed class LockContext : IDisposable
+    public partial class LockContext : IDisposable
     {
         protected object? _LockObj = null;
         protected bool _HasLock = false;

@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
+﻿using System.Drawing.Drawing2D;
 
-namespace ThePalace.Client.Desktop.Utility
+namespace ThePalace.Client.Desktop.Entities.UI
 {
     public enum GHDrawCmds
     {
@@ -18,20 +15,20 @@ namespace ThePalace.Client.Desktop.Utility
         FillPolygon,
     }
 
-    public sealed class GHDrawCmd
+    public partial class GHDrawCmd
     {
-        public GHDrawCmds Type { get; set; }
-        public string Text { get; set; }
-        public Font Font { get; set; }
-        public Pen Pen { get; set; }
-        public Brush Brush { get; set; }
-        //public GraphicsPath Path { get; set; }
-        public Rectangle? Rect { get; set; } = null;
-        public List<float> Angles { get; set; } = new();
-        public List<Point> Points { get; set; } = new();
+        public GHDrawCmds Type;
+        public string Text;
+        public Font Font;
+        public Pen Pen;
+        public Brush Brush;
+        //public GraphicsPath Path;
+        public Rectangle? Rect;
+        public List<float> Angles = new();
+        public List<Point> Points = new();
     }
 
-    public sealed class GraphicsHelper
+    public partial class GraphicsHelper
     {
         private Graphics _g;
 

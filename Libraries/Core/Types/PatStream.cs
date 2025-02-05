@@ -9,7 +9,7 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Factories
 {
-    public sealed class PatStream : StreamBase
+    public partial class PatStream : StreamBase
     {
         private const string CONST_ROOMFLAGS_FORMAT = "\t{0}";
         private static readonly string CONST_ROOMFLAGS_NOCYBORGS = string.Format(CONST_ROOMFLAGS_FORMAT, RoomFlags.CyborgFreeZone.GetDescription());

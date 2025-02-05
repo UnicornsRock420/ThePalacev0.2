@@ -1,19 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using ThePalace.Client.Desktop.Enums;
-using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Entities.Network.Shared.Users;
+using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Enums.App;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Models;
 using ThePalace.Core.Types;
 
-namespace ThePalace.Client.Desktop.Interfaces.Factories
+namespace ThePalace.Client.Desktop.Entities.Core
 {
     using IptAtomList = List<IptVariable>;
 

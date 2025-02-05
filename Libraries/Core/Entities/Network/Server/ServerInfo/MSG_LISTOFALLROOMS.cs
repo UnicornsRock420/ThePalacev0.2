@@ -46,8 +46,6 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
             if ((this.Rooms?.Count ?? 0) > 0)
                 foreach (var room in this.Rooms)
                     writer.PalaceSerialize(ref refNum, room, typeof(ListRec), opts);
-
-            refNum = this.Rooms?.Count ?? 0;
         }
     }
 }

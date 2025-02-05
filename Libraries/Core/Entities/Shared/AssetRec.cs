@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;

@@ -2,10 +2,10 @@
 
 namespace ThePalace.Core.Client.Core.Models.Threads
 {
-    public sealed class Cmd : IDisposable
+    public partial class Cmd : IDisposable
     {
-        public CmdFnc CmdFnc { get; set; } = null;
-        public object[] Values { get; set; } = null;
+        public CmdFnc CmdFnc;
+        public object[] Values;
 
         public void Dispose()
         {

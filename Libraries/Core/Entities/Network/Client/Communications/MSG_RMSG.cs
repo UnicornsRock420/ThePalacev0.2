@@ -7,6 +7,6 @@ namespace ThePalace.Core.Entities.Network.Client.Communications
     public partial class MSG_RMSG : ICommunications, IProtocolC2S
     {
         [CString(255)]
-        public string Text { get; set; }
+        public string? Text { get; set; }
     }
 }

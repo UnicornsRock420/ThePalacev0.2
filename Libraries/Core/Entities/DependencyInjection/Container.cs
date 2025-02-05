@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace ThePalace.Core.Helpers.DependencyInjection
+namespace ThePalace.Core.Entities.DependencyInjection
 {
     public partial class Container
     {

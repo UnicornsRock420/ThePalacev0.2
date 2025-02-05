@@ -7,7 +7,7 @@ using ThePalace.Core.Utility;
 
 namespace ThePalace.Core.Types
 {
-    public sealed class PropPROPSStream : StreamBase
+    public partial class PropPROPSStream : StreamBase
     {
         private const int INT_NAMEBLOCKSIZE = 32;
 

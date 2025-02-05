@@ -2,6 +2,6 @@
 {
     public interface IFormResult<T>
     {
-        T Result { get; set; }
+        T Result { get; }
     }
 }

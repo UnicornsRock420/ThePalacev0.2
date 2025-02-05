@@ -1,21 +1,18 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
-
-namespace ThePalace.Core.Desktop.Core.Models
+﻿namespace ThePalace.Client.Desktop.Entities.Threads.UI
 {
-    public sealed class FormCfg : ControlCfg
+    public partial class FormCfg : ControlCfg
     {
-        public SizeF AutoScaleDimensions { get; set; }
-        public AutoScaleMode AutoScaleMode { get; set; }
-        public FormStartPosition StartPosition { get; set; }
-        public FormWindowState WindowState { get; set; }
-        public bool Focus { get; set; }
+        public SizeF AutoScaleDimensions;
+        public AutoScaleMode AutoScaleMode;
+        public FormStartPosition StartPosition;
+        public FormWindowState WindowState;
+        public bool Focus;
 
-        public EventHandler Activated { get; set; }
-        public EventHandler Load { get; set; }
-        public EventHandler Shown { get; set; }
-        public EventHandler GotFocus { get; set; }
-        public MouseEventHandler MouseMove { get; set; }
-        public FormClosedEventHandler FormClosed { get; set; }
+        public EventHandler Activated;
+        public EventHandler Load;
+        public EventHandler Shown;
+        public EventHandler GotFocus;
+        public MouseEventHandler MouseMove;
+        public FormClosedEventHandler FormClosed;
     }
 }

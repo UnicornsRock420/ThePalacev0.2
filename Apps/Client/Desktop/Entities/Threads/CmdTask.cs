@@ -4,13 +4,13 @@ using ThePalace.Core.Entities.System;
 
 namespace ThePalace.Core.Client.Core.Models.Threads
 {
-    public sealed class CmdTask : Disposable
+    public partial class CmdTask : Disposable
     {
-        public Task Task { get; set; } = null;
-        public List<IProvider> Providers { get; set; } = new();
-        public List<IConsumer> Consumers { get; set; } = new();
-        public ConcurrentQueue<Cmd> Queue { get; set; } = new();
-        public ManualResetEvent SignalEvent { get; set; } = new(false);
+        public Task Task;
+        public List<IProvider> Providers = new();
+        public List<IConsumer> Consumers = new();
+        public ConcurrentQueue<Cmd> Queue = new();
+        public ManualResetEvent SignalEvent = new(false);
 
         public CmdTask() { }
         ~CmdTask() =>

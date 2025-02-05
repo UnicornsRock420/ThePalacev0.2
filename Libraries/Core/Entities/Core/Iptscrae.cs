@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using System.Timers;
 using ThePalace.Core.Enums.Palace;
+using Timer = System.Timers.Timer;
 
-namespace ThePalace.Core.Models
+namespace ThePalace.Core.Entities.Core
 {
     using IptAlarms = List<IptAlarm>;
     using IptAtomList = List<IptVariable>;
@@ -13,13 +13,13 @@ namespace ThePalace.Core.Models
     public delegate void IptCommandFnc(IptTracking iptTracking, int recursionDepth);
     public delegate IptVariable IptOperatorFnc(IptVariable register1, IptVariable register2);
 
-    public sealed class IptAlarm
+    public partial class IptAlarm
     {
         public DateTime Created { get; private set; }
-        public Int32 Delay { get; private set; }
+        public int Delay { get; private set; }
         public IptAtomList Value { get; private set; }
 
-        public IptAlarm(IptAtomList value, Int32 delay)
+        public IptAlarm(IptAtomList value, int delay)
         {
             Created = DateTime.Now;
             Delay = delay;
@@ -27,48 +27,48 @@ namespace ThePalace.Core.Models
         }
     }
 
-    public sealed class IptVariable
+    public partial class IptVariable
     {
-        public IptVariableTypes Type { get; set; }
-        public object Value { get; set; }
+        public IptVariableTypes Type;
+        public object Value;
     }
 
-    public sealed class IptMetaVariable
+    public partial class IptMetaVariable
     {
-        public bool IsReadOnly { get; set; } = false;
-        public bool IsSpecial { get; set; } = false;
-        public bool IsGlobal { get; set; } = false;
-        public int Depth { get; set; } = 0;
+        public bool IsReadOnly = false;
+        public bool IsSpecial = false;
+        public bool IsGlobal = false;
+        public int Depth = 0;
         private IptVariable _value;
         public IptVariable Value
         {
-            get => this._value;
+            get => _value;
             set
             {
-                if (this.IsReadOnly) return;
-                else this._value = value;
+                if (IsReadOnly) return;
+                else _value = value;
             }
         }
     }
 
-    public sealed class IptOperator
+    public partial class IptOperator
     {
-        public IptOperatorFlags Flags { get; set; }
-        public IptOperatorFnc OpFnc { get; set; }
+        public IptOperatorFlags Flags;
+        public IptOperatorFnc OpFnc;
     }
 
     public class IptTracking : IDisposable
     {
         public static int TicksToMilliseconds(int ticks) => ticks / 6 * 100;
 
-        public readonly System.Timers.Timer Timer = new System.Timers.Timer
+        public readonly Timer Timer = new Timer
         {
             Interval = 10, //IptTracking.TicksToMilliseconds(1)
         };
 
-        public bool Return { get; set; } = false;
-        public bool Break { get; set; } = false;
-        public Match[] Grep { get; set; } = null;
+        public bool Return = false;
+        public bool Break = false;
+        public Match[] Grep;
         public IptAtomList Stack { get; private set; } = new();
         public IptAlarms Alarms { get; private set; } = new();
         public IptEvents Events { get; private set; } = new();

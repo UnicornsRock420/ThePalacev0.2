@@ -4,7 +4,7 @@ using ThePalace.Core.Factories;
 
 namespace ThePalace.Core.Types
 {
-    public sealed class PropPIDSStream : StreamBase
+    public partial class PropPIDSStream : StreamBase
     {
         public PropPIDSStream() { }
         ~PropPIDSStream() =>

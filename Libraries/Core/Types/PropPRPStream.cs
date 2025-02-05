@@ -12,7 +12,7 @@ using ThePalace.Core.Utility;
 
 namespace ThePalace.Core.Types
 {
-    public sealed class PropPRPStream : StreamBase
+    public partial class PropPRPStream : StreamBase
     {
         public PropPRPStream() { }
         ~PropPRPStream() =>

@@ -1,10 +1,10 @@
-﻿using ThePalace.Client.Desktop.Entities;
+﻿using ThePalace.Client.Desktop.Entities.UI;
 
 namespace ThePalace.Core.Desktop.Plugins.Forms
 {
-    public partial class Test : FormBase
+    public partial class Ribbon : FormBase
     {
-        public Test()
+        public Ribbon()
         {
             InitializeComponent();
         }

@@ -1,11 +1,10 @@
 ﻿using ThePalace.Client.Desktop.Constants;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Client.Desktop.Utility;
 using ThePalace.Core.Helpers;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Client.Desktop.Entities.UI
 {
-    public sealed class MsgBubble : IDisposable
+    public partial class MsgBubble : IDisposable
     {
         private const int maxWidth = 150;
         private const int minWidth = 20;
@@ -28,7 +27,7 @@ namespace ThePalace.Client.Desktop.Entities
         public bool Visible { get; private set; } = true;
         public Color Colour { get; private set; } = Color.White;
         public Point Origin { get; private set; } = new(0, 0);
-        public Point Location { get; set; } = new(0, 0);
+        public Point Location = new(0, 0);
 
         public int Duration { get; private set; } = 0;
         public string OriginalText { get; private set; } = null;

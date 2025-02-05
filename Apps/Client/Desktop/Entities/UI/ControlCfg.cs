@@ -1,32 +1,36 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
+﻿using System.Windows.Forms.Design.Behavior;
 
-namespace ThePalace.Core.Desktop.Core.Models
+namespace ThePalace.Client.Desktop.Entities.Threads.UI
 {
     public delegate EventHandler Event(object sender, EventArgs e);
 
     public class ControlCfg
     {
-        public int TabIndex { get; set; }
-        public string Text { get; set; }
-        public Size Size { get; set; }
-        public Padding Margin { get; set; }
-        public Padding Padding { get; set; }
-        public Point Location { get; set; }
-        public Color BackColor { get; set; }
-        public Color ForeColor { get; set; }
-        public bool Visible { get; set; } = true;
-        public bool TabStop { get; set; } = false;
+        public int TabIndex;
+        public string Text;
+        public Size Size;
+        public Padding Margin;
+        public Padding Padding;
+        public Point Location;
+        public Color BackColor;
+        public Color ForeColor;
+        public bool Visible = true;
+        public bool TabStop = false;
 
-        public BorderStyle BorderStyle { get; set; }
+        public BorderStyle BorderStyle;
 
-        public bool UseVisualStyleBackColor { get; set; } = true;
+        public bool UseVisualStyleBackColor = true;
 
-        public bool Multiline { get; set; }
-        public int MaxLength { get; set; }
-        public int Value { get; set; }
+        public bool Multiline;
+        public int MaxLength;
+        public int Value;
 
-        public EventHandler Click { get; set; }
-        public ScrollEventHandler Scroll { get; set; }
+        public EventHandler Refresh;
+        public EventHandler Click;
+        public EventHandler DblClick;
+        public MouseEventHandler MouseHover;
+        public MouseEventHandler MouseExit;
+        public ScrollEventHandler Scroll;
+        public BehaviorDragDropEventHandler DragDrop;
     }
 }

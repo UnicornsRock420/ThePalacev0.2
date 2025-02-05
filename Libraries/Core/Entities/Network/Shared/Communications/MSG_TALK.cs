@@ -7,6 +7,6 @@ namespace ThePalace.Core.Entities.Network.Shared.Communications
     public partial class MSG_TALK : IProtocolC2S, IProtocolS2C, ICommunications
     {
         [CString(255)]
-        public string Text { get; set; }
+        public string? Text { get; set; }
     }
 }

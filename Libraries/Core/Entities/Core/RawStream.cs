@@ -1,10 +1,9 @@
-﻿using System.Reflection.PortableExecutable;
-using ThePalace.Core.Exts.Palace;
+﻿using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Helpers
+namespace ThePalace.Core.Entities.Core
 {
     public partial class RawStream : IDisposable, IData, IStruct
     {
@@ -69,9 +68,9 @@ namespace ThePalace.Core.Helpers
             if ((_stream?.Length ?? 0) < 1) return null;
 
             if (max < 1 ||
-                max > _stream.Length)
+                max > this._stream.Length)
             {
-                max = (int)_stream.Length;
+                max = (int)this._stream.Length;
             }
             if (offset > max) return null;
             if (offset < 0)
@@ -79,13 +78,17 @@ namespace ThePalace.Core.Helpers
                 offset = 0;
             }
 
-            var position = _stream.Position;
-            _stream.Position = offset;
+            var position = this._stream.Position;
+
+            if (offset > 0)
+            {
+                this._stream.Position = offset;
+            }
 
             var buffer = new byte[max];
-            _stream.Read(buffer, 0, buffer.Length);
+            this._stream.Read(buffer, 0, buffer.Length);
 
-            _stream.Position = position;
+            this._stream.Position = position;
 
             return buffer;
         }
@@ -105,14 +108,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = (sbyte)_stream.ReadByte();
+            var result = (sbyte)this._stream.ReadByte();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position--;
+                this._stream.Position--;
             }
 
             return result;
@@ -133,14 +136,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = (short)_stream.ReadUInt16();
+            var result = (short)this._stream.ReadUInt16();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position -= 2;
+                this._stream.Position -= 2;
             }
 
             return result;
@@ -161,14 +164,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = _stream.ReadInt32();
+            var result = this._stream.ReadInt32();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position -= 4;
+                this._stream.Position -= 4;
             }
 
             return result;
@@ -189,14 +192,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = (byte)_stream.ReadByte();
+            var result = (byte)this._stream.ReadByte();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position--;
+                this._stream.Position--;
             }
 
             return result;
@@ -217,14 +220,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = _stream.ReadUInt16();
+            var result = this._stream.ReadUInt16();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position -= 2;
+                this._stream.Position -= 2;
             }
 
             return result;
@@ -245,14 +248,14 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var result = _stream.ReadUInt32();
+            var result = this._stream.ReadUInt32();
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position -= 4;
+                this._stream.Position -= 4;
             }
 
             return result;
@@ -269,7 +272,7 @@ namespace ThePalace.Core.Helpers
 
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
             if (size < 1)
@@ -307,18 +310,18 @@ namespace ThePalace.Core.Helpers
             }
 
             var buffer = new byte[max];
-            var readCount = _stream.Read(buffer, 0, buffer.Length);
+            var readCount = this._stream.Read(buffer, 0, buffer.Length);
             if (readCount < 1) return null;
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                _stream.Position -= max;
+                this._stream.Position -= max;
             }
 
             return (buffer.GetString() ?? string.Empty).TrimEnd('\0');
         }
 
-        public string? ReadCString(long offset = 0, bool? peek = false)
+        public string? ReadCString(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
             if ((_stream?.Length ?? 0) < 1) return null;
 
@@ -327,27 +330,33 @@ namespace ThePalace.Core.Helpers
                 offset = 0;
             }
 
+            var _position = this._stream.Position;
+
             if (offset > 0)
             {
-                _stream.Position = offset;
+                this._stream.Position = offset;
             }
 
-            var length = _stream
-                .Skip(offset)
-                .ToList()
-                .IndexOf(0);
+            var stringBytes = new List<byte>();
+            var buffer = new byte[1];
 
-            var data = _stream
-                .ToList()
-                .Skip(offset)
-                .Take(length)
-                .ToArray();
+            do
+            {
+                var readCount = this._stream.Read(buffer, 0, buffer.Length);
+                if (readCount < 1) return null;
 
-            if (peek != null)
-                if (peek.Value != true)
-                    _stream.Position += length;
+                if (buffer[0] == 0) break;
 
-            return data.GetString();
+                stringBytes.Add(buffer[0]);
+
+            } while (stringBytes.Count <= 0x7FFF);
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position -= stringBytes.Count;
+            }
+
+            return stringBytes.GetString();
         }
         #endregion
 
@@ -356,7 +365,7 @@ namespace ThePalace.Core.Helpers
         {
             if ((_stream?.Length ?? 0) < 1) return 0;
 
-            return _stream.Seek(offset, origin);
+            return this._stream.Seek(offset, origin);
         }
 
         public byte PeekByte(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
@@ -370,12 +379,12 @@ namespace ThePalace.Core.Helpers
 
             if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                offset += _stream.Position;
+                offset += this._stream.Position;
             }
 
             if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                _stream.Position++;
+                this._stream.Position++;
             }
 
             return _stream[(int)offset];
@@ -392,15 +401,15 @@ namespace ThePalace.Core.Helpers
 
             if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                offset += _stream.Position;
+                offset += this._stream.Position;
             }
 
             if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                _stream.Position += 2;
+                this._stream.Position += 2;
             }
 
-            return _stream.ReadSInt16(offset);
+            return this._stream.ReadSInt16(offset);
         }
 
         public sint32 PeekSInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
@@ -414,15 +423,15 @@ namespace ThePalace.Core.Helpers
 
             if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                offset += _stream.Position;
+                offset += this._stream.Position;
             }
 
             if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                _stream.Position += 4;
+                this._stream.Position += 4;
             }
 
-            return _stream.ReadSInt32(offset);
+            return this._stream.ReadSInt32(offset);
         }
 
         public ushort PeekUInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
@@ -436,15 +445,15 @@ namespace ThePalace.Core.Helpers
 
             if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                offset += _stream.Position;
+                offset += this._stream.Position;
             }
 
             if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                _stream.Position += 2;
+                this._stream.Position += 2;
             }
 
-            return _stream.ReadUInt16(offset);
+            return this._stream.ReadUInt16(offset);
         }
 
         public uint PeekUInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
@@ -458,15 +467,15 @@ namespace ThePalace.Core.Helpers
 
             if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                offset += _stream.Position;
+                offset += this._stream.Position;
             }
 
             if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
             {
-                _stream.Position += 4;
+                this._stream.Position += 4;
             }
 
-            return _stream.ReadUInt32(offset);
+            return this._stream.ReadUInt32(offset);
         }
 
         public string? PeekPString(int max, int size = 0, int offset = 0)
@@ -507,7 +516,7 @@ namespace ThePalace.Core.Helpers
                 length = max;
             }
 
-            var data = _stream.ToList()
+            var data = this._stream.ToList()
                 .Skip(offset + size)
                 .Take(length)
                 .ToArray();
@@ -532,14 +541,14 @@ namespace ThePalace.Core.Helpers
                 return;
             }
 
-            _stream.Write(data);
+            this._stream.Write(data);
         }
 
         public void WriteByte(byte value)
         {
             _stream ??= new();
 
-            _stream.Write([value]);
+            this._stream.Write([value]);
         }
 
         public void WriteBytes(byte[] value, int max = 0, int offset = 0)
@@ -548,9 +557,9 @@ namespace ThePalace.Core.Helpers
 
             if (max < 1 ||
                 offset < 1)
-                _stream.Write(value);
+                this._stream.Write(value);
             else
-                _stream.Write(value
+                this._stream.Write(value
                     .Skip(offset)
                     .Take(max)
                     .ToList());
@@ -560,28 +569,28 @@ namespace ThePalace.Core.Helpers
         {
             _stream ??= new();
 
-            _stream.AddRange(value.WriteInt16());
+            this._stream.AddRange(value.WriteInt16());
         }
 
         public void WriteInt32(sint32 value)
         {
             _stream ??= new();
 
-            _stream.AddRange(value.WriteInt32());
+            this._stream.AddRange(value.WriteInt32());
         }
 
         public void WriteInt16(ushort source)
         {
             _stream ??= new();
 
-            _stream.AddRange(source.WriteUInt16());
+            this._stream.AddRange(source.WriteUInt16());
         }
 
         public void WriteInt32(uint source)
         {
             _stream ??= new();
 
-            _stream.AddRange(source.WriteUInt32());
+            this._stream.AddRange(source.WriteUInt32());
         }
 
         public void WritePString(string source, int max, int size = 0, bool padding = true)
@@ -593,14 +602,14 @@ namespace ThePalace.Core.Helpers
                 size = 1;
             }
 
-            _stream.AddRange(source.WritePString(max, size, padding));
+            this._stream.AddRange(source.WritePString(max, size, padding));
         }
 
         public void WriteCString(string source)
         {
             _stream ??= new();
 
-            _stream.AddRange(source.WriteCString());
+            this._stream.AddRange(source.WriteCString());
         }
         #endregion
 
@@ -610,7 +619,7 @@ namespace ThePalace.Core.Helpers
             if (_stream == null)
                 _stream = [];
             else
-                _stream.Clear();
+                this._stream.Clear();
         }
 
         public void DropBytes(int length = 0, int offset = 0)
@@ -626,7 +635,7 @@ namespace ThePalace.Core.Helpers
             {
                 if (offset < 1)
                 {
-                    _stream.Clear();
+                    this._stream.Clear();
 
                     return;
                 }
@@ -634,7 +643,7 @@ namespace ThePalace.Core.Helpers
                 length = Count - offset;
             }
 
-            _stream.RemoveRange(offset, length);
+            this._stream.RemoveRange(offset, length);
         }
 
         public void PadBytes(int mod)
@@ -643,7 +652,7 @@ namespace ThePalace.Core.Helpers
 
             for (var j = Count % mod; j > 0; j--)
             {
-                _stream.Add(0);
+                this._stream.Add(0);
             }
         }
 
@@ -659,7 +668,7 @@ namespace ThePalace.Core.Helpers
 
             for (var j = mod - Count % mod; j > 0; j--)
             {
-                _stream.Add(0);
+                this._stream.Add(0);
             }
         }
 

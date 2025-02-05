@@ -2,29 +2,29 @@
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Core.Entities.System;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Client.Desktop.Entities.UI
 {
-    public sealed class ScreenLayer : Disposable
+    public partial class ScreenLayer : Disposable
     {
         public ScreenLayers Type { get; private set; }
-        public Type ResourceType { get; set; }
+        public Type ResourceType;
 
         public int Width => Image?.Width ?? 0;
         public int Height => Image?.Height ?? 0;
-        public Bitmap Image { get; set; } = null;
-        public float Opacity { get; set; } = 1.0F;
-        public bool Visible { get; set; } = true;
+        public Bitmap Image;
+        public float Opacity = 1.0F;
+        public bool Visible = true;
 
         public ScreenLayer(ScreenLayers type)
         {
             Type = type;
         }
         ~ScreenLayer() =>
-            this.Dispose(false);
+            Dispose(false);
 
         public override void Dispose()
         {
-            if (this.IsDisposed) return;
+            if (IsDisposed) return;
 
             base.Dispose();
 
