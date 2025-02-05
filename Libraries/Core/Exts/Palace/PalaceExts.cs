@@ -5,6 +5,7 @@ using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
@@ -741,6 +742,16 @@ namespace ThePalace.Core.Exts.Palace
                 {
                     //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
                     Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value);
+                    continue;
+                }
+
+                if(_attrs
+                    .Where(a => a is RefNumAttribute)
+                    .Select(a => a as RefNumAttribute)
+                    .Any())
+                {
+                    refNum = (int)(object)_value;
+
                     continue;
                 }
 

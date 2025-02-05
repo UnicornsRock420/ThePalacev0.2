@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
-using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
 

@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Core.Types;
-using ThePalace.Network.Enums;
 
 namespace ThePalace.Core.Entities.Network.Shared.Assets
 {

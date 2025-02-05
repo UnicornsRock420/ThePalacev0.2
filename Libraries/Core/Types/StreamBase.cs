@@ -1,4 +1,6 @@
-﻿namespace ThePalace.Core.Types
+﻿using ThePalace.Core.Entities.System;
+
+namespace ThePalace.Core.Types
 {
     public abstract class StreamBase : Disposable, IDisposable
     {

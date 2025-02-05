@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\Events\ScriptEventArgs.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
@@ -21,13 +22,15 @@
     <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
-    <Compile Remove="Factories\RawStream.cs" />
+    <Compile Remove="Entities\RawStream.cs" />
+    <Compile Remove="Entities\ScriptEvents.cs" />
     <Compile Remove="Types\PropPIDSStream.cs" />
     <Compile Remove="Types\PropPROPSStream.cs" />
     <Compile Remove="Types\PropPRPStream.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Entities\Events\ScriptEventArgs.cs" />
     <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
     <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
@@ -42,23 +45,25 @@
     <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
     <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
     <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
-    <None Include="Factories\LockContext.cs" />
-    <None Include="Factories\RawStream.cs" />
-    <None Include="Factories\Singleton.cs" />
-    <None Include="Factories\Tree.cs" />
+    <None Include="Entities\RawStream.cs" />
+    <None Include="Entities\ScriptEvents.cs" />
+    <None Include="Helpers\LockContext.cs" />
+    <None Include="Helpers\Singleton.cs" />
+    <None Include="Entities\Tree.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="8.2.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-    <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Mapster.Core" Version="1.2.1" />
     <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
     <PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="12.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     <PackageReference Include="SharpZipLib" Version="1.4.2" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.1" />
     <PackageReference Include="System.Runtime.Caching" Version="9.0.1" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="9.0.1" />
   </ItemGroup>

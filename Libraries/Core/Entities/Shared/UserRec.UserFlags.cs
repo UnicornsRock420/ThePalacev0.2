@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using uint16 = System.UInt16;
 
 namespace ThePalace.Core.Entities.Shared

@@ -9,7 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Core\ThePalace.Core.csproj" />
     <ProjectReference Include="..\..\Libraries\Network\ThePalace.Network.csproj" />
+    <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />
   </ItemGroup>
 
 </Project>

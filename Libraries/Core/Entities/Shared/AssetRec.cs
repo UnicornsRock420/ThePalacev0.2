@@ -1,9 +1,8 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Factories;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
-using ThePalace.Network.Enums;
 using sint32 = System.Int32;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;

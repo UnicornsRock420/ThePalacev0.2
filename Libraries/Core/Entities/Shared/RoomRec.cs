@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using RoomID = System.Int16;
 using sint16 = System.Int16;

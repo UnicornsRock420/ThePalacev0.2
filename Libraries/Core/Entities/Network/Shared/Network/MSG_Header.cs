@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint32 = System.UInt32;

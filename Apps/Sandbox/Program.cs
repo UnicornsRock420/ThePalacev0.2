@@ -2,6 +2,7 @@ using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
@@ -82,7 +83,7 @@ namespace Sandbox
                 }
             }
 
-            var obj = AppDomain.CurrentDomain
+            var boType = AppDomain.CurrentDomain
                 .GetAssemblies()
                 .SelectMany(t => t.GetTypes())
                 .Where(t => !t.IsInterface)
@@ -104,7 +105,7 @@ namespace Sandbox
                 })
                 .FirstOrDefault();
 
-            var boObj = obj?.GetInstance<IProtocolHandler>();
+            var boObj = boType?.GetInstance<IProtocolHandler>();
             if (boObj != null)
             {
                 boObj.Handle(new ProtocolEventArgs

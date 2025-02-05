@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.Caching;
-using ThePalace.Core.Factories;
 
 namespace ThePalace.Core.Helpers
 {
