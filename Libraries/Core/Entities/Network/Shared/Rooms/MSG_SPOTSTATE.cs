@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 using HotSpotID = System.Int16;
 using RoomID = System.Int16;
 using StateID = System.Int16;

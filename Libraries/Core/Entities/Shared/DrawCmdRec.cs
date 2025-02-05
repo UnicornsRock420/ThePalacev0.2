@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Core;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Factories;
+using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using uint16 = System.UInt16;
 using uint8 = System.Byte;

@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Factories
 {

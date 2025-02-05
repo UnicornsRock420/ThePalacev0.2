@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint32 = System.UInt32;
 
@@ -26,7 +26,9 @@ namespace ThePalace.Core.Types
         }
         public AssetSpec(Stream reader)
         {
-            this.Deserialize(0, reader);
+            var refNum = 0;
+
+            this.Deserialize(ref refNum, reader);
         }
         public AssetSpec(AssetSpec assetSpec)
         {
@@ -37,13 +39,13 @@ namespace ThePalace.Core.Types
         public sint32 Id;
         public uint32 Crc;
 
-        public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             this.Id = reader.ReadInt32();
             this.Crc = reader.ReadUInt32();
         }
 
-        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             refNum = 0;
 

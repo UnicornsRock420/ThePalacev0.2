@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Events
 {

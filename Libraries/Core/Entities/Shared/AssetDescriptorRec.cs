@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;
 

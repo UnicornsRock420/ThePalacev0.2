@@ -1,9 +1,9 @@
 ﻿using ThePalace.Core.Exts.Palace;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities.Network.Shared.Core
+namespace ThePalace.Core.Factories
 {
     public partial class RawData : IDisposable, IData, IStruct
     {
@@ -66,7 +66,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             _data?.Count ?? 0;
 
         #region Read Methods
-        public uint8[]? GetData(int max = 0, int offset = 0, bool purge = false)
+        public uint8[]? GetData(int max = 0, int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return null;
 
@@ -76,7 +76,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 .ToArray();
 
             if (max > 0 &&
-                purge)
+                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
             {
                 _data?.RemoveRange(offset, max);
             }
@@ -84,7 +84,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return result;
         }
 
-        public sbyte ReadSByte(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
+        public sbyte ReadSByte(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -104,7 +104,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return result;
         }
 
-        public short ReadSInt16(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
+        public short ReadSInt16(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -119,12 +119,15 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
 
             var result = _data.ReadSInt16(offset);
 
-            _data.RemoveRange(offset, 2);
+            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            {
+                _data.RemoveRange(offset, 2);
+            }
 
             return result;
         }
 
-        public sint32 ReadSInt32(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
+        public sint32 ReadSInt32(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -139,67 +142,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
 
             var result = _data.ReadSInt32(offset);
 
-            _data.RemoveRange(offset, 4);
-
-            return result;
-        }
-
-        public byte ReadByte(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
-        {
-            if ((_data?.Count ?? 0) < 1) return 0;
-
-            if (offset < 1)
-            {
-                offset = 0;
-            }
-            if (offset > _data.Count - 1)
-            {
-                return 0;
-            }
-
-            var result = _data[offset];
-
-            _data.RemoveAt(offset);
-
-            return result;
-        }
-
-        public ushort ReadUInt16(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
-        {
-            if ((_data?.Count ?? 0) < 1) return 0;
-
-            if (offset < 1)
-            {
-                offset = 0;
-            }
-            if (offset > _data.Count - 2)
-            {
-                return 0;
-            }
-
-            var result = _data.ReadUInt16(offset);
-
-            _data.RemoveRange(offset, 2);
-
-            return result;
-        }
-
-        public uint ReadUInt32(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
-        {
-            if ((_data?.Count ?? 0) < 1) return 0;
-
-            if (offset < 1)
-            {
-                offset = 0;
-            }
-            if (offset > _data.Count - 4)
-            {
-                return 0;
-            }
-
-            var result = _data.ReadUInt32(offset);
-
-            if ((rawDataOptions & RawDataOptions.PurgeReadData) == RawDataOptions.PurgeReadData)
+            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
             {
                 _data.RemoveRange(offset, 4);
             }
@@ -207,7 +150,76 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return result;
         }
 
-        public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, RawDataOptions rawDataOptions = RawDataOptions.PurgeReadData)
+        public byte ReadByte(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
+        {
+            if ((_data?.Count ?? 0) < 1) return 0;
+
+            if (offset < 1)
+            {
+                offset = 0;
+            }
+            if (offset > Count - 1)
+            {
+                return 0;
+            }
+
+            var result = _data[offset];
+
+            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            {
+                _data.RemoveAt(offset);
+            }
+
+            return result;
+        }
+
+        public ushort ReadUInt16(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
+        {
+            if ((_data?.Count ?? 0) < 1) return 0;
+
+            if (offset < 1)
+            {
+                offset = 0;
+            }
+            if (offset > Count - 2)
+            {
+                return 0;
+            }
+
+            var result = _data.ReadUInt16(offset);
+
+            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            {
+                _data.RemoveRange(offset, 2);
+            }
+
+            return result;
+        }
+
+        public uint ReadUInt32(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
+        {
+            if ((_data?.Count ?? 0) < 1) return 0;
+
+            if (offset < 1)
+            {
+                offset = 0;
+            }
+            if (offset > Count - 4)
+            {
+                return 0;
+            }
+
+            var result = _data.ReadUInt32(offset);
+
+            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            {
+                _data.RemoveRange(offset, 4);
+            }
+
+            return result;
+        }
+
+        public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return null;
 
@@ -258,12 +270,13 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
 
             max -= size;
 
-            if (max > _data.Count)
+            if (max > Count)
             {
-                max = _data.Count;
+                max = Count;
             }
 
-            if (max > 0)
+            if (length > 0 &&
+                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
             {
                 _data.RemoveRange(offset, length);
             }
@@ -271,7 +284,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return (data.GetString() ?? string.Empty).TrimEnd('\0');
         }
 
-        public string? ReadCString(int offset = 0, bool? peek = false)
+        public string? ReadCString(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return null;
 
@@ -291,9 +304,11 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 .Take(length)
                 .ToArray();
 
-            if (peek != null)
-                if (peek.Value != true)
-                    _data.RemoveRange(offset, length);
+            if (length > 0 &&
+                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            {
+                _data.RemoveRange(offset, length);
+            }
 
             return data.GetString();
         }
@@ -308,7 +323,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             {
                 case SeekOrigin.End:
                     {
-                        offset = _data.Count - offset;
+                        offset = Count - offset;
                         break;
                     }
                 case SeekOrigin.Current:
@@ -320,7 +335,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
 
             if (offset < 0)
                 return 0;
-            else if (offset > _data.Count)
+            else if (offset > Count)
                 return 0;
 
             _position = offset;
@@ -328,7 +343,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return _position;
         }
 
-        public byte PeekByte(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.All)
+        public byte PeekByte(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -337,12 +352,12 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
             {
                 _position++;
             }
@@ -350,7 +365,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return _data[offset];
         }
 
-        public short PeekSInt16(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.All)
+        public short PeekSInt16(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -359,12 +374,12 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
             {
                 _position += 2;
             }
@@ -372,7 +387,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return _data.ReadSInt16(offset);
         }
 
-        public sint32 PeekSInt32(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.All)
+        public sint32 PeekSInt32(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -381,12 +396,12 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
             {
                 _position += 4;
             }
@@ -394,7 +409,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return _data.ReadSInt32(offset);
         }
 
-        public ushort PeekUInt16(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.All)
+        public ushort PeekUInt16(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -403,12 +418,12 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
             {
                 _position += 2;
             }
@@ -416,7 +431,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
             return _data.ReadUInt16(offset);
         }
 
-        public uint PeekUInt32(int offset = 0, RawDataOptions rawDataOptions = RawDataOptions.All)
+        public uint PeekUInt32(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
 
@@ -425,12 +440,12 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(rawDataOptions))
+            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
             {
                 _position += 4;
             }
@@ -600,7 +615,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
                     return;
                 }
 
-                length = _data.Count - offset;
+                length = Count - offset;
             }
 
             _data.RemoveRange(offset, length);
@@ -610,7 +625,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
         {
             _data ??= [];
 
-            for (var j = _data.Count % mod; j > 0; j--)
+            for (var j = Count % mod; j > 0; j--)
             {
                 _data.Add(0);
             }
@@ -626,7 +641,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
         {
             _data ??= [];
 
-            for (var j = mod - _data.Count % mod; j > 0; j--)
+            for (var j = mod - Count % mod; j > 0; j--)
             {
                 _data.Add(0);
             }

@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
 using HotspotID = System.Int16;
 using sint16 = System.Int16;

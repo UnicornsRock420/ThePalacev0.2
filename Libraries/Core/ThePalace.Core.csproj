@@ -21,6 +21,7 @@
     <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
+    <Compile Remove="Factories\RawStream.cs" />
     <Compile Remove="Types\PropPIDSStream.cs" />
     <Compile Remove="Types\PropPROPSStream.cs" />
     <Compile Remove="Types\PropPRPStream.cs" />
@@ -42,6 +43,7 @@
     <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
     <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
     <None Include="Factories\LockContext.cs" />
+    <None Include="Factories\RawStream.cs" />
     <None Include="Factories\Singleton.cs" />
     <None Include="Factories\Tree.cs" />
   </ItemGroup>
@@ -60,6 +62,10 @@
     <None Include="Types\PropPIDSStream.cs" />
     <None Include="Types\PropPROPSStream.cs" />
     <None Include="Types\PropPRPStream.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Entities\Network\Shared\Core\" />
   </ItemGroup>
 
 </Project>

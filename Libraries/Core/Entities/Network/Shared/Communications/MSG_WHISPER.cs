@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Shared.Communications

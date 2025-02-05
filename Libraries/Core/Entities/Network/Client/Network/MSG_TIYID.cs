@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.Network
 {

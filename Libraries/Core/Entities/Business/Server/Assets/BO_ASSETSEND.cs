@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.Assets;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Business.Server.Assets
 {

@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Core;
+using ThePalace.Core.Factories;
 using ThePalace.Core.Helpers;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
 using ThePalace.Network.Enums;
 using sint32 = System.Int32;

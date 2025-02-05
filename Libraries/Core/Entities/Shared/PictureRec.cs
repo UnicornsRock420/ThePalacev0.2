@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 

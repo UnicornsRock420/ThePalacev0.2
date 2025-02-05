@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 
 namespace ThePalace.Core.Types
@@ -21,7 +21,9 @@ namespace ThePalace.Core.Types
         }
         public Point(Stream reader)
         {
-            this.Deserialize(0, reader);
+            var refNum = 0;
+
+            this.Deserialize(ref refNum, reader);
         }
         public Point(Point assetSpec)
         {
@@ -32,13 +34,13 @@ namespace ThePalace.Core.Types
         public sint16 HAxis;
         public sint16 VAxis;
 
-        public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             this.HAxis = reader.ReadInt16();
             this.VAxis = reader.ReadInt16();
         }
 
-        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             refNum = 0;
 

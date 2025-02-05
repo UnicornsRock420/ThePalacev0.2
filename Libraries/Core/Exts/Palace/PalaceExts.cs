@@ -3,16 +3,17 @@ using System.Drawing;
 using System.Reflection;
 using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Core;
+using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Exts.Palace
 {
     public static class PalaceExts
     {
+        #region Byte Operations/Helpers
         public static short SwapInt16(this short value) =>
             value.WriteInt16().Reverse().ReadSInt16();
         public static ushort SwapUInt16(this ushort value) =>
@@ -325,7 +326,9 @@ namespace ThePalace.Core.Exts.Palace
 
             return data.ToArray();
         }
+        #endregion
 
+        #region Point-In-Polygon & Bounding Box Methods
         public static bool IsPointInPolygon(this PointF point, List<PointF> polygon) =>
             point.IsPointInPolygon(polygon.ToArray());
         public static bool IsPointInPolygon(this PointF point, params PointF[] polygon)
@@ -401,8 +404,10 @@ namespace ThePalace.Core.Exts.Palace
 
             return results.ToArray();
         }
+        #endregion
 
-        public static void PalaceDeserialize(this Stream reader, int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+        #region Struct/Object/Protocol Serialization/Deserialization Methods
+        public static void PalaceDeserialize(this Stream reader, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             if (obj == null ||
                 objType == null ||
@@ -410,7 +415,7 @@ namespace ThePalace.Core.Exts.Palace
 
             if (obj.Is<IStructSerializer>(out var serializer))
             {
-                serializer.Deserialize(refNum, reader, opts);
+                serializer.Deserialize(ref refNum, reader, opts);
 
                 return;
             }
@@ -620,11 +625,11 @@ namespace ThePalace.Core.Exts.Palace
 
                             if (result.Is<IStructSerializer>(out serializer))
                             {
-                                serializer.Deserialize(refNum, reader, opts);
+                                serializer.Deserialize(ref refNum, reader, opts);
                             }
                             else
                             {
-                                reader.PalaceDeserialize(refNum, result, _type, opts);
+                                reader.PalaceDeserialize(ref refNum, result, _type, opts);
                             }
                         }
 
@@ -675,7 +680,7 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceSerialize(this Stream writer, out int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize(this Stream writer, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             refNum = 0;
 
@@ -876,7 +881,7 @@ namespace ThePalace.Core.Exts.Palace
                         break;
 
                     case Type _t when _t is IStruct:
-                        writer.PalaceSerialize(out refNum, _value, _type);
+                        writer.PalaceSerialize(ref refNum, _value, _type);
 
                         continue;
 
@@ -898,11 +903,9 @@ namespace ThePalace.Core.Exts.Palace
             if (minByteSize > 0 && (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
-        public static void PalaceSerialize<TStruct>(this Stream writer, out int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize<TStruct>(this Stream writer, ref int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
             where TStruct : IStruct
         {
-            refNum = 0;
-
             if (obj == null) return;
 
             var typeName = typeof(TStruct).Name;
@@ -913,39 +916,39 @@ namespace ThePalace.Core.Exts.Palace
             {
                 if (obj.Is<IStructSerializer>(out var serializer))
                 {
-                    serializer.Serialize(out refNum, ms, opts);
+                    serializer.Serialize(ref refNum, ms, opts);
                 }
                 else
                 {
-                    ms.PalaceSerialize(out refNum, obj, opts);
+                    ms.PalaceSerialize(ref refNum, obj, opts);
                 }
 
                 msgBytes = ms.ToArray();
             }
             if ((msgBytes?.Length ?? 0) < 1) msgBytes = null;
 
-            var hdr = new MSG_Header
-            {
-                EventType = Enum.Parse<EventTypes>(typeName),
-                Length = (uint)(msgBytes?.Length ?? 0),
-            };
-            if (obj.Is<IStructRefNum>())
-            {
-                hdr.RefNum = refNum;
-            }
-
             if (opts.IsBit<SerializerOptions, byte>(SerializerOptions.IncludeHeader))
             {
+                var hdr = new MSG_Header
+                {
+                    EventType = Enum.Parse<EventTypes>(typeName),
+                    Length = (uint)(msgBytes?.Length ?? 0),
+                };
+                if (obj.Is<IStructRefNum>())
+                {
+                    hdr.RefNum = refNum;
+                }
+
                 var hdrBytes = (byte[]?)null;
                 using (var ms = new MemoryStream())
                 {
                     if (hdr.Is<IStructSerializer>(out var serializer))
                     {
-                        serializer.Serialize(out refNum, ms, opts);
+                        serializer.Serialize(ref refNum, ms, opts);
                     }
                     else
                     {
-                        ms.PalaceSerialize(out refNum, hdr, typeof(MSG_Header), opts);
+                        ms.PalaceSerialize(ref refNum, hdr, typeof(MSG_Header), opts);
                     }
 
                     hdrBytes = ms.ToArray();
@@ -958,5 +961,6 @@ namespace ThePalace.Core.Exts.Palace
             if ((msgBytes?.Length ?? 0) > 0)
                 writer.Write(msgBytes);
         }
+        #endregion
     }
 }

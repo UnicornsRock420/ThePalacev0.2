@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 using ThePalace.Core.Types;
 using ThePalace.Network.Enums;
 

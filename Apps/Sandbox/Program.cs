@@ -1,9 +1,9 @@
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
-using ThePalace.Core.Entities.Network.Shared.Core;
+using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts.Palace;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
 namespace Sandbox
@@ -25,12 +25,12 @@ namespace Sandbox
             var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
-            var refNum = 0;
+            var refNum = 456;
 
             using (var ms = new MemoryStream())
             {
                 ms.PalaceSerialize(
-                    out refNum,
+                    ref refNum,
                     new MSG_LISTOFALLROOMS
                     {
                         Rooms = new()
@@ -60,7 +60,7 @@ namespace Sandbox
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                ms.PalaceDeserialize(hdr.RefNum, hdr, typeof(MSG_Header));
+                ms.PalaceDeserialize(ref hdr.RefNum, hdr, typeof(MSG_Header));
 
                 if ((ms.Length - ms.Position) != hdr.Length)
                     throw new InvalidDataException(nameof(hdr));
@@ -76,7 +76,7 @@ namespace Sandbox
                     msg = (IProtocol?)msgType.GetInstance();
 
                     ms.PalaceDeserialize(
-                        hdr.RefNum,
+                        ref hdr.RefNum,
                         msg,
                         msgType);
                 }

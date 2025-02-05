@@ -1,7 +1,8 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Server.Rooms
 {
@@ -11,12 +12,12 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms
     {
         public RoomRec? RoomInfo;
 
-        public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }

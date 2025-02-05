@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Entities.Events;
 
-namespace ThePalace.Core.Interfaces
+namespace ThePalace.Core.Interfaces.Network
 {
     public interface IProtocolHandler
     {

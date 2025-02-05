@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.Rooms
 {

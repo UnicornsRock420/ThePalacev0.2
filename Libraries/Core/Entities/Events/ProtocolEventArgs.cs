@@ -1,4 +1,5 @@
-﻿using ThePalace.Core.Interfaces;
+﻿using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Events
 {

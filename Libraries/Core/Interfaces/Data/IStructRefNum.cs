@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Interfaces
+﻿namespace ThePalace.Core.Interfaces.Data
 {
     public interface IStructRefNum : IStruct
     {

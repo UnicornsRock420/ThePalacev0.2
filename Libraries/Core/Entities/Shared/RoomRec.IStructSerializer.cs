@@ -1,16 +1,16 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
-using ThePalace.Core.Entities.Network.Shared.Core;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts.Palace;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Factories;
+using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
     public partial class RoomRec : IDisposable, IData, IStructSerializer
     {
-        public void Deserialize(int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             var bytes = new byte[reader.Length - reader.Position];
             reader.Read(bytes, 0, bytes.Length);
@@ -106,7 +106,7 @@ namespace ThePalace.Core.Entities.Shared
                         h.Name = this.PeekPString(32, 1, h.NameOfst);
 
                     if (h.ScriptTextOfst > 0 && h.ScriptTextOfst < _data.Count)
-                        h.Script = this.ReadCString(h.ScriptTextOfst, true);
+                        h.Script = this.ReadCString(h.ScriptTextOfst, RawDataOptions.PurgeReadData);
 
                     if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < _data.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.NbrPts)
                         for (var s = 0; s < h.NbrPts; s++)
@@ -246,10 +246,8 @@ namespace ThePalace.Core.Entities.Shared
             return;
         }
 
-        public void Serialize(out int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            refNum = 0;
-
             using (var _data = new RawData())
             using (var _blobData = new RawData())
             {
@@ -301,7 +299,7 @@ namespace ThePalace.Core.Entities.Shared
                                 {
                                     foreach (var state in spot.States)
                                     {
-                                        state.Serialize(out refNum, ms, opts);
+                                        state.Serialize(ref refNum, ms, opts);
 
                                         //_blobData.WriteInt16(state.PictID);
                                         //_blobData.WriteInt16(0); //reserved
@@ -439,7 +437,7 @@ namespace ThePalace.Core.Entities.Shared
 
                     using (var ms = new MemoryStream())
                     {
-                        LooseProps[i].Serialize(out refNum, ms);
+                        LooseProps[i].Serialize(ref refNum, ms);
 
                         _blobData.WriteBytes(ms.ToArray());
                     }

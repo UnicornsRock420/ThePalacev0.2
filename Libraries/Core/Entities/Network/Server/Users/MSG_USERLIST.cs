@@ -1,6 +1,7 @@
 ﻿using ThePalace.Core.Attributes;
 using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Data;
+using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Server.Users
