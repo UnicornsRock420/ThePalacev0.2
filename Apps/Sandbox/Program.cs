@@ -1,3 +1,4 @@
+using ThePalace.Core.Entities.DependencyInjection;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
@@ -18,11 +19,35 @@ namespace Sandbox
         public static void Main()
         {
             //// To customize application configuration such as set high DPI settings or default 
-            
+
             //// see https://aka.ms/applicationconfiguration.
             //ApplicationConfiguration.Initialize();
             //Application.Run(new Program());
 
+            //Func<string, bool>? where = l => l == "123";
+            //var test = new List<string> { "Test", "123" }
+            //    .Where(where)
+            //    .ToList();
+
+            //Experiment1();
+
+            var types = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t => !t.IsInterface)
+                .Where(t => t.GetInterfaces().Contains(typeof(IProtocol)));
+
+            var container = new Container();
+            container.RegisterTypes(types);
+        }
+
+        public Program()
+        {
+            InitializeComponent();
+        }
+
+        private static void Experiment1()
+        {
             var packetBytes = (byte[]?)null;
             var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
@@ -117,16 +142,6 @@ namespace Sandbox
                     SessionState = null,
                 });
             }
-
-            //Func<string, bool>? where = l => l == "123";
-            //var test = new List<string> { "Test", "123" }
-            //    .Where(where)
-            //    .ToList();
-        }
-
-        public Program()
-        {
-            InitializeComponent();
         }
     }
 }
