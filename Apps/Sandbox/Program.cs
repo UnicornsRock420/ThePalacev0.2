@@ -1,4 +1,3 @@
-using ThePalace.Core.Entities.DependencyInjection;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
@@ -37,7 +36,7 @@ namespace Sandbox
                 .Where(t => !t.IsInterface)
                 .Where(t => t.GetInterfaces().Contains(typeof(IProtocol)));
 
-            var container = new Container();
+            var container = new DIContainer();
             container.RegisterTypes(types);
         }
 
