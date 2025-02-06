@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes;
+using ThePalace.Core.Entities.Shared.Rooms;
 using sint16 = System.Int16;
 
 namespace ThePalace.Core.Entities.Shared

@@ -6,7 +6,7 @@ using sint32 = System.Int32;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Users
 {
     [ByteSize(128)]
     public partial class RegistrationRec : IStruct

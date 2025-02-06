@@ -1,12 +1,12 @@
-﻿using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
+﻿using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Events
 {
     public class ScriptEventArgs : EventArgs
     {
         public IptEventTypes EventType;
-        public IStruct Packet;
+        public IProtocol Msg;
         public object ScriptState;
     }
 }

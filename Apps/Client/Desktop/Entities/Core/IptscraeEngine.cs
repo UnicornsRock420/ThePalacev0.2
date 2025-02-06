@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;

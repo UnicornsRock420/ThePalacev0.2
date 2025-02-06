@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Entities\Events\ScriptEventArgs.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
@@ -28,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Entities\Events\ScriptEventArgs.cs" />
     <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
     <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
@@ -69,10 +67,6 @@
     <None Include="Types\PropPIDSStream.cs" />
     <None Include="Types\PropPROPSStream.cs" />
     <None Include="Types\PropPRPStream.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Entities\Network\Shared\Core\" />
   </ItemGroup>
 
 </Project>

@@ -17,7 +17,7 @@ namespace ThePalace.Core.Entities.Shared
         [IgnoreDataMember]
         public string? Format;
         [IgnoreDataMember]
-        public string? Md5 => _data?.ToArray()?.ComputeMd5();
+        public string? Md5 => this.GetData()?.ComputeMd5();
 
         //public static Bitmap Render(AssetRec asset)
         //{

@@ -12,7 +12,7 @@ namespace ThePalace.Core.Entities.Shared
         [IgnoreDataMember]
         public sint32 PropFormat;
         [IgnoreDataMember]
-        public bool IsLegacy16Bit => (Desc.PropFlags & 0xFFC1) == (int)PropFormats.PF_16Bit;
+        public bool IsLegacy16Bit => (AssetDesc.PropFlags & 0xFFC1) == (int)PropFormats.PF_16Bit;
         [IgnoreDataMember]
         public bool IsLegacyS20Bit => (PropFormat & (int)PropFormats.PF_S20Bit) != 0;
         [IgnoreDataMember]
@@ -20,31 +20,31 @@ namespace ThePalace.Core.Entities.Shared
         [IgnoreDataMember]
         public bool IsLegacy32Bit => (PropFormat & (int)PropFormats.PF_32Bit) != 0;
         [IgnoreDataMember]
-        public bool IsCustom32Bit => (Desc.PropFlags & (int)PropFormats.PF_Custom32Bit) != 0;
+        public bool IsCustom32Bit => (AssetDesc.PropFlags & (int)PropFormats.PF_Custom32Bit) != 0;
         [IgnoreDataMember]
-        public bool LoResIsHead => LoResPropFlags.PF_Head.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsHead => LoResPropFlags.PF_Head.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool LoResIsGhost => LoResPropFlags.PF_Ghost.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsGhost => LoResPropFlags.PF_Ghost.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool LoResIsRare => LoResPropFlags.PF_Rare.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsRare => LoResPropFlags.PF_Rare.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool LoResIsAnimate => LoResPropFlags.PF_Animate.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsAnimate => LoResPropFlags.PF_Animate.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool LoResIsPalindrome => LoResPropFlags.PF_Palindrome.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsPalindrome => LoResPropFlags.PF_Palindrome.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool LoResIsBounce => LoResPropFlags.PF_Bounce.IsBit<LoResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool LoResIsBounce => LoResPropFlags.PF_Bounce.IsBit<LoResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool HiResIsHead => HiResPropFlags.PF_Head.IsBit<HiResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool HiResIsHead => HiResPropFlags.PF_Head.IsBit<HiResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
-        public bool HiResIsGhost => HiResPropFlags.PF_Ghost.IsBit<HiResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool HiResIsGhost => HiResPropFlags.PF_Ghost.IsBit<HiResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
         public bool HiResIsRare => false;
         [IgnoreDataMember]
-        public bool HiResIsAnimate => HiResPropFlags.PF_Animate.IsBit<HiResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool HiResIsAnimate => HiResPropFlags.PF_Animate.IsBit<HiResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
         [IgnoreDataMember]
         public bool HiResIsPalindrome => false;
         [IgnoreDataMember]
-        public bool HiResIsBounce => HiResPropFlags.PF_Bounce.IsBit<HiResPropFlags, uint16, uint16>(Desc.PropFlags);
+        public bool HiResIsBounce => HiResPropFlags.PF_Bounce.IsBit<HiResPropFlags, uint16, uint16>(AssetDesc.PropFlags);
 
         [IgnoreDataMember]
         public bool IsHead

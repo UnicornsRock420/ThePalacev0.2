@@ -1,26 +1,28 @@
 ﻿using Autofac;
+using Autofac.Core;
+using Autofac.Core.Resolving.Pipeline;
 
 namespace ThePalace.Core.Entities.DependencyInjection
 {
     public partial class Container
     {
         public Container() =>
-            builder = new ContainerBuilder();
+            Builder = new ContainerBuilder();
 
-        private ContainerBuilder builder;
+        public ContainerBuilder Builder { get; private set; }
 
         #region Register Methods
         public Container RegisterInstances<TInstance>(IEnumerable<TInstance> instances)
             where TInstance : Type
         {
-            builder.RegisterInstance(instances);
+            Builder.RegisterInstance(instances);
             return this;
         }
 
         public Container RegisterInstances<TInstance>(params TInstance[] instances)
             where TInstance : Type
         {
-            builder.RegisterInstance(instances);
+            Builder.RegisterInstance(instances);
             return this;
         }
 
@@ -28,7 +30,7 @@ namespace ThePalace.Core.Entities.DependencyInjection
             where TModule : Module
         {
             foreach (var module in modules)
-                builder.RegisterModule(module);
+                Builder.RegisterModule(module);
             return this;
         }
 
@@ -36,7 +38,7 @@ namespace ThePalace.Core.Entities.DependencyInjection
             where TModule : Module
         {
             foreach (var module in modules)
-                builder.RegisterModule(module);
+                Builder.RegisterModule(module);
             return this;
         }
 
@@ -44,7 +46,7 @@ namespace ThePalace.Core.Entities.DependencyInjection
             where TType : Type
         {
             foreach (var type in types)
-                builder.RegisterType(type);
+                Builder.RegisterType(type);
             return this;
         }
 
@@ -52,9 +54,27 @@ namespace ThePalace.Core.Entities.DependencyInjection
             where TType : Type
         {
             foreach (var type in types)
-                builder.RegisterType(type);
+                Builder.RegisterType(type);
+            return this;
+        }
+
+        public Container RegisterServices<TService>(IEnumerable<TService> services, IResolveMiddleware middleware, MiddlewareInsertionMode insertionMode = MiddlewareInsertionMode.EndOfPhase)
+            where TService : Service
+        {
+            foreach (var service in services)
+                Builder.RegisterServiceMiddleware(service, middleware, insertionMode);
+            return this;
+        }
+
+        public Container RegisterServices<TService>(IResolveMiddleware middleware, MiddlewareInsertionMode insertionMode = MiddlewareInsertionMode.EndOfPhase, params TService[] services)
+            where TService : Service
+        {
+            foreach (var service in services)
+                Builder.RegisterServiceMiddleware(service, middleware, insertionMode);
             return this;
         }
         #endregion
+
+        //public void Run() { }
     }
 }

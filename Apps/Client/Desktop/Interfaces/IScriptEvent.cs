@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Interfaces.UI
+﻿namespace ThePalace.Client.Desktop.Interfaces
 {
     public interface IScriptEvent
     {

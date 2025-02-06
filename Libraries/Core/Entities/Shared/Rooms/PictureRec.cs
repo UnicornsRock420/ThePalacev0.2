@@ -4,7 +4,7 @@ using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     [ByteSize(12)]
     public partial class PictureRec : IStruct

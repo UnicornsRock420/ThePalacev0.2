@@ -3,14 +3,14 @@ using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.ServerInfo
 {
     [DynamicSize(40, 12)]
     public partial class ListRec : IStruct
     {
         public ListRec()
         {
-            this.Name = string.Empty;
+            Name = string.Empty;
         }
 
         public sint32 PrimaryID;

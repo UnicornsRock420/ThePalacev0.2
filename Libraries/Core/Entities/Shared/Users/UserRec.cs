@@ -12,7 +12,9 @@ namespace ThePalace.Core.Entities.Shared
     {
         public UserRec()
         {
+            this.RoomPos = new();
             this.PropSpec = new AssetSpec[9];
+            this.Extended = new();
         }
 
         public void Dispose()

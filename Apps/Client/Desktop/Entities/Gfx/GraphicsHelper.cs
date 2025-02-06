@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 
-namespace ThePalace.Client.Desktop.Entities.UI
+namespace ThePalace.Client.Desktop.Entities.Gfx
 {
     public enum GHDrawCmds
     {

@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Client.Desktop.Entities.Core
+namespace ThePalace.Core.Entities.Network.Shared.Core
 {
     public partial class ConnectionState : IConnectionState
     {

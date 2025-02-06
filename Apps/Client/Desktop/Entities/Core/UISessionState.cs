@@ -2,7 +2,7 @@
 
 namespace ThePalace.Client.Desktop.Entities.Core
 {
-    public sealed partial class SessionState : IUISessionState
+    public sealed partial class UISessionState : IUISessionState
     {
     }
 }

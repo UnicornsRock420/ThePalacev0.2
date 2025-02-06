@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;

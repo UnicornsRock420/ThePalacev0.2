@@ -30,9 +30,11 @@ namespace ThePalace.Core.Entities.Core
         public RawStream(params char[] data) =>
             this._stream = new(data?.GetBytes() ?? []);
 
+        ~RawStream() => this.Dispose();
+
         public virtual void Dispose()
         {
-            this.Clear();
+            this._stream?.Clear();
             this._stream?.Dispose();
             this._stream = null;
 

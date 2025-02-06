@@ -1,8 +1,7 @@
-﻿using ThePalace.Client.Desktop.Constants;
-using ThePalace.Client.Desktop.Enums;
+﻿using ThePalace.Client.Desktop.Enums;
 using ThePalace.Core.Helpers;
 
-namespace ThePalace.Client.Desktop.Entities.UI
+namespace ThePalace.Client.Desktop.Entities.Gfx
 {
     public partial class MsgBubble : IDisposable
     {
@@ -41,12 +40,12 @@ namespace ThePalace.Client.Desktop.Entities.UI
             Parse(text, duration);
         public MsgBubble(short colorNbr, string text)
         {
-            Colour = UIConstants.NbrToColor(colorNbr);
+            Colour = DesktopConstants.NbrToColor(colorNbr);
             Parse(text);
         }
         public MsgBubble(short colorNbr, string text, int duration)
         {
-            Colour = UIConstants.NbrToColor(colorNbr);
+            Colour = DesktopConstants.NbrToColor(colorNbr);
             Parse(text, duration);
         }
         public MsgBubble(Color colour, string text)
@@ -74,15 +73,15 @@ namespace ThePalace.Client.Desktop.Entities.UI
 
             #region Regex Matching & Formatting
 
-            if (UIConstants.REGEX_VISIBLE.IsMatch(text))
+            if (DesktopConstants.REGEX_VISIBLE.IsMatch(text))
             {
                 Visible = false;
 
                 return;
             }
-            if (UIConstants.REGEX_TYPE.IsMatch(text))
+            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
             {
-                var match = UIConstants.REGEX_TYPE.Match(text);
+                var match = DesktopConstants.REGEX_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
@@ -99,18 +98,18 @@ namespace ThePalace.Client.Desktop.Entities.UI
                             break;
                     }
             }
-            if (UIConstants.REGEX_LOCATION.IsMatch(text))
+            if (DesktopConstants.REGEX_LOCATION.IsMatch(text))
             {
-                var match = UIConstants.REGEX_LOCATION.Match(text);
+                var match = DesktopConstants.REGEX_LOCATION.Match(text);
                 var x = Convert.ToInt32(match.Groups[1].Value);
                 var y = Convert.ToInt32(match.Groups[2].Value);
                 text = match.Groups[3].Value;
 
                 Origin = new Point(x, y);
             }
-            if (UIConstants.REGEX_TYPE.IsMatch(text))
+            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
             {
-                var match = UIConstants.REGEX_TYPE.Match(text);
+                var match = DesktopConstants.REGEX_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
@@ -127,21 +126,21 @@ namespace ThePalace.Client.Desktop.Entities.UI
                             break;
                     }
             }
-            if (UIConstants.REGEX_SOUND.IsMatch(text))
+            if (DesktopConstants.REGEX_SOUND.IsMatch(text))
             {
                 var mediaFilenames = new List<string>();
-                while (UIConstants.REGEX_SOUND.IsMatch(text))
+                while (DesktopConstants.REGEX_SOUND.IsMatch(text))
                 {
-                    var match = UIConstants.REGEX_SOUND.Match(text);
+                    var match = DesktopConstants.REGEX_SOUND.Match(text);
                     text = match.Groups[2].Value;
 
                     mediaFilenames.Add(match.Groups[1].Value);
                 }
                 MediaFilenames = mediaFilenames.ToArray();
             }
-            if (UIConstants.REGEX_TYPE.IsMatch(text))
+            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
             {
-                var match = UIConstants.REGEX_TYPE.Match(text);
+                var match = DesktopConstants.REGEX_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
@@ -169,7 +168,7 @@ namespace ThePalace.Client.Desktop.Entities.UI
             while (words.Count > 0)
             {
                 var newLine = line.Join(" ", words[0]);
-                var newLineSize = TextRenderer.MeasureText(newLine, UIConstants.FONT_DEFAULT);
+                var newLineSize = TextRenderer.MeasureText(newLine, DesktopConstants.FONT_DEFAULT);
 
                 if (newLineSize.Width < maxWidth)
                     line.Enqueue(words.Dequeue());
@@ -178,7 +177,7 @@ namespace ThePalace.Client.Desktop.Entities.UI
                     words.Count < 1)
                 {
                     newLine = line.Join(" ");
-                    newLineSize = TextRenderer.MeasureText(newLine, UIConstants.FONT_DEFAULT);
+                    newLineSize = TextRenderer.MeasureText(newLine, DesktopConstants.FONT_DEFAULT);
 
                     if (newLineSize.Width > TextSize.Width)
                         TextSize.Width = newLineSize.Width;
@@ -192,7 +191,7 @@ namespace ThePalace.Client.Desktop.Entities.UI
             Duration = duration > 0 ? duration : Text.Join(" ").ToCharArray().Length * 500;
 
             //TextSize.Width += -28; // 16;
-            TextSize.Height = Text.Length * (UIConstants.FONT_DEFAULT.Height - 5) + 2;
+            TextSize.Height = Text.Length * (DesktopConstants.FONT_DEFAULT.Height - 5) + 2;
 
             #endregion
         }
@@ -234,7 +233,7 @@ namespace ThePalace.Client.Desktop.Entities.UI
             using (var colourBrush = new SolidBrush(Colour))
             using (var colourPen = new Pen(colourBrush, 2))
             {
-                var helper = new GraphicsHelper(g, UIConstants.FONT_DEFAULT, colourPen, colourBrush);
+                var helper = new GraphicsHelper(g, DesktopConstants.FONT_DEFAULT, colourPen, colourBrush);
 
                 switch (Type)
                 {

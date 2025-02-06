@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Constants;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Exts.Palace;
 
 namespace ThePalace.Core.Helpers

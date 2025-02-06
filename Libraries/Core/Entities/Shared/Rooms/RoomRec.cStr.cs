@@ -16,7 +16,7 @@ namespace ThePalace.Core.Entities.Shared
         }
         public RoomRec(uint8[]? data = null)
         {
-            this._stream = new();
+            this._stream = new(data);
 
             this.HotSpots = new();
             this.Pictures = new();
@@ -24,10 +24,10 @@ namespace ThePalace.Core.Entities.Shared
             this.LooseProps = new();
         }
 
+        ~RoomRec() => this.Dispose();
+
         public override void Dispose()
         {
-            this?.Clear();
-
             this.HotSpots?.Clear();
             this.HotSpots = null;
 
