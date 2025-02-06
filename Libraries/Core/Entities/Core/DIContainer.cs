@@ -1,18 +1,47 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
+using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Formatting.Compact;
+using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Core.Entities.Core
 {
     public partial class DIContainer
     {
-        public DIContainer() =>
+        public DIContainer()
+        {
             Builder = new ContainerBuilder();
-        public DIContainer(ContainerBuilder builder) =>
+
+            _logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(
+                    outputTemplate:
+                    "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{Context}] {Message:lj}{NewLine}{Exception}")
+                .WriteTo.File(new CompactJsonFormatter(), "logs/logs")
+                .CreateLogger();
+
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets<DIContainer>()
+                .Build();
+        }
+        public DIContainer(ContainerBuilder builder)
+        {
             Builder = builder;
+
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets<DIContainer>()
+                .Build();
+        }
 
         public ContainerBuilder Builder { get; private set; }
         public IContainer? Container { get; private set; }
+
+        private static ILogger _logger;
+        private readonly IConfiguration _configuration;
 
         #region Register Methods
         public DIContainer RegisterModules<TModule>(IEnumerable<TModule> modules)

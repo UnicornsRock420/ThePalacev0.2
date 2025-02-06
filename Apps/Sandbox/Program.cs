@@ -1,9 +1,11 @@
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
@@ -30,14 +32,14 @@ namespace Sandbox
 
             //Experiment1();
 
-            var types = AppDomain.CurrentDomain
+            var iProtocolTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
                 .SelectMany(t => t.GetTypes())
                 .Where(t => !t.IsInterface)
-                .Where(t => t.GetInterfaces().Contains(typeof(IProtocol)));
+                .Where(t => t.GetInterfaces().Contains(typeof(IStruct)));
 
             var container = new DIContainer();
-            container.RegisterTypes(types);
+            container.RegisterTypes(iProtocolTypes);
         }
 
         public Program()
@@ -64,7 +66,7 @@ namespace Sandbox
                             new()
                             {
                                 PrimaryID = 1,
-                                Flags = 0,
+                                Flags = (sint16)RoomFlags.NoPainting,
                                 RefNum = 12,
 
                                 Name = "Testing 123",
