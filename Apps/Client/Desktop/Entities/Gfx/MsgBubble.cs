@@ -1,4 +1,6 @@
 ﻿using ThePalace.Client.Desktop.Enums;
+using ThePalace.Common.Desktop.Constants;
+using ThePalace.Core.Constants;
 using ThePalace.Core.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.Gfx
@@ -161,14 +163,14 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             #endregion
             #region Word(s) & Line Formatting
 
-            var words = ClientConstants.REGEX_WHITESPACE.Split(text).ToList();
+            var words = RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
             var lines = new List<string>();
             var line = new List<string>();
 
             while (words.Count > 0)
             {
                 var newLine = line.Join(" ", words[0]);
-                var newLineSize = TextRenderer.MeasureText(newLine, DesktopConstants.FONT_DEFAULT);
+                var newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT));
 
                 if (newLineSize.Width < maxWidth)
                     line.Enqueue(words.Dequeue());
@@ -177,7 +179,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
                     words.Count < 1)
                 {
                     newLine = line.Join(" ");
-                    newLineSize = TextRenderer.MeasureText(newLine, DesktopConstants.FONT_DEFAULT);
+                    newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT));
 
                     if (newLineSize.Width > TextSize.Width)
                         TextSize.Width = newLineSize.Width;
@@ -191,7 +193,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             Duration = duration > 0 ? duration : Text.Join(" ").ToCharArray().Length * 500;
 
             //TextSize.Width += -28; // 16;
-            TextSize.Height = Text.Length * (DesktopConstants.FONT_DEFAULT.Height - 5) + 2;
+            TextSize.Height = Text.Length * (DesktopConstants.FONT_HEIGHT - 5) + 2;
 
             #endregion
         }
@@ -233,7 +235,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             using (var colourBrush = new SolidBrush(Colour))
             using (var colourPen = new Pen(colourBrush, 2))
             {
-                var helper = new GraphicsHelper(g, DesktopConstants.FONT_DEFAULT, colourPen, colourBrush);
+                var helper = new GraphicsHelper(g, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT), colourPen, colourBrush);
 
                 switch (Type)
                 {

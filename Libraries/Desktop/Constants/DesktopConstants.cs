@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace ThePalace.Common.Desktop.Constants
 {
@@ -11,7 +10,8 @@ namespace ThePalace.Common.Desktop.Constants
         public static readonly Regex REGEX_SOUND = new Regex(@"^[\s]*[\)]([\w\d\.]+)[\s]*(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
         public static readonly Regex REGEX_LOCATION = new Regex(@"^[\s]*[@]([0-9]+)[\s]*[,][\s]*([0-9]+)[\s]*(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
 
-        //public Font FONT_DEFAULT = new Font("Arial", 14);
+        public const string FONT_NAME = "Arial";
+        public const int FONT_HEIGHT = 14;
 
         public static class AspectRatio
         {

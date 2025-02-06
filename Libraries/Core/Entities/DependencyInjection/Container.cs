@@ -65,14 +65,6 @@ namespace ThePalace.Core.Entities.DependencyInjection
                 Builder.RegisterServiceMiddleware(service, middleware, insertionMode);
             return this;
         }
-
-        public Container RegisterServices<TService>(IResolveMiddleware middleware, MiddlewareInsertionMode insertionMode = MiddlewareInsertionMode.EndOfPhase, params TService[] services)
-            where TService : Service
-        {
-            foreach (var service in services)
-                Builder.RegisterServiceMiddleware(service, middleware, insertionMode);
-            return this;
-        }
         #endregion
 
         //public void Run() { }
