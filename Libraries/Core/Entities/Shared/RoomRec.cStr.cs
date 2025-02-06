@@ -3,43 +3,42 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomRec : RawData
+    public partial class RoomRec : RawStream
     {
         public RoomRec()
         {
-            _data = new();
+            this._stream = new();
 
-            HotSpots = new();
-            Pictures = new();
-            DrawCmds = new();
-            LooseProps = new();
+            this.HotSpots = new();
+            this.Pictures = new();
+            this.DrawCmds = new();
+            this.LooseProps = new();
         }
         public RoomRec(uint8[]? data = null)
         {
-            _data = new(data);
+            this._stream = new();
 
-            HotSpots = new();
-            Pictures = new();
-            DrawCmds = new();
-            LooseProps = new();
+            this.HotSpots = new();
+            this.Pictures = new();
+            this.DrawCmds = new();
+            this.LooseProps = new();
         }
 
         public override void Dispose()
         {
-            _data?.Clear();
-            _data = null;
+            this?.Clear();
 
-            HotSpots?.Clear();
-            HotSpots = null;
+            this.HotSpots?.Clear();
+            this.HotSpots = null;
 
-            Pictures?.Clear();
-            Pictures = null;
+            this.Pictures?.Clear();
+            this.Pictures = null;
 
-            DrawCmds?.Clear();
-            DrawCmds = null;
+            this.DrawCmds?.Clear();
+            this.DrawCmds = null;
 
-            LooseProps?.Clear();
-            LooseProps = null;
+            this.LooseProps?.Clear();
+            this.LooseProps = null;
 
             base.Dispose();
 

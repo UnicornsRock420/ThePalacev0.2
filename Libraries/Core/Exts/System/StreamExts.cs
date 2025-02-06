@@ -205,5 +205,22 @@
 
             stream.Write(BitConverter.GetBytes(value));
         }
+
+        public static void Clear(this MemoryStream stream, int offset = 0, bool clearBytes = true)
+        {
+            if (stream == null)
+                stream = new();
+            else
+            {
+                if (clearBytes)
+                {
+                    var buffer = stream.GetBuffer();
+                    Array.Clear(buffer, 0, buffer.Length);
+                }
+
+                stream.Position = offset;
+                stream.SetLength(offset);
+            }
+        }
     }
 }

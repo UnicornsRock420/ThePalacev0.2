@@ -221,7 +221,6 @@ namespace ThePalace.Core.Exts.Palace
             }
 
             var length = 0;
-
             switch (size)
             {
                 case 4:
@@ -282,7 +281,6 @@ namespace ThePalace.Core.Exts.Palace
             }
 
             var length = value.Length;
-
             if (length >= max - size)
             {
                 length = max - size;
@@ -309,9 +307,10 @@ namespace ThePalace.Core.Exts.Palace
 
             if (padding)
             {
-                for (var j = size + length; j < max; j++)
+                var padSize = max - (size + length);
+                if (padSize > 0)
                 {
-                    data.Add(0);
+                    data.AddRange(new byte[padSize]);
                 }
             }
 
@@ -683,8 +682,6 @@ namespace ThePalace.Core.Exts.Palace
 
         public static void PalaceSerialize(this Stream writer, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
-            refNum = 0;
-
             if (obj == null ||
                 objType == null ||
                 !(obj is IStruct)) return;

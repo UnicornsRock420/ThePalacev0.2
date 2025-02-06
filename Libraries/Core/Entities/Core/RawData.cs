@@ -234,7 +234,6 @@ namespace ThePalace.Core.Entities.Core
             }
 
             var length = 0;
-
             switch (size)
             {
                 case 4:
@@ -468,7 +467,6 @@ namespace ThePalace.Core.Entities.Core
             }
 
             var length = 0;
-
             switch (size)
             {
                 case 4:

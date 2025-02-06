@@ -47,8 +47,6 @@ namespace ThePalace.Core.Types
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            refNum = 0;
-
             writer.WriteInt32(this.Id);
             writer.WriteUInt32(this.Crc);
         }

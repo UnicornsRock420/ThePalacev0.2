@@ -11,9 +11,8 @@ namespace ThePalace.Core.Entities.Core
         public enum RawStreamOptions : uint
         {
             None = 0x00,
-            UsePosition = 0x01,
-            IncrementPosition = 0x02,
-            All = UsePosition | IncrementPosition,
+            IncrementPosition = 0x01,
+            Padding = 0x02,
         }
 
         public static explicit operator uint8[](RawStream p) => p.Data ?? [];
@@ -21,64 +20,67 @@ namespace ThePalace.Core.Entities.Core
         public static explicit operator RawStream(uint8[] v) => new(v);
         public static explicit operator RawStream(char[] v) => new(v);
         public RawStream() =>
-            _stream = new();
+            this._stream = new();
         public RawStream(IEnumerable<uint8>? data = null) =>
-            _stream = new MemoryStream(data?.ToArray() ?? []);
+            this._stream = new(data?.ToArray() ?? []);
         public RawStream(IEnumerable<char>? data = null) =>
-            _stream = new MemoryStream(data?.GetBytes() ?? []);
+            this._stream = new(data?.GetBytes() ?? []);
         public RawStream(params uint8[] data) =>
-            _stream = new MemoryStream(data ?? []);
+            this._stream = new(data ?? []);
         public RawStream(params char[] data) =>
-            _stream = new MemoryStream(data?.GetBytes() ?? []);
+            this._stream = new(data?.GetBytes() ?? []);
 
         public virtual void Dispose()
         {
-            _stream?.Dispose();
-            _stream = null;
+            this.Clear();
+            this._stream?.Dispose();
+            this._stream = null;
 
             GC.SuppressFinalize(this);
         }
 
-        public static RawStream New() =>
-            new();
-        public static RawStream FromEnumerable(IEnumerable<uint8>? data = null) =>
-            new(data);
-        public static RawStream FromEnumerable(IEnumerable<char>? data = null) =>
-            new(data);
-        public static RawStream FromBytes(uint8[]? data = null) =>
-            new(data);
-        public static RawStream FromChars(char[]? data = null) =>
-            new(data);
+        public static RawStream New() => new();
+        public static RawStream FromEnumerable(IEnumerable<uint8>? data = null) => new(data);
+        public static RawStream FromEnumerable(IEnumerable<char>? data = null) => new(data);
+        public static RawStream FromBytes(uint8[]? data = null) => new(data);
+        public static RawStream FromChars(char[]? data = null) => new(data);
 
         protected MemoryStream? _stream;
         public virtual uint8[]? Data
         {
-            get => _stream?.ToArray() ?? [];
-            set => _stream = new MemoryStream(value ?? []);
+            get => this._stream?.ToArray() ?? [];
+            set => this._stream = new(value ?? []);
+        }
+        public virtual MemoryStream? Stream
+        {
+            get => this._stream;
+            set => this._stream = value;
         }
 
         public virtual sint32 Count =>
-            (sint32)(_stream?.Length ?? 0);
+            (sint32)(this._stream?.Length ?? 0);
         public virtual sint32 Length =>
-            (sint32)(_stream?.Length ?? 0);
+            (sint32)(this._stream?.Length ?? 0);
 
         #region Read Methods
         public uint8[]? GetData(int max = 0, int offset = 0, bool purge = false)
         {
-            if ((_stream?.Length ?? 0) < 1) return null;
+            if ((this._stream?.Length ?? 0) < 1) return null;
 
             if (max < 1 ||
-                max > this._stream.Length)
+                max > (int)this._stream.Length)
             {
                 max = (int)this._stream.Length;
             }
+
             if (offset > max) return null;
+
             if (offset < 0)
             {
                 offset = 0;
             }
 
-            var position = this._stream.Position;
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -88,23 +90,25 @@ namespace ThePalace.Core.Entities.Core
             var buffer = new byte[max];
             this._stream.Read(buffer, 0, buffer.Length);
 
-            this._stream.Position = position;
+            this._stream.Position = _position;
 
             return buffer;
         }
 
         public sbyte ReadSByte(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 1)
+            if (offset > this.Count - 1)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -115,7 +119,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position--;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -123,16 +127,18 @@ namespace ThePalace.Core.Entities.Core
 
         public short ReadSInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 2)
+            if (offset > this.Count - 2)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -143,7 +149,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= 2;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -151,16 +157,18 @@ namespace ThePalace.Core.Entities.Core
 
         public sint32 ReadSInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 4)
+            if (offset > this.Count - 4)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -171,7 +179,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= 4;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -179,16 +187,18 @@ namespace ThePalace.Core.Entities.Core
 
         public byte ReadByte(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 1)
+            if (offset > this.Count - 1)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -199,7 +209,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position--;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -207,16 +217,18 @@ namespace ThePalace.Core.Entities.Core
 
         public ushort ReadUInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 2)
+            if (offset > this.Count - 2)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -227,7 +239,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= 2;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -235,16 +247,18 @@ namespace ThePalace.Core.Entities.Core
 
         public uint ReadUInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
-            if (offset > Count - 4)
+            if (offset > this.Count - 4)
             {
                 return 0;
             }
+
+            var _position = this._stream.Position;
 
             if (offset > 0)
             {
@@ -255,7 +269,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= 4;
+                this._stream.Position = _position;
             }
 
             return result;
@@ -263,16 +277,11 @@ namespace ThePalace.Core.Entities.Core
 
         public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return null;
+            if ((this._stream?.Length ?? 0) < 1) return null;
 
             if (offset < 1)
             {
                 offset = 0;
-            }
-
-            if (offset > 0)
-            {
-                this._stream.Position = offset;
             }
 
             if (size < 1)
@@ -281,7 +290,6 @@ namespace ThePalace.Core.Entities.Core
             }
 
             var length = 0;
-
             switch (size)
             {
                 case 4:
@@ -309,13 +317,20 @@ namespace ThePalace.Core.Entities.Core
                 length = max;
             }
 
-            var buffer = new byte[max];
+            var _position = this._stream.Position;
+
+            if (offset > 0)
+            {
+                this._stream.Position = offset + size;
+            }
+
+            var buffer = new byte[length];
             var readCount = this._stream.Read(buffer, 0, buffer.Length);
             if (readCount < 1) return null;
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= max;
+                this._stream.Position = _position;
             }
 
             return (buffer.GetString() ?? string.Empty).TrimEnd('\0');
@@ -323,7 +338,7 @@ namespace ThePalace.Core.Entities.Core
 
         public string? ReadCString(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            if ((_stream?.Length ?? 0) < 1) return null;
+            if ((this._stream?.Length ?? 0) < 1) return null;
 
             if (offset < 1)
             {
@@ -353,7 +368,7 @@ namespace ThePalace.Core.Entities.Core
 
             if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position -= stringBytes.Count;
+                this._stream.Position = _position;
             }
 
             return stringBytes.GetString();
@@ -363,124 +378,144 @@ namespace ThePalace.Core.Entities.Core
         #region Peek Methods
         public long Seek(long offset = 0, SeekOrigin origin = SeekOrigin.Begin)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             return this._stream.Seek(offset, origin);
         }
 
-        public byte PeekByte(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
+        public byte PeekByte(long offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
+            var _position = this._stream.Position;
+
+            if (offset > 0)
             {
-                offset += this._stream.Position;
+                this._stream.Position = offset;
             }
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
+            var result = (byte)this._stream.ReadByte();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position++;
+                this._stream.Position = _position;
             }
 
-            return _stream[(int)offset];
+            return result;
         }
 
-        public short PeekSInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
+        public short PeekSInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
+            var _position = this._stream.Position;
+
+            if (offset > 0)
             {
-                offset += this._stream.Position;
+                this._stream.Position = offset;
             }
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
+            var result = (byte)this._stream.ReadInt16();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position += 2;
+                this._stream.Position = _position;
             }
 
-            return this._stream.ReadSInt16(offset);
+            return result;
         }
 
-        public sint32 PeekSInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
+        public sint32 PeekSInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
+            var _position = this._stream.Position;
+
+            if (offset > 0)
             {
-                offset += this._stream.Position;
+                this._stream.Position = offset;
             }
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
+            var result = (byte)this._stream.ReadInt32();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position += 4;
+                this._stream.Position = _position;
             }
 
-            return this._stream.ReadSInt32(offset);
+            return result;
         }
 
-        public ushort PeekUInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
+        public ushort PeekUInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
+            var _position = this._stream.Position;
+
+            if (offset > 0)
             {
-                offset += this._stream.Position;
+                this._stream.Position = offset;
             }
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
+            var result = (byte)this._stream.ReadUInt16();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position += 2;
+                this._stream.Position = _position;
             }
 
-            return this._stream.ReadUInt16(offset);
+            return result;
         }
 
-        public uint PeekUInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.All)
+        public uint PeekUInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return 0;
+            if ((this._stream?.Length ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawStreamOptions.UsePosition.IsBit<RawStreamOptions, uint>(opts))
+            var _position = this._stream.Position;
+
+            if (offset > 0)
             {
-                offset += this._stream.Position;
+                this._stream.Position = offset;
             }
 
-            if (RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, uint>(opts))
+            var result = (byte)this._stream.ReadUInt32();
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
             {
-                this._stream.Position += 4;
+                this._stream.Position = _position;
             }
 
-            return this._stream.ReadUInt32(offset);
+            return result;
         }
 
-        public string? PeekPString(int max, int size = 0, int offset = 0)
+        public string? PeekPString(int max, int size = 0, int offset = 0, RawStreamOptions opts = RawStreamOptions.None)
         {
-            if ((_stream?.Length ?? 0) < 1) return null;
+            if ((this._stream?.Length ?? 0) < 1) return null;
 
             if (offset < 1)
             {
@@ -493,7 +528,6 @@ namespace ThePalace.Core.Entities.Core
             }
 
             var length = 0;
-
             switch (size)
             {
                 case 4:
@@ -516,27 +550,37 @@ namespace ThePalace.Core.Entities.Core
                 length = max;
             }
 
-            var data = this._stream.ToList()
-                .Skip(offset + size)
-                .Take(length)
-                .ToArray();
+            var _position = this._stream.Position;
 
-            return data.GetString();
+            if (offset > 0)
+            {
+                this._stream.Position = offset + size;
+            }
+
+            var buffer = new byte[length];
+            this._stream.Read(buffer, 0, buffer.Length);
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
+
+            return buffer.GetString();
 
         }
         #endregion
 
         #region Write Methods
         public void SetData(IEnumerable<uint8>? data = null) =>
-            _stream = new MemoryStream(data?.ToArray() ?? []);
+            this._stream = new(data?.ToArray() ?? []);
         public void SetData(uint8[]? data = null) =>
-            _stream = new MemoryStream(data ?? []);
+            this._stream = new(data ?? []);
 
         public void AppendBytes(uint8[]? data = null)
         {
-            if (Count < 1)
+            if (this.Count < 1)
             {
-                _stream = new MemoryStream(data);
+                this._stream = new(data);
 
                 return;
             }
@@ -546,14 +590,29 @@ namespace ThePalace.Core.Entities.Core
 
         public void WriteByte(byte value)
         {
-            _stream ??= new();
+            this._stream ??= new();
+
+            var _position = this._stream.Position;
 
             this._stream.Write([value]);
         }
 
-        public void WriteBytes(byte[] value, int max = 0, int offset = 0)
+        public void WriteBytes(byte[] value, int max = 0, int offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
+
+            var _position = this._stream.Position;
+
+            if (offset > 0)
+            {
+                this._stream.Position = offset;
+            }
+
+            var length = value.Length;
+            if (length >= max)
+            {
+                length = max;
+            }
 
             if (max < 1 ||
                 offset < 1)
@@ -561,70 +620,126 @@ namespace ThePalace.Core.Entities.Core
             else
                 this._stream.Write(value
                     .Skip(offset)
-                    .Take(max)
-                    .ToList());
+                    .Take(length)
+                    .ToArray());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WriteInt16(short value)
+        public void WriteInt16(short value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            this._stream.AddRange(value.WriteInt16());
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WriteInt16());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WriteInt32(sint32 value)
+        public void WriteInt32(sint32 value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            this._stream.AddRange(value.WriteInt32());
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WriteInt32());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WriteInt16(ushort source)
+        public void WriteInt16(ushort value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            this._stream.AddRange(source.WriteUInt16());
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WriteUInt16());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WriteInt32(uint source)
+        public void WriteInt32(uint value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            this._stream.AddRange(source.WriteUInt32());
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WriteUInt32());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WritePString(string source, int max, int size = 0, bool padding = true)
+        public void WritePString(string value, int max, int size = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition | RawStreamOptions.Padding)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
             if (size < 1)
             {
                 size = 1;
             }
 
-            this._stream.AddRange(source.WritePString(max, size, padding));
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WritePString(max, size, RawStreamOptions.Padding.IsBit<RawStreamOptions, byte>(opts)));
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
 
-        public void WriteCString(string source)
+        public void WriteCString(string value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            this._stream.AddRange(source.WriteCString());
+            var _position = this._stream.Position;
+
+            this._stream.Write(value.WriteCString());
+
+            if (!RawStreamOptions.IncrementPosition.IsBit<RawStreamOptions, byte>(opts))
+            {
+                this._stream.Position = _position;
+            }
         }
         #endregion
 
         #region Helper Methods
-        public void Clear()
+        public void Clear(int offset = 0, bool clearBytes = true)
         {
-            if (_stream == null)
-                _stream = [];
+            if (this._stream == null)
+                this._stream = new();
             else
-                this._stream.Clear();
+            {
+                if (clearBytes)
+                {
+                    var buffer = this._stream.GetBuffer();
+                    Array.Clear(buffer, offset, buffer.Length - offset);
+                }
+
+                this._stream.Position = offset;
+                this._stream.SetLength(offset);
+            }
         }
 
         public void DropBytes(int length = 0, int offset = 0)
         {
-            if ((_stream?.Length ?? 0) < 1) return;
+            if ((this._stream?.Length ?? 0) < 1) return;
 
             if (offset < 1)
             {
@@ -635,51 +750,48 @@ namespace ThePalace.Core.Entities.Core
             {
                 if (offset < 1)
                 {
-                    this._stream.Clear();
+                    this.Clear();
 
                     return;
                 }
 
-                length = Count - offset;
+                length = this.Count - offset;
             }
 
-            this._stream.RemoveRange(offset, length);
+            if ((offset + length) > 0)
+            {
+                var _position = this._stream.Position;
+
+                this._stream.Position = offset + length;
+
+                if ((this._stream.Length - this._stream.Position) > 0)
+                {
+                    var buffer = new byte[this._stream.Length - this._stream.Position];
+                    var byteCount = this._stream.Read(buffer, 0, buffer.Length);
+                    if (byteCount < 1) return;
+
+                    this.Clear(offset);
+
+                    this._stream.Write(buffer, 0, buffer.Length);
+                }
+
+                this._stream.Position = _position;
+            }
         }
 
         public void PadBytes(int mod)
         {
-            _stream ??= new();
+            this._stream ??= new();
 
-            for (var j = Count % mod; j > 0; j--)
+            for (var j = mod - (this.Count % mod); j > 0; j--)
             {
-                this._stream.Add(0);
+                this._stream.Write([0]);
             }
         }
 
         public static int PadOffset(int mod, int value)
         {
-            value += value % mod;
-            return value;
-        }
-
-        public void AlignBytes(int mod)
-        {
-            _stream ??= new();
-
-            for (var j = mod - Count % mod; j > 0; j--)
-            {
-                this._stream.Add(0);
-            }
-        }
-
-        public void Deserialize(Stream data)
-        {
-            throw new NotImplementedException();
-        }
-
-        public byte[] Serialize()
-        {
-            throw new NotImplementedException();
+            return (value += value % mod);
         }
         #endregion
     }

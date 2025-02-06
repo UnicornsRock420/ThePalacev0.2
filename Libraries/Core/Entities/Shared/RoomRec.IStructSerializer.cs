@@ -6,6 +6,7 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
+using static ThePalace.Core.Entities.Core.RawData;
 
 namespace ThePalace.Core.Entities.Shared
 {
@@ -13,11 +14,6 @@ namespace ThePalace.Core.Entities.Shared
     {
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            var bytes = new byte[reader.Length - reader.Position];
-            reader.Read(bytes, 0, bytes.Length);
-
-            _data = new List<byte>(bytes);
-
             var roomNameOfst = (short)0;
             var pictNameOfst = (short)0;
             var artistNameOfst = (short)0;
@@ -36,24 +32,24 @@ namespace ThePalace.Core.Entities.Shared
 
             try
             {
-                this.RoomFlags = (RoomFlags)_data.ReadSInt32();
-                this.FacesID = _data.ReadSInt32();
-                this.RoomID = _data.ReadSInt16();
-                roomNameOfst = _data.ReadSInt16();
-                pictNameOfst = _data.ReadSInt16();
-                artistNameOfst = _data.ReadSInt16();
-                passwordOfst = _data.ReadSInt16();
-                nbrHotspots = _data.ReadSInt16();
-                hotspotOfst = _data.ReadSInt16();
-                nbrPictures = _data.ReadSInt16();
-                pictureOfst = _data.ReadSInt16();
-                nbrDrawCmds = _data.ReadSInt16();
-                firstDrawCmd = _data.ReadSInt16();
-                nbrPeople = _data.ReadSInt16();
-                nbrLProps = _data.ReadSInt16();
-                firstLProp = _data.ReadSInt16();
-                reserved = _data.ReadSInt16();
-                lenVars = _data.ReadSInt16();
+                this.RoomFlags = (RoomFlags)this.ReadSInt32();
+                this.FacesID = this.ReadSInt32();
+                this.RoomID = this.ReadSInt16();
+                roomNameOfst = this.ReadSInt16();
+                pictNameOfst = this.ReadSInt16();
+                artistNameOfst = this.ReadSInt16();
+                passwordOfst = this.ReadSInt16();
+                nbrHotspots = this.ReadSInt16();
+                hotspotOfst = this.ReadSInt16();
+                nbrPictures = this.ReadSInt16();
+                pictureOfst = this.ReadSInt16();
+                nbrDrawCmds = this.ReadSInt16();
+                firstDrawCmd = this.ReadSInt16();
+                nbrPeople = this.ReadSInt16();
+                nbrLProps = this.ReadSInt16();
+                firstLProp = this.ReadSInt16();
+                reserved = this.ReadSInt16();
+                lenVars = this.ReadSInt16();
 
                 // Get the strings
                 this.Name = this.PeekPString(32, 1, roomNameOfst);
@@ -103,13 +99,13 @@ namespace ThePalace.Core.Entities.Shared
                     h.ScriptTextOfst = this.PeekSInt16();
                     this.PeekSInt16(); //alignReserved
 
-                    if (h.NameOfst > 0 && h.NameOfst < _data.Count)
+                    if (h.NameOfst > 0 && h.NameOfst < this.Count)
                         h.Name = this.PeekPString(32, 1, h.NameOfst);
 
-                    if (h.ScriptTextOfst > 0 && h.ScriptTextOfst < _data.Count)
-                        h.Script = this.ReadCString(h.ScriptTextOfst, RawDataOptions.PurgeReadData);
+                    if (h.ScriptTextOfst > 0 && h.ScriptTextOfst < this.Count)
+                        h.Script = this.ReadCString(h.ScriptTextOfst);
 
-                    if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < _data.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.NbrPts)
+                    if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < this.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.NbrPts)
                         for (var s = 0; s < h.NbrPts; s++)
                         {
                             this.Seek(h.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
@@ -162,7 +158,7 @@ namespace ThePalace.Core.Entities.Shared
                     this.PeekSInt16(); //reserved
 
                     if (pict.PicNameOfst > 0 &&
-                        pict.PicNameOfst < _data.Count)
+                        pict.PicNameOfst < this.Count)
                     {
                         pict.Name = this.PeekPString(32, 1, pict.PicNameOfst);
 
@@ -249,35 +245,35 @@ namespace ThePalace.Core.Entities.Shared
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            using (var _data = new RawData())
-            using (var _blobData = new RawData())
+            using (var _data = new RawStream()) //RawData()
+            using (var _blobData = new RawStream()) //RawData()
             {
                 // ALIGN header
                 _blobData.PadBytes(4);
 
                 // Room Name
                 var roomNameOfst = (short)_blobData.Count;
-                _blobData.WritePString(Name ?? $"Room {RoomID}", 32, 1);
+                _blobData.WritePString(this.Name ?? $"Room {this.RoomID}", 32, 1);
 
                 // Artist Name
                 var artistNameOfst = (short)_blobData.Count;
-                _blobData.WritePString(Artist ?? string.Empty, 32, 1);
+                _blobData.WritePString(this.Artist ?? string.Empty, 32, 1);
 
                 var pictNameOfst = (short)_blobData.Count;
-                _blobData.WritePString(Picture ?? "clouds.gif", 32, 1);
+                _blobData.WritePString(this.Picture ?? "clouds.gif", 32, 1);
 
                 // Password
                 var passwordOfst = (short)_blobData.Count;
-                _blobData.WritePString(Password ?? string.Empty, 32, 1);
+                _blobData.WritePString(this.Password ?? string.Empty, 32, 1);
 
                 //Start Spots
                 var hotspotOfst = (short)0;
 
                 using (var tmp = new MemoryStream())
                 {
-                    if ((HotSpots?.Count ?? 0) > 0)
+                    if ((this.HotSpots?.Count ?? 0) > 0)
                     {
-                        foreach (var spot in HotSpots)
+                        foreach (var spot in this.HotSpots)
                         {
                             // Buffer spot scripts
 
@@ -367,7 +363,7 @@ namespace ThePalace.Core.Entities.Shared
 
                     _blobData.PadBytes(4);
 
-                    hotspotOfst = (short)(HotSpots.Count > 0 ? _blobData.Count : 0);
+                    hotspotOfst = (short)(this.HotSpots.Count > 0 ? _blobData.Count : 0);
 
                     _blobData.WriteBytes(tmp.ToArray());
                 }
@@ -377,9 +373,9 @@ namespace ThePalace.Core.Entities.Shared
 
                 using (var tmp = new MemoryStream())
                 {
-                    if ((Pictures?.Count ?? 0) > 0)
+                    if ((this.Pictures?.Count ?? 0) > 0)
                     {
-                        foreach (var pict in Pictures)
+                        foreach (var pict in this.Pictures)
                         {
                             pict.PicNameOfst = (short)_blobData.Count;
                             _blobData.WritePString(pict.Name, 32, 1);
@@ -392,7 +388,7 @@ namespace ThePalace.Core.Entities.Shared
                         }
                     }
 
-                    pictureOfst = (short)(Pictures.Count > 0 ? _blobData.Count : 0);
+                    pictureOfst = (short)(this.Pictures.Count > 0 ? _blobData.Count : 0);
 
                     _blobData.WriteBytes(tmp.ToArray());
                 }
@@ -405,22 +401,22 @@ namespace ThePalace.Core.Entities.Shared
                 {
                     _blobData.PadBytes(4);
 
-                    firstDrawCmd = (short)((DrawCmds?.Count ?? 0) > 0 ? _blobData.Count : 0);
+                    firstDrawCmd = (short)((this.DrawCmds?.Count ?? 0) > 0 ? _blobData.Count : 0);
 
                     using (var tmp2 = new MemoryStream())
                     {
-                        for (var i = 0; i < (DrawCmds?.Count ?? 0); i++)
+                        for (var i = 0; i < (this.DrawCmds?.Count ?? 0); i++)
                         {
-                            DrawCmds[i].CmdLength = (ushort)DrawCmds[i].Data.Length;
-                            DrawCmds[i].DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * DrawCmds.Count);
-                            DrawCmds[i].NextOfst = (short)(i == DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
+                            this.DrawCmds[i].CmdLength = (ushort)this.DrawCmds[i].Data.Length;
+                            this.DrawCmds[i].DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
+                            this.DrawCmds[i].NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
 
-                            tmp1.WriteInt16(DrawCmds[i].NextOfst);
+                            tmp1.WriteInt16(this.DrawCmds[i].NextOfst);
                             tmp1.WriteInt16(0); //reserved
-                            tmp1.WriteInt16(DrawCmds[i].DrawCmd);
-                            tmp1.WriteUInt16(DrawCmds[i].CmdLength);
-                            tmp1.WriteInt16(DrawCmds[i].DataOfst);
-                            tmp2.Write(DrawCmds[i].Data);
+                            tmp1.WriteInt16(this.DrawCmds[i].DrawCmd);
+                            tmp1.WriteUInt16(this.DrawCmds[i].CmdLength);
+                            tmp1.WriteInt16(this.DrawCmds[i].DataOfst);
+                            tmp2.Write(this.DrawCmds[i].Data);
                         }
 
                         tmp1.Write(tmp2.ToArray());
@@ -430,15 +426,15 @@ namespace ThePalace.Core.Entities.Shared
                 }
 
                 // Start Loose Props
-                var firstLProp = (short)((LooseProps?.Count ?? 0) > 0 ? _blobData.Count : 0);
+                var firstLProp = (short)((this.LooseProps?.Count ?? 0) > 0 ? _blobData.Count : 0);
 
-                for (var i = 0; i < (LooseProps?.Count ?? 0); i++)
+                for (var i = 0; i < (this.LooseProps?.Count ?? 0); i++)
                 {
-                    LooseProps[i].NextOfst = (short)(i == LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.Palace.AttributeExts.GetByteSize<LoosePropRec>());
+                    this.LooseProps[i].NextOfst = (short)(i == this.LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.Palace.AttributeExts.GetByteSize<LoosePropRec>());
 
                     using (var ms = new MemoryStream())
                     {
-                        LooseProps[i].Serialize(ref refNum, ms);
+                        this.LooseProps[i].Serialize(ref refNum, ms);
 
                         _blobData.WriteBytes(ms.ToArray());
                     }
@@ -448,29 +444,29 @@ namespace ThePalace.Core.Entities.Shared
                 {
                     var lenVars = (short)_blobData.Count;
 
-                    _data.WriteInt32((int)RoomFlags);                // Room Flags
-                    _data.WriteInt32(FacesID);                  // Default Face ID
-                    _data.WriteInt16(RoomID);                   // The Rooms ID
-                    _data.WriteInt16(roomNameOfst);      // Room Name
-                    _data.WriteInt16(pictNameOfst);      // Background Image Offset
-                    _data.WriteInt16(artistNameOfst);    // Artist
-                    _data.WriteInt16(passwordOfst);      // Password
-                    _data.WriteInt16((short)HotSpots.Count);    // Number of Hotspots
-                    _data.WriteInt16(hotspotOfst);       // Hotspot Offset
-                    _data.WriteInt16((short)HotSpots.Count);    // Number of Pictures
-                    _data.WriteInt16(pictureOfst);       // Pictures Offset
-                    _data.WriteInt16((short)HotSpots.Count);    // Number of Draw Commands
-                    _data.WriteInt16(firstDrawCmd);      // Draw Command Offset
-                    _data.WriteInt16(0);                        // Number of People ( Obsolete )
-                    _data.WriteInt16((short)LooseProps.Count);  // Number of Props
-                    _data.WriteInt16(firstLProp);        // Loose Props Offset
-                    _data.WriteInt16(0);                        // Reserved Padding
-                    _data.WriteInt16(lenVars);                  // Length of Data Blob
+                    this.WriteInt32((int)this.RoomFlags);                // Room Flags
+                    this.WriteInt32(this.FacesID);                  // Default Face ID
+                    this.WriteInt16(this.RoomID);                   // The Rooms ID
+                    this.WriteInt16(roomNameOfst);      // Room Name
+                    this.WriteInt16(pictNameOfst);      // Background Image Offset
+                    this.WriteInt16(artistNameOfst);    // Artist
+                    this.WriteInt16(passwordOfst);      // Password
+                    this.WriteInt16((short)this.HotSpots.Count);    // Number of Hotspots
+                    this.WriteInt16(hotspotOfst);       // Hotspot Offset
+                    this.WriteInt16((short)this.HotSpots.Count);    // Number of Pictures
+                    this.WriteInt16(pictureOfst);       // Pictures Offset
+                    this.WriteInt16((short)this.HotSpots.Count);    // Number of Draw Commands
+                    this.WriteInt16(firstDrawCmd);      // Draw Command Offset
+                    this.WriteInt16(0);                        // Number of People ( Obsolete )
+                    this.WriteInt16((short)this.LooseProps.Count);  // Number of Props
+                    this.WriteInt16(firstLProp);        // Loose Props Offset
+                    this.WriteInt16(0);                        // Reserved Padding
+                    this.WriteInt16(lenVars);                  // Length of Data Blob
                 }
 
-                _data.WriteBytes(_blobData.GetData());
+                this._stream.Write(_blobData.Stream.ToArray());
 
-                writer.Write(_data.GetData());
+                writer.Write(this.Stream.ToArray());
             }
         }
     }
