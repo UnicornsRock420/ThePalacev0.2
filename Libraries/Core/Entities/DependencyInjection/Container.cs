@@ -20,6 +20,14 @@ namespace ThePalace.Core.Entities.DependencyInjection
             return this;
         }
 
+        public Container RegisterModules<TModule>(params TModule[] modules)
+            where TModule : Module
+        {
+            foreach (var module in modules)
+                Builder.RegisterModule(module);
+            return this;
+        }
+
         public Container RegisterInstances<TInstance>(IEnumerable<TInstance> instances)
             where TInstance : Type
         {
@@ -35,14 +43,6 @@ namespace ThePalace.Core.Entities.DependencyInjection
             Builder
                 .RegisterInstance(instances)
                 .InstancePerLifetimeScope();
-            return this;
-        }
-
-        public Container RegisterModules<TModule>(params TModule[] modules)
-            where TModule : Module
-        {
-            foreach (var module in modules)
-                Builder.RegisterModule(module);
             return this;
         }
 
