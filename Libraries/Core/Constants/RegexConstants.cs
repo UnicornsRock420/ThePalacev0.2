@@ -15,6 +15,11 @@ namespace ThePalace.Core.Constants
         public static readonly Regex REGEX_WHITESPACE_SINGLELINE = _regex_whitespace_singleline();
 
 
+        [GeneratedRegex(@"[\da-z]", RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled)]
+        private static partial Regex _regex_alphanumeric_singlecharacter();
+        public static readonly Regex REGEX_ALPHANUMERIC_SINGLECHARACTER = _regex_alphanumeric_singlecharacter();
+
+
         [GeneratedRegex(@"[\s]+", RegexOptions.Multiline | RegexOptions.Compiled)]
         private static partial Regex _regex_whitespace_multiline();
         public static readonly Regex REGEX_WHITESPACE_MULTILINE = _regex_whitespace_multiline();
