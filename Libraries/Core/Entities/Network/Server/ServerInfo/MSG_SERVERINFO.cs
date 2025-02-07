@@ -10,7 +10,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
     {
         public ServerPermissions ServerPermissions;
 
-        [PString(1, 63)]
+        [Str63]
         public string? ServerName;
 
         public ServerOptions ServerOptions;

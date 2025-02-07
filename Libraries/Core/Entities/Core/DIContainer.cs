@@ -3,45 +3,42 @@ using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Formatting.Compact;
 using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Core.Entities.Core
 {
     public partial class DIContainer
     {
+        #region cStr
         public DIContainer()
         {
             Builder = new ContainerBuilder();
+
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .AddUserSecrets<DIContainer>()
+                .Build();
 
             _logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .WriteTo.Console(
                     outputTemplate:
                     "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{Context}] {Message:lj}{NewLine}{Exception}")
-                .WriteTo.File(new CompactJsonFormatter(), "logs/logs")
+                //.WriteTo.File(new CompactJsonFormatter(), "logs/logs")
                 .CreateLogger();
-
-            _configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddUserSecrets<DIContainer>()
-                .Build();
         }
-        public DIContainer(ContainerBuilder builder)
+        public DIContainer(ContainerBuilder builder) : this()
         {
             Builder = builder;
-
-            _configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json")
-                .AddUserSecrets<DIContainer>()
-                .Build();
         }
+        #endregion
 
-        public ContainerBuilder Builder { get; private set; }
-        public IContainer? Container { get; private set; }
-
+        #region Fields & Properties
         private static ILogger _logger;
         private readonly IConfiguration _configuration;
+        public ContainerBuilder Builder { get; private set; }
+        public IContainer? Container { get; private set; }
+        #endregion
 
         #region Register Methods
         public DIContainer RegisterModules<TModule>(IEnumerable<TModule> modules)

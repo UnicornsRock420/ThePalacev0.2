@@ -49,7 +49,7 @@ namespace ThePalace.Core.Entities.Shared
         public sint16 OpenToMsgs;
         public sint16 NbrProps;
 
-        [PString(1, 31)]
+        [Str31]
         public string? Name;
     }
 }

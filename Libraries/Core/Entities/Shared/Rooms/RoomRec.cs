@@ -7,7 +7,7 @@ using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    [DynamicSize]
+    [ByteSize(40)]
     public partial class RoomRec : IStruct
     {
         public RoomFlags RoomFlags;

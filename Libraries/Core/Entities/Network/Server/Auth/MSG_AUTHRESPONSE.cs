@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Server.Auth
     [Mnemonic("autr")]
     public partial class MSG_AUTHRESPONSE : IProtocolS2C
     {
-        [PString(1, 255)]
+        [Str255]
         public string? NameAndPassword;
 
         [IgnoreDataMember]

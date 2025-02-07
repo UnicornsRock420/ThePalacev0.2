@@ -36,7 +36,7 @@ namespace ThePalace.Core.Factories
         private static readonly Regex REGEX_WHITESPACE = new Regex(@"\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex REGEX_TOKENS = new Regex(@"^[a-z]+\s+""(.*)""$", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly RoomRec NULL_ROOMREC = default(RoomRec);
+        private static readonly RoomDescRec NULL_ROOMREC = default(RoomDescRec);
         private static readonly HotspotRec NULL_HOTSPOTREC = default(HotspotRec);
         private static readonly PictureRec NULL_PICTUREREC = default(PictureRec);
         private static readonly LoosePropRec NULL_LOOSEPROPREC = default(LoosePropRec);
@@ -48,7 +48,7 @@ namespace ThePalace.Core.Factories
         public override void Dispose() =>
             base.Dispose();
 
-        public void Read(out List<RoomRec> rooms)
+        public void Read(out List<RoomDescRec> rooms)
         {
             rooms = [];
 
@@ -81,7 +81,7 @@ namespace ThePalace.Core.Factories
                     {
                         case "ROOM":
                             insideRoom = true;
-                            workingRoom = new RoomRec();
+                            workingRoom = new RoomDescRec();
                             workingRoom.HotSpots = [];
                             workingRoom.Pictures = [];
                             workingRoom.LooseProps = [];
@@ -93,7 +93,7 @@ namespace ThePalace.Core.Factories
                                 insideRoom = false;
                             }
 
-                            if (workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
                                 rooms.Add(workingRoom);
                                 workingRoom = NULL_ROOMREC;
@@ -274,9 +274,9 @@ namespace ThePalace.Core.Factories
                             {
                                 workingHotspot.HotspotID = tokens[1].TryParse<short>(0);
                             }
-                            else if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            else if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomID = tokens[1].TryParse<short>(0);
+                                workingRoom.RoomInfo.RoomID = tokens[1].TryParse<short>(0);
                             }
 
                             break;
@@ -294,7 +294,7 @@ namespace ThePalace.Core.Factories
                             {
                                 workingHotspot.Name = value;
                             }
-                            else if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            else if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
                                 workingRoom.Name = value;
                             }
@@ -306,7 +306,7 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
                                 workingRoom.Artist = value;
                             }
@@ -318,7 +318,7 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
                                 workingRoom.Picture = value;
                             }
@@ -330,9 +330,9 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID && !string.IsNullOrWhiteSpace(value))
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID && !string.IsNullOrWhiteSpace(value))
                             {
-                                workingRoom.RoomFlags |= RoomFlags.AuthorLocked;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.AuthorLocked;
                                 workingRoom.Password = value.GetBytes().ReadCString().GetBytes().DecryptString();
                             }
 
@@ -343,7 +343,7 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
                                 workingRoom.MaxOccupancy = tokens[1].TryParse<short>(0);
                             }
@@ -355,66 +355,66 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.FacesID = tokens[1].TryParse<short>(0);
+                                workingRoom.RoomInfo.FacesID = tokens[1].TryParse<short>(0);
                             }
 
                             break;
                         case "DROPZONE":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.DropZone;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.DropZone;
                             }
 
                             break;
                         case "NOLOOSEPROPS":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.RF_NoLooseProps;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.RF_NoLooseProps;
                             }
 
                             break;
                         case "PRIVATE":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.Private;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.Private;
                             }
 
                             break;
                         case "NOPAINTING":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.NoPainting;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.NoPainting;
                             }
 
                             break;
                         case "NOCYBORGS":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.CyborgFreeZone;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.CyborgFreeZone;
                             }
 
                             break;
                         case "HIDDEN":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.Hidden;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.Hidden;
                             }
 
                             break;
                         case "NOGUESTS":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.NoGuests;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.NoGuests;
                             }
 
                             break;
                         case "WIZARDSONLY":
                         case "OPERATORSONLY":
-                            if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
-                                workingRoom.RoomFlags |= RoomFlags.WizardsOnly;
+                                workingRoom.RoomInfo.RoomFlags |= RoomFlags.WizardsOnly;
                             }
 
                             break;
@@ -616,20 +616,20 @@ namespace ThePalace.Core.Factories
             }
         }
 
-        public void Write(bool printHeader = true, params RoomRec[] rooms)
+        public void Write(bool printHeader = true, params RoomDescRec[] rooms)
         {
             using (var writer = new StreamWriter(_fileStream, Encoding.ASCII))
             {
                 if (printHeader)
                 {
                     var entrance = rooms
-                        .Where(r => RoomFlags.DropZone.IsBit<RoomFlags, RoomFlags, short>(r.RoomFlags))
-                        .OrderBy(r => r.RoomID)
+                        .Where(r => RoomFlags.DropZone.IsBit<RoomFlags, RoomFlags, short>(r.RoomInfo.RoomFlags))
+                        .OrderBy(r => r.RoomInfo.RoomID)
                         .FirstOrDefault();
 
-                    if (entrance.RoomID > 0)
+                    if (entrance.RoomInfo.RoomID > 0)
                     {
-                        writer.WriteLine($"ENTRANCE {entrance.RoomID}");
+                        writer.WriteLine($"ENTRANCE {entrance.RoomInfo.RoomID}");
                         writer.WriteLine();
                     }
                 }
@@ -642,18 +642,18 @@ namespace ThePalace.Core.Factories
 
                         if (!string.IsNullOrWhiteSpace(r.Password.ToString())) writer.WriteLine($"\tLOCKED \"{r.Password.ToString().EncryptString().WritePalaceString()}\"");
 
-                        writer.WriteLine($"\tID {r.RoomID}");
+                        writer.WriteLine($"\tID {r.RoomInfo.RoomID}");
 
                         if (r.MaxOccupancy > 0) writer.WriteLine($"\tMAXMEMBERS {r.MaxOccupancy}");
 
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps) writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.Private) == RoomFlags.Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
-                        if (((RoomFlags)r.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps) writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.Private) == RoomFlags.Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
+                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
 
                         writer.WriteLine($"\tNAME \"{r.Name}\"");
                         if (!string.IsNullOrWhiteSpace(r.Picture?.ToString())) writer.WriteLine($"\tPICT \"{r.Picture?.ToString()}\"");

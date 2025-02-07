@@ -14,7 +14,7 @@ namespace ThePalace.Core.Entities.Shared.Users
         public uint32 Crc;
         public uint32 Counter;
 
-        [PString(1, 31)]
+        [Str31]
         public string? UserName;
 
         [EncryptedString(1, 31)]

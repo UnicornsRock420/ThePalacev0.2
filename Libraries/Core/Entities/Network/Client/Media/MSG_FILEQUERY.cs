@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Network.Client.Media
     [Mnemonic("qFil")]
     public partial class MSG_FILEQUERY : IProtocolC2S
     {
-        [PString(1, 255)]
+        [Str255]
         public string? FileName;
     }
 }

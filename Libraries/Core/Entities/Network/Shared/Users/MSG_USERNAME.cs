@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
     [Mnemonic("usrN")]
     public partial class MSG_USERNAME : IProtocolC2S, IProtocolS2C
     {
-        [PString(1, 31)]
+        [Str31]
         public string? Name;
     }
 }

@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Network.Server.Media
     [Mnemonic("fnfe")]
     public partial class MSG_FILENOTFND : IProtocolS2C
     {
-        [PString(1, 255)]
+        [Str255]
         public string? FileName;
     }
 }

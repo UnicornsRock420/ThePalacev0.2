@@ -10,7 +10,7 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomRec : IDisposable, IData, IStructSerializer
+    public partial class RoomDescRec : IDisposable, IStructSerializer
     {
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
@@ -32,9 +32,9 @@ namespace ThePalace.Core.Entities.Shared
 
             try
             {
-                this.RoomFlags = (RoomFlags)this.ReadSInt32();
-                this.FacesID = this.ReadSInt32();
-                this.RoomID = this.ReadSInt16();
+                this.RoomInfo.RoomFlags = (RoomFlags)this.ReadSInt32();
+                this.RoomInfo.FacesID = this.ReadSInt32();
+                this.RoomInfo.RoomID = this.ReadSInt16();
                 roomNameOfst = this.ReadSInt16();
                 pictNameOfst = this.ReadSInt16();
                 artistNameOfst = this.ReadSInt16();
@@ -253,7 +253,7 @@ namespace ThePalace.Core.Entities.Shared
 
                 // Room Name
                 var roomNameOfst = (short)_blobData.Count;
-                _blobData.WritePString(this.Name ?? $"Room {this.RoomID}", 32, 1);
+                _blobData.WritePString(this.Name ?? $"Room {this.RoomInfo.RoomID}", 32, 1);
 
                 // Artist Name
                 var artistNameOfst = (short)_blobData.Count;
@@ -444,9 +444,9 @@ namespace ThePalace.Core.Entities.Shared
                 {
                     var lenVars = (short)_blobData.Count;
 
-                    this.WriteInt32((int)this.RoomFlags);                // Room Flags
-                    this.WriteInt32(this.FacesID);                  // Default Face ID
-                    this.WriteInt16(this.RoomID);                   // The Rooms ID
+                    this.WriteInt32((int)this.RoomInfo.RoomFlags);                // Room Flags
+                    this.WriteInt32(this.RoomInfo.FacesID);                  // Default Face ID
+                    this.WriteInt16(this.RoomInfo.RoomID);                   // The Rooms ID
                     this.WriteInt16(roomNameOfst);      // Room Name
                     this.WriteInt16(pictNameOfst);      // Background Image Offset
                     this.WriteInt16(artistNameOfst);    // Artist

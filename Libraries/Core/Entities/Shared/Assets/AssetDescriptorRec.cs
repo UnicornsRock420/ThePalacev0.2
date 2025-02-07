@@ -12,7 +12,7 @@ namespace ThePalace.Core.Entities.Shared.Assets
         public uint16 PropFlags;
         public uint32 Size;
 
-        [PString(1, 31)]
+        [Str31]
         public string? Name;
     }
 }
