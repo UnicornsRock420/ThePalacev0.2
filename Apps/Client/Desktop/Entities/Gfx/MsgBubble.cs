@@ -1,6 +1,5 @@
 ﻿using ThePalace.Client.Desktop.Enums;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Core.Constants;
 using ThePalace.Core.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.Gfx
@@ -13,18 +12,9 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
         public Bitmap Image { get; private set; } = null;
 
         public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
-        public DateTime Created { get; private set; } = DateTime.Now;
+        public DateTime Created { get; } = DateTime.Now;
         private DateTime? _accessed = null;
-        public DateTime Accessed
-        {
-            get
-            {
-                if (!_accessed.HasValue)
-                    _accessed = DateTime.Now;
-
-                return _accessed.Value;
-            }
-        }
+        public DateTime Accessed => _accessed ??= DateTime.Now;
         public bool Visible { get; private set; } = true;
         public Color Colour { get; private set; } = Color.White;
         public Point Origin { get; private set; } = new(0, 0);
@@ -75,102 +65,84 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
 
             #region Regex Matching & Formatting
 
-            if (DesktopConstants.REGEX_VISIBLE.IsMatch(text))
+            if (RegexConstants.REGEX_VISIBLE.IsMatch(text))
             {
                 Visible = false;
 
                 return;
             }
-            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
+            if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
             {
-                var match = DesktopConstants.REGEX_TYPE.Match(text);
+                var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
                     switch (match.Groups[1].Value[0])
                     {
-                        case '!':
-                            Type = BubbleTypes.Shout;
-                            break;
-                        case ':':
-                            Type = BubbleTypes.Thought;
-                            break;
-                        case '^':
-                            Type = BubbleTypes.Sticky;
-                            break;
+                        case '!': Type = BubbleTypes.Shout; break;
+                        case ':': Type = BubbleTypes.Thought; break;
+                        case '^': Type = BubbleTypes.Sticky; break;
                     }
             }
-            if (DesktopConstants.REGEX_LOCATION.IsMatch(text))
+            if (RegexConstants.REGEX_COORDINATES.IsMatch(text))
             {
-                var match = DesktopConstants.REGEX_LOCATION.Match(text);
+                var match = RegexConstants.REGEX_COORDINATES.Match(text);
                 var x = Convert.ToInt32(match.Groups[1].Value);
                 var y = Convert.ToInt32(match.Groups[2].Value);
                 text = match.Groups[3].Value;
 
                 Origin = new Point(x, y);
             }
-            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
+            if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
             {
-                var match = DesktopConstants.REGEX_TYPE.Match(text);
+                var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
                     switch (match.Groups[1].Value[0])
                     {
-                        case '!':
-                            Type = BubbleTypes.Shout;
-                            break;
-                        case ':':
-                            Type = BubbleTypes.Thought;
-                            break;
-                        case '^':
-                            Type = BubbleTypes.Sticky;
-                            break;
+                        case '!': Type = BubbleTypes.Shout; break;
+                        case ':': Type = BubbleTypes.Thought; break;
+                        case '^': Type = BubbleTypes.Sticky; break;
                     }
             }
-            if (DesktopConstants.REGEX_SOUND.IsMatch(text))
+            if (RegexConstants.REGEX_SOUND.IsMatch(text))
             {
                 var mediaFilenames = new List<string>();
-                while (DesktopConstants.REGEX_SOUND.IsMatch(text))
+                while (RegexConstants.REGEX_SOUND.IsMatch(text))
                 {
-                    var match = DesktopConstants.REGEX_SOUND.Match(text);
+                    var match = RegexConstants.REGEX_SOUND.Match(text);
                     text = match.Groups[2].Value;
 
                     mediaFilenames.Add(match.Groups[1].Value);
                 }
                 MediaFilenames = mediaFilenames.ToArray();
             }
-            if (DesktopConstants.REGEX_TYPE.IsMatch(text))
+            if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
             {
-                var match = DesktopConstants.REGEX_TYPE.Match(text);
+                var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
                 text = match.Groups[2].Value;
 
                 if (Type == BubbleTypes.Normal)
                     switch (match.Groups[1].Value[0])
                     {
-                        case '!':
-                            Type = BubbleTypes.Shout;
-                            break;
-                        case ':':
-                            Type = BubbleTypes.Thought;
-                            break;
-                        case '^':
-                            Type = BubbleTypes.Sticky;
-                            break;
+                        case '!': Type = BubbleTypes.Shout; break;
+                        case ':': Type = BubbleTypes.Thought; break;
+                        case '^': Type = BubbleTypes.Sticky; break;
                     }
             }
 
             #endregion
             #region Word(s) & Line Formatting
 
-            var words = RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
+            var words = ThePalace.Core.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
             var lines = new List<string>();
             var line = new List<string>();
 
             while (words.Count > 0)
             {
                 var newLine = line.Join(" ", words[0]);
-                var newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT));
+                var newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
                 if (newLineSize.Width < maxWidth)
                     line.Enqueue(words.Dequeue());
@@ -179,7 +151,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
                     words.Count < 1)
                 {
                     newLine = line.Join(" ");
-                    newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT));
+                    newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
                     if (newLineSize.Width > TextSize.Width)
                         TextSize.Width = newLineSize.Width;
@@ -193,7 +165,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             Duration = duration > 0 ? duration : Text.Join(" ").ToCharArray().Length * 500;
 
             //TextSize.Width += -28; // 16;
-            TextSize.Height = Text.Length * (DesktopConstants.FONT_HEIGHT - 5) + 2;
+            TextSize.Height = Text.Length * (DesktopConstants.Font.HEIGHT - 5) + 2;
 
             #endregion
         }
@@ -235,7 +207,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             using (var colourBrush = new SolidBrush(Colour))
             using (var colourPen = new Pen(colourBrush, 2))
             {
-                var helper = new GraphicsHelper(g, new Font(DesktopConstants.FONT_NAME, DesktopConstants.FONT_HEIGHT), colourPen, colourBrush);
+                var helper = new GraphicsHelper(g, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT), colourPen, colourBrush);
 
                 switch (Type)
                 {

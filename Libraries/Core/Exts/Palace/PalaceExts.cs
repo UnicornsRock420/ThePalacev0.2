@@ -406,7 +406,7 @@ namespace ThePalace.Core.Exts.Palace
         }
         #endregion
 
-        #region Struct/Object/Protocol Serialization/Deserialization Methods
+        #region Serialization/Deserialization Methods
         public static void PalaceDeserialize(this Stream reader, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             if (obj == null ||

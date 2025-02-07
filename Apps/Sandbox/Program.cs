@@ -32,14 +32,13 @@ namespace Sandbox
 
             //Experiment1();
 
-            var iProtocolTypes = AppDomain.CurrentDomain
+            var iStructTypes = AppDomain.CurrentDomain
                 .GetAssemblies()
                 .SelectMany(t => t.GetTypes())
-                .Where(t => !t.IsInterface)
-                .Where(t => t.GetInterfaces().Contains(typeof(IStruct)));
+                .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IStruct)));
 
             var container = new DIContainer();
-            container.RegisterTypes(iProtocolTypes);
+            container.RegisterTypes(iStructTypes);
         }
 
         public Program()
