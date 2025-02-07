@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Enums
+﻿namespace ThePalace.Core.Enums.Palace
 {
     [Flags]
     public enum SerializerOptions : byte

@@ -12,7 +12,7 @@ using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Exts.Palace
 {
-    public static class PalaceExts
+    public static class BinaryOpsExts
     {
         #region Byte Operations/Helpers
         public static short SwapInt16(this short value) =>
@@ -340,7 +340,8 @@ namespace ThePalace.Core.Exts.Palace
 
             var result = false;
             for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
-                if (polygon[i].Y > point.Y != polygon[j].Y > point.Y && point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                if (polygon[i].Y > point.Y != polygon[j].Y > point.Y &&
+                    point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
                     result = !result;
             return result;
         }
@@ -356,7 +357,8 @@ namespace ThePalace.Core.Exts.Palace
 
             var result = false;
             for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
-                if (polygon[i].Y > point.Y != polygon[j].Y > point.Y && point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                if (polygon[i].Y > point.Y != polygon[j].Y > point.Y &&
+                    point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
                     result = !result;
             return result;
         }
@@ -372,7 +374,8 @@ namespace ThePalace.Core.Exts.Palace
 
             var result = false;
             for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
-                if (polygon[i].VAxis > point.VAxis != polygon[j].VAxis > point.VAxis && point.HAxis < (polygon[j].HAxis - polygon[i].HAxis) * (point.VAxis - polygon[i].VAxis) / (polygon[j].VAxis - polygon[i].VAxis) + polygon[i].HAxis)
+                if (polygon[i].VAxis > point.VAxis != polygon[j].VAxis > point.VAxis &&
+                    point.HAxis < (polygon[j].HAxis - polygon[i].HAxis) * (point.VAxis - polygon[i].VAxis) / (polygon[j].VAxis - polygon[i].VAxis) + polygon[i].HAxis)
                     result = !result;
             return result;
         }
@@ -386,21 +389,21 @@ namespace ThePalace.Core.Exts.Palace
             var h = (short)(centered ? size.Height / 2 : size.Height);
 
             if (centered)
-                results.Add(new Types.Point((short)(point.HAxis - w), (short)(point.VAxis - h)));
+                results.Add(new Types.Point((short)(point.VAxis - h), (short)(point.HAxis - w)));
             else
                 results.Add(point);
 
             if (centered)
-                results.Add(new Types.Point((short)(point.HAxis + w), (short)(point.VAxis - h)));
+                results.Add(new Types.Point((short)(point.VAxis - h), (short)(point.HAxis + w)));
             else
-                results.Add(new Types.Point((short)(point.HAxis + w), point.VAxis));
+                results.Add(new Types.Point(point.VAxis, (short)(point.HAxis + w)));
 
-            results.Add(new Types.Point((short)(point.HAxis + w), (short)(point.VAxis + h)));
+            results.Add(new Types.Point((short)(point.VAxis + h), (short)(point.HAxis + w)));
 
             if (centered)
-                results.Add(new Types.Point((short)(point.HAxis - w), (short)(point.VAxis + h)));
+                results.Add(new Types.Point((short)(point.VAxis + h), (short)(point.HAxis - w)));
             else
-                results.Add(new Types.Point(point.HAxis, (short)(point.VAxis + h)));
+                results.Add(new Types.Point((short)(point.VAxis + h), point.HAxis));
 
             return results.ToArray();
         }
@@ -563,7 +566,8 @@ namespace ThePalace.Core.Exts.Palace
                                 _cb(member, buffer.GetString());
                             }
 
-                            if (pString.PaddingModulo > 0 && ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
+                            if (pString.PaddingModulo > 0 &&
+                                ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
                             {
                                 buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
                                 var readCount = reader.Read(buffer, 0, buffer.Length);
@@ -688,6 +692,7 @@ namespace ThePalace.Core.Exts.Palace
 
             var streamPosition = writer.Position;
 
+            var doRefNumOnly = opts.IsBit<SerializerOptions, byte>(SerializerOptions.RefNumOnly);
             var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
             var members = objType
@@ -742,15 +747,21 @@ namespace ThePalace.Core.Exts.Palace
                     continue;
                 }
 
-                if(_attrs
+                if (_attrs
                     .Where(a => a is RefNumAttribute)
                     .Any())
                 {
                     refNum = (int)(object)_value;
 
+                    if (doRefNumOnly)
+                    {
+                        return;
+                    }
+
                     continue;
                 }
-                if (opts.IsBit<SerializerOptions, byte>(SerializerOptions.RefNumOnly))
+
+                if (doRefNumOnly)
                 {
                     continue;
                 }
@@ -856,7 +867,8 @@ namespace ThePalace.Core.Exts.Palace
                                 writer.Write(buffer, 0, buffer.Length);
                             }
 
-                            if (pString.PaddingModulo > 0 && ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
+                            if (pString.PaddingModulo > 0 &&
+                                ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
                             {
                                 buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
                                 writer.Write(buffer, 0, buffer.Length);
@@ -911,7 +923,8 @@ namespace ThePalace.Core.Exts.Palace
                     writer.Write(buffer, 0, buffer.Length);
             }
 
-            if (minByteSize > 0 && (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
+            if (minByteSize > 0 &&
+                (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
         public static void PalaceSerialize<TStruct>(this Stream writer, ref int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
@@ -920,15 +933,17 @@ namespace ThePalace.Core.Exts.Palace
             if (obj == null) return;
 
             var objType = typeof(TStruct);
-            var objTypeName = objType.Name;
-            if (string.IsNullOrWhiteSpace(objTypeName)) return;
+            var doObjIsIStructRefNum = obj.Is<IStructRefNum>();
 
             var msgBytes = (byte[]?)null;
             using (var ms = new MemoryStream())
             {
                 if (obj.Is<IStructSerializer>(out var serializer))
                 {
-                    ms.PalaceSerialize(ref refNum, obj, objType, SerializerOptions.RefNumOnly);
+                    if (doObjIsIStructRefNum)
+                    {
+                        ms.PalaceSerialize(ref refNum, obj, objType, SerializerOptions.RefNumOnly);
+                    }
 
                     serializer.Serialize(ref refNum, ms, opts);
                 }
@@ -945,10 +960,11 @@ namespace ThePalace.Core.Exts.Palace
             {
                 var hdr = new MSG_Header
                 {
-                    EventType = Enum.Parse<EventTypes>(objTypeName),
+                    EventType = Enum.Parse<EventTypes>(objType.Name),
                     Length = (uint)(msgBytes?.Length ?? 0),
                 };
-                if (obj.Is<IStructRefNum>())
+
+                if (doObjIsIStructRefNum)
                 {
                     hdr.RefNum = refNum;
                 }
@@ -956,18 +972,11 @@ namespace ThePalace.Core.Exts.Palace
                 var hdrBytes = (byte[]?)null;
                 using (var ms = new MemoryStream())
                 {
-                    if (hdr.Is<IStructSerializer>(out var serializer))
-                    {
-                        serializer.Serialize(ref refNum, ms, opts);
-                    }
-                    else
-                    {
-                        ms.PalaceSerialize(ref refNum, hdr, typeof(MSG_Header), opts);
-                    }
+                    ms.PalaceSerialize(ref refNum, hdr, typeof(MSG_Header), opts);
 
                     hdrBytes = ms.ToArray();
                 }
-                if ((hdrBytes?.Length ?? 0) < 1) return;
+                if ((hdrBytes?.Length ?? 0) < 1) throw new Exception("Unable to serialize " + nameof(MSG_Header));
 
                 writer.Write(hdrBytes);
             }

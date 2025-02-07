@@ -1,130 +1,119 @@
-﻿using ThePalace.Core.Enums;
+﻿using ThePalace.Core.Entities.Network.Shared.Network;
+using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared
 {
     public partial class DrawCmdRec : IStructSerializer
     {
+        private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.Palace.AttributeExts.GetByteSize<MSG_Header>();
+        private static readonly int CONST_INT_SIZEOF_POINT = Exts.Palace.AttributeExts.GetByteSize<Types.Point>();
+
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            throw new NotImplementedException();
+            NextOfst = reader.ReadInt16();
+            Reserved = reader.ReadInt16();
+            DrawCmd = reader.ReadInt16();
+            CmdLength = reader.ReadUInt16();
+            DataOfst = reader.ReadInt16();
+
+            reader.Position = DataOfst + CONST_INT_SIZEOF_MSG_Header;
+
+            switch (Type)
+            {
+                case DrawCmdTypes.DC_Path:
+                    {
+                        PenSize = reader.ReadInt16();
+
+                        var nbrPoints = reader.ReadInt16();
+
+                        Red = (byte)reader.ReadInt16().SwapShort();
+                        Green = (byte)reader.ReadInt16().SwapShort();
+                        Blue = (byte)reader.ReadInt16().SwapShort();
+
+                        var vAxis = reader.ReadInt16();
+                        var hAxis = reader.ReadInt16();
+                        Pos = new(hAxis, vAxis);
+
+                        Points = [];
+                        while (Points.Count < nbrPoints &&
+                            Length >= CONST_INT_SIZEOF_POINT)
+                        {
+                            vAxis = reader.ReadInt16();
+                            hAxis = reader.ReadInt16();
+                            var p = new Types.Point(vAxis, hAxis);
+
+                            Points.Add(p);
+                        }
+                    }
+
+                    break;
+                case DrawCmdTypes.DC_Ellipse:
+                    {
+                        PenSize = reader.ReadInt16();
+
+                        Red = (byte)reader.ReadInt16().SwapShort();
+                        Green = (byte)reader.ReadInt16().SwapShort();
+                        Blue = (byte)reader.ReadInt16().SwapShort();
+
+                        Rect = new();
+                        Rect.X = reader.ReadInt16();
+                        Rect.Y = reader.ReadInt16();
+                        Rect.Width = reader.ReadInt16();
+                        Rect.Height = reader.ReadInt16();
+
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
+                    }
+
+                    break;
+                case DrawCmdTypes.DC_Text:
+                    {
+                        PenSize = reader.ReadInt16();
+
+                        Red = (byte)reader.ReadInt16().SwapShort();
+                        Green = (byte)reader.ReadInt16().SwapShort();
+                        Blue = (byte)reader.ReadInt16().SwapShort();
+
+                        var vAxis = reader.ReadInt16();
+                        var hAxis = reader.ReadInt16();
+                        Pos = new(hAxis, vAxis);
+
+                        Text = ReadPString(128, 1);
+
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
+                    }
+
+                    break;
+                case DrawCmdTypes.DC_Shape:
+                    {
+                        PenSize = reader.ReadInt16();
+
+                        Red = (byte)reader.ReadInt16().SwapShort();
+                        Green = (byte)reader.ReadInt16().SwapShort();
+                        Blue = (byte)reader.ReadInt16().SwapShort();
+
+                        var vAxis = reader.ReadInt16();
+                        var hAxis = reader.ReadInt16();
+                        Pos = new(hAxis, vAxis);
+
+                        // TODO:
+
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
+                    }
+
+                    break;
+            }
         }
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            throw new NotImplementedException();
+            writer.WriteInt16(NextOfst);
+            writer.WriteInt16(Reserved);
+            writer.WriteInt16(DrawCmd);
+            writer.WriteUInt16(CmdLength);
+            writer.WriteInt16(DataOfst);
+            writer.Write(Data, 0, CmdLength);
         }
-
-        public void Deserialize()
-        {
-            //nextOfst = packet.ReadSInt16();
-            //packet.DropBytes(2); //reserved
-            //DrawCmd = packet.ReadSInt16();
-            //cmdLength = packet.ReadUInt16();
-            //dataOfst = packet.ReadSInt16();
-            //data = packet.Data
-            //    .Skip(dataOfst)
-            //    .Take(cmdLength)
-            //    .ToArray();
-        }
-
-        //public void DeserializeData()
-        //{
-        //    using (var packet = new Packet(data))
-        //        switch (type)
-        //        {
-        //            case DrawCmdTypes.DC_Path:
-        //                {
-        //                    penSize = packet.ReadSInt16();
-        //                    var nbrPoints = packet.ReadSInt16();
-        //                    red = (byte)packet.ReadSInt16().SwapShort();
-        //                    green = (byte)packet.ReadSInt16().SwapShort();
-        //                    blue = (byte)packet.ReadSInt16().SwapShort();
-
-        //                    pos = new();
-        //                    pos.v = packet.ReadSInt16();
-        //                    pos.h = packet.ReadSInt16();
-
-        //                    Points = new();
-        //                    while (Points.Count < nbrPoints &&
-        //                        packet.Length >= Network.Protocols.Interfaces.Entities.Palace.Point.SizeOf)
-        //                    {
-        //                        var p = new Palace.Point();
-        //                        p.v = packet.ReadSInt16();
-        //                        p.h = packet.ReadSInt16();
-
-        //                        Points.Add(p);
-        //                    }
-        //                }
-
-        //                break;
-        //            case DrawCmdTypes.DC_Ellipse:
-        //                {
-        //                    //penSize = packet.ReadSInt16();
-        //                    //red = (byte)packet.ReadSInt16().SwapShort();
-        //                    //green = (byte)packet.ReadSInt16().SwapShort();
-        //                    //blue = (byte)packet.ReadSInt16().SwapShort();
-
-        //                    //Rect = new();
-        //                    //Rect.X = packet.ReadSInt16();
-        //                    //Rect.Y = packet.ReadSInt16();
-        //                    //Rect.Width = packet.ReadSInt16();
-        //                    //Rect.Height = packet.ReadSInt16();
-
-        //                    throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
-        //                }
-
-        //                break;
-        //            case DrawCmdTypes.DC_Text:
-        //                {
-        //                    //penSize = packet.ReadSInt16();
-        //                    //red = (byte)packet.ReadSInt16().SwapShort();
-        //                    //green = (byte)packet.ReadSInt16().SwapShort();
-        //                    //blue = (byte)packet.ReadSInt16().SwapShort();
-
-        //                    //pos = new();
-        //                    //pos.v = packet.ReadSInt16();
-        //                    //pos.h = packet.ReadSInt16();
-
-        //                    //text = packet.ReadPString(128, 1);
-
-        //                    throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
-        //                }
-
-        //                break;
-        //            case DrawCmdTypes.DC_Shape:
-        //                {
-        //                    //penSize = packet.ReadSInt16();
-        //                    //red = (byte)packet.ReadSInt16().SwapShort();
-        //                    //green = (byte)packet.ReadSInt16().SwapShort();
-        //                    //blue = (byte)packet.ReadSInt16().SwapShort();
-
-        //                    //pos = new();
-        //                    //pos.v = packet.ReadSInt16();
-        //                    //pos.h = packet.ReadSInt16();
-
-        //                    // TODO:
-
-        //                    throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
-        //                }
-
-        //                break;
-        //        }
-        //}
-
-        //public byte[] Serialize(params object[] values)
-        //{
-        //    using (var packet = new Packet())
-        //    {
-        //        packet.WriteInt16(nextOfst);
-        //        packet.WriteInt16(0); //reserved
-        //        packet.WriteInt16(DrawCmd);
-        //        packet.WriteInt16(cmdLength);
-        //        packet.WriteInt16(dataOfst);
-        //        packet.WriteBytes(data, cmdLength);
-
-        //        return packet.GetData();
-        //    }
-        //}
     }
 }

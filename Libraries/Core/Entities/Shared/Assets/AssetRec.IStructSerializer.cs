@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Enums;
+﻿using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared

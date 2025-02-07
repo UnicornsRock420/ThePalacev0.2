@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint32 = System.UInt32;
@@ -28,7 +28,7 @@ namespace ThePalace.Core.Types
         {
             var refNum = 0;
 
-            this.Deserialize(ref refNum, reader);
+            this.Deserialize(ref refNum, reader, SerializerOptions.None);
         }
         public AssetSpec(AssetSpec assetSpec)
         {

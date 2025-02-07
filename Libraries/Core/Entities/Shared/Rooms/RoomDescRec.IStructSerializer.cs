@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Enums;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
@@ -32,24 +31,24 @@ namespace ThePalace.Core.Entities.Shared
 
             try
             {
-                this.RoomInfo.RoomFlags = (RoomFlags)this.ReadSInt32();
-                this.RoomInfo.FacesID = this.ReadSInt32();
-                this.RoomInfo.RoomID = this.ReadSInt16();
-                roomNameOfst = this.ReadSInt16();
-                pictNameOfst = this.ReadSInt16();
-                artistNameOfst = this.ReadSInt16();
-                passwordOfst = this.ReadSInt16();
-                nbrHotspots = this.ReadSInt16();
-                hotspotOfst = this.ReadSInt16();
-                nbrPictures = this.ReadSInt16();
-                pictureOfst = this.ReadSInt16();
-                nbrDrawCmds = this.ReadSInt16();
-                firstDrawCmd = this.ReadSInt16();
-                nbrPeople = this.ReadSInt16();
-                nbrLProps = this.ReadSInt16();
-                firstLProp = this.ReadSInt16();
-                reserved = this.ReadSInt16();
-                lenVars = this.ReadSInt16();
+                this.RoomInfo.RoomFlags = (RoomFlags)this.ReadInt32();
+                this.RoomInfo.FacesID = this.ReadInt32();
+                this.RoomInfo.RoomID = this.ReadInt16();
+                roomNameOfst = this.ReadInt16();
+                pictNameOfst = this.ReadInt16();
+                artistNameOfst = this.ReadInt16();
+                passwordOfst = this.ReadInt16();
+                nbrHotspots = this.ReadInt16();
+                hotspotOfst = this.ReadInt16();
+                nbrPictures = this.ReadInt16();
+                pictureOfst = this.ReadInt16();
+                nbrDrawCmds = this.ReadInt16();
+                firstDrawCmd = this.ReadInt16();
+                nbrPeople = this.ReadInt16();
+                nbrLProps = this.ReadInt16();
+                firstLProp = this.ReadInt16();
+                reserved = this.ReadInt16();
+                lenVars = this.ReadInt16();
 
                 // Get the strings
                 this.Name = this.PeekPString(32, 1, roomNameOfst);
@@ -82,7 +81,7 @@ namespace ThePalace.Core.Entities.Shared
 
                     var vAxis = this.PeekSInt16();
                     var hAxis = this.PeekSInt16();
-                    h.Loc = new Types.Point(hAxis, vAxis);
+                    h.Loc = new Types.Point(vAxis, hAxis);
 
                     h.HotspotID = this.PeekSInt16();
                     h.Dest = this.PeekSInt16();
@@ -112,7 +111,7 @@ namespace ThePalace.Core.Entities.Shared
 
                             vAxis = this.PeekSInt16();
                             hAxis = this.PeekSInt16();
-                            var p = new Types.Point(hAxis, vAxis);
+                            var p = new Types.Point(vAxis, hAxis);
 
                             h.Vortexes.Add(p);
                         }
@@ -127,7 +126,7 @@ namespace ThePalace.Core.Entities.Shared
 
                         vAxis = this.PeekSInt16();
                         hAxis = this.PeekSInt16();
-                        hs.PicLoc = new Types.Point(hAxis, vAxis);
+                        hs.PicLoc = new Types.Point(vAxis, hAxis);
 
                         h.States.Add(hs);
                     }

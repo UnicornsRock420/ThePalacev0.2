@@ -127,7 +127,7 @@ namespace ThePalace.Core.Entities.Core
             return result;
         }
 
-        public short ReadSInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
+        public short ReadInt16(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
             if ((this._stream?.Length ?? 0) < 1) return 0;
 
@@ -157,7 +157,7 @@ namespace ThePalace.Core.Entities.Core
             return result;
         }
 
-        public sint32 ReadSInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
+        public sint32 ReadInt32(long offset = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
             if ((this._stream?.Length ?? 0) < 1) return 0;
 
@@ -295,11 +295,11 @@ namespace ThePalace.Core.Entities.Core
             switch (size)
             {
                 case 4:
-                    length = ReadSInt32();
+                    length = ReadInt32();
 
                     break;
                 case 2:
-                    length = ReadSInt16();
+                    length = ReadInt16();
 
                     break;
                 default:
