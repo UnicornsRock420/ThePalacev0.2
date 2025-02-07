@@ -640,7 +640,7 @@ namespace ThePalace.Core.Factories
                     {
                         writer.WriteLine("ROOM");
 
-                        if (!string.IsNullOrWhiteSpace(r.Password.ToString())) writer.WriteLine($"\tLOCKED \"{r.Password.ToString().EncryptString().WritePalaceString()}\"");
+                        if (!string.IsNullOrWhiteSpace(r.Password.ToString())) writer.WriteLine($"\tLOCKED \"{r.Password.ToString().EncryptString().WritePalaceEscapedString()}\"");
 
                         writer.WriteLine($"\tID {r.RoomInfo.RoomID}");
 

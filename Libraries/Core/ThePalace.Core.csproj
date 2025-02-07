@@ -45,8 +45,8 @@
     <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
     <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
     <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
-    <None Include="Helpers\LockContext.cs" />
-    <None Include="Helpers\Singleton.cs" />
+    <None Include="Factories\LockContext.cs" />
+    <None Include="Factories\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>

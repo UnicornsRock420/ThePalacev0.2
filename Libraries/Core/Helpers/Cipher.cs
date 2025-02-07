@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.RegularExpressions;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Exts.Palace;
@@ -171,7 +170,7 @@ namespace ThePalace.Core.Helpers
             return crc == ComputeLicenseCrc(seed);
         }
 
-        public static byte[] ReadPalaceString(this string source)
+        public static byte[] ReadPalaceEscapedString(this string source)
         {
             var srcBytes = source.GetBytes();
             var destBytes = new List<byte>();
@@ -180,11 +179,10 @@ namespace ThePalace.Core.Helpers
             {
                 if (srcBytes[j] == (byte)'\\')
                 {
-                    var byte1 = (char)srcBytes[++j];
-                    var byte2 = (char)srcBytes[++j];
-                    var hex = $"0x{byte1}{byte2}";
+                    var halfByte1 = (char)srcBytes[++j];
+                    var halfByte2 = (char)srcBytes[++j];
 
-                    destBytes.Add(Convert.ToByte(hex, 16));
+                    destBytes.Add(Convert.ToByte($"0x{halfByte1}{halfByte2}", 16));
                 }
                 else
                 {
@@ -195,13 +193,13 @@ namespace ThePalace.Core.Helpers
             return destBytes.ToArray();
         }
 
-        public static string WritePalaceString(this byte[] source)
+        public static string WritePalaceEscapedString(this byte[] source)
         {
             var dest = new StringBuilder();
 
             for (var j = 0; j < source.Length; j++)
             {
-                if (Regex.IsMatch($"{(char)source[j]}", @"[a-z0-9]", RegexOptions.IgnoreCase | RegexOptions.Singleline))
+                if (RegexConstants.REGEX_ALPHANUMERIC_SINGLECHARACTER.IsMatch(source[j].ToString()))
                 {
                     dest.Append(source[j]);
                 }
@@ -269,6 +267,13 @@ namespace ThePalace.Core.Helpers
             }
 
             return ctr;
+        }
+
+
+        private enum RegConstants : uint
+        {
+            MAGIC_LONG = 0x9602C9BF,
+            CRC_MAGIC = 0xA95ADE76,
         }
 
         private static readonly uint[] gCrcMask =
