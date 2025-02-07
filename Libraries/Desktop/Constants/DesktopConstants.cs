@@ -1,17 +1,14 @@
 ﻿using System.Drawing;
-using System.Text.RegularExpressions;
 
 namespace ThePalace.Common.Desktop.Constants
 {
     public partial class DesktopConstants
     {
-        public static readonly Regex REGEX_VISIBLE = new Regex(@"^[;](.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
-        public static readonly Regex REGEX_TYPE = new Regex(@"^[\s]*([!:^])[\s]*(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
-        public static readonly Regex REGEX_SOUND = new Regex(@"^[\s]*[\)]([\w\d\.]+)[\s]*(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
-        public static readonly Regex REGEX_LOCATION = new Regex(@"^[\s]*[@]([0-9]+)[\s]*[,][\s]*([0-9]+)[\s]*(.*)$", RegexOptions.Multiline | RegexOptions.Compiled);
-
-        public const string FONT_NAME = "Arial";
-        public const int FONT_HEIGHT = 14;
+        public static class Font
+        {
+            public const string NAME = "Arial";
+            public const int HEIGHT = 14;
+        }
 
         public static class AspectRatio
         {
@@ -32,8 +29,8 @@ namespace ThePalace.Common.Desktop.Constants
         public const int MaxNbrFaces = 13;
         public const int MaxNbrColors = 16;
 
-        public static readonly uint[] SmileyColours = new uint[]
-        {
+        public static readonly uint[] SmileyColours =
+        [
             0xFFFF0000,
             0xFFFF5F00,
             0xFFFFBF00,
@@ -50,7 +47,7 @@ namespace ThePalace.Common.Desktop.Constants
             0xFFDF00FF,
             0xFFFF00BF,
             0xFFFF005F,
-        };
+        ];
 
         public static Color NbrToColor(short colorNbr) =>
             Color.FromArgb((int)SmileyColours[colorNbr % MaxNbrColors]);

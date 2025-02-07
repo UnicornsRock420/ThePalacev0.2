@@ -132,4 +132,8 @@
     <None Include="Types\PropPRPStream.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+  </ItemGroup>
+
 </Project>

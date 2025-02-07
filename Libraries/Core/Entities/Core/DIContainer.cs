@@ -2,7 +2,7 @@
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
 using Microsoft.Extensions.Configuration;
-using Serilog;
+using ThePalace.Logging.Entities;
 using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Core.Entities.Core
@@ -12,30 +12,34 @@ namespace ThePalace.Core.Entities.Core
         #region cStr
         public DIContainer()
         {
-            Builder = new ContainerBuilder();
-
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddUserSecrets<DIContainer>()
                 .Build();
 
-            _logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .WriteTo.Console(
-                    outputTemplate:
-                    "[{Timestamp:HH:mm:ss} {Level:u3}] [{Module}] [{Context}] {Message:lj}{NewLine}{Exception}")
-                //.WriteTo.File(new CompactJsonFormatter(), "logs/logs")
-                .CreateLogger();
+            _logger = new LoggingHub(_configuration);
+
+            Builder = new ContainerBuilder();
         }
         public DIContainer(ContainerBuilder builder) : this()
         {
             Builder = builder;
         }
+        public DIContainer(IConfiguration configuration) : this()
+        {
+            _configuration = configuration;
+        }
+        public DIContainer(ContainerBuilder builder, IConfiguration configuration) : this()
+        {
+            _configuration = configuration;
+
+            Builder = builder;
+        }
         #endregion
 
         #region Fields & Properties
-        private static ILogger _logger;
         private readonly IConfiguration _configuration;
+        private static ILogger _logger;
         public ContainerBuilder Builder { get; private set; }
         public IContainer? Container { get; private set; }
         #endregion
@@ -70,8 +74,6 @@ namespace ThePalace.Core.Entities.Core
             where TInstance : Type
             where TAs : Type
         {
-            if (!typeof(TAs).IsInterface) return this;
-
             Builder
                 .RegisterInstance(instances)
                 .As<TAs>()
@@ -92,8 +94,6 @@ namespace ThePalace.Core.Entities.Core
             where TInstance : Type
             where TAs : Type
         {
-            if (!typeof(TAs).IsInterface) return this;
-
             Builder
                 .RegisterInstance(instances)
                 .As<TAs>()
@@ -115,8 +115,6 @@ namespace ThePalace.Core.Entities.Core
             where TType : Type
             where TAs : Type
         {
-            if (!typeof(TAs).IsInterface) return this;
-
             Builder
                 .RegisterType(type)
                 .WithParameters(@params)
@@ -139,8 +137,6 @@ namespace ThePalace.Core.Entities.Core
             where TType : Type
             where TAs : Type
         {
-            if (!typeof(TAs).IsInterface) return this;
-
             foreach (var type in types)
                 Builder
                     .RegisterType(type)
