@@ -9,6 +9,7 @@ namespace ThePalace.Network.Helpers
             new ConnectionState
             {
                 Socket = handler,
+                IPAddress = handler.GetIPAddress()
             };
     }
 }
