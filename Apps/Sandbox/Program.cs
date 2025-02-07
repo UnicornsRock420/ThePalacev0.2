@@ -32,13 +32,15 @@ namespace Sandbox
 
             //Experiment1();
 
-            var iStructTypes = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IStruct)));
+            //var iStructTypes = AppDomain.CurrentDomain
+            //    .GetAssemblies()
+            //    .SelectMany(t => t.GetTypes())
+            //    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IStruct)));
 
-            var container = new DIContainer();
-            container.RegisterTypes(iStructTypes);
+            //var container = new DIContainer();
+            //container.RegisterTypes(iStructTypes);
+
+            Experiment1();
         }
 
         public Program()

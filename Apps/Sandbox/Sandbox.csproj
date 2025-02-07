@@ -14,4 +14,10 @@
     <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -43,9 +43,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            refNum = this.Rooms?.Count ?? 0;
-
-            if (refNum > 0)
+            if ((this.Rooms?.Count ?? 0) > 0)
                 foreach (var room in this.Rooms)
                     writer.PalaceSerialize(ref refNum, room, typeof(ListRec), opts);
         }

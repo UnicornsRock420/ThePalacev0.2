@@ -744,11 +744,14 @@ namespace ThePalace.Core.Exts.Palace
 
                 if(_attrs
                     .Where(a => a is RefNumAttribute)
-                    .Select(a => a as RefNumAttribute)
                     .Any())
                 {
                     refNum = (int)(object)_value;
 
+                    continue;
+                }
+                if (opts.IsBit<SerializerOptions, byte>(SerializerOptions.RefNumOnly))
+                {
                     continue;
                 }
 
@@ -916,14 +919,17 @@ namespace ThePalace.Core.Exts.Palace
         {
             if (obj == null) return;
 
-            var typeName = typeof(TStruct).Name;
-            if (string.IsNullOrWhiteSpace(typeName)) return;
+            var objType = typeof(TStruct);
+            var objTypeName = objType.Name;
+            if (string.IsNullOrWhiteSpace(objTypeName)) return;
 
             var msgBytes = (byte[]?)null;
             using (var ms = new MemoryStream())
             {
                 if (obj.Is<IStructSerializer>(out var serializer))
                 {
+                    ms.PalaceSerialize(ref refNum, obj, objType, SerializerOptions.RefNumOnly);
+
                     serializer.Serialize(ref refNum, ms, opts);
                 }
                 else
@@ -939,7 +945,7 @@ namespace ThePalace.Core.Exts.Palace
             {
                 var hdr = new MSG_Header
                 {
-                    EventType = Enum.Parse<EventTypes>(typeName),
+                    EventType = Enum.Parse<EventTypes>(objTypeName),
                     Length = (uint)(msgBytes?.Length ?? 0),
                 };
                 if (obj.Is<IStructRefNum>())
