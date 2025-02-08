@@ -21,7 +21,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
 
         public IptAlarm(IptAtomList value, int delay)
         {
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
             Delay = delay;
             Value = value;
         }

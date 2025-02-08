@@ -13,9 +13,9 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
         public Bitmap Image { get; private set; } = null;
 
         public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
-        public DateTime Created { get; } = DateTime.Now;
+        public DateTime Created { get; } = DateTime.UtcNow;
         private DateTime? _accessed = null;
-        public DateTime Accessed => _accessed ??= DateTime.Now;
+        public DateTime Accessed => _accessed ??= DateTime.UtcNow;
         public bool Visible { get; private set; } = true;
         public Color Colour { get; private set; } = Color.White;
         public Point Origin { get; private set; } = new(0, 0);

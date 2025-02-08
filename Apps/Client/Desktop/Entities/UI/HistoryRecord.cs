@@ -10,7 +10,7 @@ namespace ThePalace.Client.Desktop.Entities.UI
 
         private HistoryRecord()
         {
-            Created = DateTime.Now;
+            Created = DateTime.UtcNow;
         }
         public HistoryRecord(string url) : this()
         {
