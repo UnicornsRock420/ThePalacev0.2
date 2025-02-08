@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
@@ -129,8 +128,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}]);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("LINETO", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -160,8 +158,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //};
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("PENPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -183,8 +180,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //};
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("PENTO", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -216,8 +212,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //};
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("PENCOLOR", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -241,8 +236,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //};
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("PAINTCLEAR", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -290,8 +284,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //$scope.model.Screen.paintPenSize = register.Value;
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End Paint Commands
@@ -318,8 +311,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SOUNDPAUSE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -340,8 +332,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("MIDISTOP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -364,8 +355,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("COSINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -382,8 +372,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("TANGENT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -400,8 +389,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SQUAREROOT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -418,8 +406,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("RANDOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -439,8 +426,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("MOD", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -491,8 +477,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         iptTracking.Stack.Push(iptTracking.Stack[iptTracking.Stack.Count - (int)register.Value - 1]);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("DUP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -536,8 +521,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SUSRMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -554,8 +538,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("GLOBALMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -572,8 +555,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("LOCALMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -592,8 +574,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("STATUSMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -606,8 +587,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //$scope.setStatusMsg(register.Value);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("PRIVATEMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -631,8 +611,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("LOGMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -649,8 +628,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -675,8 +653,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SAYAT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -700,8 +677,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             // End Message Commands
@@ -716,8 +692,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         // TODO:
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("USERPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -745,8 +720,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("DROPPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -797,8 +771,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("DOFFPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -858,8 +831,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 //                    propID = register.Value;
                 //
                 //                    break;
-                //                default:
-                //                    throw new Exception($"Wrong datatype {register2.Type}...");
+                //                default: throw new Exception($"Wrong datatype {register2.Type}...");
                 //
                 //                    break;
                 //            }
@@ -933,8 +905,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register3.Type}...");
+                    default: throw new Exception($"Wrong datatype {register3.Type}...");
                 }
             }));
             iptCommands.TryAdd("REMOVEPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -962,8 +933,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 //                    propID = register.Value;
                 //
                 //                    break;
-                //                default:
-                //                    throw new Exception($"Wrong datatype {register.Type}...");
+                //                default: throw new Exception($"Wrong datatype {register.Type}...");
                 //
                 //                    break;
                 //            }
@@ -1017,8 +987,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 //	            });
                 //
                 //                break;
-                //            default:
-                //                throw new Exception($"Wrong datatype {register.Type}...");
+                //            default: throw new Exception($"Wrong datatype {register.Type}...");
                 //
                 //                break;
                 //        }
@@ -1060,16 +1029,14 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //            });
                         //
                         //            break;
-                        //        default:
-                        //            throw new Exception($"Wrong datatype {register.Type}...");
+                        //        default: throw new Exception($"Wrong datatype {register.Type}...");
                         //    }
                         //}
 
                         //$scope.setProps(propSpec.length ? propSpec : null);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SHOWLOOSEPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1115,8 +1082,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("UPPERCASE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1136,8 +1102,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("STRINDEX", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1160,8 +1125,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("STRLEN", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1178,8 +1142,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SUBSTR", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1202,8 +1165,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("SUBSTRING", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1227,8 +1189,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register3.Type}...");
+                    default: throw new Exception($"Wrong datatype {register3.Type}...");
                 }
             }));
             iptCommands.TryAdd("GREPSTR", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1257,8 +1218,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("GREPSUB", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1285,8 +1245,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("STRTOATOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1303,8 +1262,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End String Commands
@@ -1402,8 +1360,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("DEF", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1440,8 +1397,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         iptTracking.Stack.Push(array[(int)register1.Value]);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("PUT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1467,8 +1423,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         array[(int)register1.Value] = register3;
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("LENGTH", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1486,8 +1441,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End Array Commands
@@ -1509,8 +1463,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("ATOI", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1529,8 +1482,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("TOPTYPE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1654,8 +1606,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("LOCK", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1673,8 +1624,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("UNLOCK", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1692,8 +1642,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("ISLOCKED", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1716,8 +1665,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("GETSPOTSTATE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1739,8 +1687,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETSPOTSTATE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1771,8 +1718,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETSPOTSTATELOCAL", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1801,8 +1747,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETLOC", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1832,8 +1777,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETPICLOC", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1863,8 +1807,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //    });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SELECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1883,8 +1826,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETALARM", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1910,8 +1852,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("ME", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1928,7 +1869,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                 if (sessionState == null) return;
 
                 var index = iptTracking.Variables.ContainsKey("ME") ? (int)iptTracking.Variables["ME"].Value.Value : 0;
@@ -1971,8 +1912,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //}
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SPOTDEST", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -1984,7 +1924,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                     case IptVariableTypes.Integer:
                         if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                         if (sessionState == null) return;
 
                         var index = (int)register.Value;
@@ -1993,44 +1933,34 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //var spots = sessionState.RoomInfo.HotSpots.ToArray();
                         //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            //Value = spots[index].Dest,
-                        });
+                        iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
+                        //Value = spots[index].Dest,
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("NBRSPOTS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                 if (sessionState == null) return;
 
-                iptTracking.Stack.Push(new IptVariable
-                {
-                    Type = IptVariableTypes.Integer,
-                    //Value = sessionState.RoomInfo.HotSpots.Count,
-                });
+                iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
+                //Value = sessionState.RoomInfo.HotSpots.Count,
             }));
             iptCommands.TryAdd("NBRDOORS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                 if (sessionState == null) return;
 
-                iptTracking.Stack.Push(new IptVariable
-                {
-                    Type = IptVariableTypes.Integer,
-                    //Value = sessionState.RoomInfo.HotSpots
-                    //    .Where(s => ((HotspotTypes)s.Flags & HotspotTypes.HS_Door) == HotspotTypes.HS_Door)
-                    //    .Count(),
-                });
+                iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
+                //Value = sessionState.RoomInfo.HotSpots
+                //    .Where(s => ((HotspotTypes)s.Flags & HotspotTypes.HS_Door) == HotspotTypes.HS_Door)
+                //    .Count(),
             }));
             iptCommands.TryAdd("SPOTNAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
@@ -2041,7 +1971,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                     case IptVariableTypes.Integer:
                         if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                         if (sessionState == null) return;
 
                         var index = (int)register.Value;
@@ -2050,15 +1980,10 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //var spots = sessionState.RoomInfo.HotSpots.ToArray();
                         //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            //Value = spots[index].Name,
-                        });
+                        iptTracking.Stack.Push(new IptVariable(IptVariableTypes.String /*, spots[index].Name */));
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End Spot Commands
@@ -2085,8 +2010,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         Executor(register.Value as IptAtomList, iptTracking, recursionDepth + 1);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("ALARMEXEC", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2105,8 +2029,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         iptTracking.Alarms.Add(new IptAlarm(register2.Value as IptAtomList, (int)register1.Value));
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("WHILE", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2150,8 +2073,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("FOREACH", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2177,8 +2099,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register2.Type}...");
+                    default: throw new Exception($"Wrong datatype {register2.Type}...");
                 }
             }));
             iptCommands.TryAdd("GLOBAL", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2212,8 +2133,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End Functional Commands
@@ -2222,7 +2142,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                 if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
@@ -2264,8 +2184,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2301,8 +2220,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("MOUSEPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2508,8 +2426,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("SETCOLOR", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2534,8 +2451,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("WHONAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2565,8 +2481,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 //        });
 
                 //        break;
-                //    default:
-                //        throw new Exception($"Wrong datatype {register.Type}...");
+                //    default: throw new Exception($"Wrong datatype {register.Type}...");
                 //}
 
                 throw new NotImplementedException("WHONAME");
@@ -2631,8 +2546,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("ROOMUSER", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2660,8 +2574,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("GOTOROOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2686,8 +2599,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End User Commands
@@ -2707,7 +2619,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                     case IptVariableTypes.Integer:
                         if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
 
-                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                         if (sessionState == null) break;
 
                         var value = 1F - (int)register.Value / 100F;
@@ -2719,8 +2631,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //sessionState.RefreshScreen(ScreenLayers.DimRoom);
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("DELAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2733,15 +2644,14 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         Thread.Sleep(IptTracking.TicksToMilliseconds((int)register.Value));
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("BEEP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as IUISessionState;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
                 if (sessionState == null) return;
 
                 //ThreadManager.Current.Enqueue(ThreadQueues.Audio, null, sessionState, AudioCommandTypes.BEEP);
@@ -2764,8 +2674,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //$window.open(register.Value, '_blank');
 
                         throw new NotImplementedException("GOTOURL");
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("GOTOURLFRAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2784,8 +2693,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //$window.open(register2.Value, register1.Value);
 
                         throw new NotImplementedException("GOTOURLFRAME");
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("KILLUSER", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2810,8 +2718,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //});
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("CLEARLOG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3397,8 +3304,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         Debug.WriteLine(register.Value.ToString());
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("CONSOLEMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3411,8 +3317,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         Console.WriteLine(register.Value.ToString());
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("CONNECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3430,8 +3335,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.CONNECT, register.Value.ToString());
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("DISCONNECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3495,8 +3399,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         }
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // Start Math Commands
@@ -3522,8 +3425,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("AVG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3553,8 +3455,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("POW", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3577,8 +3478,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register1.Type}...");
+                    default: throw new Exception($"Wrong datatype {register1.Type}...");
                 }
             }));
             iptCommands.TryAdd("SUM", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3607,8 +3507,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("MIN", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3637,8 +3536,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             iptCommands.TryAdd("MAX", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -3667,8 +3565,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         });
 
                         break;
-                    default:
-                        throw new Exception($"Wrong datatype {register.Type}...");
+                    default: throw new Exception($"Wrong datatype {register.Type}...");
                 }
             }));
             // End Math Commands
@@ -3928,8 +3825,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 Type = IptVariableTypes.Bool,
                                 Value = (int)register1.Value != (int)register2.Value ? 1 : 0,
                             };
-                        default:
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                        default: throw new Exception($"Wrong datatype {register1.Type}...");
                     }
                 },
             });
@@ -3953,8 +3849,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 Type = IptVariableTypes.Bool,
                                 Value = (int)register1.Value != (int)register2.Value ? 1 : 0,
                             };
-                        default:
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                        default: throw new Exception($"Wrong datatype {register1.Type}...");
                     }
                 },
             });
@@ -3978,8 +3873,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 Type = IptVariableTypes.Bool,
                                 Value = (int)register1.Value == (int)register2.Value ? 1 : 0,
                             };
-                        default:
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                        default: throw new Exception($"Wrong datatype {register1.Type}...");
                     }
                 },
             });
@@ -4003,8 +3897,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 Type = IptVariableTypes.Integer,
                                 Value = (int)register1.Value + (int)register2.Value,
                             };
-                        default:
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                        default: throw new Exception($"Wrong datatype {register1.Type}...");
                     }
                 },
             });
@@ -4028,8 +3921,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 Type = IptVariableTypes.Bool,
                                 Value = (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0,
                             };
-                        default:
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                        default: throw new Exception($"Wrong datatype {register1.Type}...");
                     }
                 },
             });

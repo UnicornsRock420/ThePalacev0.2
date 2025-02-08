@@ -15,9 +15,9 @@ namespace ThePalace.Common.Desktop.Entities.Core
 
     public partial class IptAlarm
     {
-        public DateTime Created { get; private set; }
-        public int Delay { get; private set; }
-        public IptAtomList Value { get; private set; }
+        public DateTime Created { get; internal set; }
+        public int Delay { get; internal set; }
+        public IptAtomList Value { get; internal set; }
 
         public IptAlarm(IptAtomList value, int delay)
         {
@@ -29,6 +29,19 @@ namespace ThePalace.Common.Desktop.Entities.Core
 
     public partial class IptVariable
     {
+        public IptVariable() { }
+        public IptVariable(IptVariableTypes type)
+        {
+            Type = type;
+        }
+        public IptVariable(
+            IptVariableTypes type,
+            object value)
+        {
+            Type = type;
+            Value = value;
+        }
+
         public IptVariableTypes Type;
         public object Value;
     }
@@ -39,6 +52,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
         public bool IsSpecial = false;
         public bool IsGlobal = false;
         public int Depth = 0;
+
         private IptVariable _value;
         public IptVariable Value
         {
@@ -46,7 +60,8 @@ namespace ThePalace.Common.Desktop.Entities.Core
             set
             {
                 if (IsReadOnly) return;
-                else _value = value;
+
+                _value = value;
             }
         }
     }
@@ -69,10 +84,10 @@ namespace ThePalace.Common.Desktop.Entities.Core
         public bool Return = false;
         public bool Break = false;
         public Match[] Grep;
-        public IptAtomList Stack { get; private set; } = new();
-        public IptAlarms Alarms { get; private set; } = new();
-        public IptEvents Events { get; private set; } = new();
-        public IptVariables Variables { get; private set; } = new();
+        public IptAtomList Stack { get; internal set; } = new();
+        public IptAlarms Alarms { get; internal set; } = new();
+        public IptEvents Events { get; internal set; } = new();
+        public IptVariables Variables { get; internal set; } = new();
 
         public IptTracking() { }
 
