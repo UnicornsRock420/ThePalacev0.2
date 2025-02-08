@@ -23,4 +23,11 @@
     <PackageReference Include="System.Windows.Extensions" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj" />
+    <ProjectReference Include="..\Core\ThePalace.Core.csproj" />
+    <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+    <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
+  </ItemGroup>
+
 </Project>

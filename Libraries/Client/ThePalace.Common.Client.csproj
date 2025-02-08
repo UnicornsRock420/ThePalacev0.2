@@ -10,4 +10,10 @@
     <Folder Include="Entities\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Core\ThePalace.Core.csproj" />
+    <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+    <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
+  </ItemGroup>
+
 </Project>

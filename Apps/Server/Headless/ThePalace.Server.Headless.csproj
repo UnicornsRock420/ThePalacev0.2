@@ -7,4 +7,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj" />
+    <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj" />
+    <ProjectReference Include="..\..\..\Libraries\Server\ThePalace.Common.Server.csproj" />
+  </ItemGroup>
+
 </Project>

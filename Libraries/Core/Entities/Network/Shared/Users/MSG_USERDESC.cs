@@ -12,6 +12,8 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
         public sint16 FaceNbr;
         public sint16 ColorNbr;
         public sint32 NbrProps;
-        public AssetSpec[] AssetSpec;
+
+        [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)
+        public AssetSpec[] PropSpec;
     }
 }

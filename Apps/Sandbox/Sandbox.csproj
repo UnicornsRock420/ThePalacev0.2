@@ -9,9 +9,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Client\ThePalace.Common.Client.csproj" />
     <ProjectReference Include="..\..\Libraries\Core\ThePalace.Core.csproj" />
+    <ProjectReference Include="..\..\Libraries\Desktop\ThePalace.Common.Desktop.csproj" />
+    <ProjectReference Include="..\..\Libraries\Logging\ThePalace.Logging.csproj" />
     <ProjectReference Include="..\..\Libraries\Network\ThePalace.Network.csproj" />
+    <ProjectReference Include="..\..\Libraries\Server\ThePalace.Common.Server.csproj" />
+    <ProjectReference Include="..\..\Modules\Database\SqliteDbs\ThePalace.Database.SqliteDbs.csproj" />
+    <ProjectReference Include="..\..\Modules\Database\SqlServerDbs\ThePalace.Database.SqlServerDbs.csproj" />
+    <ProjectReference Include="..\..\Modules\Media\DirectX\ThePalace.Media.DirectX.csproj" />
+    <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj" />
     <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />
+    <ProjectReference Include="..\Client\Desktop\ThePalace.Client.Desktop.csproj" />
+    <ProjectReference Include="..\Client\Headless\ThePalace.Client.Headless.csproj" />
+    <ProjectReference Include="..\Server\Desktop\ThePalace.Server.Desktop.csproj" />
+    <ProjectReference Include="..\Server\Headless\ThePalace.Server.Headless.csproj" />
   </ItemGroup>
 
   <ItemGroup>
