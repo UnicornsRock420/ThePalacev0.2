@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities\Core\RawData.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
@@ -31,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Entities\Core\RawData.cs" />
     <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
     <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
     <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
