@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Entities - Copy\**" />
+    <EmbeddedResource Remove="Entities - Copy\**" />
+    <None Remove="Entities - Copy\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
     <PackageReference Include="System.Globalization" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />

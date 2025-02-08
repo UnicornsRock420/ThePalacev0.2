@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.Communications
 {
     [Mnemonic("smsg")]
-    public partial class MSG_SMSG : IntegrationEvent, IProtocolC2S, ICommunications
+    public partial class MSG_SMSG : Core.EventParams, IProtocolC2S, ICommunications
     {
         [CString(255)]
         public string? Text { get; set; }

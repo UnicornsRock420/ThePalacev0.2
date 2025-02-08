@@ -1,6 +1,7 @@
 ﻿using ThePalace.Client.Desktop.Enums;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Core.Helpers;
+using ThePalace.Network.Constants;
 
 namespace ThePalace.Client.Desktop.Entities.Gfx
 {

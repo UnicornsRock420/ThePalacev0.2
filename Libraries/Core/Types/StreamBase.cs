@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Entities.System;
+﻿using System.Collections;
 
 namespace ThePalace.Core.Types
 {

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Client.Desktop.Interfaces
+﻿namespace ThePalace.Common.Desktop.Interfaces
 {
     public interface IProvider : IFeature
     {

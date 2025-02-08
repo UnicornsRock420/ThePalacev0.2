@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Shared.Network
 {
     [Mnemonic("pong")]
-    public partial class MSG_PONG : IntegrationEvent, IProtocolC2S, IProtocolS2C
+    public partial class MSG_PONG : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
     {
     }
 }

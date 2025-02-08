@@ -11,7 +11,7 @@ namespace ThePalace.Core.Entities.Network.Client.Network
 {
     [DynamicSize]
     [Mnemonic("blow")]
-    public partial class MSG_BLOWTHRU : IntegrationEvent, IStructSerializer, IProtocolC2S
+    public partial class MSG_BLOWTHRU : Core.EventParams, IStructSerializer, IProtocolC2S
     {
         public uint32 Flags;
         public uint32 NbrUsers;

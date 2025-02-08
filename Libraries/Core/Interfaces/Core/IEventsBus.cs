@@ -2,16 +2,16 @@
 {
     public interface IEventsBus : IDisposable
     {
-        Task Publish(object? sender, IIntegrationEvent @event);
+        Task Publish(object? sender, IEventParams @event);
 
-        void Subscribe(IIntegrationEventHandler handler);
+        void Subscribe(IEventHandler handler);
     }
 
     public interface IEventsBus<T> : IDisposable
-        where T : IIntegrationEvent
+        where T : IEventParams
     {
         Task Publish(object? sender, T @event);
 
-        void Subscribe(IIntegrationEventHandler<T> handler);
+        void Subscribe(IEventHandler<T> handler);
     }
 }

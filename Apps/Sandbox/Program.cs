@@ -1,4 +1,4 @@
-using ThePalace.Core.Entities.Events;
+using ThePalace.Core.Entities.EventParams;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
@@ -44,52 +44,6 @@ namespace Sandbox
         public Program()
         {
             InitializeComponent();
-        }
-
-        private static readonly Type CONST_TYPE_IINTEGRATIONEVENTHANDLER = typeof(IIntegrationEventHandler);
-        private static void DispatchBO(IIntegrationEvent msg)
-        {
-            var msgType = msg.GetType();
-
-            var boType = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(t =>
-                    t.GetTypes()
-                        .Where(t =>
-                        {
-                            if (t.IsInterface) return false;
-
-                            var itrfs = t.GetInterfaces();
-
-                            if (!itrfs.Contains(CONST_TYPE_IINTEGRATIONEVENTHANDLER)) return false;
-
-                            if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
-
-                            return true;
-                        }))
-                .Select(t =>
-                {
-                    foreach (var i in t.GetInterfaces() ?? [])
-                        if (i == CONST_TYPE_IINTEGRATIONEVENTHANDLER)
-                            return t;
-
-                    return null;
-                })
-                .FirstOrDefault();
-
-            var boObj = boType?.GetInstance<IIntegrationEventHandler>();
-            if (boObj != null)
-            {
-                boObj.Handle(
-                    new { },
-                    new ProtocolEventArgs
-                    {
-                        SourceID = 0,
-                        RefNum = 123,
-                        Request = (IProtocol?)msg,
-                        SessionState = null,
-                    });
-            }
         }
 
         private static void Experiment1()
@@ -156,6 +110,52 @@ namespace Sandbox
             }
 
             DispatchBO(msg);
+        }
+
+        private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        private static void DispatchBO(IProtocol msg)
+        {
+            var msgType = msg.GetType();
+
+            var boType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t =>
+                    t.GetTypes()
+                        .Where(t =>
+                        {
+                            if (t.IsInterface) return false;
+
+                            var itrfs = t.GetInterfaces();
+
+                            if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
+
+                            if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
+
+                            return true;
+                        }))
+                .Select(t =>
+                {
+                    foreach (var i in t.GetInterfaces() ?? [])
+                        if (i == CONST_TYPE_IEventHandler)
+                            return t;
+
+                    return null;
+                })
+                .FirstOrDefault();
+
+            var boObj = boType?.GetInstance<IEventHandler>();
+            if (boObj != null)
+            {
+                boObj.Handle(
+                    new { },
+                    new ProtocolEventParams
+                    {
+                        SourceID = 0,
+                        RefNum = 123,
+                        Request = (IProtocol?)msg,
+                        ConnectionState = null,
+                    });
+            }
         }
     }
 }

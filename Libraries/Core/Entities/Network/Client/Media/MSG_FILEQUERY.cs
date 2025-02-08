@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.Media
 {
     [Mnemonic("qFil")]
-    public partial class MSG_FILEQUERY : IntegrationEvent, IProtocolC2S
+    public partial class MSG_FILEQUERY : Core.EventParams, IProtocolC2S
     {
         [Str255]
         public string? FileName;

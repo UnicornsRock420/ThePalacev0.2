@@ -6,7 +6,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [Mnemonic("vers")]
-    public partial class MSG_VERSION : IntegrationEvent, IProtocolS2C
+    public partial class MSG_VERSION : Core.EventParams, IProtocolS2C
     {
         public sint32 major;
         public sint32 minor;

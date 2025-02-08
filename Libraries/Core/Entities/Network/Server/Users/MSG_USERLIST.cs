@@ -8,7 +8,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Network.Server.Users
 {
     [Mnemonic("rprs")]
-    public partial class MSG_USERLIST : IntegrationEvent, IStructRefNum, IProtocolS2C
+    public partial class MSG_USERLIST : Core.EventParams, IStructRefNum, IProtocolS2C
     {
         [RefNum]
         public sint32 RefNum

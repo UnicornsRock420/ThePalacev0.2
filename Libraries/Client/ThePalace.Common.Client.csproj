@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Constants\RegexConstants.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Entities\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Constants\RegexConstants.cs" />
   </ItemGroup>
 
   <ItemGroup>

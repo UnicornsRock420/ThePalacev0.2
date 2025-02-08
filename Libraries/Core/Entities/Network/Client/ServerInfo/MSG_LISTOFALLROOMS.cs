@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.ServerInfo
 {
     [Mnemonic("rLst")]
-    public partial class MSG_LISTOFALLROOMS : IntegrationEvent, IProtocolC2S
+    public partial class MSG_LISTOFALLROOMS : Core.EventParams, IProtocolC2S
     {
     }
 }

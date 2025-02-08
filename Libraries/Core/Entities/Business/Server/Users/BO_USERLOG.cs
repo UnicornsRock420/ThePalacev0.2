@@ -1,14 +1,13 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Server.Users;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Business.Server.Users
 {
     [Mnemonic("log ")]
-    public partial class BO_USERLOG : IIntegrationEventHandler<MSG_USERLOG>
+    public partial class BO_USERLOG : IEventHandler<MSG_USERLOG>
     {
-        public async Task<object?> Handle(object? sender, IIntegrationEvent @event)
+        public async Task<object?> Handle(object? sender, IEventParams @event)
         {
             throw new NotImplementedException();
         }

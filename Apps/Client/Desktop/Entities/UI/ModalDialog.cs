@@ -1,5 +1,5 @@
 ﻿using ThePalace.Client.Desktop.Entities.UI;
-using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.Threads.UI
 {

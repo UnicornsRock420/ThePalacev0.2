@@ -8,7 +8,7 @@ using RoomID = System.Int16;
 namespace ThePalace.Core.Entities.Network.Client.Rooms
 {
     [Mnemonic("ofNs")]
-    public partial class MSG_SPOTINFO : IntegrationEvent, IProtocolC2S, IDisposable
+    public partial class MSG_SPOTINFO : Core.EventParams, IProtocolC2S, IDisposable
     {
         public HotspotRec? SpotInfo;
         public PictureRec[] PictureList;

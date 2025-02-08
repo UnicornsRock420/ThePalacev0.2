@@ -8,7 +8,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Network.Shared.Users
 {
     [Mnemonic("usrD")]
-    public partial class MSG_USERDESC : IntegrationEvent, IProtocolC2S, IProtocolS2C
+    public partial class MSG_USERDESC : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
     {
         public sint16 FaceNbr;
         public sint16 ColorNbr;

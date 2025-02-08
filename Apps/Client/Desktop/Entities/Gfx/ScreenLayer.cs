@@ -1,6 +1,6 @@
-﻿using ThePalace.Client.Desktop.Enums;
-using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Core.Entities.System;
+﻿using System.Collections;
+using ThePalace.Client.Desktop.Enums;
+using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.Gfx
 {

@@ -1,14 +1,13 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Shared.Rooms;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Business.Shared.Rooms
 {
     [Mnemonic("coLs")]
-    public partial class BO_SPOTMOVE : IIntegrationEventHandler<MSG_SPOTMOVE>
+    public partial class BO_SPOTMOVE : IEventHandler<MSG_SPOTMOVE>
     {
-        public async Task<object?> Handle(object? sender, IIntegrationEvent @event)
+        public async Task<object?> Handle(object? sender, IEventParams @event)
         {
             throw new NotImplementedException();
         }

@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [Mnemonic("tiyr")]
-    public partial class MSG_TIYID : IntegrationEvent, IProtocolS2C
+    public partial class MSG_TIYID : Core.EventParams, IProtocolS2C
     {
         [IgnoreDataMember]
         public string? IpAddress;

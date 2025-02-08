@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Users
 {
     [Mnemonic("nprs")]
-    public partial class MSG_USERNEW : IntegrationEvent, IProtocolS2C
+    public partial class MSG_USERNEW : Core.EventParams, IProtocolS2C
     {
         public UserRec? User;
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ThePalace.Core.Client.Core.Models.Threads
+namespace ThePalace.Core.Entities.Threads
 {
     public partial class Cmd : IDisposable
     {

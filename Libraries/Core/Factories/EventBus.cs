@@ -5,7 +5,7 @@ namespace ThePalace.Core.Factories
 {
     public sealed class EventBus : IEventsBus
     {
-        private readonly ConcurrentDictionary<string, List<IIntegrationEventHandler>> _handlersDictionary;
+        private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary;
 
         public static EventBus Instance { get; } = new();
 
@@ -21,8 +21,8 @@ namespace ThePalace.Core.Factories
             _handlersDictionary?.Clear();
         }
 
-        public void Subscribe<T>(IIntegrationEventHandler<T> handler)
-            where T : IIntegrationEvent
+        public void Subscribe<T>(IEventHandler<T> handler)
+            where T : IEventParams
         {
             var eventType = typeof(T);
             if (eventType == null) return;
@@ -36,7 +36,7 @@ namespace ThePalace.Core.Factories
             }
         }
 
-        public void Subscribe(IIntegrationEventHandler handler)
+        public void Subscribe(IEventHandler handler)
         {
             var eventType = handler.GetType();
             if (eventType == null) return;
@@ -51,7 +51,7 @@ namespace ThePalace.Core.Factories
         }
 
         public async Task Publish<T>(object? sender, T @event)
-            where T : IIntegrationEvent
+            where T : IEventParams
         {
             var eventType = typeof(T);
             if (eventType == null) return;
@@ -66,14 +66,14 @@ namespace ThePalace.Core.Factories
 
             foreach (var eventHandler in handlers)
             {
-                if (eventHandler is IIntegrationEventHandler<T> handler)
+                if (eventHandler is IEventHandler<T> handler)
                 {
                     await eventHandler.Handle(sender, @event);
                 }
             }
         }
 
-        public async Task Publish(object? sender, IIntegrationEvent @event)
+        public async Task Publish(object? sender, IEventParams @event)
         {
             var eventType = @event.GetType();
             if (eventType == null) return;
@@ -97,9 +97,9 @@ namespace ThePalace.Core.Factories
     }
 
     public class EventBus<T> : IEventsBus<T>
-        where T : IIntegrationEvent
+        where T : IEventParams
     {
-        private readonly ConcurrentDictionary<string, List<IIntegrationEventHandler<T>>> _handlersDictionary;
+        private readonly ConcurrentDictionary<string, List<IEventHandler<T>>> _handlersDictionary;
 
         public static EventBus<T> Instance { get; } = new();
 
@@ -115,7 +115,7 @@ namespace ThePalace.Core.Factories
             _handlersDictionary?.Clear();
         }
 
-        public void Subscribe(IIntegrationEventHandler<T> handler)
+        public void Subscribe(IEventHandler<T> handler)
         {
             var eventType = typeof(T);
             if (eventType == null) return;
@@ -144,7 +144,7 @@ namespace ThePalace.Core.Factories
 
             foreach (var eventHandler in handlers)
             {
-                if (eventHandler is IIntegrationEventHandler<T> handler)
+                if (eventHandler is IEventHandler<T> handler)
                 {
                     await eventHandler.Handle(sender, @event);
                 }

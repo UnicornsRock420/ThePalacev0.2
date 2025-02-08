@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [DynamicSize]
     [Mnemonic("HTTP")]
-    public partial class MSG_HTTPSERVER : IntegrationEvent, IProtocolS2C
+    public partial class MSG_HTTPSERVER : Core.EventParams, IProtocolS2C
     {
         [CString]
         public string? Url;

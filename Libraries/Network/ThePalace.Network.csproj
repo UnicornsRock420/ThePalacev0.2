@@ -7,7 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Core\ThePalace.Core.csproj" />
+    <Compile Remove="Constants\RegexConstants.cs" />
+    <Compile Remove="LockContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Constants\RegexConstants.cs" />
+    <None Include="Factories\LockContext.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
   </ItemGroup>
 

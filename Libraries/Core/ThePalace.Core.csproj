@@ -134,6 +134,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+    <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
   </ItemGroup>
 
 </Project>

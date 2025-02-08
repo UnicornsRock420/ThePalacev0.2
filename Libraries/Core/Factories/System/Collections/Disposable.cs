@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Entities.System
+﻿namespace System.Collections
 {
     public class Disposable : IDisposable
     {

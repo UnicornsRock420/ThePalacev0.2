@@ -3,14 +3,14 @@ using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Core.Entities.Core
 {
-    public abstract class IntegrationEvent : EventArgs, IEventArgs, IIntegrationEvent
+    public abstract class EventParams : EventArgs, IEventParams
     {
-        protected IntegrationEvent()
+        protected EventParams()
         {
             Id = Guid.NewGuid();
             OccurredOn = DateTime.UtcNow;
         }
-        protected IntegrationEvent(
+        protected EventParams(
             Guid id,
             DateTime occurredOn)
         {

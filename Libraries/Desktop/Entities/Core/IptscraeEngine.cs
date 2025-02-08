@@ -1,14 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Types;
 
-namespace ThePalace.Client.Desktop.Entities.Core
+namespace ThePalace.Common.Desktop.Entities.Core
 {
     using IptAtomList = List<IptVariable>;
 

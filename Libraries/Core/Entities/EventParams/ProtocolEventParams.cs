@@ -1,16 +1,16 @@
 ﻿using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
+using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Core.Entities.Events
+namespace ThePalace.Core.Entities.EventParams
 {
-    public class ProtocolEventArgs : IntegrationEvent
+    public class ProtocolEventParams : Core.EventParams
     {
         public int SourceID;
         public int RefNum;
 
         public IProtocol? Request;
-        public ISessionState SessionState;
+        public IConnectionState ConnectionState;
 
         public CancellationToken CancellationToken;
     }

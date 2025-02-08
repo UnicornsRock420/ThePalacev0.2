@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
 {
     [DynamicSize(32, 1)]
     [Mnemonic("usrN")]
-    public partial class MSG_USERNAME : IntegrationEvent, IProtocolC2S, IProtocolS2C
+    public partial class MSG_USERNAME : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
     {
         [Str31]
         public string? Name;

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Client.Desktop.Entities.UI
+﻿namespace ThePalace.Common.Desktop.Entities.Core
 {
     public partial class LocalizationNoun
     {

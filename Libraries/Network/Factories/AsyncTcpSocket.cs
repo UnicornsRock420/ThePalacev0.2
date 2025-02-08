@@ -230,7 +230,7 @@ namespace ThePalace.Network.Factories
                 return;
             }
 
-            connectionState.BytesReceived.AddRange(connectionState.Buffer, bytesReceived, 0);
+            connectionState.BytesReceived.AddRange(connectionState.Buffer[0..bytesReceived]);
 
             connectionState.LastReceived = DateTime.UtcNow;
 
