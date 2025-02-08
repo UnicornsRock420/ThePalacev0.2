@@ -1,5 +1,5 @@
-﻿using ThePalace.Core.Attributes;
-using ThePalace.Core.Helpers;
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
 using RoomID = System.Int16;
@@ -14,24 +14,11 @@ namespace ThePalace.Core.Entities.Shared
         {
             this.RoomPos = new();
             this.PropSpec = new AssetSpec[9];
-            this.Extended = new();
         }
 
         public void Dispose()
         {
             PropSpec = null;
-
-            Extended
-                ?.Values
-                ?.Where(_ => _ is IDisposable)
-                ?.Cast<IDisposable>()
-                ?.ToList()
-                ?.ForEach(_ => TCF
-                    .Options(false)
-                    .Try(() => _.Dispose())
-                    .Execute());
-            Extended?.Clear();
-            Extended = null;
 
             GC.SuppressFinalize(this);
         }

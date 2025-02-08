@@ -36,8 +36,8 @@ namespace ThePalace.Core.Factories
         private static readonly Regex REGEX_WHITESPACE = new Regex(@"\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex REGEX_TOKENS = new Regex(@"^[a-z]+\s+""(.*)""$", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly RoomDescRec NULL_ROOMREC = default(RoomDescRec);
-        private static readonly HotspotRec NULL_HOTSPOTREC = default(HotspotRec);
+        private static readonly RoomDesc NULL_ROOMREC = default(RoomDesc);
+        private static readonly HotspotDesc NULL_HOTSPOTREC = default(HotspotDesc);
         private static readonly PictureRec NULL_PICTUREREC = default(PictureRec);
         private static readonly LoosePropRec NULL_LOOSEPROPREC = default(LoosePropRec);
 
@@ -48,12 +48,12 @@ namespace ThePalace.Core.Factories
         public override void Dispose() =>
             base.Dispose();
 
-        public void Read(out List<RoomDescRec> rooms)
+        public void Read(out List<RoomDesc> rooms)
         {
             rooms = [];
 
             var workingRoom = NULL_ROOMREC;
-            var workingHotspot = default(HotspotRec);
+            var workingHotspot = default(HotspotDesc);
             var workingPicture = default(PictureRec);
             var workingLooseProp = default(LoosePropRec);
 
@@ -81,7 +81,7 @@ namespace ThePalace.Core.Factories
                     {
                         case "ROOM":
                             insideRoom = true;
-                            workingRoom = new RoomDescRec();
+                            workingRoom = new RoomDesc();
                             workingRoom.HotSpots = [];
                             workingRoom.Pictures = [];
                             workingRoom.LooseProps = [];
@@ -107,12 +107,12 @@ namespace ThePalace.Core.Factories
                                 workingHotspot = new();
                                 workingScript = new StringBuilder();
 
-                                workingHotspot.Type = HotspotTypes.HS_Door;
+                                workingHotspot.SpotInfo.Type = HotspotTypes.HS_Door;
                             }
 
                             break;
                         case "ENDDOOR":
-                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 insideHotspot = false;
 
@@ -129,13 +129,13 @@ namespace ThePalace.Core.Factories
                                 workingHotspot = new();
                                 workingScript = new();
 
-                                workingHotspot.Type = HotspotTypes.HS_Normal;
+                                workingHotspot.SpotInfo.Type = HotspotTypes.HS_Normal;
                             }
 
                             break;
                         case "ENDSPOT":
                         case "ENDHOTSPOT":
-                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 insideHotspot = false;
 
@@ -151,12 +151,12 @@ namespace ThePalace.Core.Factories
                                 workingHotspot = new();
                                 workingScript = new();
 
-                                workingHotspot.Type = HotspotTypes.HS_Bolt;
+                                workingHotspot.SpotInfo.Type = HotspotTypes.HS_Bolt;
                             }
 
                             break;
                         case "ENDBOLT":
-                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 insideHotspot = false;
 
@@ -172,12 +172,12 @@ namespace ThePalace.Core.Factories
                                 workingHotspot = new();
                                 workingScript = new();
 
-                                workingHotspot.Type = HotspotTypes.HS_NavArea;
+                                workingHotspot.SpotInfo.Type = HotspotTypes.HS_NavArea;
                             }
 
                             break;
                         case "ENDNAVAREA":
-                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingRoom.HotSpots != null && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 insideHotspot = false;
 
@@ -236,7 +236,7 @@ namespace ThePalace.Core.Factories
 
                             break;
                         case "ENDSCRIPT":
-                            if (insideRoom && insideHotspot && insideScript && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID && workingScript != null)
+                            if (insideRoom && insideHotspot && insideScript && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID && workingScript != null)
                             {
                                 insideScript = false;
 
@@ -246,7 +246,7 @@ namespace ThePalace.Core.Factories
 
                             break;
                         case "PICTS":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 insidePicts = true;
                                 workingHotspot.States = [];
@@ -270,9 +270,9 @@ namespace ThePalace.Core.Factories
                             {
                                 workingPicture.PicID = tokens[1].TryParse<short>(0);
                             }
-                            else if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            else if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.HotspotID = tokens[1].TryParse<short>(0);
+                                workingHotspot.SpotInfo.HotspotID = tokens[1].TryParse<short>(0);
                             }
                             else if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
                             {
@@ -290,7 +290,7 @@ namespace ThePalace.Core.Factories
                             {
                                 workingPicture.Name = value;
                             }
-                            else if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            else if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 workingHotspot.Name = value;
                             }
@@ -422,77 +422,77 @@ namespace ThePalace.Core.Factories
                         case "SHUTABLE":
                             if (insideRoom && insideHotspot)
                             {
-                                workingHotspot.Type |= HotspotTypes.HS_LockableDoor;
+                                workingHotspot.SpotInfo.Type |= HotspotTypes.HS_LockableDoor;
                             }
 
                             break;
                         case "DRAGGABLE":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Draggable;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Draggable;
                             }
 
                             break;
                         case "FORBIDDEN":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Forbidden;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Forbidden;
                             }
 
                             break;
                         case "MANDATORY":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Mandatory;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Mandatory;
                             }
 
                             break;
                         case "LANDINGPAD":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_LandingPad;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_LandingPad;
                             }
 
                             break;
                         case "DONTMOVEHERE":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_DontMoveHere;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_DontMoveHere;
                             }
 
                             break;
                         case "INVISIBLE":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Invisible;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Invisible;
                             }
 
                             break;
                         case "SHOWNAME":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_ShowName;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_ShowName;
                             }
 
                             break;
                         case "SHOWFRAME":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_ShowFrame;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_ShowFrame;
                             }
 
                             break;
                         case "SHADOW":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Shadow;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Shadow;
                             }
 
                             break;
                         case "FILL":
-                            if (insideRoom && insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideRoom && insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
-                                workingHotspot.Flags |= HotspotFlags.HS_Fill;
+                                workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Fill;
                             }
 
                             break;
@@ -502,9 +502,9 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideHotspot && workingHotspot.Dest != null)
+                            if (insideHotspot && workingHotspot.SpotInfo.Dest != null)
                             {
-                                workingHotspot.Dest = tokens[1].TryParse<short>(0);
+                                workingHotspot.SpotInfo.Dest = tokens[1].TryParse<short>(0);
                             }
 
                             break;
@@ -514,7 +514,7 @@ namespace ThePalace.Core.Factories
                                 break;
                             }
 
-                            if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                             {
                                 workingHotspot.Vortexes = [];
 
@@ -540,9 +540,9 @@ namespace ThePalace.Core.Factories
                                 var h = coords[0].TryParse<short>(0);
                                 var v = coords[1].TryParse<short>(0);
 
-                                if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                                if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
                                 {
-                                    workingHotspot.Loc = new Point(h, v);
+                                    workingHotspot.SpotInfo.Loc = new Point(h, v);
                                 }
                                 else if (insideProp && workingLooseProp.AssetSpec.Id != NULL_LOOSEPROPREC.AssetSpec.Id)
                                 {
@@ -594,14 +594,17 @@ namespace ThePalace.Core.Factories
                                 {
                                     var state = tokens[j].Split(',');
 
-                                    workingHotspot.States.Add(new HotspotStateRec
+                                    workingHotspot.States.Add(new HotspotStateDesc
                                     {
-                                        PictID = state[0].TryParse<short>(0),
-                                        PicLoc = new Point
+                                        StateInfo = new HotspotStateRec
                                         {
-                                            HAxis = state[1].TryParse<short>(0),
-                                            VAxis = state[2].TryParse<short>(0),
-                                        },
+                                            PictID = state[0].TryParse<short>(0),
+                                            PicLoc = new Point
+                                            {
+                                                HAxis = state[1].TryParse<short>(0),
+                                                VAxis = state[2].TryParse<short>(0),
+                                            },
+                                        }
                                     });
                                 }
                             }
@@ -616,7 +619,7 @@ namespace ThePalace.Core.Factories
             }
         }
 
-        public void Write(bool printHeader = true, params RoomDescRec[] rooms)
+        public void Write(bool printHeader = true, params RoomDesc[] rooms)
         {
             using (var writer = new StreamWriter(_fileStream, Encoding.ASCII))
             {
@@ -688,28 +691,28 @@ namespace ThePalace.Core.Factories
                         {
                             foreach (var hotspot in r.HotSpots)
                             {
-                                writer.WriteLine($"\t{hotspot.Type.GetDescription()}");
+                                writer.WriteLine($"\t{hotspot.SpotInfo.Type.GetDescription()}");
 
-                                if (hotspot.Type == HotspotTypes.HS_LockableDoor || hotspot.Type == HotspotTypes.HS_ShutableDoor) writer.WriteLine("\t\tLOCKABLE");
+                                if (hotspot.SpotInfo.Type == HotspotTypes.HS_LockableDoor || hotspot.SpotInfo.Type == HotspotTypes.HS_ShutableDoor) writer.WriteLine("\t\tLOCKABLE");
 
-                                writer.WriteLine($"\t\tID {hotspot.HotspotID}");
+                                writer.WriteLine($"\t\tID {hotspot.SpotInfo.HotspotID}");
 
-                                if (hotspot.Dest != 0) writer.WriteLine($"\t\tDEST {hotspot.Dest}");
+                                if (hotspot.SpotInfo.Dest != 0) writer.WriteLine($"\t\tDEST {hotspot.SpotInfo.Dest}");
 
                                 if (!string.IsNullOrWhiteSpace(hotspot.Name)) writer.WriteLine($"\t\tID \"{hotspot.Name}\"");
 
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere) writer.WriteLine(CONST_HOTSPOTFLAGS_DONTMOVEHERE);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable) writer.WriteLine(CONST_HOTSPOTFLAGS_DRAGGABLE);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill) writer.WriteLine(CONST_HOTSPOTFLAGS_FILL);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden) writer.WriteLine(CONST_HOTSPOTFLAGS_FORBIDDEN);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible) writer.WriteLine(CONST_HOTSPOTFLAGS_INVISIBLE);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad) writer.WriteLine(CONST_HOTSPOTFLAGS_LANDINGPAD);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory) writer.WriteLine(CONST_HOTSPOTFLAGS_MANDATORY);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow) writer.WriteLine(CONST_HOTSPOTFLAGS_SHADOW);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWFRAME);
-                                if (((HotspotFlags)hotspot.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWNAME);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere) writer.WriteLine(CONST_HOTSPOTFLAGS_DONTMOVEHERE);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable) writer.WriteLine(CONST_HOTSPOTFLAGS_DRAGGABLE);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill) writer.WriteLine(CONST_HOTSPOTFLAGS_FILL);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden) writer.WriteLine(CONST_HOTSPOTFLAGS_FORBIDDEN);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible) writer.WriteLine(CONST_HOTSPOTFLAGS_INVISIBLE);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad) writer.WriteLine(CONST_HOTSPOTFLAGS_LANDINGPAD);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory) writer.WriteLine(CONST_HOTSPOTFLAGS_MANDATORY);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow) writer.WriteLine(CONST_HOTSPOTFLAGS_SHADOW);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWFRAME);
+                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWNAME);
 
-                                if (hotspot.NbrPts > 0 && hotspot.Vortexes?.Count > 0)
+                                if (hotspot.SpotInfo.NbrPts > 0 && hotspot.Vortexes?.Count > 0)
                                 {
                                     writer.Write("\t\tOUTLINE");
 
@@ -721,7 +724,7 @@ namespace ThePalace.Core.Factories
                                     writer.WriteLine();
                                 }
 
-                                writer.WriteLine($"\t\tLOC {hotspot.Loc.HAxis},{hotspot.Loc.VAxis}");
+                                writer.WriteLine($"\t\tLOC {hotspot.SpotInfo.Loc.HAxis},{hotspot.SpotInfo.Loc.VAxis}");
 
                                 if (hotspot.States?.Count > 0)
                                 {
@@ -729,7 +732,7 @@ namespace ThePalace.Core.Factories
 
                                     foreach (var state in hotspot.States)
                                     {
-                                        writer.WriteLine($"\t\t\t{state.PictID},{state.PicLoc.HAxis},{state.PicLoc.VAxis}");
+                                        writer.WriteLine($"\t\t\t{state.StateInfo.PictID},{state.StateInfo.PicLoc.HAxis},{state.StateInfo.PicLoc.VAxis}");
                                     }
 
                                     writer.WriteLine("\t\tENDPICTS");
@@ -744,7 +747,7 @@ namespace ThePalace.Core.Factories
                                     writer.WriteLine("\t\t\tENDSCRIPT");
                                 }
 
-                                writer.WriteLine($"\tEND{hotspot.Type.GetDescription()}");
+                                writer.WriteLine($"\tEND{hotspot.SpotInfo.Type.GetDescription()}");
                             }
                         }
 

@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes.Serialization;
 using sint32 = System.Int32;
 using uint32 = System.UInt32;
 

@@ -4,7 +4,7 @@ using uint32 = System.UInt32;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomDescRec
+    public partial class RoomDesc
     {
         [IgnoreDataMember]
         public bool IsAuthorLocked

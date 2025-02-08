@@ -9,7 +9,7 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomDescRec : IDisposable, IStructSerializer
+    public partial class RoomDesc : IDisposable, IStructSerializer
     {
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
@@ -69,45 +69,45 @@ namespace ThePalace.Core.Entities.Shared
                 {
                     this.Seek(hotspotOfst + Exts.Palace.AttributeExts.GetByteSize<HotspotRec>() * i);
 
-                    var h = new HotspotRec
+                    var h = new HotspotDesc
                     {
                         Vortexes = new(),
                         States = new(),
                     };
                     this.PeekSInt32(); //scriptEventMask
-                    h.Flags = (HotspotFlags)this.PeekSInt32();
+                    h.SpotInfo.Flags = (HotspotFlags)this.PeekSInt32();
                     this.PeekSInt32(); //secureInfo
                     this.PeekSInt32(); //refCon
 
                     var vAxis = this.PeekSInt16();
                     var hAxis = this.PeekSInt16();
-                    h.Loc = new Types.Point(vAxis, hAxis);
+                    h.SpotInfo.Loc = new Types.Point(vAxis, hAxis);
 
-                    h.HotspotID = this.PeekSInt16();
-                    h.Dest = this.PeekSInt16();
-                    h.NbrPts = this.PeekSInt16();
-                    h.PtsOfst = this.PeekSInt16();
-                    h.Type = (HotspotTypes)this.PeekSInt16();
+                    h.SpotInfo.HotspotID = this.PeekSInt16();
+                    h.SpotInfo.Dest = this.PeekSInt16();
+                    h.SpotInfo.NbrPts = this.PeekSInt16();
+                    h.SpotInfo.PtsOfst = this.PeekSInt16();
+                    h.SpotInfo.Type = (HotspotTypes)this.PeekSInt16();
                     this.PeekSInt16(); //groupID
                     this.PeekSInt16(); //nbrScripts
                     this.PeekSInt16(); //scriptRecOfst
-                    h.State = this.PeekSInt16();
-                    h.NbrStates = this.PeekSInt16();
-                    h.StateRecOfst = this.PeekSInt16();
-                    h.NameOfst = this.PeekSInt16();
-                    h.ScriptTextOfst = this.PeekSInt16();
+                    h.SpotInfo.State = this.PeekSInt16();
+                    h.SpotInfo.NbrStates = this.PeekSInt16();
+                    h.SpotInfo.StateRecOfst = this.PeekSInt16();
+                    h.SpotInfo.NameOfst = this.PeekSInt16();
+                    h.SpotInfo.ScriptTextOfst = this.PeekSInt16();
                     this.PeekSInt16(); //alignReserved
 
-                    if (h.NameOfst > 0 && h.NameOfst < this.Count)
-                        h.Name = this.PeekPString(32, 1, h.NameOfst);
+                    if (h.SpotInfo.NameOfst > 0 && h.SpotInfo.NameOfst < this.Count)
+                        h.Name = this.PeekPString(32, 1, h.SpotInfo.NameOfst);
 
-                    if (h.ScriptTextOfst > 0 && h.ScriptTextOfst < this.Count)
-                        h.Script = this.ReadCString(h.ScriptTextOfst);
+                    if (h.SpotInfo.ScriptTextOfst > 0 && h.SpotInfo.ScriptTextOfst < this.Count)
+                        h.Script = this.ReadCString(h.SpotInfo.ScriptTextOfst);
 
-                    if (h.NbrPts > 0 && h.PtsOfst > 0 && h.PtsOfst < this.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.NbrPts)
-                        for (var s = 0; s < h.NbrPts; s++)
+                    if (h.SpotInfo.NbrPts > 0 && h.SpotInfo.PtsOfst > 0 && h.SpotInfo.PtsOfst < this.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.SpotInfo.NbrPts)
+                        for (var s = 0; s < h.SpotInfo.NbrPts; s++)
                         {
-                            this.Seek(h.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
+                            this.Seek(h.SpotInfo.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
 
                             vAxis = this.PeekSInt16();
                             hAxis = this.PeekSInt16();
@@ -116,17 +116,17 @@ namespace ThePalace.Core.Entities.Shared
                             h.Vortexes.Add(p);
                         }
 
-                    for (var s = 0; s < h.NbrStates; s++)
+                    for (var s = 0; s < h.SpotInfo.NbrStates; s++)
                     {
-                        this.Seek(h.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>());
+                        this.Seek(h.SpotInfo.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>());
 
-                        var hs = new HotspotStateRec();
-                        hs.PictID = this.PeekSInt16();
+                        var hs = new HotspotStateDesc();
+                        hs.StateInfo.PictID = this.PeekSInt16();
                         this.PeekSInt16(); //reserved
 
                         vAxis = this.PeekSInt16();
                         hAxis = this.PeekSInt16();
-                        hs.PicLoc = new Types.Point(vAxis, hAxis);
+                        hs.StateInfo.PicLoc = new Types.Point(vAxis, hAxis);
 
                         h.States.Add(hs);
                     }
@@ -182,15 +182,15 @@ namespace ThePalace.Core.Entities.Shared
                 {
                     this.Seek(ofst);
 
-                    var drawCmd = new DrawCmdRec();
-                    ofst = drawCmd.NextOfst = this.PeekSInt16();
+                    var drawCmd = new DrawCmdDesc();
+                    ofst = drawCmd.DrawCmdInfo.NextOfst = this.PeekSInt16();
                     this.PeekSInt16(); //reserved
-                    drawCmd.DrawCmd = this.PeekSInt16();
-                    drawCmd.CmdLength = this.PeekUInt16();
-                    drawCmd.DataOfst = this.PeekSInt16();
+                    drawCmd.DrawCmdInfo.DrawCmd = this.PeekSInt16();
+                    drawCmd.DrawCmdInfo.CmdLength = this.PeekUInt16();
+                    drawCmd.DrawCmdInfo.DataOfst = this.PeekSInt16();
                     drawCmd.Data = this.Data
-                        .Skip(drawCmd.DataOfst)
-                        .Take(drawCmd.CmdLength)
+                        .Skip(drawCmd.DrawCmdInfo.DataOfst)
+                        .Take(drawCmd.DrawCmdInfo.CmdLength)
                         .ToArray();
                     //drawCmd.DeserializeData();
 
@@ -278,18 +278,18 @@ namespace ThePalace.Core.Entities.Shared
 
                             if (!string.IsNullOrEmpty(spot.Script))
                             {
-                                spot.ScriptTextOfst = (short)_blobData.Count;
+                                spot.SpotInfo.ScriptTextOfst = (short)_blobData.Count;
                                 _blobData.WriteCString(spot.Script);
                             }
                             else
-                                spot.ScriptTextOfst = 0;
+                                spot.SpotInfo.ScriptTextOfst = 0;
 
                             //Buffer spot states
-                            spot.NbrStates = (short)(spot.States?.Count ?? 0);
+                            spot.SpotInfo.NbrStates = (short)(spot.States?.Count ?? 0);
 
-                            if (spot.NbrStates > 0)
+                            if (spot.SpotInfo.NbrStates > 0)
                             {
-                                spot.StateRecOfst = (short)(spot.NbrStates > 0 ? _blobData.Count : 0);
+                                spot.SpotInfo.StateRecOfst = (short)(spot.SpotInfo.NbrStates > 0 ? _blobData.Count : 0);
 
                                 using (var ms = new MemoryStream())
                                 {
@@ -306,13 +306,13 @@ namespace ThePalace.Core.Entities.Shared
                                 }
                             }
                             else
-                                spot.StateRecOfst = 0;
+                                spot.SpotInfo.StateRecOfst = 0;
 
-                            spot.PtsOfst = 0;
+                            spot.SpotInfo.PtsOfst = 0;
 
                             if ((spot.Vortexes?.Count ?? 0) > 0)
                             {
-                                spot.PtsOfst = (short)_blobData.Count;
+                                spot.SpotInfo.PtsOfst = (short)_blobData.Count;
 
                                 if ((spot.Vortexes?.Count ?? 0) > 0)
                                 {
@@ -324,38 +324,38 @@ namespace ThePalace.Core.Entities.Shared
                                 }
                             }
                             else
-                                spot.PtsOfst = 0;
+                                spot.SpotInfo.PtsOfst = 0;
 
                             if (!string.IsNullOrEmpty(spot.Name))
                             {
-                                spot.NameOfst = (short)_blobData.Count;
+                                spot.SpotInfo.NameOfst = (short)_blobData.Count;
                                 _blobData.WritePString(spot.Name, 32, 1);
                             }
                             else
-                                spot.NameOfst = 0;
+                                spot.SpotInfo.NameOfst = 0;
 
                             //Buffer spotrecs
-                            tmp.WriteInt32((int)spot.ScriptEventMask);
-                            tmp.WriteInt32((int)spot.Flags);
+                            tmp.WriteInt32((int)spot.SpotInfo.ScriptEventMask);
+                            tmp.WriteInt32((int)spot.SpotInfo.Flags);
                             tmp.WriteInt32(0); //secureInfo
                             tmp.WriteInt32(0); //refCon
 
-                            tmp.WriteInt16(spot.Loc.HAxis);
-                            tmp.WriteInt16(spot.Loc.VAxis);
+                            tmp.WriteInt16(spot.SpotInfo.Loc.HAxis);
+                            tmp.WriteInt16(spot.SpotInfo.Loc.VAxis);
 
-                            tmp.WriteInt16(spot.HotspotID);
-                            tmp.WriteInt16(spot.Dest);
-                            tmp.WriteInt16(spot.NbrPts);
-                            tmp.WriteInt16(spot.PtsOfst);
-                            tmp.WriteInt16((short)spot.Type);
+                            tmp.WriteInt16(spot.SpotInfo.HotspotID);
+                            tmp.WriteInt16(spot.SpotInfo.Dest);
+                            tmp.WriteInt16(spot.SpotInfo.NbrPts);
+                            tmp.WriteInt16(spot.SpotInfo.PtsOfst);
+                            tmp.WriteInt16((short)spot.SpotInfo.Type);
                             tmp.WriteInt16(0); //groupID
                             tmp.WriteInt16(0); //nbrScripts
                             tmp.WriteInt16(0); //scriptRecOfst
-                            tmp.WriteInt16(spot.State);
-                            tmp.WriteInt16(spot.NbrStates);
-                            tmp.WriteInt16(spot.StateRecOfst);
-                            tmp.WriteInt16(spot.NameOfst);
-                            tmp.WriteInt16(spot.ScriptTextOfst);
+                            tmp.WriteInt16(spot.SpotInfo.State);
+                            tmp.WriteInt16(spot.SpotInfo.NbrStates);
+                            tmp.WriteInt16(spot.SpotInfo.StateRecOfst);
+                            tmp.WriteInt16(spot.SpotInfo.NameOfst);
+                            tmp.WriteInt16(spot.SpotInfo.ScriptTextOfst);
                             tmp.WriteInt16(0); //alignReserved
                         }
                     }
@@ -406,15 +406,15 @@ namespace ThePalace.Core.Entities.Shared
                     {
                         for (var i = 0; i < (this.DrawCmds?.Count ?? 0); i++)
                         {
-                            this.DrawCmds[i].CmdLength = (ushort)this.DrawCmds[i].Data.Length;
-                            this.DrawCmds[i].DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
-                            this.DrawCmds[i].NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
+                            this.DrawCmds[i].DrawCmdInfo.CmdLength = (ushort)this.DrawCmds[i].Data.Length;
+                            this.DrawCmds[i].DrawCmdInfo.DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
+                            this.DrawCmds[i].DrawCmdInfo.NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
 
-                            tmp1.WriteInt16(this.DrawCmds[i].NextOfst);
+                            tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.NextOfst);
                             tmp1.WriteInt16(0); //reserved
-                            tmp1.WriteInt16(this.DrawCmds[i].DrawCmd);
-                            tmp1.WriteUInt16(this.DrawCmds[i].CmdLength);
-                            tmp1.WriteInt16(this.DrawCmds[i].DataOfst);
+                            tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.DrawCmd);
+                            tmp1.WriteUInt16(this.DrawCmds[i].DrawCmdInfo.CmdLength);
+                            tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.DataOfst);
                             tmp2.Write(this.DrawCmds[i].Data);
                         }
 

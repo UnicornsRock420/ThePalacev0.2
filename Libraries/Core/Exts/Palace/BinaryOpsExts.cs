@@ -2,7 +2,8 @@
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
+using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Enums.Palace;

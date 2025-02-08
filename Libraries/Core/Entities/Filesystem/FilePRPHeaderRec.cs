@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes.Serialization;
 using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Filesystem

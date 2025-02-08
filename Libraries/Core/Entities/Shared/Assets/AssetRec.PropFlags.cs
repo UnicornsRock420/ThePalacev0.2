@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Interfaces;
 using sint32 = System.Int32;
 using uint16 = System.UInt16;
 

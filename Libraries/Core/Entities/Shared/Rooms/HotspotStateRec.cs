@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Types;
 using sint16 = System.Int16;

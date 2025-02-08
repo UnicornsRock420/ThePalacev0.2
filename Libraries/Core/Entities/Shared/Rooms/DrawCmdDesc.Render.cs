@@ -1,31 +1,31 @@
 ﻿using System.Drawing;
 using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
+using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Enums.Palace;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class DrawCmdRec
+    public partial class DrawCmdDesc
     {
         [IgnoreDataMember]
         public DrawCmdTypes Type
         {
-            get => (DrawCmdTypes)(DrawCmd & 0x00FF);
-            set => DrawCmd = (short)(DrawCmd & 0xFF00 | (short)value & 0x00FF);
+            get => (DrawCmdTypes)(DrawCmdInfo.DrawCmd & 0x00FF);
+            set => DrawCmdInfo.DrawCmd = (short)(DrawCmdInfo.DrawCmd & 0xFF00 | (short)value & 0x00FF);
         }
         [IgnoreDataMember]
         public bool Layer
         {
-            get => (DrawCmd & 0x8000) != 0;
-            set => DrawCmd = (short)(DrawCmd & 0x00FF | (value ? 0x8000 : 0x0000));
+            get => (DrawCmdInfo.DrawCmd & 0x8000) != 0;
+            set => DrawCmdInfo.DrawCmd = (short)(DrawCmdInfo.DrawCmd & 0x00FF | (value ? 0x8000 : 0x0000));
         }
         [IgnoreDataMember]
         public bool Filled
         {
-            get => (DrawCmd & 0x0100) != 0;
-            set => DrawCmd = (short)(DrawCmd & 0x00FF | (value ? 0x0100 : 0x0000));
+            get => (DrawCmdInfo.DrawCmd & 0x0100) != 0;
+            set => DrawCmdInfo.DrawCmd = (short)(DrawCmdInfo.DrawCmd & 0x00FF | (value ? 0x0100 : 0x0000));
         }
 
         [IgnoreDataMember]

@@ -4,22 +4,22 @@ using ThePalace.Core.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class HotspotStateRec : IStructSerializer
+    public partial class HotspotStateDesc : IStructSerializer
     {
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            this.PictID = reader.ReadInt16();
-            this.Reserved = reader.ReadInt16();
+            StateInfo.PictID = reader.ReadInt16();
+            StateInfo.Reserved = reader.ReadInt16();
 
-            this.PicLoc = new Point(reader);
+            StateInfo.PicLoc = new Point(reader);
         }
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            writer.WriteInt16(this.PictID);
-            writer.WriteInt16(this.Reserved);
+            writer.WriteInt16(StateInfo.PictID);
+            writer.WriteInt16(StateInfo.Reserved);
 
-            this.PicLoc.Serialize(ref refNum, writer);
+            StateInfo.PicLoc.Serialize(ref refNum, writer);
         }
     }
 }

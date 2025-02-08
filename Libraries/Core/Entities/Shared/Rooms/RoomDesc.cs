@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes;
+using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Data;
@@ -8,9 +8,9 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomDescRec : RawStream, IStruct, IData
+    public partial class RoomDesc : RawStream, IStruct, IData
     {
-        public RoomDescRec()
+        public RoomDesc()
         {
             this.RoomInfo = new();
 
@@ -19,7 +19,7 @@ namespace ThePalace.Core.Entities.Shared
             this.DrawCmds = new();
             this.LooseProps = new();
         }
-        public RoomDescRec(RoomRec room)
+        public RoomDesc(RoomRec room)
         {
             this.RoomInfo = room;
 
@@ -28,7 +28,7 @@ namespace ThePalace.Core.Entities.Shared
             this.DrawCmds = new();
             this.LooseProps = new();
         }
-        public RoomDescRec(uint8[]? data = null) : base(data)
+        public RoomDesc(uint8[]? data = null) : base(data)
         {
             this.HotSpots = new();
             this.Pictures = new();
@@ -36,7 +36,7 @@ namespace ThePalace.Core.Entities.Shared
             this.LooseProps = new();
         }
 
-        ~RoomDescRec() => this.Dispose();
+        ~RoomDesc() => this.Dispose();
 
         public override void Dispose()
         {
@@ -75,11 +75,11 @@ namespace ThePalace.Core.Entities.Shared
         public string? Password;
 
         [IgnoreDataMember]
-        public List<HotspotRec>? HotSpots;
+        public List<HotspotDesc>? HotSpots;
         [IgnoreDataMember]
         public List<PictureRec>? Pictures;
         [IgnoreDataMember]
-        public List<DrawCmdRec>? DrawCmds;
+        public List<DrawCmdDesc>? DrawCmds;
         [IgnoreDataMember]
         public List<LoosePropRec>? LooseProps;
     }

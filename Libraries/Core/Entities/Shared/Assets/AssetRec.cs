@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Enums.Palace;
@@ -37,7 +37,7 @@ namespace ThePalace.Core.Entities.Shared
         public uint32 BlockSize;
         public uint16 BlockNbr;
         public uint16 NbrBlocks;
-        public AssetDescriptorRec AssetDesc;
+        public AssetDesc AssetDesc;
 
         //public sint32 RHandle;
         //public sint32 LastUseTime;

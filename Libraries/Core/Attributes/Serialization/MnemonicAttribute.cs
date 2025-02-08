@@ -1,6 +1,6 @@
 ﻿using uint32 = System.UInt32;
 
-namespace ThePalace.Core.Attributes
+namespace ThePalace.Core.Attributes.Serialization
 {
     public class MnemonicAttribute(
         string mnemonic) : Attribute

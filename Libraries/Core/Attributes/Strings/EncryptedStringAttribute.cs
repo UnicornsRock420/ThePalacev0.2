@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Enums;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Attributes
+namespace ThePalace.Core.Attributes.Strings
 {
     public class EncryptedStringAttribute(
         sint32 lengthByteSize = 1,

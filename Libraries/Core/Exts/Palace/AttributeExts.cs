@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes;
+﻿using ThePalace.Core.Attributes.Serialization;
 
 namespace ThePalace.Core.Exts.Palace
 {
@@ -7,121 +7,139 @@ namespace ThePalace.Core.Exts.Palace
         public static class Types
         {
             public static readonly Type MnemonicAttribute = typeof(MnemonicAttribute);
-            public static readonly Type BitWidthAttribute = typeof(BitSizeAttribute);
-            public static readonly Type ByteWidthAttribute = typeof(ByteSizeAttribute);
+            public static readonly Type BitSizeAttribute = typeof(BitSizeAttribute);
+            public static readonly Type ByteSizeAttribute = typeof(ByteSizeAttribute);
         }
 
         public static string? GetMnemonic<T>()
         {
+            var attribs = new List<MnemonicAttribute>();
             var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:
-                    return _t
+                    attribs.AddRange(_t
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
-                        ?.Cast<MnemonicAttribute>()
-                        ?.Select(a => a.Mnemonic)
-                        ?.FirstOrDefault();
+                        ?.Cast<MnemonicAttribute>() ?? []);
+                    break;
                 case Type _e when _e is Enum || _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return null;
 
-                    return type
+                    attribs.AddRange(_e
                         ?.GetField(key)
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
-                        ?.Cast<MnemonicAttribute>()
-                        ?.Select(a => a.Mnemonic)
-                        ?.FirstOrDefault() ?? key;
+                        ?.Cast<MnemonicAttribute>() ?? []);
+                    break;
             }
 
-            return null;
+            if (attribs.Count < 1) return null;
+
+            return attribs
+                .Select(a => a.Mnemonic)
+                .FirstOrDefault();
         }
 
         public static uint GetHexValue<T>()
         {
+            var attribs = new List<MnemonicAttribute>();
             var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:
-                    return _t
+                    attribs.AddRange(_t
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
-                        ?.Cast<MnemonicAttribute>()
-                        ?.Select(a => a.HexValue)
-                        ?.FirstOrDefault() ?? 0;
+                        ?.Cast<MnemonicAttribute>() ?? []);
+                    break;
                 case Type _e when _e is Enum || _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 
-                    return _e
+                    attribs.AddRange(_e
                         ?.GetField(key)
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
-                        ?.Cast<MnemonicAttribute>()
-                        ?.Select(a => a.HexValue)
-                        ?.FirstOrDefault() ?? 0;
+                        ?.Cast<MnemonicAttribute>() ?? []);
+                    break;
             }
 
-            return 0;
+            if (attribs.Count < 1) return 0;
+
+            return attribs
+                .Select(a => a.HexValue)
+                .FirstOrDefault();
         }
 
         public static int GetBitSize<T>()
         {
+            var byteAttribs = new List<ByteSizeAttribute>();
+            var bitAttribs = new List<BitSizeAttribute>();
             var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:
-                    return _t
-                        ?.GetCustomAttributes(Types.ByteWidthAttribute, false)
-                        ?.Cast<ByteSizeAttribute>()
-                        ?.Select(a => a.ByteSize * 8)
-                        ?.FirstOrDefault() ?? _t
-                        ?.GetCustomAttributes(Types.BitWidthAttribute, false)
-                        ?.Cast<BitSizeAttribute>()
-                        ?.Select(a => a.BitSize)
-                        ?.FirstOrDefault() ?? 0;
+                    byteAttribs.AddRange(_t
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<ByteSizeAttribute>() ?? []);
+                    bitAttribs.AddRange(_t
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<BitSizeAttribute>() ?? []);
+                    break;
+
+                //?.Select(a => a.ByteSize * 8)
+                //?.FirstOrDefault() ?? _t
+                //?.GetCustomAttributes(Types.BitSizeAttribute, false)
+                //?.Cast<BitSizeAttribute>()
+                //?.Select(a => a.BitSize)
+                //?.FirstOrDefault() ?? 0;
                 case Type _e when _e is Enum || _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 
-                    return _e
+                    byteAttribs.AddRange(_e
                         ?.GetField(key)
-                        ?.GetCustomAttributes(Types.ByteWidthAttribute, false)
-                        ?.Cast<ByteSizeAttribute>()
-                        ?.Select(a => a.ByteSize * 8)
-                        ?.FirstOrDefault() ?? type
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<ByteSizeAttribute>() ?? []);
+                    bitAttribs.AddRange(_e
                         ?.GetField(key)
-                        ?.GetCustomAttributes(Types.BitWidthAttribute, false)
-                        ?.Cast<BitSizeAttribute>()
-                        ?.Select(a => a.BitSize)
-                        ?.FirstOrDefault() ?? 0;
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<BitSizeAttribute>() ?? []);
+                    break;
             }
 
-            return 0;
+            if ((byteAttribs.Count + bitAttribs.Count) < 1) return 0;
+
+            return byteAttribs.Select(a => a.ByteSize * 8)
+                .Union(bitAttribs.Select(a => a.BitSize))
+                .FirstOrDefault();
         }
 
         public static int GetByteSize<T>()
         {
+            var attribs = new List<ByteSizeAttribute>();
             var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:
-                    return _t
-                        ?.GetCustomAttributes(Types.ByteWidthAttribute, false)
-                        ?.Cast<ByteSizeAttribute>()
-                        ?.Select(a => a.ByteSize)
-                        ?.FirstOrDefault() ?? 0;
+                    attribs.AddRange(_t
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<ByteSizeAttribute>() ?? []);
+                    break;
                 case Type _e when _e is Enum || _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 
-                    return type
+                    attribs.AddRange(_e
                         ?.GetField(key)
-                        ?.GetCustomAttributes(Types.ByteWidthAttribute, false)
-                        ?.Cast<ByteSizeAttribute>()
-                        ?.Select(a => a.ByteSize)
-                        ?.FirstOrDefault() ?? 0;
+                        ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
+                        ?.Cast<ByteSizeAttribute>() ?? []);
+                    break;
             }
 
-            return 0;
+            if (attribs.Count < 1) return 0;
+
+            return attribs
+                .Select(a => a.ByteSize)
+                .FirstOrDefault();
         }
 
         //static AttributeExts() { }

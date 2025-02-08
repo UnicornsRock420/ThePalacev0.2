@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Attributes
+﻿namespace ThePalace.Core.Attributes.Strings
 {
     public class Str255Attribute : PStringAttribute
     {

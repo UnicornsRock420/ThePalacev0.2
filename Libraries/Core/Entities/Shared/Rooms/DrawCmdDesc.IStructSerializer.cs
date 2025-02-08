@@ -1,24 +1,25 @@
-﻿using ThePalace.Core.Entities.Network.Shared.Network;
+﻿using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class DrawCmdRec : IStructSerializer
+    public partial class DrawCmdDesc : RawStream, IStructSerializer
     {
         private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.Palace.AttributeExts.GetByteSize<MSG_Header>();
         private static readonly int CONST_INT_SIZEOF_POINT = Exts.Palace.AttributeExts.GetByteSize<Types.Point>();
 
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            NextOfst = reader.ReadInt16();
-            Reserved = reader.ReadInt16();
-            DrawCmd = reader.ReadInt16();
-            CmdLength = reader.ReadUInt16();
-            DataOfst = reader.ReadInt16();
+            DrawCmdInfo.NextOfst = reader.ReadInt16();
+            DrawCmdInfo.Reserved = reader.ReadInt16();
+            DrawCmdInfo.DrawCmd = reader.ReadInt16();
+            DrawCmdInfo.CmdLength = reader.ReadUInt16();
+            DrawCmdInfo.DataOfst = reader.ReadInt16();
 
-            reader.Position = DataOfst + CONST_INT_SIZEOF_MSG_Header;
+            reader.Position = DrawCmdInfo.DataOfst + CONST_INT_SIZEOF_MSG_Header;
 
             switch (Type)
             {
@@ -108,12 +109,12 @@ namespace ThePalace.Core.Entities.Shared
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            writer.WriteInt16(NextOfst);
-            writer.WriteInt16(Reserved);
-            writer.WriteInt16(DrawCmd);
-            writer.WriteUInt16(CmdLength);
-            writer.WriteInt16(DataOfst);
-            writer.Write(Data, 0, CmdLength);
+            writer.WriteInt16(DrawCmdInfo.NextOfst);
+            writer.WriteInt16(DrawCmdInfo.Reserved);
+            writer.WriteInt16(DrawCmdInfo.DrawCmd);
+            writer.WriteUInt16(DrawCmdInfo.CmdLength);
+            writer.WriteInt16(DrawCmdInfo.DataOfst);
+            writer.Write(Data, 0, DrawCmdInfo.CmdLength);
         }
     }
 }

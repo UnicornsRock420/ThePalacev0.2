@@ -4,7 +4,7 @@ using uint16 = System.UInt16;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class UserRec
+    public partial class UserDesc
     {
         [IgnoreDataMember]
         public UserFlags UserFlags;
