@@ -1,11 +1,12 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Network;
 using uint32 = System.UInt32;
 
 namespace ThePalace.Core.Entities.Network.Server.Users
 {
     [Mnemonic("log ")]
-    public partial class MSG_USERLOG : IProtocolS2C
+    public partial class MSG_USERLOG : IntegrationEvent, IProtocolS2C
     {
         public uint32 NbrUsers;
     }

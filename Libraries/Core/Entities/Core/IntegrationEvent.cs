@@ -1,17 +1,27 @@
-﻿using MediatR;
+﻿using System.Runtime.Serialization;
+using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Core.Entities.Core
 {
-    public abstract class IntegrationEvent : INotification
+    public abstract class IntegrationEvent : EventArgs, IEventArgs, IIntegrationEvent
     {
-        public Guid Id { get; }
-
-        public DateTime OccurredOn { get; }
-
-        protected IntegrationEvent(Guid id, DateTime occurredOn)
+        protected IntegrationEvent()
+        {
+            Id = Guid.NewGuid();
+            OccurredOn = DateTime.UtcNow;
+        }
+        protected IntegrationEvent(
+            Guid id,
+            DateTime occurredOn)
         {
             Id = id;
             OccurredOn = occurredOn;
         }
+
+        [IgnoreDataMember]
+        public Guid Id { get; protected set; }
+
+        [IgnoreDataMember]
+        public DateTime OccurredOn { get; protected set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Network;
@@ -7,7 +8,7 @@ using RoomID = System.Int16;
 namespace ThePalace.Core.Entities.Network.Client.Rooms
 {
     [Mnemonic("ofNs")]
-    public partial class MSG_SPOTINFO : IProtocolC2S, IDisposable
+    public partial class MSG_SPOTINFO : IntegrationEvent, IProtocolC2S, IDisposable
     {
         public HotspotRec? SpotInfo;
         public PictureRec[] PictureList;

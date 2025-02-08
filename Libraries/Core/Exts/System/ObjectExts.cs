@@ -120,6 +120,9 @@ namespace System
             return false;
         }
 
+        public static bool Is(this object obj, Type type) =>
+            IsAny(obj, type);
+
         public static bool IsAny(this object obj, params Type[] types)
         {
             var type = obj.GetType();

@@ -1,5 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Network;
 
@@ -7,7 +8,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
     [DynamicSize]
     [Mnemonic("sinf")]
-    public partial class MSG_SERVERINFO : IProtocolS2C
+    public partial class MSG_SERVERINFO : IntegrationEvent, IProtocolS2C
     {
         public ServerPermissions ServerPermissions;
 

@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
@@ -7,7 +8,7 @@ using sint32 = System.Int32;
 namespace ThePalace.Core.Entities.Network.Server.Users
 {
     [Mnemonic("rprs")]
-    public partial class MSG_USERLIST : IStructRefNum, IProtocolS2C
+    public partial class MSG_USERLIST : IntegrationEvent, IStructRefNum, IProtocolS2C
     {
         [RefNum]
         public sint32 RefNum

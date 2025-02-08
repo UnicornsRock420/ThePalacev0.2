@@ -1,15 +1,17 @@
-﻿using ThePalace.Core.Entities.Core;
-
-namespace ThePalace.Core.Interfaces.Core
+﻿namespace ThePalace.Core.Interfaces.Core
 {
     public interface IEventsBus : IDisposable
     {
-        Task Publish<T>(T @event)
-            where T : IntegrationEvent;
+        Task Publish(object? sender, IIntegrationEvent @event);
 
-        void Subscribe<T>(IIntegrationEventHandler<T> handler)
-            where T : IntegrationEvent;
+        void Subscribe(IIntegrationEventHandler handler);
+    }
 
-        void StartConsuming();
+    public interface IEventsBus<T> : IDisposable
+        where T : IIntegrationEvent
+    {
+        Task Publish(object? sender, T @event);
+
+        void Subscribe(IIntegrationEventHandler<T> handler);
     }
 }

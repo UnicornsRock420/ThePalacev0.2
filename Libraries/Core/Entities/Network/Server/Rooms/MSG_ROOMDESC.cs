@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
@@ -8,7 +9,7 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms
 {
     [DynamicSize]
     [Mnemonic("room")]
-    public partial class MSG_ROOMDESC : IStructSerializer, IProtocolS2C
+    public partial class MSG_ROOMDESC : IntegrationEvent, IStructSerializer, IProtocolS2C
     {
         public RoomRec? RoomInfo;
 

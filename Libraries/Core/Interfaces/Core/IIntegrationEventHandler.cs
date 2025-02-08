@@ -1,14 +1,12 @@
-﻿using ThePalace.Core.Entities.Core;
-
-namespace ThePalace.Core.Interfaces.Core
+﻿namespace ThePalace.Core.Interfaces.Core
 {
-    public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
-        where TIntegrationEvent : IntegrationEvent
+    public interface IIntegrationEventHandler
     {
-        Task Handle(TIntegrationEvent @event);
+        Task<object?> Handle(object? sender, IIntegrationEvent @event);
     }
 
-    public interface IIntegrationEventHandler
+    public interface IIntegrationEventHandler<in TIntegrationEvent> : IIntegrationEventHandler
+        where TIntegrationEvent : IIntegrationEvent
     {
     }
 }

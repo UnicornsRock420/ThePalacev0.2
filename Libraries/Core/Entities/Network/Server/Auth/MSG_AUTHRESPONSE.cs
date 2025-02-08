@@ -1,12 +1,13 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Server.Auth
 {
     [Mnemonic("autr")]
-    public partial class MSG_AUTHRESPONSE : IProtocolS2C
+    public partial class MSG_AUTHRESPONSE : IntegrationEvent, IProtocolS2C
     {
         [Str255]
         public string? NameAndPassword;

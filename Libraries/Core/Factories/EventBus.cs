@@ -1,21 +1,20 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Core;
 
-namespace CompanyName.MyMeetings.BuildingBlocks.Infrastructure.EventBus
+namespace ThePalace.Core.Factories
 {
     public sealed class EventBus : IEventsBus
     {
-        private static readonly Type CONST_TYPE_IINTEGRATIONEVENTHANDLER = typeof(IIntegrationEventHandler);
-
-        private readonly IDictionary<string, List<IIntegrationEventHandler>> _handlersDictionary;
+        private readonly ConcurrentDictionary<string, List<IIntegrationEventHandler>> _handlersDictionary;
 
         public static EventBus Instance { get; } = new();
 
         private EventBus()
         {
-            _handlersDictionary = new ConcurrentDictionary<string, List<IIntegrationEventHandler>>();
+            _handlersDictionary = new();
         }
+
+        ~EventBus() => this.Dispose();
 
         public void Dispose()
         {
@@ -23,83 +22,133 @@ namespace CompanyName.MyMeetings.BuildingBlocks.Infrastructure.EventBus
         }
 
         public void Subscribe<T>(IIntegrationEventHandler<T> handler)
-            where T : IntegrationEvent
+            where T : IIntegrationEvent
         {
-            var eventType = typeof(T).FullName;
-            if (eventType != null)
-            {
-                if (!_handlersDictionary.TryAdd(eventType, [handler]))
-                {
-                    _handlersDictionary[eventType].Add(handler);
-                }
-            }
-        }
-
-        public async Task Publish<T>(T @event)
-            where T : IntegrationEvent
-        {
-            var eventType = typeof(T).FullName;
+            var eventType = typeof(T);
             if (eventType == null) return;
 
-            foreach (var integrationEventHandler in _handlersDictionary[eventType])
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
             {
-                if (integrationEventHandler is IIntegrationEventHandler<T> handler)
+                _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
+        public void Subscribe(IIntegrationEventHandler handler)
+        {
+            var eventType = handler.GetType();
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
+            {
+                _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
+        public async Task Publish<T>(object? sender, T @event)
+            where T : IIntegrationEvent
+        {
+            var eventType = typeof(T);
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+
+            var handlers = _handlersDictionary[eventTypeName];
+            if (handlers.Count < 1) return;
+
+            foreach (var eventHandler in handlers)
+            {
+                if (eventHandler is IIntegrationEventHandler<T> handler)
                 {
-                    await handler.Handle(@event);
+                    await eventHandler.Handle(sender, @event);
                 }
             }
         }
 
-        //public async Task Publish(object @event)
-        //{
-        //    var eventType = @event.GetType();
-        //    if (eventType == null) return;
-
-        //    var eventTypeName = eventType.FullName;
-
-        //    if (eventType.DeclaringType != typeof(IntegrationEvent)) return;
-
-        //    foreach (var integrationEventHandler in _handlersDictionary[eventTypeName])
-        //    {
-        //        var handlerType = _handlersDictionary[eventTypeName]
-        //            .Where(i =>
-        //            {
-        //                var t = i.GetType();
-
-        //                if (t.IsInterface) return false;
-
-        //                var itrfs = t.GetInterfaces();
-
-        //                if (!itrfs.Contains(CONST_TYPE_IINTEGRATIONEVENTHANDLER)) return false;
-
-        //                if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(eventType))) return false;
-
-        //                return true;
-        //            })
-        //            .Select(i1 =>
-        //            {
-        //                var t = i1.GetType();
-
-        //                foreach (var i2 in t.GetInterfaces() ?? [])
-        //                    if (i2 == CONST_TYPE_IINTEGRATIONEVENTHANDLER)
-        //                        return t;
-
-        //                return null;
-        //            })
-        //            .FirstOrDefault();
-
-        //        if (handlerType == null) continue;
-
-        //        var handler = (IIntegrationEventHandler)handlerType.GetInstance();
-        //        if (handler == null) continue;
-
-        //        await handler.Handle(@event);
-        //    }
-        //}
-
-        public void StartConsuming()
+        public async Task Publish(object? sender, IIntegrationEvent @event)
         {
-            throw new NotImplementedException();
+            var eventType = @event.GetType();
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+
+            var handlers = _handlersDictionary[eventTypeName];
+            if (handlers.Count < 1) return;
+
+            foreach (var eventHandler in handlers)
+            {
+                if (@event.Is(eventType))
+                {
+                    await eventHandler.Handle(sender, @event);
+                }
+            }
+        }
+    }
+
+    public class EventBus<T> : IEventsBus<T>
+        where T : IIntegrationEvent
+    {
+        private readonly ConcurrentDictionary<string, List<IIntegrationEventHandler<T>>> _handlersDictionary;
+
+        public static EventBus<T> Instance { get; } = new();
+
+        private EventBus()
+        {
+            _handlersDictionary = new();
+        }
+
+        ~EventBus() => this.Dispose();
+
+        public void Dispose()
+        {
+            _handlersDictionary?.Clear();
+        }
+
+        public void Subscribe(IIntegrationEventHandler<T> handler)
+        {
+            var eventType = typeof(T);
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
+            {
+                _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
+        public async Task Publish(object? sender, T @event)
+        {
+            var eventType = typeof(T);
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+
+            var handlers = _handlersDictionary[eventTypeName];
+            if (handlers.Count < 1) return;
+
+            foreach (var eventHandler in handlers)
+            {
+                if (eventHandler is IIntegrationEventHandler<T> handler)
+                {
+                    await eventHandler.Handle(sender, @event);
+                }
+            }
         }
     }
 }

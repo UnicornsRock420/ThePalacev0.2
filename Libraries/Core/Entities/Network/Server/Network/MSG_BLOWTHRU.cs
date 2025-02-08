@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
@@ -9,7 +10,7 @@ namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [DynamicSize]
     [Mnemonic("blow")]
-    public partial class MSG_BLOWTHRU : IStructSerializer, IProtocolS2C
+    public partial class MSG_BLOWTHRU : IntegrationEvent, IStructSerializer, IProtocolS2C
     {
         public uint32 PluginTag;
         public uint8[] Embedded;

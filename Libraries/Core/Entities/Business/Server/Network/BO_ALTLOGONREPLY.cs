@@ -1,14 +1,14 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.Network;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Business.Server.Network
 {
     [Mnemonic("rep2")]
-    public partial class BO_ALTLOGONREPLY : IProtocolHandler<MSG_ALTLOGONREPLY>
+    public partial class BO_ALTLOGONREPLY : IIntegrationEventHandler<MSG_ALTLOGONREPLY>
     {
-        public Task<object?> Handle(ProtocolEventArgs eventArgs)
+        public async Task<object?> Handle(object? sender, IIntegrationEvent @event)
         {
             throw new NotImplementedException();
         }

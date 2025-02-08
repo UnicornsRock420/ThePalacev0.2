@@ -3,6 +3,7 @@ using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
@@ -45,8 +46,8 @@ namespace Sandbox
             InitializeComponent();
         }
 
-        private static readonly Type CONST_TYPE_IPROTOCOLHANDLER = typeof(IProtocolHandler);
-        private static void DispatchBO(object msg)
+        private static readonly Type CONST_TYPE_IINTEGRATIONEVENTHANDLER = typeof(IIntegrationEventHandler);
+        private static void DispatchBO(IIntegrationEvent msg)
         {
             var msgType = msg.GetType();
 
@@ -60,7 +61,7 @@ namespace Sandbox
 
                             var itrfs = t.GetInterfaces();
 
-                            if (!itrfs.Contains(CONST_TYPE_IPROTOCOLHANDLER)) return false;
+                            if (!itrfs.Contains(CONST_TYPE_IINTEGRATIONEVENTHANDLER)) return false;
 
                             if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
 
@@ -69,23 +70,25 @@ namespace Sandbox
                 .Select(t =>
                 {
                     foreach (var i in t.GetInterfaces() ?? [])
-                        if (i == CONST_TYPE_IPROTOCOLHANDLER)
+                        if (i == CONST_TYPE_IINTEGRATIONEVENTHANDLER)
                             return t;
 
                     return null;
                 })
                 .FirstOrDefault();
 
-            var boObj = boType?.GetInstance<IProtocolHandler>();
+            var boObj = boType?.GetInstance<IIntegrationEventHandler>();
             if (boObj != null)
             {
-                boObj.Handle(new ProtocolEventArgs
-                {
-                    SourceID = 0,
-                    RefNum = 123,
-                    Request = (IProtocol?)msg,
-                    SessionState = null,
-                });
+                boObj.Handle(
+                    new { },
+                    new ProtocolEventArgs
+                    {
+                        SourceID = 0,
+                        RefNum = 123,
+                        Request = (IProtocol?)msg,
+                        SessionState = null,
+                    });
             }
         }
 
