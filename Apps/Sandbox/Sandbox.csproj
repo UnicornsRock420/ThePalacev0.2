@@ -15,8 +15,6 @@
     <ProjectReference Include="..\..\Libraries\Logging\ThePalace.Logging.csproj" />
     <ProjectReference Include="..\..\Libraries\Network\ThePalace.Network.csproj" />
     <ProjectReference Include="..\..\Libraries\Server\ThePalace.Common.Server.csproj" />
-    <ProjectReference Include="..\..\Modules\Database\SqliteDbs\ThePalace.Database.SqliteDbs.csproj" />
-    <ProjectReference Include="..\..\Modules\Database\SqlServerDbs\ThePalace.Database.SqlServerDbs.csproj" />
     <ProjectReference Include="..\..\Modules\Media\DirectX\ThePalace.Media.DirectX.csproj" />
     <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj" />
     <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />

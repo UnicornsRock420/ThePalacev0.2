@@ -4,7 +4,6 @@ namespace ThePalace.Common.Desktop.Constants
 {
     public static partial class RegexConstants
     {
-        // General:
         [GeneratedRegex(@"^[;](.*)$", RegexOptions.Singleline | RegexOptions.Compiled)]
         private static partial Regex _regex_visible();
         public static readonly Regex REGEX_VISIBLE = _regex_visible();

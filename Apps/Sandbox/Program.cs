@@ -1,10 +1,8 @@
-using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Events;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
-using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
@@ -45,6 +43,50 @@ namespace Sandbox
         public Program()
         {
             InitializeComponent();
+        }
+
+        private static readonly Type CONST_TYPE_IPROTOCOLHANDLER = typeof(IProtocolHandler);
+        private static void DispatchBO(object msg)
+        {
+            var msgType = msg.GetType();
+
+            var boType = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t =>
+                    t.GetTypes()
+                        .Where(t =>
+                        {
+                            if (t.IsInterface) return false;
+
+                            var itrfs = t.GetInterfaces();
+
+                            if (!itrfs.Contains(CONST_TYPE_IPROTOCOLHANDLER)) return false;
+
+                            if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
+
+                            return true;
+                        }))
+                .Select(t =>
+                {
+                    foreach (var i in t.GetInterfaces() ?? [])
+                        if (i == CONST_TYPE_IPROTOCOLHANDLER)
+                            return t;
+
+                    return null;
+                })
+                .FirstOrDefault();
+
+            var boObj = boType?.GetInstance<IProtocolHandler>();
+            if (boObj != null)
+            {
+                boObj.Handle(new ProtocolEventArgs
+                {
+                    SourceID = 0,
+                    RefNum = 123,
+                    Request = (IProtocol?)msg,
+                    SessionState = null,
+                });
+            }
         }
 
         private static void Experiment1()
@@ -110,39 +152,7 @@ namespace Sandbox
                 }
             }
 
-            var boType = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                .Where(t => !t.IsInterface)
-                .Where(t =>
-                {
-                    var itrfs = t.GetInterfaces();
-
-                    return
-                        itrfs.Contains(typeof(IProtocolHandler)) &&
-                        itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType));
-                })
-                .Select(t =>
-                {
-                    foreach (var i in t.GetInterfaces() ?? [])
-                        if (i == typeof(IProtocolHandler))
-                            return t;
-
-                    return null;
-                })
-                .FirstOrDefault();
-
-            var boObj = boType?.GetInstance<IProtocolHandler>();
-            if (boObj != null)
-            {
-                boObj.Handle(new ProtocolEventArgs
-                {
-                    SourceID = 0,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
-                    SessionState = null,
-                });
-            }
+            DispatchBO(msg);
         }
     }
 }

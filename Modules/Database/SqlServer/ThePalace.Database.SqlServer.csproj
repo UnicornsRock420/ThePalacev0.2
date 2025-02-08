@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Dapper.Extensions.MSSQL" Version="5.2.0" />
+    <PackageReference Include="Dapper.StrongName" Version="2.1.66" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\ThePalace.Database.Core.csproj" />
+  </ItemGroup>
+
+</Project>

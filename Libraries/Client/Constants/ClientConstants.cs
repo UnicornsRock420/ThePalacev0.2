@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Constants
+﻿namespace ThePalace.Common.Client.Constants
 {
     public static class ClientConstants
     {
