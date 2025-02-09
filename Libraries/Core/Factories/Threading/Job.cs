@@ -10,8 +10,7 @@ namespace ThePalace.Core.Factories.Threading
             None = 0,
             BreakOnError = 0x01,
             RunOnce = 0x02,
-            RunUntilCancelled = 0x04,
-            UseManualResetEvent = 0x08,
+            UseManualResetEvent = 0x04,
         }
 
         public partial class RunLog
@@ -100,7 +99,7 @@ namespace ThePalace.Core.Factories.Threading
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
-        public object JobState { get; set; }
+        public object? JobState { get; set; }
 
         public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
         public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
@@ -113,9 +112,7 @@ namespace ThePalace.Core.Factories.Threading
         public async Task<int> Run()
         {
             var doBreakOnError = JobOptions.BreakOnError.IsBit<JobOptions, int>(_opts);
-            var doRunRunOnce =
-                JobOptions.RunOnce.IsBit<JobOptions, int>(_opts) &&
-                !JobOptions.RunUntilCancelled.IsBit<JobOptions, int>(_opts);
+            var doRunRunOnce = JobOptions.RunOnce.IsBit<JobOptions, int>(_opts);
             var doUseManualResetEvent = JobOptions.UseManualResetEvent.IsBit<JobOptions, int>(_opts);
 
             if (doUseManualResetEvent)
