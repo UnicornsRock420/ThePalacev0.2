@@ -55,7 +55,9 @@ namespace ThePalace.Core.Factories.Threading
                 .ContinueWith(
                     t =>
                     {
-                        t.Exception?.Handle(e => true);
+                        t.Exception?.Handle(e =>
+                            e is OperationCanceledException &&
+                            _token.IsCancellationRequested);
 #if DEBUG
                         Console.WriteLine("You have canceled the task");
 #endif
