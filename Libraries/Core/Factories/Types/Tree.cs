@@ -69,13 +69,21 @@
                 var @ref = Parent;
                 while (@ref != null)
                 {
-                    result.Add(Id);
-                    @ref = Parent;
+                    result.Add(@ref.Id);
+
+                    @ref = @ref.Parent;
                 }
 
                 result.Reverse();
                 return result;
             }
+        }
+
+        public List<T> GetAll(Tree<T>? node = null)
+        {
+            if ((this?.Children?.Count ?? 0) < 1) return [];
+
+            return new List<T>(GetAll(this.Children));
         }
     }
 }

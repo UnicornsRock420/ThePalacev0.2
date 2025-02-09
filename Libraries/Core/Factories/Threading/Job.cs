@@ -9,9 +9,10 @@ namespace ThePalace.Core.Factories.Threading
         {
             None = 0,
             BreakOnError = 0x01,
-            RunOnce = 0x02,
-            UseSleepInterval = 0x04,
-            UseManualResetEvent = 0x08,
+            RunNow = 0x02,
+            RunOnce = 0x04,
+            UseSleepInterval = 0x08,
+            UseManualResetEvent = 0x10,
         }
 
         public partial class RunLog
@@ -178,7 +179,14 @@ namespace ThePalace.Core.Factories.Threading
                 }
                 else if (doUseSleepInterval)
                 {
+                    var timer = DateTime.UtcNow;
+
                     await Task.Delay(SleepInterval);
+
+                    if (DateTime.UtcNow.Subtract(timer).TotalMilliseconds < (SleepInterval.TotalMilliseconds * 0.70))
+                    {
+                        Thread.Sleep(SleepInterval);
+                    }
                 }
             }
 
