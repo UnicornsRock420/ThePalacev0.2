@@ -50,10 +50,19 @@ namespace ThePalace.Core.Factories.Threading
 
         public void Dispose()
         {
+            try { _manualResetEvent?.Dispose(); } catch { }
+            try { _token?.Dispose(); } catch { }
+            try { Task?.Dispose(); } catch { }
+
             Children?.ForEach(c => { try { c?.Dispose(); } catch { } });
             Children?.Clear();
             Children?.Dispose();
             Children = null;
+
+            _runLogs?.Clear();
+            _runLogs = null;
+
+            JobState = null;
 
             GC.SuppressFinalize(this);
         }
