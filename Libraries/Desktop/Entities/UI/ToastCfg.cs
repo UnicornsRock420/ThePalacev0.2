@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Common.Desktop.Entities.UI
 {
 #if WINDOWS10_0_17763_0_OR_GREATER
     public partial class ToastCfg

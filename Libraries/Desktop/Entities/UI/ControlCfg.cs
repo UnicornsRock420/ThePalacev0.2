@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms.Design.Behavior;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Common.Desktop.Entities.UI
 {
     public delegate EventHandler Event(object sender, EventArgs e);
     public delegate MouseEventHandler MouseEvent(object sender, MouseEventArgs e);

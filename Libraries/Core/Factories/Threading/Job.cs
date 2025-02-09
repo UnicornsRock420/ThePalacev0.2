@@ -1,8 +1,8 @@
-﻿using ThePalace.Core.Factories.Types;
+﻿using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Core.Factories.Threading
 {
-    public partial class Job : Tree<Job>, IDisposable
+    public partial class Job : IDisposable
     {
         [Flags]
         public enum JobOptions : int
@@ -26,7 +26,8 @@ namespace ThePalace.Core.Factories.Threading
 
         private Job()
         {
-            _token = new();
+            _token = CancellationTokenFactory.NewToken();
+            _subJobs = new();
             _runLogs = new();
             _errors = new();
 
@@ -41,7 +42,7 @@ namespace ThePalace.Core.Factories.Threading
             JobState = null;
         }
 
-        public Job(Action? cmd = null, object? jobState = null, JobOptions opts = JobOptions.UseSleepInterval) : this()
+        public Job(Action? cmd = null, IJobState? jobState = null, JobOptions opts = JobOptions.UseSleepInterval) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
@@ -72,11 +73,14 @@ namespace ThePalace.Core.Factories.Threading
 
         ~Job() => this.Dispose();
 
-        public override void Dispose()
+        public void Dispose()
         {
             try { _manualResetEvent?.Dispose(); } catch { }
             try { _token?.Dispose(); } catch { }
             try { Task?.Dispose(); } catch { }
+
+            _subJobs?.ForEach(j => { try { j?.Dispose(); } catch { } });
+            _subJobs?.Clear();
 
             _runLogs?.ForEach(l => { try { l.Exception = null; } catch { } });
             _runLogs?.Clear();
@@ -86,8 +90,6 @@ namespace ThePalace.Core.Factories.Threading
             _errors = null;
 
             JobState = null;
-
-            base.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -105,6 +107,8 @@ namespace ThePalace.Core.Factories.Threading
 
         protected readonly CancellationTokenSource _token;
         public CancellationToken Token => _token.Token;
+        private readonly List<Job> _subJobs;
+        public IReadOnlyList<Job> SubJobs => _subJobs.AsReadOnly();
 
         public JobOptions Options { get; set; }
         public readonly Guid Id;
@@ -113,7 +117,7 @@ namespace ThePalace.Core.Factories.Threading
         public int Failures { get; protected set; }
         protected readonly ManualResetEvent _manualResetEvent;
         public TimeSpan SleepInterval { get; set; }
-        public object? JobState { get; set; }
+        public IJobState? JobState { get; set; }
 
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
@@ -191,6 +195,17 @@ namespace ThePalace.Core.Factories.Threading
             }
 
             return Failures > 0 ? -1 : 0;
+        }
+
+        public async Task Fork(int threadCount = 1)
+        {
+            if (threadCount < 1) return;
+
+            for (var j = threadCount; j > 0; j--)
+            {
+                var subJob = new Job(Cmd, JobState, Options);
+                _subJobs.Add(subJob);
+            }
         }
     }
 }

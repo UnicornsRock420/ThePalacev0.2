@@ -30,7 +30,8 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         private static readonly CancellationTokenSource _globalToken;
-        private readonly Root<Job> _jobs;
+        private readonly Dictionary<Guid, Job> _jobs;
+        public IReadOnlyDictionary<Guid, Job> Jobs => _jobs.AsReadOnly();
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
@@ -38,11 +39,7 @@ namespace ThePalace.Core.Factories.Threading
         {
             var job = new Job(cmd, jobState, opts);
 
-            var xPath = job.XPath;
-            xPath.Add(job.Id);
-
-            _jobs.Journal.Add(job.Id, xPath);
-            _jobs.Children.Add(job);
+            _jobs.Add(job.Id, job);
 
             if (Job.JobOptions.RunNow.IsSet<JobOptions, int>(opts))
             {
@@ -52,47 +49,22 @@ namespace ThePalace.Core.Factories.Threading
             return job.Task;
         }
 
-        public bool Cancel(Guid jobId, bool cascade = false)
+        public bool Cancel(Guid jobId, bool cascade = true)
         {
-            if (!_jobs.Journal.ContainsKey(jobId)) return false;
+            if (!_jobs.ContainsKey(jobId)) return false;
 
-            var jobs = new List<Job>();
+            var jobs = new List<Job>{ _jobs[jobId] };
 
             if (cascade)
             {
-                var xPath = _jobs.Journal[jobId];
-
-                var node = GetNode(_jobs.Children, xPath);
-
-                jobs.AddRange(node.SelectMany(n => n.Children));
+                jobs.AddRange(
+                    _jobs[jobId].SubJobs
+                        .SelectMany(n => n.SubJobs ?? []));
             }
 
             jobs.ForEach(j => j.Cancel());
 
             return true;
-        }
-
-        public static Tree<Job> GetNode(Tree<Job> node, List<Guid> xPath)
-        {
-            var result = (Tree<Job>?)node;
-
-            foreach (var id in xPath)
-            {
-                if (result == null ||
-                    result.Count < 1) break;
-
-                foreach (var job in result.Children)
-                {
-                    if (job.Id == id)
-                    {
-                        result = result.Children;
-
-                        break;
-                    }
-                }
-            }
-
-            return result;
         }
 
         public void Shutdown()
