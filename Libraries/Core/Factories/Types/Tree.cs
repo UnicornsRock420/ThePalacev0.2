@@ -2,12 +2,6 @@
 {
     public class Tree<T> : List<T>, IDisposable
     {
-        protected bool IsDisposed { get; private set; } = false;
-
-        public Guid Id { get; internal set; } = Guid.NewGuid();
-
-        public Tree<T> Children = [];
-
         ~Tree() => Dispose(false);
 
         public void Dispose()
@@ -19,7 +13,13 @@
             GC.SuppressFinalize(this);
         }
 
+        public Guid Id { get; internal set; } = Guid.NewGuid();
+        public Guid ParentId { get; internal set; }
+
+        public Tree<T> Children = [];
+
         // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected bool IsDisposed { get; private set; } = false;
         protected virtual void Dispose(bool disposing)
         {
             if (IsDisposed) return;
@@ -65,13 +65,13 @@
             GC.SuppressFinalize(this);
         }
 
-        protected bool IsDisposed { get; private set; } = false;
-
         public TKey Id { get; internal set; }
+        public TKey ParentId { get; internal set; }
 
         public Tree<TKey, TValue> Children = [];
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected bool IsDisposed { get; private set; } = false;
         protected virtual void Dispose(bool disposing)
         {
             if (IsDisposed) return;
