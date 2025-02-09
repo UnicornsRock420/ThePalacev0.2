@@ -92,10 +92,11 @@ namespace ThePalace.Core.Factories.Threading
         private readonly Task _task;
         public Task Task => _task;
 
-        private const int _logLimit = 20;
+        private const int _CONST_INT_LOGLIMIT = 20;
         private List<RunLog> _runLogs;
         public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
 
+        private const int _CONST_INT_ERRORLIMIT = 20;
         private List<Exception> _errors;
         public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
@@ -104,6 +105,7 @@ namespace ThePalace.Core.Factories.Threading
         public CancellationToken Token => _token.Token;
 
         public readonly Guid Id;
+        public int SleepInterval { get; set; } = 1500;
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
@@ -151,10 +153,13 @@ namespace ThePalace.Core.Factories.Threading
                     IsRunning = false;
                     Failures++;
 
+                    if (_errors.Count >= _CONST_INT_LOGLIMIT)
+                        _errors.RemoveAt(0);
+
                     _errors.Add(ex);
                 }
 
-                if (_runLogs.Count >= _logLimit)
+                if (_runLogs.Count >= _CONST_INT_ERRORLIMIT)
                     _runLogs.RemoveAt(0);
 
                 _runLogs.Add(runLog);
@@ -163,12 +168,16 @@ namespace ThePalace.Core.Factories.Threading
 
                 if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
 
+                Token.ThrowIfCancellationRequested();
+
                 if (doUseManualResetEvent)
                 {
                     WaitOne();
                 }
-
-                Token.ThrowIfCancellationRequested();
+                else
+                {
+                    Thread.Sleep(SleepInterval);
+                }
             }
 
             return Failures > 0 ? -1 : 0;
