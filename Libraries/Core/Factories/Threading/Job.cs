@@ -19,6 +19,7 @@ namespace ThePalace.Core.Factories.Threading
             public DateTime Start { get; set; }
             public DateTime? Finish { get; set; }
             public DateTime? Error { get; set; }
+            public Exception? Exception { get; set; }
             public TimeSpan Duration => (Finish ?? Error ?? DateTime.UtcNow).Subtract(Start);
         }
 
@@ -47,12 +48,20 @@ namespace ThePalace.Core.Factories.Threading
                 _manualResetEvent = new(false);
             }
 
-            _task = Task.Run(_cmd = cmd, _token.Token);
+            _task = Task
+                .Run(_cmd = cmd, _token.Token)
+                .ContinueWith(t =>
+                {
+                    t.Exception?.Handle(e => true);
+#if DEBUG
+                    Console.WriteLine("You have canceled the task");
+#endif
+                }, TaskContinuationOptions.OnlyOnCanceled);
         }
 
         ~Job() => this.Dispose();
 
-        public void Dispose()
+        public override void Dispose()
         {
             try { _manualResetEvent?.Dispose(); } catch { }
             try { _token?.Dispose(); } catch { }
@@ -63,6 +72,7 @@ namespace ThePalace.Core.Factories.Threading
             Children?.Dispose();
             Children = null;
 
+            _runLogs?.ForEach(l => { try { l.Exception = null; } catch { } });
             _runLogs?.Clear();
             _runLogs = null;
 
@@ -70,6 +80,8 @@ namespace ThePalace.Core.Factories.Threading
             _errors = null;
 
             JobState = null;
+
+            base.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -93,6 +105,9 @@ namespace ThePalace.Core.Factories.Threading
         public int Failures { get; private set; }
 
         public object JobState { get; set; }
+
+        public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
+        public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
@@ -132,9 +147,12 @@ namespace ThePalace.Core.Factories.Threading
                 catch (Exception ex)
                 {
                     runLog.Error = DateTime.UtcNow;
+                    runLog.Exception = ex;
 
                     IsRunning = false;
                     Failures++;
+
+                    _errors.Add(ex);
                 }
 
                 if (_runLogs.Count >= _logLimit)
@@ -150,6 +168,8 @@ namespace ThePalace.Core.Factories.Threading
                 {
                     WaitOne();
                 }
+
+                Token.ThrowIfCancellationRequested();
             }
 
             return Failures > 0 ? -1 : 0;

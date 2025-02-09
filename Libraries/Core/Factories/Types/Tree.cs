@@ -18,7 +18,7 @@
 
         ~Tree() => Dispose(false);
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (IsDisposed) return;
 
