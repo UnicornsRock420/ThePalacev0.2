@@ -52,13 +52,15 @@ namespace ThePalace.Core.Factories.Threading
 
             _task = Task
                 .Run(_cmd = cmd, _token.Token)
-                .ContinueWith(t =>
-                {
-                    t.Exception?.Handle(e => true);
+                .ContinueWith(
+                    t =>
+                    {
+                        t.Exception?.Handle(e => true);
 #if DEBUG
-                    Console.WriteLine("You have canceled the task");
+                        Console.WriteLine("You have canceled the task");
 #endif
-                }, TaskContinuationOptions.OnlyOnCanceled);
+                    },
+                    TaskContinuationOptions.OnlyOnCanceled);
         }
 
         ~Job() => this.Dispose();
