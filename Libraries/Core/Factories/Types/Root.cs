@@ -14,12 +14,11 @@
             GC.SuppressFinalize(this);
         }
 
-        protected bool IsDisposed { get; private set; } = false;
-
         public Dictionary<TKey, List<TKey>> Journal = [];
         public Tree<TValue> Children = [];
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
+        protected bool IsDisposed { get; private set; } = false;
         protected virtual void Dispose(bool disposing)
         {
             if (IsDisposed) return;

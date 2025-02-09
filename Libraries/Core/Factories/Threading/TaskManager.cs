@@ -2,45 +2,6 @@
 
 namespace ThePalace.Core.Factories.Threading
 {
-    public partial class Job : IDisposable
-    {
-        private Job() { }
-
-        public Job(Action? cmd = null)
-        {
-            if (cmd == null) throw new ArgumentNullException(nameof(cmd));
-
-            _cmd = cmd;
-        }
-
-        ~Job() => this.Dispose();
-
-        public void Dispose() { }
-
-        private readonly Action _cmd = null;
-
-        public int Counter { get; private set; } = 0;
-        public int Failures { get; private set; } = 0;
-
-        public int Run()
-        {
-            Counter++;
-
-            try
-            {
-                _cmd();
-
-                return 0;
-            }
-            catch (Exception ex)
-            {
-                Failures++;
-
-                return -1;
-            }
-        }
-    }
-
     public partial class TaskManager : Singleton<TaskManager>, IDisposable
     {
         static TaskManager()
