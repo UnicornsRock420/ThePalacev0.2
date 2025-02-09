@@ -1,6 +1,6 @@
 ﻿using ThePalace.Common.Desktop.Interfaces;
 
-namespace ThePalace.Client.Desktop.Entities
+namespace ThePalace.Common.Desktop.Forms.Core
 {
     public class ModalDialog<T> : FormBase, IFormResult<T>
     {

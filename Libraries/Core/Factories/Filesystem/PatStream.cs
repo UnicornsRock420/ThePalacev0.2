@@ -626,7 +626,7 @@ namespace ThePalace.Core.Factories.Filesystem
                 if (printHeader)
                 {
                     var entrance = rooms
-                        .Where(r => RoomFlags.DropZone.IsBit<RoomFlags, RoomFlags, short>(r.RoomInfo.RoomFlags))
+                        .Where(r => RoomFlags.DropZone.IsSet<RoomFlags, RoomFlags, short>(r.RoomInfo.RoomFlags))
                         .OrderBy(r => r.RoomInfo.RoomID)
                         .FirstOrDefault();
 

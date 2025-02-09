@@ -10,7 +10,8 @@ namespace ThePalace.Core.Factories.Threading
             None = 0,
             BreakOnError = 0x01,
             RunOnce = 0x02,
-            UseManualResetEvent = 0x04,
+            UseSleepInterval = 0x04,
+            UseManualResetEvent = 0x08,
         }
 
         public partial class RunLog
@@ -35,23 +36,26 @@ namespace ThePalace.Core.Factories.Threading
             Completions = 0;
             Failures = 0;
 
+            SleepInterval = TimeSpan.FromMilliseconds(1500);
             JobState = null;
         }
 
-        public Job(Action? cmd = null, object? jobState = null, JobOptions opts = JobOptions.None) : this()
+        public Job(Action? cmd = null, object? jobState = null, JobOptions opts = JobOptions.UseSleepInterval) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
             JobState = jobState;
-            _opts = opts;
+            Options = opts;
 
-            if (JobOptions.UseManualResetEvent.IsBit<JobOptions, int>(_opts))
+            if (JobOptions.UseManualResetEvent.IsSet<JobOptions, int>(Options))
             {
                 _manualResetEvent = new(false);
             }
 
-            _task = Task
-                .Run(_cmd = cmd, _token.Token)
+            Task = Task
+                .Run(
+                    Cmd = cmd,
+                    _token.Token)
                 .ContinueWith(
                     t =>
                     {
@@ -87,10 +91,8 @@ namespace ThePalace.Core.Factories.Threading
             GC.SuppressFinalize(this);
         }
 
-        private JobOptions _opts;
-        private readonly Action? _cmd;
-        private readonly Task _task;
-        public Task Task => _task;
+        internal readonly Action Cmd;
+        public readonly Task Task;
 
         private const int _CONST_INT_LOGLIMIT = 20;
         private List<RunLog> _runLogs;
@@ -100,17 +102,17 @@ namespace ThePalace.Core.Factories.Threading
         private List<Exception> _errors;
         public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
-        protected readonly ManualResetEvent _manualResetEvent;
         protected readonly CancellationTokenSource _token;
         public CancellationToken Token => _token.Token;
 
+        public JobOptions Options { get; set; }
         public readonly Guid Id;
-        public int SleepInterval { get; set; } = 1500;
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
+        protected readonly ManualResetEvent _manualResetEvent;
+        public TimeSpan SleepInterval { get; set; }
         public object? JobState { get; set; }
-
 
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
@@ -119,9 +121,10 @@ namespace ThePalace.Core.Factories.Threading
 
         public async Task<int> Run()
         {
-            var doBreakOnError = JobOptions.BreakOnError.IsBit<JobOptions, int>(_opts);
-            var doRunRunOnce = JobOptions.RunOnce.IsBit<JobOptions, int>(_opts);
-            var doUseManualResetEvent = JobOptions.UseManualResetEvent.IsBit<JobOptions, int>(_opts);
+            var doBreakOnError = JobOptions.BreakOnError.IsSet<JobOptions, int>(Options);
+            var doRunRunOnce = JobOptions.RunOnce.IsSet<JobOptions, int>(Options);
+            var doUseSleepInterval = JobOptions.UseSleepInterval.IsSet<JobOptions, int>(Options);
+            var doUseManualResetEvent = JobOptions.UseManualResetEvent.IsSet<JobOptions, int>(Options);
 
             if (doUseManualResetEvent)
             {
@@ -138,7 +141,7 @@ namespace ThePalace.Core.Factories.Threading
 
                 try
                 {
-                    _task.Start();
+                    Task.Start();
 
                     runLog.Finish = DateTime.UtcNow;
 
@@ -148,7 +151,6 @@ namespace ThePalace.Core.Factories.Threading
                 catch (Exception ex)
                 {
                     runLog.Error = DateTime.UtcNow;
-                    runLog.Exception = ex;
 
                     IsRunning = false;
                     Failures++;
@@ -156,7 +158,7 @@ namespace ThePalace.Core.Factories.Threading
                     if (_errors.Count >= _CONST_INT_LOGLIMIT)
                         _errors.RemoveAt(0);
 
-                    _errors.Add(ex);
+                    _errors.Add(runLog.Exception = ex);
                 }
 
                 if (_runLogs.Count >= _CONST_INT_ERRORLIMIT)
@@ -174,9 +176,9 @@ namespace ThePalace.Core.Factories.Threading
                 {
                     WaitOne();
                 }
-                else
+                else if (doUseSleepInterval)
                 {
-                    Thread.Sleep(SleepInterval);
+                    await Task.Delay(SleepInterval);
                 }
             }
 

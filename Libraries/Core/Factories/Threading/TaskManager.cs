@@ -11,7 +11,6 @@ namespace ThePalace.Core.Factories.Threading
 
         public TaskManager()
         {
-            _tokens = new();
             _jobs = new();
         }
 
@@ -30,8 +29,7 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         private static readonly CancellationTokenSource _globalToken;
-        private Root<CancellationTokenSource> _tokens;
-        private readonly List<Job> _jobs;
+        private readonly Root<Job> _jobs;
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 

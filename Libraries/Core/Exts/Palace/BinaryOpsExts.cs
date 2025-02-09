@@ -424,7 +424,7 @@ namespace ThePalace.Core.Exts.Palace
                 return;
             }
 
-            var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
+            var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
             var members = objType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -544,21 +544,21 @@ namespace ThePalace.Core.Exts.Palace
 
                                 if (pString is EncryptedStringAttribute encryptedString)
                                 {
-                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
                                     {
                                         buffer = buffer.GetString().FromHex();
                                     }
 
-                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
                                     {
                                         buffer = buffer.DecryptBytes();
                                     }
-                                    else if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    else if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
                                     {
                                         buffer = buffer.EncryptBytes();
                                     }
 
-                                    if (encryptedString.DeserializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
                                     {
                                         buffer = buffer.ToHex().GetBytes();
                                     }
@@ -693,8 +693,8 @@ namespace ThePalace.Core.Exts.Palace
 
             var streamPosition = writer.Position;
 
-            var doRefNumOnly = opts.IsBit<SerializerOptions, byte>(SerializerOptions.RefNumOnly);
-            var doSwap = opts.IsBit<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
+            var doRefNumOnly = opts.IsSet<SerializerOptions, byte>(SerializerOptions.RefNumOnly);
+            var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
             var members = objType
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -845,21 +845,21 @@ namespace ThePalace.Core.Exts.Palace
 
                                 if (pString is EncryptedStringAttribute encryptedString)
                                 {
-                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
+                                    if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
                                     {
                                         buffer = buffer.GetString().FromHex();
                                     }
 
-                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
+                                    if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
                                     {
                                         buffer = buffer.DecryptBytes();
                                     }
-                                    else if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
+                                    else if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
                                     {
                                         buffer = buffer.EncryptBytes();
                                     }
 
-                                    if (encryptedString.SerializeOptions.IsBit<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
+                                    if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
                                     {
                                         buffer = buffer.ToHex().GetBytes();
                                     }
@@ -957,7 +957,7 @@ namespace ThePalace.Core.Exts.Palace
             }
             if ((msgBytes?.Length ?? 0) < 1) msgBytes = null;
 
-            if (opts.IsBit<SerializerOptions, byte>(SerializerOptions.IncludeHeader))
+            if (opts.IsSet<SerializerOptions, byte>(SerializerOptions.IncludeHeader))
             {
                 var hdr = new MSG_Header
                 {

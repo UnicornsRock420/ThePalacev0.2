@@ -13,7 +13,7 @@
         //{
         //}
 
-        public static bool IsBit<TStruct, TCast>(this TStruct? bits, TStruct? flags)
+        public static bool IsSet<TStruct, TCast>(this TStruct? bits, TStruct? flags)
             where TStruct : struct
             where TCast : struct
         {
@@ -88,7 +88,7 @@
 
             return false;
         }
-        public static bool IsBit<TEnum, TCast>(this TEnum? bits, TEnum? flags)
+        public static bool IsSet<TEnum, TCast>(this TEnum? bits, TEnum? flags)
             where TEnum : Enum
             where TCast : struct
         {
@@ -162,7 +162,7 @@
 
             return false;
         }
-        public static bool IsBit<TEnum, TFlags, TCast>(this TEnum? bits, TFlags? flags)
+        public static bool IsSet<TEnum, TFlags, TCast>(this TEnum? bits, TFlags? flags)
             where TEnum : Enum
             where TFlags : struct
             where TCast : struct
