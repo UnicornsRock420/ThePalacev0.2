@@ -4,12 +4,11 @@ namespace ThePalace.Common.Desktop.Forms.Core
 {
     public class FormBase : Form
     {
-        public FormBase() => _cursor = new Cursor(Cursor.Current.Handle);
+        public FormBase() { }
 
         ~FormBase() => base.Dispose(false);
 
-        private readonly Cursor _cursor;
-        public Cursor Cursor => _cursor;
+        public Cursor Cursor => Cursor.Current;
 
         public IUISessionState SessionState;
 
