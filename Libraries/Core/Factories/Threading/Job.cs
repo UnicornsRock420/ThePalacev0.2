@@ -89,9 +89,13 @@ namespace ThePalace.Core.Factories.Threading
         private readonly Action? _cmd;
         private readonly Task _task;
         public Task Task => _task;
+
         private const int _logLimit = 20;
         private List<RunLog> _runLogs;
+        public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
+
         private List<Exception> _errors;
+        public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
         protected readonly ManualResetEvent _manualResetEvent;
         protected readonly CancellationTokenSource _token;
@@ -103,8 +107,6 @@ namespace ThePalace.Core.Factories.Threading
         public int Failures { get; protected set; }
         public object? JobState { get; set; }
 
-        public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
-        public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
