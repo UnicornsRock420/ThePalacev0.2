@@ -30,16 +30,21 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         private static readonly CancellationTokenSource _globalToken;
-        private Root<Guid, CancellationTokenSource> _subTokens;
-        private readonly List<Task> _jobs;
+        private Root<CancellationTokenSource> _subTokens;
+        private readonly List<Job> _jobs;
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
-        public Task CreateTask(Action cmd)
+        public Task CreateTask(Action cmd, bool start = true)
         {
-            var task = Task.Factory.StartNew(cmd);
+            var job = new Job(cmd);
 
-            return task;
+            if (start)
+            {
+                job.Task.Start();
+            }
+
+            return job.Task;
         }
 
         public void Shutdown()

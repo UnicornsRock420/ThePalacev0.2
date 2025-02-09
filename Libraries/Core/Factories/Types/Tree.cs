@@ -2,6 +2,20 @@
 {
     public class Tree<T> : List<T>, IDisposable
     {
+        public Tree()
+        {
+            Parent = null;
+            ParentId = null;
+            Id = Guid.NewGuid();
+
+            Children = new(Id, this);
+        }
+        internal Tree(Guid id, Tree<T>? parentNode = null) : this()
+        {
+            Parent = parentNode;
+            ParentId = id;
+        }
+
         ~Tree() => Dispose(false);
 
         public void Dispose()
@@ -12,11 +26,6 @@
 
             GC.SuppressFinalize(this);
         }
-
-        public Guid Id { get; internal set; } = Guid.NewGuid();
-        public Guid ParentId { get; internal set; }
-
-        public Tree<T> Children = [];
 
         // The bulk of the clean-up code is implemented in Dispose(bool)
         protected bool IsDisposed { get; private set; } = false;
@@ -41,58 +50,11 @@
 
             IsDisposed = true;
         }
-    }
 
-    public partial class Tree<TKey, TValue> : List<TValue>, IDisposable
-    {
-        public Tree()
-        {
-            Id = default;
-        }
-        public Tree(TKey id)
-        {
-            Id = id;
-        }
+        public readonly Guid? ParentId;
+        public readonly Guid Id;
 
-        ~Tree() => Dispose(false);
-
-        public void Dispose()
-        {
-            if (IsDisposed) return;
-
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
-        }
-
-        public TKey Id { get; internal set; }
-        public TKey ParentId { get; internal set; }
-
-        public Tree<TKey, TValue> Children = [];
-
-        // The bulk of the clean-up code is implemented in Dispose(bool)
-        protected bool IsDisposed { get; private set; } = false;
-        protected virtual void Dispose(bool disposing)
-        {
-            if (IsDisposed) return;
-
-            if (disposing)
-            {
-                if (typeof(TValue).GetInterfaces().Contains(typeof(IDisposable)))
-                {
-                    Children
-                        ?.Where(c => c is IDisposable)
-                        ?.Cast<IDisposable>()
-                        ?.ToList()
-                        ?.ForEach(c => { try { c?.Dispose(); } catch { } });
-                }
-
-                Children?.Clear();
-                Children?.Dispose(true);
-                Children = null;
-            }
-
-            IsDisposed = true;
-        }
+        public Tree<T> Parent { get; protected set; }
+        public Tree<T> Children { get; protected set; }
     }
 }
