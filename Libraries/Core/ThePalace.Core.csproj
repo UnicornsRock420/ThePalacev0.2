@@ -22,9 +22,9 @@
     <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
     <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
-    <Compile Remove="Types\PropPIDSStream.cs" />
-    <Compile Remove="Types\PropPROPSStream.cs" />
-    <Compile Remove="Types\PropPRPStream.cs" />
+    <Compile Remove="Factories\Filesystem\PropPIDSStream.cs" />
+    <Compile Remove="Factories\Filesystem\PropPROPSStream.cs" />
+    <Compile Remove="Factories\Filesystem\PropPRPStream.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,8 +47,11 @@
     <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
     <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
     <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
-    <None Include="Factories\LockContext.cs" />
-    <None Include="Factories\Singleton.cs" />
+    <None Include="Factories\Filesystem\PropPIDSStream.cs" />
+    <None Include="Factories\Filesystem\PropPROPSStream.cs" />
+    <None Include="Factories\Filesystem\PropPRPStream.cs" />
+    <None Include="Factories\Types\LockContext.cs" />
+    <None Include="Factories\Types\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -126,12 +129,6 @@
     <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
     <PackageReference Include="System.Threading.Timer" Version="4.3.0" />
     <PackageReference Include="System.Windows.Extensions" Version="9.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Types\PropPIDSStream.cs" />
-    <None Include="Types\PropPROPSStream.cs" />
-    <None Include="Types\PropPRPStream.cs" />
   </ItemGroup>
 
   <ItemGroup>

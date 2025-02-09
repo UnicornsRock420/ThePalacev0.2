@@ -5,7 +5,7 @@ using ThePalace.Core.Factories;
 using ThePalace.Core.Models.Protocols;
 using ThePalace.Core.Utility;
 
-namespace ThePalace.Core.Types
+namespace ThePalace.Core.Factories.Filesystem
 {
     public partial class PropPROPSStream : StreamBase
     {

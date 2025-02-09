@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ThePalace.Core.Factories
+﻿namespace ThePalace.Core.Factories
 {
     public class Singleton<T>
         where T : class, new()

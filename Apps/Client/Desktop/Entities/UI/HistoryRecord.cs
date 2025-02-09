@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ThePalace.Client.Desktop.Entities.UI
+namespace ThePalace.Client.Desktop.Entities
 {
     public partial class HistoryRecord
     {

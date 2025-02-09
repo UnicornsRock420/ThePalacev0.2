@@ -1,12 +1,9 @@
-﻿namespace ThePalace.Core.Factories
+﻿namespace ThePalace.Core.Factories.Types
 {
-    public class Tree<T> : List<T>, IDisposable
+    public partial class Root<TKey, TValue> : IDisposable
+        where TKey : notnull
     {
-        protected bool IsDisposed { get; private set; } = false;
-
-        public Tree<T> Children = [];
-
-        ~Tree() => Dispose(false);
+        ~Root() => Dispose(false);
 
         public void Dispose()
         {
@@ -17,6 +14,11 @@
             GC.SuppressFinalize(this);
         }
 
+        protected bool IsDisposed { get; private set; } = false;
+
+        public Dictionary<TKey, List<TKey>> Journal = [];
+        public Tree<TValue> Children = [];
+
         // The bulk of the clean-up code is implemented in Dispose(bool)
         protected virtual void Dispose(bool disposing)
         {
@@ -24,16 +26,20 @@
 
             if (disposing)
             {
-                if (typeof(T).GetInterfaces().Contains(typeof(IDisposable)))
+                if (typeof(TValue).GetInterfaces().Contains(typeof(IDisposable)))
                 {
                     Children
+                        ?.Where(c => c is IDisposable)
                         ?.Cast<IDisposable>()
                         ?.ToList()
                         ?.ForEach(c => { try { c?.Dispose(); } catch { } });
                 }
 
+                Journal?.Clear();
+                Journal = null;
+
                 Children?.Clear();
-                Children?.Dispose(true);
+                Children?.Dispose();
                 Children = null;
             }
 

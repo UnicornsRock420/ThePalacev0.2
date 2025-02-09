@@ -1,7 +1,6 @@
-﻿using ThePalace.Client.Desktop.Entities.UI;
-using ThePalace.Common.Desktop.Interfaces;
+﻿using ThePalace.Common.Desktop.Interfaces;
 
-namespace ThePalace.Client.Desktop.Entities.Threads.UI
+namespace ThePalace.Client.Desktop.Entities
 {
     public class FormDialog : FormBase, IFormDialog
     {

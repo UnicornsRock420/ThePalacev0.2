@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Core.Interfaces.Core;
 
-namespace ThePalace.Core.Factories
+namespace ThePalace.Core.Factories.Types
 {
     public sealed class EventBus : IEventsBus
     {
@@ -14,7 +14,7 @@ namespace ThePalace.Core.Factories
             _handlersDictionary = new();
         }
 
-        ~EventBus() => this.Dispose();
+        ~EventBus() => Dispose();
 
         public void Dispose()
         {
@@ -108,7 +108,7 @@ namespace ThePalace.Core.Factories
             _handlersDictionary = new();
         }
 
-        ~EventBus() => this.Dispose();
+        ~EventBus() => Dispose();
 
         public void Dispose()
         {

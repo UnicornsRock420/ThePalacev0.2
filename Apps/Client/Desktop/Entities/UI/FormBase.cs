@@ -1,6 +1,6 @@
 ﻿using ThePalace.Common.Desktop.Interfaces;
 
-namespace ThePalace.Client.Desktop.Entities.UI
+namespace ThePalace.Client.Desktop.Entities
 {
     public class FormBase : Form
     {

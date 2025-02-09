@@ -8,7 +8,7 @@ using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Types;
 
-namespace ThePalace.Core.Factories
+namespace ThePalace.Core.Factories.Filesystem
 {
     public partial class PatStream : StreamBase
     {
@@ -36,14 +36,14 @@ namespace ThePalace.Core.Factories
         private static readonly Regex REGEX_WHITESPACE = new Regex(@"\s+", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
         private static readonly Regex REGEX_TOKENS = new Regex(@"^[a-z]+\s+""(.*)""$", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
 
-        private static readonly RoomDesc NULL_ROOMREC = default(RoomDesc);
-        private static readonly HotspotDesc NULL_HOTSPOTREC = default(HotspotDesc);
-        private static readonly PictureRec NULL_PICTUREREC = default(PictureRec);
-        private static readonly LoosePropRec NULL_LOOSEPROPREC = default(LoosePropRec);
+        private static readonly RoomDesc NULL_ROOMREC = default;
+        private static readonly HotspotDesc NULL_HOTSPOTREC = default;
+        private static readonly PictureRec NULL_PICTUREREC = default;
+        private static readonly LoosePropRec NULL_LOOSEPROPREC = default;
 
         public PatStream() { }
         ~PatStream() =>
-            this.Dispose();
+            Dispose();
 
         public override void Dispose() =>
             base.Dispose();
@@ -649,14 +649,14 @@ namespace ThePalace.Core.Factories
 
                         if (r.MaxOccupancy > 0) writer.WriteLine($"\tMAXMEMBERS {r.MaxOccupancy}");
 
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps) writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.Private) == RoomFlags.Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
-                        if (((RoomFlags)r.RoomInfo.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone) writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone) writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden) writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests) writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps) writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting) writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.Private) == RoomFlags.Private) writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
+                        if ((r.RoomInfo.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly) writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
 
                         writer.WriteLine($"\tNAME \"{r.Name}\"");
                         if (!string.IsNullOrWhiteSpace(r.Picture?.ToString())) writer.WriteLine($"\tPICT \"{r.Picture?.ToString()}\"");
@@ -701,16 +701,16 @@ namespace ThePalace.Core.Factories
 
                                 if (!string.IsNullOrWhiteSpace(hotspot.Name)) writer.WriteLine($"\t\tID \"{hotspot.Name}\"");
 
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere) writer.WriteLine(CONST_HOTSPOTFLAGS_DONTMOVEHERE);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable) writer.WriteLine(CONST_HOTSPOTFLAGS_DRAGGABLE);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill) writer.WriteLine(CONST_HOTSPOTFLAGS_FILL);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden) writer.WriteLine(CONST_HOTSPOTFLAGS_FORBIDDEN);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible) writer.WriteLine(CONST_HOTSPOTFLAGS_INVISIBLE);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad) writer.WriteLine(CONST_HOTSPOTFLAGS_LANDINGPAD);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory) writer.WriteLine(CONST_HOTSPOTFLAGS_MANDATORY);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow) writer.WriteLine(CONST_HOTSPOTFLAGS_SHADOW);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWFRAME);
-                                if (((HotspotFlags)hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWNAME);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere) writer.WriteLine(CONST_HOTSPOTFLAGS_DONTMOVEHERE);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable) writer.WriteLine(CONST_HOTSPOTFLAGS_DRAGGABLE);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill) writer.WriteLine(CONST_HOTSPOTFLAGS_FILL);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden) writer.WriteLine(CONST_HOTSPOTFLAGS_FORBIDDEN);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible) writer.WriteLine(CONST_HOTSPOTFLAGS_INVISIBLE);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad) writer.WriteLine(CONST_HOTSPOTFLAGS_LANDINGPAD);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory) writer.WriteLine(CONST_HOTSPOTFLAGS_MANDATORY);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow) writer.WriteLine(CONST_HOTSPOTFLAGS_SHADOW);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWFRAME);
+                                if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName) writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWNAME);
 
                                 if (hotspot.SpotInfo.NbrPts > 0 && hotspot.Vortexes?.Count > 0)
                                 {

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Helpers
+﻿namespace ThePalace.Core.Factories.Types
 {
     sealed public class TCF : IDisposable
     {

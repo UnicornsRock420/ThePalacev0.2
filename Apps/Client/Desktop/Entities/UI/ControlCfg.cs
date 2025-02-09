@@ -1,17 +1,21 @@
 ﻿using System.Windows.Forms.Design.Behavior;
 
-namespace ThePalace.Client.Desktop.Entities.Threads.UI
+namespace ThePalace.Client.Desktop.Entities
 {
     public delegate EventHandler Event(object sender, EventArgs e);
+    public delegate MouseEventHandler MouseEvent(object sender, MouseEventArgs e);
+    public delegate ScrollEventHandler ScrollEvent(object sender, ScrollEventArgs e);
+    public delegate BehaviorDragDropEventHandler DragDropEvent(object sender, BehaviorDragDropEventArgs e);
 
     public class ControlCfg
     {
         public int TabIndex;
-        public string Text;
+        public string? Title;
         public Size Size;
         public Padding Margin;
         public Padding Padding;
-        public Point Location;
+        public Point WindowLocation;
+        public Point MouseLocation;
         public Color BackColor;
         public Color ForeColor;
         public bool Visible = true;

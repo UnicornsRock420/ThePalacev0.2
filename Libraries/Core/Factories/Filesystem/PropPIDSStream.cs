@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Factories;
 
-namespace ThePalace.Core.Types
+namespace ThePalace.Core.Factories.Filesystem
 {
     public partial class PropPIDSStream : StreamBase
     {

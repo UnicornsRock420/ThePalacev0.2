@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Client.Desktop.Entities.Threads.UI
+﻿namespace ThePalace.Client.Desktop.Entities
 {
     public partial class ComboboxItem
     {

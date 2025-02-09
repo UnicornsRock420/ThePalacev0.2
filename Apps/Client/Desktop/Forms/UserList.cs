@@ -1,4 +1,4 @@
-﻿using ThePalace.Client.Desktop.Entities.UI;
+﻿using ThePalace.Client.Desktop.Entities;
 
 namespace ThePalace.Core.Desktop.Plugins.Forms
 {

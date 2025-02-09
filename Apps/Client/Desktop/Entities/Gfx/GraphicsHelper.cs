@@ -42,6 +42,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
         private List<GHDrawCmd> _drawCmds = new();
         private List<Point> _points = new();
 
+        private GraphicsHelper() { }
         public GraphicsHelper(Graphics g)
         {
             _location = new Point(0, 0);

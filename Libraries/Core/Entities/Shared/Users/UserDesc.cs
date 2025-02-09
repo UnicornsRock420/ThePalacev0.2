@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.Serialization;
-using ThePalace.Core.Helpers;
+using ThePalace.Core.Factories.Types;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared
