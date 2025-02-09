@@ -7,8 +7,6 @@
             Parent = null;
             ParentId = null;
             Id = Guid.NewGuid();
-
-            Children = new(Id, this);
         }
         internal Tree(Guid id, Tree<T>? parentNode = null) : this()
         {
@@ -37,15 +35,15 @@
             {
                 if (typeof(T).GetInterfaces().Contains(typeof(IDisposable)))
                 {
-                    Children
+                    _children
                         ?.Cast<IDisposable>()
                         ?.ToList()
                         ?.ForEach(c => { try { c?.Dispose(); } catch { } });
                 }
 
-                Children?.Clear();
-                Children?.Dispose(true);
-                Children = null;
+                _children?.Clear();
+                _children?.Dispose(true);
+                _children = null;
             }
 
             IsDisposed = true;
@@ -55,6 +53,29 @@
         public readonly Guid Id;
 
         public Tree<T> Parent { get; protected set; }
-        public Tree<T> Children { get; protected set; }
+
+        protected Tree<T> _children;
+        public Tree<T> Children => _children ??= new(Id, this);
+
+        public List<Guid> XPath
+        {
+            get
+            {
+                var result = new List<Guid>
+                {
+                    Id
+                };
+
+                var @ref = Parent;
+                while (@ref != null)
+                {
+                    result.Add(Id);
+                    @ref = Parent;
+                }
+
+                result.Reverse();
+                return result;
+            }
+        }
     }
 }

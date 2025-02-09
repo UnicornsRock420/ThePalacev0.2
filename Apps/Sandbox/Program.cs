@@ -38,7 +38,7 @@ namespace Sandbox
             //var container = new DIContainer();
             //container.RegisterTypes(iStructTypes);
 
-            Experiment1();
+            //Experiment1();
         }
 
         public Program()

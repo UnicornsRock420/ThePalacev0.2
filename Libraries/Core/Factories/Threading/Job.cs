@@ -30,17 +30,20 @@ namespace ThePalace.Core.Factories.Threading
             _errors = new();
 
             Id = Guid.NewGuid();
+
             IsRunning = false;
+
             Completions = 0;
             Failures = 0;
 
-            Children = new(Id);
+            JobState = null;
         }
 
-        public Job(Action? cmd = null, JobOptions opts = JobOptions.None) : this()
+        public Job(Action? cmd = null, object? jobState = null, JobOptions opts = JobOptions.None) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
+            JobState = jobState;
             _opts = opts;
 
             if (JobOptions.UseManualResetEvent.IsBit<JobOptions, int>(_opts))
@@ -66,11 +69,6 @@ namespace ThePalace.Core.Factories.Threading
             try { _manualResetEvent?.Dispose(); } catch { }
             try { _token?.Dispose(); } catch { }
             try { Task?.Dispose(); } catch { }
-
-            Children?.ForEach(c => { try { c?.Dispose(); } catch { } });
-            Children?.Clear();
-            Children?.Dispose();
-            Children = null;
 
             _runLogs?.ForEach(l => { try { l.Exception = null; } catch { } });
             _runLogs?.Clear();
@@ -99,11 +97,9 @@ namespace ThePalace.Core.Factories.Threading
         public CancellationToken Token => _token.Token;
 
         public readonly Guid Id;
-
-        public bool IsRunning { get; private set; }
-        public int Completions { get; private set; }
-        public int Failures { get; private set; }
-
+        public bool IsRunning { get; protected set; }
+        public int Completions { get; protected set; }
+        public int Failures { get; protected set; }
         public object JobState { get; set; }
 
         public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
