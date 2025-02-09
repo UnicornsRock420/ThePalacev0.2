@@ -2,74 +2,94 @@
 {
     public partial class LockContext : IDisposable
     {
-        protected object? _LockObj = null;
-        protected bool _HasLock = false;
+        protected object? _lockObj;
+        protected bool _hasLock;
 
-        public bool HasLock => _HasLock;
+        public bool HasLock => _hasLock;
 
-        private LockContext() { }
-        public LockContext(object? obj = null)
+        private LockContext()
         {
-            _LockObj = obj ?? new();
-            _HasLock = false;
+            _hasLock = false;
         }
-        ~LockContext() =>
-            this.Dispose();
-
-        public static LockContext GetLock(object? obj = null)
+        public LockContext(object? obj = null) : this()
         {
-            var result = new LockContext(obj);
-            result.Lock();
-            return result;
+            _lockObj = obj ?? new();
         }
+
+        ~LockContext() => this.Dispose();
 
         public void Dispose()
         {
             Unlock();
 
-            _LockObj = null;
+            _lockObj = null;
 
             GC.SuppressFinalize(this);
         }
 
+        public static LockContext GetLock(object? obj = null, bool tryLock = false)
+        {
+            var result = (LockContext?)null;
+
+            if (obj is LockContext _lockContext)
+            {
+                result = _lockContext;
+            }
+            else
+            {
+                result = new LockContext(obj);
+            }
+
+            if (tryLock)
+            {
+                result.TryLock();
+            }
+            else
+            {
+                result.Lock();
+            }
+
+            return result;
+        }
+
         public bool Lock()
         {
-            if (_LockObj == null) return false;
-            if (_HasLock) return true;
+            if (_lockObj == null) return false;
+            if (_hasLock) return true;
 
-            Monitor.Enter(_LockObj, ref _HasLock);
+            Monitor.Enter(_lockObj, ref _hasLock);
 
-            return _HasLock;
+            return _hasLock;
         }
 
         public bool TryLock(int millisecondsTimeout = 0)
         {
-            if (_LockObj == null) return false;
-            if (_HasLock) return true;
+            if (_lockObj == null) return false;
+            if (_hasLock) return true;
 
             if (millisecondsTimeout > 0)
             {
-                Monitor.TryEnter(_LockObj, millisecondsTimeout, ref _HasLock);
+                Monitor.TryEnter(_lockObj, millisecondsTimeout, ref _hasLock);
             }
             else
             {
-                Monitor.TryEnter(_LockObj, ref _HasLock);
+                Monitor.TryEnter(_lockObj, ref _hasLock);
             }
 
-            return _HasLock;
+            return _hasLock;
         }
 
         public bool Unlock()
         {
-            if (_LockObj != null &&
-                _HasLock)
+            if (_lockObj != null &&
+                _hasLock)
             {
-                Monitor.Exit(_LockObj);
+                Monitor.Exit(_lockObj);
 
-                _HasLock = false;
+                _hasLock = false;
             }
 
-            return _HasLock;
+            return _hasLock;
         }
     }
 }

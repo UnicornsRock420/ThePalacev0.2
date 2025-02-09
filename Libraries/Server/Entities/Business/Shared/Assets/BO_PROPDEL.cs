@@ -1,0 +1,15 @@
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Network.Client.Assets;
+using ThePalace.Core.Interfaces.Core;
+
+namespace ThePalace.Common.Server.Entities.Business.Shared.Assets
+{
+    [Mnemonic("dPrp")]
+    public partial class BO_PROPDEL : IEventHandler<MSG_PROPDEL>
+    {
+        public async Task<object?> Handle(object? sender, IEventParams @event)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
