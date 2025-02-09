@@ -9,8 +9,9 @@ namespace ThePalace.Core.Factories.Threading
         {
             None = 0,
             BreakOnError = 0x01,
-            RunUntilCancelled = 0x02,
-            UseManualResetEvent = 0x04,
+            RunOnce = 0x02,
+            RunUntilCancelled = 0x04,
+            UseManualResetEvent = 0x08,
         }
 
         public partial class RunLog
@@ -24,9 +25,12 @@ namespace ThePalace.Core.Factories.Threading
         private Job()
         {
             _token = new();
+            _runLogs = new();
+            _errors = new();
 
             Id = Guid.NewGuid();
-            Counter = 0;
+            IsRunning = false;
+            Completions = 0;
             Failures = 0;
 
             Children = new(Id);
@@ -43,7 +47,7 @@ namespace ThePalace.Core.Factories.Threading
                 _manualResetEvent = new(false);
             }
 
-            Task = Task.Run(_cmd = cmd);
+            _task = Task.Run(_cmd = cmd, _token.Token);
         }
 
         ~Job() => this.Dispose();
@@ -62,6 +66,9 @@ namespace ThePalace.Core.Factories.Threading
             _runLogs?.Clear();
             _runLogs = null;
 
+            _errors?.Clear();
+            _errors = null;
+
             JobState = null;
 
             GC.SuppressFinalize(this);
@@ -69,7 +76,11 @@ namespace ThePalace.Core.Factories.Threading
 
         private JobOptions _opts;
         private readonly Action? _cmd;
-        public readonly Task Task;
+        private readonly Task _task;
+        public Task Task => _task;
+        private const int _logLimit = 20;
+        private List<RunLog> _runLogs;
+        private List<Exception> _errors;
 
         protected readonly ManualResetEvent _manualResetEvent;
         protected readonly CancellationTokenSource _token;
@@ -77,19 +88,23 @@ namespace ThePalace.Core.Factories.Threading
 
         public readonly Guid Id;
 
-        public int Counter { get; private set; }
+        public bool IsRunning { get; private set; }
+        public int Completions { get; private set; }
         public int Failures { get; private set; }
 
         public object JobState { get; set; }
 
-        private const int _logLimit = 20;
-        private List<RunLog> _runLogs;
-        public int Run()
-        {
-            Counter++;
+        public void Set() => _manualResetEvent?.Set();
+        public void Reset() => _manualResetEvent?.Reset();
+        public void WaitOne() => _manualResetEvent?.WaitOne();
+        public void Cancel() => _token.Cancel();
 
+        public async Task<int> Run()
+        {
             var doBreakOnError = JobOptions.BreakOnError.IsBit<JobOptions, int>(_opts);
-            var doRunUntilCancelled = JobOptions.RunUntilCancelled.IsBit<JobOptions, int>(_opts);
+            var doRunRunOnce =
+                JobOptions.RunOnce.IsBit<JobOptions, int>(_opts) &&
+                !JobOptions.RunUntilCancelled.IsBit<JobOptions, int>(_opts);
             var doUseManualResetEvent = JobOptions.UseManualResetEvent.IsBit<JobOptions, int>(_opts);
 
             if (doUseManualResetEvent)
@@ -103,29 +118,33 @@ namespace ThePalace.Core.Factories.Threading
                 {
                     Start = DateTime.UtcNow,
                 };
+                IsRunning = true;
 
                 try
                 {
-                    _cmd();
+                    _task.Start();
 
                     runLog.Finish = DateTime.UtcNow;
 
-                    if (!doRunUntilCancelled) return 0;
+                    IsRunning = false;
+                    Completions++;
                 }
                 catch (Exception ex)
                 {
                     runLog.Error = DateTime.UtcNow;
 
+                    IsRunning = false;
                     Failures++;
-
-                    if (!doRunUntilCancelled ||
-                        doBreakOnError) return -1;
                 }
 
                 if (_runLogs.Count >= _logLimit)
                     _runLogs.RemoveAt(0);
 
                 _runLogs.Add(runLog);
+
+                if (doRunRunOnce && runLog.Finish.HasValue) return 0;
+
+                if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
 
                 if (doUseManualResetEvent)
                 {
@@ -135,11 +154,5 @@ namespace ThePalace.Core.Factories.Threading
 
             return Failures > 0 ? -1 : 0;
         }
-
-        public void Cancel() => _token.Cancel();
-
-        public void Set() => _manualResetEvent?.Set();
-        public void Reset() => _manualResetEvent?.Reset();
-        public void WaitOne() => _manualResetEvent?.WaitOne();
     }
 }
