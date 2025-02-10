@@ -52,13 +52,13 @@ namespace ThePalace.Core.Factories.Threading
 
         public Task CreateTask(Action cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval)
         {
+            if (_globalToken.IsCancellationRequested) return null;
+
             var job = new Job(cmd, jobState, opts);
 
             _jobs.Add(job.Id, job);
 
-            if (RunOptions.RunNow.IsSet<RunOptions, int>(opts) &&
-                !job.Token.IsCancellationRequested &&
-                !job.Task.IsCanceled)
+            if (RunOptions.RunNow.IsSet<RunOptions, int>(opts))
             {
                 job.Task.Start();
             }
@@ -68,7 +68,8 @@ namespace ThePalace.Core.Factories.Threading
 
         public static async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
         {
-            if (threadCount < 1) return;
+            if (_globalToken.IsCancellationRequested ||
+                threadCount < 1) return;
 
             for (var j = threadCount; j > 0; j--)
             {
@@ -91,26 +92,37 @@ namespace ThePalace.Core.Factories.Threading
             return true;
         }
 
-        public void Run(int sleepInterval = 750)
+        private static readonly TaskStatus[] _expiredStates =
+        new TaskStatus[]
+        {
+            TaskStatus.Canceled,
+            TaskStatus.Faulted,
+            TaskStatus.RanToCompletion,
+        };
+
+        public void Run(int sleepInterval = 750, CancellationToken? token = null)
         {
             while (!GlobalToken.IsCancellationRequested)
             {
-                Task.WaitAny(_jobs.Values.Select(j => j.Task).ToArray());
+                var jobs = _jobs.Values.ToList();
+                var index = Task.WaitAny(jobs.Select(j => j.Task).ToArray());
 
-                foreach (var job in _jobs.Values.ToList())
+                // TODO: index
+
+                foreach (var job in jobs)
                 {
-                    if (job.Task.Status != TaskStatus.WaitingForActivation &&
-                        job.Task.Status != TaskStatus.Running)
+                    if (_expiredStates.Contains(job.Task.Status))
                     {
+                        try { job.Cancel(); } catch { }
                         try { job.Dispose(); } catch { }
 
                         _jobs.Remove(job.Id);
                     }
                 }
 
-                Thread.Sleep(sleepInterval);
-
                 GlobalToken.ThrowIfCancellationRequested();
+
+                Thread.Sleep(sleepInterval);
             }
         }
 

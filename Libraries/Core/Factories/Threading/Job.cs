@@ -61,7 +61,7 @@ namespace ThePalace.Core.Factories.Threading
                 _resetEvent = new(false);
             }
 
-            Task = new Task(Cmd = cmd, _token.Token);
+            Build(Cmd = cmd);
         }
 
         public Job(Job src) : this()
@@ -140,6 +140,17 @@ namespace ThePalace.Core.Factories.Threading
             }
 
             jobs.ForEach(t => t.Cancel());
+        }
+
+        public void Build(Action? cmd = null, CancellationToken? token = null)
+        {
+            if (Task != null)
+            {
+                try { Cancel(); } catch { }
+                try { Task?.Dispose(); } catch { }
+            }
+
+            Task = new Task(cmd ?? Cmd, token ?? _token.Token);
         }
 
         public async Task<int> Run()
