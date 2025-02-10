@@ -93,43 +93,66 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         private static readonly TaskStatus[] _expiredStates =
-        new TaskStatus[]
-        {
+        [
             TaskStatus.Canceled,
             TaskStatus.Faulted,
             TaskStatus.RanToCompletion,
-        };
-
-        public void Run(int sleepInterval = 750, CancellationToken? token = null)
+        ];
+        private void Cleanup()
         {
-            while (!GlobalToken.IsCancellationRequested)
+            var jobs = _jobs.Values.ToList();
+
+            foreach (var job in jobs)
             {
-                var jobs = _jobs.Values.ToList();
-                var index = Task.WaitAny(jobs.Select(j => j.Task).ToArray());
-
-                if (index > -1)
+                if (_expiredStates.Contains(job.Task.Status))
                 {
-                    var _job = jobs[index];
-                    try { _job.Cancel(); } catch { }
-                    try { _job.Dispose(); } catch { }
+                    try { job.Cancel(); } catch { }
+                    try { job.Dispose(); } catch { }
 
-                    _jobs.Remove(_job.Id);
-
-                    jobs = _jobs.Values.ToList();
+                    _jobs.Remove(job.Id);
                 }
+            }
+        }
 
+        public void Run(int sleepInterval = 1000, CancellationToken? token = null)
+        {
+            while (!GlobalToken.IsCancellationRequested &&
+                !(!token.HasValue || token.Value.IsCancellationRequested))
+            {
+                Cleanup();
+
+                var jobs = _jobs.Values.ToList();
                 foreach (var job in jobs)
                 {
-                    if (_expiredStates.Contains(job.Task.Status))
+                    if (!_expiredStates.Contains(job.Task.Status) &&
+                        job.Task.Status != TaskStatus.Running)
                     {
-                        try { job.Cancel(); } catch { }
-                        try { job.Dispose(); } catch { }
-
-                        _jobs.Remove(job.Id);
+                        try { job.Task.Start(); } catch { }
                     }
                 }
 
+                var index = Task.WaitAny(jobs.Select(j => j.Task).ToArray());
+                if (index > -1)
+                {
+                    var _job = jobs[index];
+
+                    if (_expiredStates.Contains(_job.Task.Status))
+                    {
+                        try { _job.Cancel(); } catch { }
+                        try { _job.Dispose(); } catch { }
+
+                        _jobs.Remove(_job.Id);
+
+                        jobs = _jobs.Values.ToList();
+                    }
+                }
+
+                Cleanup();
+
                 GlobalToken.ThrowIfCancellationRequested();
+
+                if (token.HasValue)
+                    token.Value.ThrowIfCancellationRequested();
 
                 Thread.Sleep(sleepInterval);
             }
