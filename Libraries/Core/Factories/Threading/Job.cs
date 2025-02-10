@@ -18,8 +18,9 @@ namespace ThePalace.Core.Factories.Threading
         [Flags]
         public enum CancelOptions : int
         {
-            Cascade = 0x01,
+            OnlyMain = 0x01,
             OnlyChildren = 0x02,
+            Cascade = CancelOptions.OnlyMain | CancelOptions.OnlyChildren,
         }
 
         public partial class RunLog
@@ -64,11 +65,12 @@ namespace ThePalace.Core.Factories.Threading
             Build(Cmd = cmd);
         }
 
-        public Job(Job src) : this()
+        internal Job(Job parent) : this(parent.Cmd, parent.JobState, parent.Options)
         {
-            Cmd = src.Cmd;
-            JobState = src.JobState;
-            Options = src.Options;
+            ParentId = parent.Id;
+            Cmd = parent.Cmd;
+            JobState = parent.JobState;
+            Options = parent.Options;
         }
 
         ~Job() => this.Dispose();
@@ -101,7 +103,7 @@ namespace ThePalace.Core.Factories.Threading
         private List<RunLog> _runLogs;
         public IReadOnlyList<RunLog> RunLogs => _runLogs.AsReadOnly();
 
-        private const int _CONST_INT_ERRORLIMIT = 20;
+        private const int _CONST_INT_ERRORLIMIT = 50;
         private List<Exception> _errors;
         public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
@@ -112,6 +114,7 @@ namespace ThePalace.Core.Factories.Threading
 
         public RunOptions Options { get; set; }
         public readonly Guid Id;
+        public readonly Guid? ParentId;
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
@@ -119,21 +122,21 @@ namespace ThePalace.Core.Factories.Threading
         public TimeSpan SleepInterval { get; set; }
         public IJobState? JobState { get; set; }
 
-        public void Set() => _resetEvent?.Set();
-        public void Reset() => _resetEvent?.Reset();
-        public void WaitOne() => _resetEvent?.WaitOne();
+        public void EventSet() => _resetEvent?.Set();
+        public void EventReset() => _resetEvent?.Reset();
+        public void EventWaitOne() => _resetEvent?.WaitOne();
 
-        public void Cancel(CancelOptions opts = CancelOptions.OnlyChildren)
+        public void Cancel(CancelOptions opts = CancelOptions.Cascade)
         {
+            var doCascade = CancelOptions.Cascade.IsSet<CancelOptions, int>(opts);
             var jobs = new List<Job>();
 
-            if (CancelOptions.Cascade.IsSet<CancelOptions, int>(opts) ||
-                !CancelOptions.OnlyChildren.IsSet<CancelOptions, int>(opts))
+            if (doCascade || CancelOptions.OnlyMain.IsSet<CancelOptions, int>(opts))
             {
                 jobs.Add(this);
             }
 
-            if (CancelOptions.Cascade.IsSet<CancelOptions, int>(opts))
+            if (doCascade || CancelOptions.OnlyChildren.IsSet<CancelOptions, int>(opts))
             {
                 jobs.AddRange(this._subJobs
                     .SelectMany(j => j._subJobs));
@@ -162,7 +165,7 @@ namespace ThePalace.Core.Factories.Threading
 
             if (doUseManualResetEvent)
             {
-                Reset();
+                EventReset();
             }
 
             while (!_token.IsCancellationRequested)
@@ -208,7 +211,7 @@ namespace ThePalace.Core.Factories.Threading
 
                 if (doUseManualResetEvent)
                 {
-                    WaitOne();
+                    EventWaitOne();
                 }
                 else if (doUseSleepInterval)
                 {
@@ -221,6 +224,11 @@ namespace ThePalace.Core.Factories.Threading
                         Thread.Sleep(SleepInterval);
                     }
                 }
+
+                doBreakOnError = RunOptions.BreakOnError.IsSet<RunOptions, int>(Options);
+                doRunRunOnce = RunOptions.RunOnce.IsSet<RunOptions, int>(Options);
+                doUseSleepInterval = RunOptions.UseSleepInterval.IsSet<RunOptions, int>(Options);
+                doUseManualResetEvent = RunOptions.UseManualResetEvent.IsSet<RunOptions, int>(Options);
             }
 
             return Failures > 0 ? -1 : 0;

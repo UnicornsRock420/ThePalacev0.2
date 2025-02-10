@@ -12,7 +12,6 @@ namespace ThePalace.Core.Factories.Threading
 
         public TaskManager()
         {
-            _resetEvent = new(false);
             _jobs = new();
         }
 
@@ -44,7 +43,6 @@ namespace ThePalace.Core.Factories.Threading
 
         private static readonly CancellationTokenSource _globalToken;
 
-        private readonly ManualResetEvent _resetEvent;
         private readonly Dictionary<Guid, Job> _jobs;
         public IReadOnlyDictionary<Guid, Job> Jobs => _jobs.AsReadOnly();
 
@@ -66,19 +64,20 @@ namespace ThePalace.Core.Factories.Threading
             return job.Task;
         }
 
-        public static async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
+        public async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
         {
             if (_globalToken.IsCancellationRequested ||
-                threadCount < 1) return;
+                threadCount < 1 ||
+                !_jobs.ContainsKey(parent.Id)) return;
 
             for (var j = threadCount; j > 0; j--)
             {
-                var job = new Job(parent.Cmd, parent.JobState, parent.Options);
+                var job = new Job(parent);
                 parent._subJobs.Add(job);
 
                 if (RunOptions.RunNow.IsSet<RunOptions, int>(opts))
                 {
-                    job.Task.Start();
+                    job.Run();
                 }
             }
         }
@@ -100,7 +99,9 @@ namespace ThePalace.Core.Factories.Threading
         ];
         private void Cleanup()
         {
-            var jobs = _jobs.Values.ToList();
+            var jobs = _jobs.Values
+                .SelectMany(j => j._subJobs)
+                .ToList();
 
             foreach (var job in jobs)
             {
@@ -109,43 +110,40 @@ namespace ThePalace.Core.Factories.Threading
                     try { job.Cancel(); } catch { }
                     try { job.Dispose(); } catch { }
 
-                    _jobs.Remove(job.Id);
+                    if (_jobs.ContainsKey(job.Id))
+                    {
+                        _jobs.Remove(job.Id);
+                    }
+                    else if (
+                        job.ParentId.HasValue &&
+                        _jobs.ContainsKey(job.ParentId.Value))
+                    {
+                        _jobs[job.ParentId.Value]._subJobs.Remove(job);
+                    }
                 }
             }
         }
 
-        public void Run(int sleepInterval = 1000, CancellationToken? token = null)
+        public void Run(int sleepInterval = 750, CancellationToken? token = null)
         {
             while (!GlobalToken.IsCancellationRequested &&
                 !(!token.HasValue || token.Value.IsCancellationRequested))
             {
                 Cleanup();
 
-                var jobs = _jobs.Values.ToList();
+                var jobs = _jobs.Values
+                    .SelectMany(j => j._subJobs)
+                    .ToList();
                 foreach (var job in jobs)
                 {
                     if (!_expiredStates.Contains(job.Task.Status) &&
                         job.Task.Status != TaskStatus.Running)
                     {
-                        try { job.Task.Start(); } catch { }
+                        try { job.Run(); } catch { }
                     }
                 }
 
-                var index = Task.WaitAny(jobs.Select(j => j.Task).ToArray());
-                if (index > -1)
-                {
-                    var _job = jobs[index];
-
-                    if (_expiredStates.Contains(_job.Task.Status))
-                    {
-                        try { _job.Cancel(); } catch { }
-                        try { _job.Dispose(); } catch { }
-
-                        _jobs.Remove(_job.Id);
-
-                        jobs = _jobs.Values.ToList();
-                    }
-                }
+                Task.WaitAny(jobs.Select(j => j.Task).ToArray());
 
                 Cleanup();
 
