@@ -12,6 +12,7 @@ namespace ThePalace.Core.Factories.Threading
 
         public TaskManager()
         {
+            _resetEvent = new(false);
             _jobs = new();
         }
 
@@ -42,6 +43,8 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         private static readonly CancellationTokenSource _globalToken;
+
+        private readonly ManualResetEvent _resetEvent;
         private readonly Dictionary<Guid, Job> _jobs;
         public IReadOnlyDictionary<Guid, Job> Jobs => _jobs.AsReadOnly();
 
@@ -57,10 +60,10 @@ namespace ThePalace.Core.Factories.Threading
                 !job.Token.IsCancellationRequested &&
                 !job.Task.IsCanceled)
             {
-                job.Wrapper.Start();
+                job.Task.Start();
             }
 
-            return job.Wrapper;
+            return job.Task;
         }
 
         public static async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
@@ -86,6 +89,29 @@ namespace ThePalace.Core.Factories.Threading
             _jobs[jobId].Cancel(opts);
 
             return true;
+        }
+
+        public void Run(int sleepInterval = 750)
+        {
+            while (!GlobalToken.IsCancellationRequested)
+            {
+                Task.WaitAny(_jobs.Values.Select(j => j.Task).ToArray());
+
+                foreach (var job in _jobs.Values.ToList())
+                {
+                    if (job.Task.Status != TaskStatus.WaitingForActivation &&
+                        job.Task.Status != TaskStatus.Running)
+                    {
+                        try { job.Dispose(); } catch { }
+
+                        _jobs.Remove(job.Id);
+                    }
+                }
+
+                Thread.Sleep(sleepInterval);
+
+                GlobalToken.ThrowIfCancellationRequested();
+            }
         }
 
         public void Shutdown() => Dispose();

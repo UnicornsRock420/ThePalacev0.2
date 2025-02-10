@@ -13,7 +13,7 @@ namespace Sandbox
 {
     public partial class Program : Form
     {
-        private static readonly ManualResetEvent _event = new(false);
+        //private static readonly ManualResetEvent _event = new(false);
 
         /// <summary>
         ///  The main entry point for the application.
@@ -44,17 +44,13 @@ namespace Sandbox
 
             //Experiment1();
 
-            _event.Reset();
-
             var taskManager = new TaskManager();
-            taskManager.CreateTask(() =>
+            var job = taskManager.CreateTask(() =>
             {
                 Console.WriteLine("Test123");
-
-                _event.Set();
             }, null, RunOptions.RunNow | RunOptions.RunOnce);
 
-            _event.WaitOne();
+            taskManager.Run();
         }
 
         public Program()

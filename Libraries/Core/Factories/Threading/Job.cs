@@ -58,28 +58,10 @@ namespace ThePalace.Core.Factories.Threading
 
             if (RunOptions.UseManualResetEvent.IsSet<RunOptions, int>(Options))
             {
-                _manualResetEvent = new(false);
+                _resetEvent = new(false);
             }
 
             Task = new Task(Cmd = cmd, _token.Token);
-            Wrapper = new Task(() =>
-            {
-                Task.Start();
-
-                Task = Task.ContinueWith(
-                    t =>
-                    {
-                        t.Exception?.Handle(e =>
-                            e is OperationCanceledException &&
-                            _token.IsCancellationRequested);
-#if DEBUG
-                        Console.WriteLine("You have canceled the task");
-#endif
-                    },
-                    TaskContinuationOptions.OnlyOnCanceled);
-
-                Task.Wait();
-            });
         }
 
         public Job(Job src) : this()
@@ -93,7 +75,7 @@ namespace ThePalace.Core.Factories.Threading
 
         public void Dispose()
         {
-            try { _manualResetEvent?.Dispose(); } catch { }
+            try { _resetEvent?.Dispose(); } catch { }
             try { _token?.Dispose(); } catch { }
             try { Task?.Dispose(); } catch { }
 
@@ -114,7 +96,6 @@ namespace ThePalace.Core.Factories.Threading
 
         internal readonly Action Cmd;
         internal Task Task;
-        internal Task Wrapper;
 
         private const int _CONST_INT_LOGLIMIT = 20;
         private List<RunLog> _runLogs;
@@ -134,13 +115,13 @@ namespace ThePalace.Core.Factories.Threading
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
-        internal readonly ManualResetEvent _manualResetEvent;
+        internal readonly ManualResetEvent _resetEvent;
         public TimeSpan SleepInterval { get; set; }
         public IJobState? JobState { get; set; }
 
-        public void Set() => _manualResetEvent?.Set();
-        public void Reset() => _manualResetEvent?.Reset();
-        public void WaitOne() => _manualResetEvent?.WaitOne();
+        public void Set() => _resetEvent?.Set();
+        public void Reset() => _resetEvent?.Reset();
+        public void WaitOne() => _resetEvent?.WaitOne();
 
         public void Cancel(CancelOptions opts = CancelOptions.OnlyChildren)
         {
