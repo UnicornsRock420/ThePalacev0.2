@@ -21,7 +21,19 @@ namespace ThePalace.Core.Factories.Threading
         {
             if (_globalToken.IsCancellationRequested == false)
             {
-                Shutdown();
+                try { _globalToken.Cancel(); } catch { }
+
+                _jobs.Values
+                    .SelectMany(j => j._subJobs)
+                    .ToList()
+                    .ForEach(j =>
+                    {
+                        try { j.Cancel(); } catch { }
+                        try { j.Dispose(); } catch { }
+
+                        j.JobState = null;
+                    });
+                _jobs.Clear();
 
                 Thread.Sleep(1500);
             }
@@ -74,9 +86,6 @@ namespace ThePalace.Core.Factories.Threading
             return true;
         }
 
-        public void Shutdown()
-        {
-            try { _globalToken.Cancel(); } catch { }
-        }
+        public void Shutdown() => Dispose();
     }
 }
