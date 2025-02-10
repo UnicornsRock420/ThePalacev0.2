@@ -107,7 +107,16 @@ namespace ThePalace.Core.Factories.Threading
                 var jobs = _jobs.Values.ToList();
                 var index = Task.WaitAny(jobs.Select(j => j.Task).ToArray());
 
-                // TODO: index
+                if (index > -1)
+                {
+                    var _job = jobs[index];
+                    try { _job.Cancel(); } catch { }
+                    try { _job.Dispose(); } catch { }
+
+                    _jobs.Remove(_job.Id);
+
+                    jobs = _jobs.Values.ToList();
+                }
 
                 foreach (var job in jobs)
                 {
