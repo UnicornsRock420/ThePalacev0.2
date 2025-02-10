@@ -8,8 +8,6 @@ namespace ThePalace.Common.Desktop.Forms.Core
 
         ~FormBase() => base.Dispose(false);
 
-        public Cursor Cursor => Cursor.Current;
-
         public IUISessionState SessionState;
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

@@ -50,8 +50,8 @@
     <None Include="Factories\Filesystem\PropPIDSStream.cs" />
     <None Include="Factories\Filesystem\PropPROPSStream.cs" />
     <None Include="Factories\Filesystem\PropPRPStream.cs" />
-    <None Include="Factories\Types\LockContext.cs" />
-    <None Include="Factories\Types\Singleton.cs" />
+    <None Include="Factories\Core\LockContext.cs" />
+    <None Include="Factories\Core\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>

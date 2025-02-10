@@ -5,7 +5,7 @@ namespace ThePalace.Core.Factories.Threading
     public partial class Job : IDisposable
     {
         [Flags]
-        public enum JobOptions : int
+        public enum RunOptions : int
         {
             None = 0,
             BreakOnError = 0x01,
@@ -13,6 +13,13 @@ namespace ThePalace.Core.Factories.Threading
             RunOnce = 0x04,
             UseSleepInterval = 0x08,
             UseManualResetEvent = 0x10,
+        }
+
+        [Flags]
+        public enum CancelOptions : int
+        {
+            Cascade = 0x01,
+            OnlyChildren = 0x02,
         }
 
         public partial class RunLog
@@ -42,14 +49,14 @@ namespace ThePalace.Core.Factories.Threading
             JobState = null;
         }
 
-        public Job(Action? cmd = null, IJobState? jobState = null, JobOptions opts = JobOptions.UseSleepInterval) : this()
+        public Job(Action? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
             JobState = jobState;
             Options = opts;
 
-            if (JobOptions.UseManualResetEvent.IsSet<JobOptions, int>(Options))
+            if (RunOptions.UseManualResetEvent.IsSet<RunOptions, int>(Options))
             {
                 _manualResetEvent = new(false);
             }
@@ -69,6 +76,13 @@ namespace ThePalace.Core.Factories.Threading
 #endif
                     },
                     TaskContinuationOptions.OnlyOnCanceled);
+        }
+
+        public Job(Job src) : this()
+        {
+            Cmd = src.Cmd;
+            JobState = src.JobState;
+            Options = src.Options;
         }
 
         ~Job() => this.Dispose();
@@ -105,31 +119,48 @@ namespace ThePalace.Core.Factories.Threading
         private List<Exception> _errors;
         public IReadOnlyList<Exception> Errors => _errors.AsReadOnly();
 
-        protected readonly CancellationTokenSource _token;
+        internal readonly CancellationTokenSource _token;
         public CancellationToken Token => _token.Token;
-        private readonly List<Job> _subJobs;
+        internal readonly List<Job> _subJobs;
         public IReadOnlyList<Job> SubJobs => _subJobs.AsReadOnly();
 
-        public JobOptions Options { get; set; }
+        public RunOptions Options { get; set; }
         public readonly Guid Id;
         public bool IsRunning { get; protected set; }
         public int Completions { get; protected set; }
         public int Failures { get; protected set; }
-        protected readonly ManualResetEvent _manualResetEvent;
+        internal readonly ManualResetEvent _manualResetEvent;
         public TimeSpan SleepInterval { get; set; }
         public IJobState? JobState { get; set; }
 
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
         public void WaitOne() => _manualResetEvent?.WaitOne();
-        public void Cancel() => _token.Cancel();
+        public void Cancel(CancelOptions opts = CancelOptions.OnlyChildren)
+        {
+            var jobs = new List<Job>();
+
+            if (CancelOptions.Cascade.IsSet<CancelOptions, int>(opts) ||
+                !CancelOptions.OnlyChildren.IsSet<CancelOptions, int>(opts))
+            {
+                jobs.Add(this);
+            }
+
+            if (CancelOptions.Cascade.IsSet<CancelOptions, int>(opts))
+            {
+                jobs.AddRange(this._subJobs
+                    .SelectMany(j => j._subJobs));
+            }
+
+            jobs.ForEach(t => t.Cancel());
+        }
 
         public async Task<int> Run()
         {
-            var doBreakOnError = JobOptions.BreakOnError.IsSet<JobOptions, int>(Options);
-            var doRunRunOnce = JobOptions.RunOnce.IsSet<JobOptions, int>(Options);
-            var doUseSleepInterval = JobOptions.UseSleepInterval.IsSet<JobOptions, int>(Options);
-            var doUseManualResetEvent = JobOptions.UseManualResetEvent.IsSet<JobOptions, int>(Options);
+            var doBreakOnError = RunOptions.BreakOnError.IsSet<RunOptions, int>(Options);
+            var doRunRunOnce = RunOptions.RunOnce.IsSet<RunOptions, int>(Options);
+            var doUseSleepInterval = RunOptions.UseSleepInterval.IsSet<RunOptions, int>(Options);
+            var doUseManualResetEvent = RunOptions.UseManualResetEvent.IsSet<RunOptions, int>(Options);
 
             if (doUseManualResetEvent)
             {
@@ -195,17 +226,6 @@ namespace ThePalace.Core.Factories.Threading
             }
 
             return Failures > 0 ? -1 : 0;
-        }
-
-        public async Task Fork(int threadCount = 1)
-        {
-            if (threadCount < 1) return;
-
-            for (var j = threadCount; j > 0; j--)
-            {
-                var subJob = new Job(Cmd, JobState, Options);
-                _subJobs.Add(subJob);
-            }
         }
     }
 }

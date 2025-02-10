@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Factories.Types;
+﻿using ThePalace.Core.Interfaces.Core;
 using static ThePalace.Core.Factories.Threading.Job;
 
 namespace ThePalace.Core.Factories.Threading
@@ -35,13 +35,13 @@ namespace ThePalace.Core.Factories.Threading
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
-        public Task CreateTask(Action cmd, object jobState, Job.JobOptions opts = Job.JobOptions.UseSleepInterval)
+        public Task CreateTask(Action cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval)
         {
             var job = new Job(cmd, jobState, opts);
 
             _jobs.Add(job.Id, job);
 
-            if (Job.JobOptions.RunNow.IsSet<JobOptions, int>(opts))
+            if (RunOptions.RunNow.IsSet<RunOptions, int>(opts))
             {
                 job.Task.Start();
             }
@@ -49,20 +49,27 @@ namespace ThePalace.Core.Factories.Threading
             return job.Task;
         }
 
-        public bool Cancel(Guid jobId, bool cascade = true)
+        public static async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
+        {
+            if (threadCount < 1) return;
+
+            for (var j = threadCount; j > 0; j--)
+            {
+                var job = new Job(parent.Cmd, parent.JobState, parent.Options);
+                parent._subJobs.Add(job);
+
+                if (RunOptions.RunNow.IsSet<RunOptions, int>(opts))
+                {
+                    job.Task.Start();
+                }
+            }
+        }
+
+        public bool Cancel(Guid jobId, CancelOptions opts = CancelOptions.Cascade)
         {
             if (!_jobs.ContainsKey(jobId)) return false;
 
-            var jobs = new List<Job>{ _jobs[jobId] };
-
-            if (cascade)
-            {
-                jobs.AddRange(
-                    _jobs[jobId].SubJobs
-                        .SelectMany(n => n.SubJobs ?? []));
-            }
-
-            jobs.ForEach(j => j.Cancel());
+            _jobs[jobId].Cancel(opts);
 
             return true;
         }
