@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
-using ThePalace.Core.Types;
 using HotspotID = System.Int16;
 using sint16 = System.Int16;
 using sint32 = System.Int32;

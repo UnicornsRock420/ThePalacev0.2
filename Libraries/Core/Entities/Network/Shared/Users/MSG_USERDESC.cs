@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Interfaces.Network;
-using ThePalace.Core.Types;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 
@@ -18,7 +18,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
         public sint16 ColorNbr;
         public sint32 NbrProps;
 
-        [Binding(typeof(MSG_USERDESC), nameof(NbrProps))]
+        [SizeDependency(typeof(MSG_USERDESC), nameof(NbrProps))]
         [DynamicSize(8 * 9)] // AssetSpec(8) * Props(9)
         public AssetSpec[] PropSpec;
     }

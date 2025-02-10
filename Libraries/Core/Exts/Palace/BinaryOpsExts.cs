@@ -347,9 +347,9 @@ namespace ThePalace.Core.Exts.Palace
             return result;
         }
 
-        public static bool IsPointInPolygon(this Point point, List<Point> polygon) =>
+        public static bool IsPointInPolygon(this System.Drawing.Point point, List<System.Drawing.Point> polygon) =>
             point.IsPointInPolygon(polygon.ToArray());
-        public static bool IsPointInPolygon(this Point point, params Point[] polygon)
+        public static bool IsPointInPolygon(this System.Drawing.Point point, params System.Drawing.Point[] polygon)
         {
             if (polygon.Length < 3) return false;
 
@@ -364,9 +364,9 @@ namespace ThePalace.Core.Exts.Palace
             return result;
         }
 
-        public static bool IsPointInPolygon(this Types.Point point, List<Types.Point> polygon) =>
+        public static bool IsPointInPolygon(this Entities.Shared.Types.Point point, List<Entities.Shared.Types.Point> polygon) =>
             point.IsPointInPolygon(polygon.ToArray());
-        public static bool IsPointInPolygon(this Types.Point point, params Types.Point[] polygon)
+        public static bool IsPointInPolygon(this Entities.Shared.Types.Point point, params Entities.Shared.Types.Point[] polygon)
         {
             if (polygon.Length < 3) return false;
 
@@ -381,30 +381,30 @@ namespace ThePalace.Core.Exts.Palace
             return result;
         }
 
-        public static Types.Point[] GetBoundingBox(this Types.Point point, int width, int height, bool centered = false) =>
+        public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, int width, int height, bool centered = false) =>
             point.GetBoundingBox(new Size(width, height), centered);
-        public static Types.Point[] GetBoundingBox(this Types.Point point, Size size, bool centered = false)
+        public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, Size size, bool centered = false)
         {
-            var results = new List<Types.Point>();
+            var results = new List<Entities.Shared.Types.Point>();
             var w = (short)(centered ? size.Width / 2 : size.Width);
             var h = (short)(centered ? size.Height / 2 : size.Height);
 
             if (centered)
-                results.Add(new Types.Point((short)(point.VAxis - h), (short)(point.HAxis - w)));
+                results.Add(new Entities.Shared.Types.Point((short)(point.VAxis - h), (short)(point.HAxis - w)));
             else
                 results.Add(point);
 
             if (centered)
-                results.Add(new Types.Point((short)(point.VAxis - h), (short)(point.HAxis + w)));
+                results.Add(new Entities.Shared.Types.Point((short)(point.VAxis - h), (short)(point.HAxis + w)));
             else
-                results.Add(new Types.Point(point.VAxis, (short)(point.HAxis + w)));
+                results.Add(new Entities.Shared.Types.Point(point.VAxis, (short)(point.HAxis + w)));
 
-            results.Add(new Types.Point((short)(point.VAxis + h), (short)(point.HAxis + w)));
+            results.Add(new Entities.Shared.Types.Point((short)(point.VAxis + h), (short)(point.HAxis + w)));
 
             if (centered)
-                results.Add(new Types.Point((short)(point.VAxis + h), (short)(point.HAxis - w)));
+                results.Add(new Entities.Shared.Types.Point((short)(point.VAxis + h), (short)(point.HAxis - w)));
             else
-                results.Add(new Types.Point((short)(point.VAxis + h), point.HAxis));
+                results.Add(new Entities.Shared.Types.Point((short)(point.VAxis + h), point.HAxis));
 
             return results.ToArray();
         }

@@ -3,7 +3,7 @@ using ThePalace.Core.Enums.Palace;
 using sint32 = System.Int32;
 using uint16 = System.UInt16;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Assets
 {
     public partial class AssetRec
     {

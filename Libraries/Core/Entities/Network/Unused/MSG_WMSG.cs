@@ -2,7 +2,7 @@
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Interfaces;
-using ThePalace.Core.Types;
+using ThePalace.Core.Entities.Shared.Types;
 
 namespace ThePalace.Network.Entities.Unused
 {

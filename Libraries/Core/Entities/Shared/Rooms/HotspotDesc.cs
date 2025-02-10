@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Types;
+﻿using ThePalace.Core.Entities.Shared.Types;
 
 namespace ThePalace.Core.Entities.Shared
 {

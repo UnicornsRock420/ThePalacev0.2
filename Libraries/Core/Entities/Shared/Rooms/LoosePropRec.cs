@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Types;
+using ThePalace.Core.Entities.Shared.Types;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 

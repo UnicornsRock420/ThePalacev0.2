@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Interfaces.Data;
-using ThePalace.Core.Types;
 using RoomID = System.Int16;
 using sint16 = System.Int16;
 using UserID = System.Int32;

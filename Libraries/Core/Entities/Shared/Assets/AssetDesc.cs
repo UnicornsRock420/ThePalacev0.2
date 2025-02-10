@@ -1,19 +1,23 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Data;
-using uint16 = System.UInt16;
-using uint32 = System.UInt32;
 
 namespace ThePalace.Core.Entities.Shared.Assets
 {
     [ByteSize(40)]
-    public partial class AssetDesc : IStruct
+    public partial class AssetDesc : RawStream, IStruct
     {
-        public uint16 AssetFlags;
-        public uint16 PropFlags;
-        public uint32 Size;
+        ~AssetDesc() => Dispose();
 
-        [Str31]
-        public string? Name;
+        public override void Dispose()
+        {
+            //try { Image?.Dispose(); Image = null; } catch { }
+
+            base.Dispose();
+
+            GC.SuppressFinalize(this);
+        }
+
+        public AssetRec AssetInfo { get; set; }
     }
 }

@@ -4,31 +4,31 @@ using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 
-namespace ThePalace.Core.Types
+namespace ThePalace.Core.Entities.Shared.Types
 {
     [ByteSize(4)]
     public partial class Point : IStructSerializer
     {
         public Point()
         {
-            this.VAxis = (sint16)RndGenerator.Next(0, 384);
-            this.HAxis = (sint16)RndGenerator.Next(0, 512);
+            VAxis = (sint16)RndGenerator.Next(0, 384);
+            HAxis = (sint16)RndGenerator.Next(0, 512);
         }
         public Point(sint16 vAxis, sint16 hAxis)
         {
-            this.VAxis = vAxis;
-            this.HAxis = hAxis;
+            VAxis = vAxis;
+            HAxis = hAxis;
         }
         public Point(Stream reader)
         {
             var refNum = 0;
 
-            this.Deserialize(ref refNum, reader, SerializerOptions.None);
+            Deserialize(ref refNum, reader, SerializerOptions.None);
         }
         public Point(Point assetSpec)
         {
-            this.HAxis = assetSpec.HAxis;
-            this.VAxis = assetSpec.VAxis;
+            HAxis = assetSpec.HAxis;
+            VAxis = assetSpec.VAxis;
         }
 
         public sint16 VAxis;
@@ -36,14 +36,14 @@ namespace ThePalace.Core.Types
 
         public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
-            this.VAxis = reader.ReadInt16();
-            this.HAxis = reader.ReadInt16();
+            VAxis = reader.ReadInt16();
+            HAxis = reader.ReadInt16();
         }
 
         public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
-            writer.WriteInt16(this.VAxis);
-            writer.WriteInt16(this.HAxis);
+            writer.WriteInt16(VAxis);
+            writer.WriteInt16(HAxis);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms.Assets
 {
     public partial class AssetRec : IStructSerializer
     {

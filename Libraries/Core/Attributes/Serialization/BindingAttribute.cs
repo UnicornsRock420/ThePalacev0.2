@@ -2,7 +2,7 @@
 
 namespace ThePalace.Core.Attributes.Serialization
 {
-    public class BindingAttribute : Attribute
+    public abstract class BindingAttribute : Attribute
     {
         public BindingAttribute(Type type, params string[] propertyNames)
         {

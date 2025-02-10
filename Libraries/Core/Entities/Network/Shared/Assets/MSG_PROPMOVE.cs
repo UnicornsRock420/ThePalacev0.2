@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Interfaces.Network;
-using ThePalace.Core.Types;
 using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Network.Shared.Assets

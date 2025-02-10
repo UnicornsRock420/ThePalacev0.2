@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Types;
+using ThePalace.Core.Entities.Shared.Types;
 using sint16 = System.Int16;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Assets
 {
-    public partial class AssetRec
+    public partial class AssetDesc
     {
         [IgnoreDataMember]
         public sint16 Width;
@@ -16,10 +16,8 @@ namespace ThePalace.Core.Entities.Shared
         public Point Offset;
         [IgnoreDataMember]
         public string? Format;
-        [IgnoreDataMember]
-        public string? Md5 => this.GetData()?.ComputeMd5();
 
-        //public static Bitmap Render(AssetRec asset)
+        //public static Bitmap Render(AssetDesc asset)
         //{
         //    if (asset.IsCustom32Bit)
         //        return RenderCustom32bit(asset);
@@ -35,7 +33,7 @@ namespace ThePalace.Core.Entities.Shared
         //        return RenderLegacy8bit(asset);
         //}
 
-        //private static Bitmap RenderLegacy8bit(AssetRec asset)
+        //private static Bitmap RenderLegacy8bit(AssetDesc asset)
         //{
         //    var result = new Bitmap(asset.Width, asset.Height);
         //    if (result == null) throw new OutOfMemoryException();
@@ -75,7 +73,7 @@ namespace ThePalace.Core.Entities.Shared
 
         //    return result;
         //}
-        //private static Bitmap RenderLegacy16bit(AssetRec asset)
+        //private static Bitmap RenderLegacy16bit(AssetDesc asset)
         //{
         //    var result = new Bitmap(asset.Width, asset.Height);
         //    if (result == null) throw new OutOfMemoryException();
@@ -120,7 +118,7 @@ namespace ThePalace.Core.Entities.Shared
 
         //    return result;
         //}
-        //private static Bitmap RenderLegacy20bit(AssetRec asset)
+        //private static Bitmap RenderLegacy20bit(AssetDesc asset)
         //{
         //    var result = new Bitmap(asset.Width, asset.Height);
         //    if (result == null) throw new OutOfMemoryException();
@@ -179,7 +177,7 @@ namespace ThePalace.Core.Entities.Shared
 
         //    return result;
         //}
-        //private static Bitmap RenderLegacyS20bit(AssetRec asset)
+        //private static Bitmap RenderLegacyS20bit(AssetDesc asset)
         //{
         //    var result = new Bitmap(asset.Width, asset.Height);
         //    if (result == null) throw new OutOfMemoryException();
@@ -238,7 +236,7 @@ namespace ThePalace.Core.Entities.Shared
 
         //    return result;
         //}
-        //private static Bitmap RenderLegacy32bit(AssetRec asset)
+        //private static Bitmap RenderLegacy32bit(AssetDesc asset)
         //{
         //    var inflatedData = InflateData(asset.data) ?? asset.data;
 
@@ -253,7 +251,7 @@ namespace ThePalace.Core.Entities.Shared
 
         //    return RenderByteArray(inflatedData);
         //}
-        //private static Bitmap RenderCustom32bit(AssetRec asset)
+        //private static Bitmap RenderCustom32bit(AssetDesc asset)
         //{
         //    var result = RenderByteArray(asset.data);
         //    if (result != null)

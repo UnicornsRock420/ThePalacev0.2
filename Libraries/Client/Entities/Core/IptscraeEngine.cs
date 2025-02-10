@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Types;
 
 namespace ThePalace.Common.Desktop.Entities.Core
 {

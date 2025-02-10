@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Types;
+﻿using ThePalace.Core.Entities.Shared.Types;
 using sint32 = System.Int32;
 
 namespace ThePalace.Core.Entities.Filesystem
