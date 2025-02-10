@@ -53,12 +53,14 @@ namespace ThePalace.Core.Factories.Threading
 
             _jobs.Add(job.Id, job);
 
-            if (RunOptions.RunNow.IsSet<RunOptions, int>(opts))
+            if (RunOptions.RunNow.IsSet<RunOptions, int>(opts) &&
+                !job.Token.IsCancellationRequested &&
+                !job.Task.IsCanceled)
             {
-                job.Task.Start();
+                job.Wrapper.Start();
             }
 
-            return job.Task;
+            return job.Wrapper;
         }
 
         public static async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)

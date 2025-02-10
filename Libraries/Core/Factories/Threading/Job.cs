@@ -61,11 +61,12 @@ namespace ThePalace.Core.Factories.Threading
                 _manualResetEvent = new(false);
             }
 
-            Task = Task
-                .Run(
-                    Cmd = cmd,
-                    _token.Token)
-                .ContinueWith(
+            Task = new Task(Cmd = cmd, _token.Token);
+            Wrapper = new Task(() =>
+            {
+                Task.Start();
+
+                Task = Task.ContinueWith(
                     t =>
                     {
                         t.Exception?.Handle(e =>
@@ -76,6 +77,9 @@ namespace ThePalace.Core.Factories.Threading
 #endif
                     },
                     TaskContinuationOptions.OnlyOnCanceled);
+
+                Task.Wait();
+            });
         }
 
         public Job(Job src) : this()
@@ -109,7 +113,8 @@ namespace ThePalace.Core.Factories.Threading
         }
 
         internal readonly Action Cmd;
-        public readonly Task Task;
+        internal Task Task;
+        internal Task Wrapper;
 
         private const int _CONST_INT_LOGLIMIT = 20;
         private List<RunLog> _runLogs;

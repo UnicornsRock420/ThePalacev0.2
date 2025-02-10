@@ -3,14 +3,18 @@ using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Factories.Threading;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
+using static ThePalace.Core.Factories.Threading.Job;
 using sint16 = System.Int16;
 
 namespace Sandbox
 {
     public partial class Program : Form
     {
+        private static readonly ManualResetEvent _event = new(false);
+
         /// <summary>
         ///  The main entry point for the application.
         /// </summary>
@@ -39,6 +43,18 @@ namespace Sandbox
             //container.RegisterTypes(iStructTypes);
 
             //Experiment1();
+
+            _event.Reset();
+
+            var taskManager = new TaskManager();
+            taskManager.CreateTask(() =>
+            {
+                Console.WriteLine("Test123");
+
+                _event.Set();
+            }, null, RunOptions.RunNow | RunOptions.RunOnce);
+
+            _event.WaitOne();
         }
 
         public Program()
