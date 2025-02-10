@@ -136,6 +136,7 @@ namespace ThePalace.Core.Factories.Threading
         public void Set() => _manualResetEvent?.Set();
         public void Reset() => _manualResetEvent?.Reset();
         public void WaitOne() => _manualResetEvent?.WaitOne();
+
         public void Cancel(CancelOptions opts = CancelOptions.OnlyChildren)
         {
             var jobs = new List<Job>();
