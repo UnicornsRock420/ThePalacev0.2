@@ -1,25 +1,14 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Interfaces;
-using ThePalace.Core.Entities.Shared.Types;
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.Entities.Unused
 {
     [Mnemonic("wmsg")]
-    [MessagePackObject(true, AllowPrivate = true)]
-    public partial class MSG_WMSG : IProtocolCommunications, IProtocolSerializer
+    public partial class MSG_WMSG : EventParams, IProtocol, ICommunications
     {
-        public CString Text;
-
-        public void Deserialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public byte[] Serialize()
-        {
-            throw new NotImplementedException();
-        }
+        [CString]
+        public string Text { get; set; }
     }
 }

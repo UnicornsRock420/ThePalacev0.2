@@ -1,13 +1,12 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.Entities.Unused
 {
     [Mnemonic("wprs")]
-    [MessagePackObject(true, AllowPrivate = true)]
-    public partial class MSG_USERENTER : IProtocol
+    public partial class MSG_USERENTER : EventParams, IProtocol
     {
         public UserRec? User;
     }

@@ -1,5 +1,4 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Network;
 using HotSpotID = System.Int16;
 using RoomID = System.Int16;

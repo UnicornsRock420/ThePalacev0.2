@@ -1,5 +1,4 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;

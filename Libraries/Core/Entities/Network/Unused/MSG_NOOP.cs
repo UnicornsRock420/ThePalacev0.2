@@ -1,13 +1,11 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Interfaces;
-using ThePalace.Core.Entities.Shared;
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.Entities.Unused
 {
     [Mnemonic("NOOP")]
-    [MessagePackObject(true, AllowPrivate = true)]
-    public partial class MSG_NOOP : IProtocol
+    public partial class MSG_NOOP : EventParams, IProtocol
     {
     }
 }

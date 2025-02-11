@@ -1,13 +1,11 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Interfaces;
-using ThePalace.Core.Entities.Shared;
+﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.EventTypes.Client.Rooms
 {
     [Mnemonic("opSs")]
-    [MessagePackObject(true, AllowPrivate = true)]
-    public partial class MSG_SPOTSETDESC : IProtocol
+    public partial class MSG_SPOTSETDESC : EventParams, IProtocol
     {
     }
 }

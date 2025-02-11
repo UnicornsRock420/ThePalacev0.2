@@ -5,7 +5,7 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Core
 {
-    public partial class RawStream : IDisposable, IData, IStruct
+    public partial class RawStream : EventArgs, IDisposable, IData, IStruct
     {
         [Flags]
         public enum RawStreamOptions : uint
