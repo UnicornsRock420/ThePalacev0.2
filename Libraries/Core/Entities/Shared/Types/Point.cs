@@ -19,12 +19,7 @@ namespace ThePalace.Core.Entities.Shared.Types
             VAxis = vAxis;
             HAxis = hAxis;
         }
-        public Point(Stream reader)
-        {
-            var refNum = 0;
-
-            Deserialize(reader, SerializerOptions.None);
-        }
+        public Point(Stream reader, SerializerOptions opts = SerializerOptions.None) => Deserialize(reader, opts);
         public Point(Point assetSpec)
         {
             HAxis = assetSpec.HAxis;

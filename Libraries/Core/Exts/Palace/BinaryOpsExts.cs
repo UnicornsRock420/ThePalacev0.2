@@ -1,16 +1,18 @@
-﻿using System.Buffers;
+﻿using System;
+using System.Buffers;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Enums.App;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ThePalace.Core.Exts.Palace
 {
@@ -253,6 +255,59 @@ namespace ThePalace.Core.Exts.Palace
                 .GetString();
         }
 
+        public static string ReadPString(this Stream stream, int max, int offset = 0, int size = 0, int modulo = 0)
+        {
+            if (stream == null) return null;
+
+            if (offset < 1)
+            {
+                offset = 0;
+            }
+
+            if (size < 1)
+            {
+                size = 1;
+            }
+
+            var length = 0;
+            switch (size)
+            {
+                case 4:
+                    length = stream.ReadInt32(offset);
+
+                    break;
+                case 2:
+                    length = stream.ReadInt16(offset);
+
+                    break;
+                default:
+                    length = stream.ReadByte(offset);
+                    size = 1;
+
+                    break;
+            }
+
+            if (length > max)
+            {
+                length = max;
+            }
+
+            var buffer = new byte[length];
+            var readCount = stream.Read(buffer, 0, buffer.Length);
+            if (readCount < 1) throw new EndOfStreamException();
+
+            var result = buffer.GetString();
+
+            if (modulo > 0 && (length + size) % modulo > 0)
+            {
+                buffer = new byte[(modulo - ((length + size) % modulo))];
+                readCount = stream.Read(buffer, 0, buffer.Length);
+                if (readCount < 1) throw new EndOfStreamException();
+            }
+
+            return result;
+        }
+
         public static string ReadCString(this byte[] value, int offset = 0)
         {
             if (offset < 1)
@@ -273,7 +328,7 @@ namespace ThePalace.Core.Exts.Palace
                 .GetString();
         }
 
-        public static byte[] WritePString(this string value, int max, int size, bool padding = true)
+        public static byte[] WritePString(this string value, int max, int size, int modulo = 0)
         {
             var data = new List<byte>();
 
@@ -307,16 +362,51 @@ namespace ThePalace.Core.Exts.Palace
 
             data.AddRange(value.GetBytes());
 
-            if (padding)
+            if (modulo > 0 && (length + size) % modulo > 0)
             {
-                var padSize = max - (size + length);
-                if (padSize > 0)
-                {
-                    data.AddRange(new byte[padSize]);
-                }
+                data.AddRange(new byte[(modulo - ((length + size) % modulo))]);
             }
 
             return data.ToArray();
+        }
+        public static void WritePString(this Stream writer, string value, int max, int size, int modulo = 0)
+        {
+            var _value = value.GetBytes();
+
+            if (size < 1)
+            {
+                size = 1;
+            }
+
+            var length = _value.Length;
+            if (length >= max - size)
+            {
+                length = max - size;
+            }
+
+            switch (size)
+            {
+                case 4:
+                    writer.Write(WriteInt32(length));
+
+                    break;
+                case 2:
+                    writer.Write(WriteInt16((short)length));
+
+                    break;
+                default:
+                    writer.Write([(byte)length]);
+                    size = 1;
+
+                    break;
+            }
+
+            writer.Write(_value);
+
+            if (modulo > 0 && (length + size) % modulo > 0)
+            {
+                writer.Write(new byte[(modulo - ((length + size) % modulo))]);
+            }
         }
 
         public static byte[] WriteCString(this string value)
@@ -412,7 +502,7 @@ namespace ThePalace.Core.Exts.Palace
         #endregion
 
         #region Serialization/Deserialization Methods
-        private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStruct);
+        private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStructSerializer);
         private static List<MemberInfo> GetMembers(this Type type, BindingFlags flags = BindingFlags.Public | BindingFlags.Instance) =>
             type
                 .GetProperties(flags)
@@ -489,39 +579,6 @@ namespace ThePalace.Core.Exts.Palace
                     //throw new Exception(string.Format("Member (t:{0}, n:{1})", _type.Name, _name));
                     Console.WriteLine("Member (t:{0}, n:{1})", _type?.Name, _name);
                     continue;
-                }
-
-                if (_attrs.Any(a => a is PredicateAttribute))
-                {
-                    var predicate = _attrs
-                        .Where(a => a is PredicateAttribute)
-                        .Select(a => a as PredicateAttribute)
-                        .FirstOrDefault();
-                    if (predicate?.Property != null)
-                    {
-                        var _intValue = 0;
-
-                        if (predicate.Property is FieldInfo _fNfo)
-                        {
-                            _intValue = (int)(_fNfo.GetValue(obj) ?? 0);
-                        }
-                        else if (predicate.Property is PropertyInfo _pNfo)
-                        {
-                            _intValue = (int)(_pNfo.GetValue(obj) ?? 0);
-                        }
-
-                        switch (predicate.Operator)
-                        {
-                            case PredicateOperators.EqualTo:
-                                if (_intValue != (int)predicate.Value) continue;
-
-                                break;
-                            case PredicateOperators.NotEqualTo:
-                                if (_intValue == (int)predicate.Value) continue;
-
-                                break;
-                        }
-                    }
                 }
 
                 var byteSize = _attrs
@@ -651,20 +708,6 @@ namespace ThePalace.Core.Exts.Palace
                         continue;
 
                     case Type _t when _t == ByteExts.Types.ByteArray:
-                        var sizeDependencyMemberInfo = _attrs
-                            .Where(a => a is SizeDependencyAttribute)
-                            .Select(a => a as SizeDependencyAttribute)
-                            .SelectMany(a => a?.Properties ?? [])
-                            .FirstOrDefault();
-                        if (sizeDependencyMemberInfo is FieldInfo _fNfo)
-                        {
-                            byteSize = (int)(_fNfo.GetValue(obj) ?? 0);
-                        }
-                        else if (sizeDependencyMemberInfo is PropertyInfo _pNfo)
-                        {
-                            byteSize = (int)(_pNfo.GetValue(obj) ?? 0);
-                        }
-
                         if (byteSize > 0)
                         {
                             buffer = new byte[byteSize];
@@ -793,39 +836,6 @@ namespace ThePalace.Core.Exts.Palace
                     //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
                     Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type?.Name, _name, _value ?? default(object));
                     continue;
-                }
-
-                if (_attrs.Any(a => a is PredicateAttribute))
-                {
-                    var predicate = _attrs
-                        .Where(a => a is PredicateAttribute)
-                        .Select(a => a as PredicateAttribute)
-                        .FirstOrDefault();
-                    if (predicate?.Property != null)
-                    {
-                        var _intValue = 0;
-
-                        if (predicate.Property is FieldInfo _fNfo)
-                        {
-                            _intValue = (int)(_fNfo.GetValue(obj) ?? 0);
-                        }
-                        else if (predicate.Property is PropertyInfo _pNfo)
-                        {
-                            _intValue = (int)(_pNfo.GetValue(obj) ?? 0);
-                        }
-
-                        switch (predicate.Operator)
-                        {
-                            case PredicateOperators.EqualTo:
-                                if (_intValue != (int)predicate.Value) continue;
-
-                                break;
-                            case PredicateOperators.NotEqualTo:
-                                if (_intValue == (int)predicate.Value) continue;
-
-                                break;
-                        }
-                    }
                 }
 
                 var byteSize = _attrs
@@ -957,20 +967,6 @@ namespace ThePalace.Core.Exts.Palace
                         continue;
 
                     case Type _t when _t == ByteExts.Types.ByteArray:
-                        var sizeDependencyMemberInfo = _attrs
-                            .Where(a => a is SizeDependencyAttribute)
-                            .Select(a => a as SizeDependencyAttribute)
-                            .SelectMany(a => a?.Properties ?? [])
-                            .FirstOrDefault();
-                        if (sizeDependencyMemberInfo is FieldInfo _fNfo)
-                        {
-                            byteSize = (int)(_fNfo.GetValue(obj) ?? 0);
-                        }
-                        else if (sizeDependencyMemberInfo is PropertyInfo _pNfo)
-                        {
-                            byteSize = (int)(_pNfo.GetValue(obj) ?? 0);
-                        }
-
                         if (byteSize < 1)
                         {
                             buffer = ((byte[]?)(object?)_value) ?? [];

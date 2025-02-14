@@ -1,4 +1,5 @@
-﻿using ThePalace.Core.Exts.Palace;
+﻿using System.IO;
+using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
@@ -12,7 +13,6 @@ namespace ThePalace.Core.Entities.Core
         {
             None = 0x00,
             IncrementPosition = 0x01,
-            Padding = 0x02,
         }
 
         public static explicit operator uint8[](RawStream p) => p.Data ?? [];
@@ -29,6 +29,8 @@ namespace ThePalace.Core.Entities.Core
             this._stream = new(data ?? []);
         public RawStream(params char[] data) =>
             this._stream = new(data?.GetBytes() ?? []);
+        public RawStream(MemoryStream? stream = null) =>
+            this._stream = stream ?? new();
 
         ~RawStream() => this.Dispose();
 
@@ -277,7 +279,7 @@ namespace ThePalace.Core.Entities.Core
             return result;
         }
 
-        public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
+        public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, int modulo = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
             if ((this._stream?.Length ?? 0) < 1) return null;
 
@@ -329,6 +331,13 @@ namespace ThePalace.Core.Entities.Core
             var buffer = new byte[length];
             var readCount = this._stream.Read(buffer, 0, buffer.Length);
             if (readCount < 1) return null;
+
+            if (modulo > 0 && (length + size) % modulo > 0)
+            {
+                buffer = new byte[(modulo - ((length + size) % modulo))];
+                readCount = this._stream.Read(buffer, 0, buffer.Length);
+                if (readCount < 1) throw new EndOfStreamException();
+            }
 
             if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
             {
@@ -687,7 +696,7 @@ namespace ThePalace.Core.Entities.Core
             }
         }
 
-        public void WritePString(string value, int max, int size = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition | RawStreamOptions.Padding)
+        public void WritePString(string value, int max, int size = 0, int modulo = 0, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
         {
             this._stream ??= new();
 
@@ -698,7 +707,7 @@ namespace ThePalace.Core.Entities.Core
 
             var _position = this._stream.Position;
 
-            this._stream.Write(value.WritePString(max, size, RawStreamOptions.Padding.IsSet<RawStreamOptions, byte>(opts)));
+            this._stream.Write(value.WritePString(max, size, modulo));
 
             if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
             {

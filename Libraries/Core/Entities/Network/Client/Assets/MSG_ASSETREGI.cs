@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared.Rooms.Assets;
+using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.Assets

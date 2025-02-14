@@ -11,7 +11,7 @@ namespace ThePalace.Core.Entities.Shared
             StateInfo.PictID = reader.ReadInt16();
             StateInfo.Reserved = reader.ReadInt16();
 
-            StateInfo.PicLoc = new Point(reader);
+            StateInfo.PicLoc = new Point(reader, opts);
         }
 
         public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
@@ -19,7 +19,7 @@ namespace ThePalace.Core.Entities.Shared
             writer.WriteInt16(StateInfo.PictID);
             writer.WriteInt16(StateInfo.Reserved);
 
-            StateInfo.PicLoc.Serialize(writer);
+            StateInfo.PicLoc.Serialize(writer, opts);
         }
     }
 }

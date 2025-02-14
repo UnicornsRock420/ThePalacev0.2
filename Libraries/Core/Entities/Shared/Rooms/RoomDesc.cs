@@ -8,9 +8,9 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Shared
 {
-    public partial class RoomDesc : RawStream, IStruct, IData
+    public partial class RoomDesc : RawStream, IStruct
     {
-        public RoomDesc()
+        public RoomDesc() : base()
         {
             this.RoomInfo = new();
 
@@ -19,7 +19,7 @@ namespace ThePalace.Core.Entities.Shared
             this.DrawCmds = new();
             this.LooseProps = new();
         }
-        public RoomDesc(RoomRec room)
+        public RoomDesc(RoomRec room) : base()
         {
             this.RoomInfo = room;
 

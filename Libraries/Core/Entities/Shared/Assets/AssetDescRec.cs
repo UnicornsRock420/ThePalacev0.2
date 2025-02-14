@@ -1,5 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using uint16 = System.UInt16;
 using uint32 = System.UInt32;
@@ -15,5 +17,19 @@ namespace ThePalace.Core.Entities.Shared.Assets
 
         [Str31]
         public string? Name;
+
+        public void Deserialize(Stream reader, SerializerOptions opts)
+        {
+            AssetFlags = reader.ReadUInt16();
+            PropFlags = reader.ReadUInt16();
+            Size = reader.ReadUInt32();
+
+            Name = reader.ReadPString(1, 31, 32);
+        }
+
+        public void Serialize(Stream writer, SerializerOptions opts)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

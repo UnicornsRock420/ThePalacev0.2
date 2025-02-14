@@ -433,7 +433,7 @@ namespace ThePalace.Core.Entities.Shared
 
                     using (var ms = new MemoryStream())
                     {
-                        this.LooseProps[i].Serialize(ms);
+                        this.LooseProps[i].Serialize(ms, opts);
 
                         _blobData.WriteBytes(ms.ToArray());
                     }

@@ -24,12 +24,7 @@ namespace ThePalace.Core.Entities.Shared.Types
             this.Id = Id;
             this.Crc = Crc;
         }
-        public AssetSpec(Stream reader)
-        {
-            var refNum = 0;
-
-            Deserialize(reader, SerializerOptions.None);
-        }
+        public AssetSpec(Stream reader, SerializerOptions opts = SerializerOptions.None) => Deserialize(reader, opts);
         public AssetSpec(AssetSpec assetSpec)
         {
             Id = assetSpec.Id;
