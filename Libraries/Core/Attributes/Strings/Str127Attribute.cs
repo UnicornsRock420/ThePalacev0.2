@@ -2,7 +2,7 @@
 {
     public class Str127Attribute : PStringAttribute
     {
-        public Str127Attribute() : base(1, 31, 0)
+        public Str127Attribute() : base(1, 127, 128)
         {
         }
     }

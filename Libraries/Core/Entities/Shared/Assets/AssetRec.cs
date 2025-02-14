@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared.Types;
+using ThePalace.Core.Enums.App;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
@@ -27,7 +28,7 @@ namespace ThePalace.Core.Entities.Shared.Assets
         public uint16 BlockNbr;
         public uint16 NbrBlocks;
 
-        [Predicate(typeof(AssetRec), nameof(BlockNbr), IptOperatorFlags.EqualTo, 0)]
+        [Predicate(typeof(AssetRec), nameof(BlockNbr), PredicateOperators.EqualTo, 0)]
         public AssetDescRec AssetDesc;
 
         [SizeDependency(typeof(AssetRec), nameof(BlockSize))]

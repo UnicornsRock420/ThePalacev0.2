@@ -18,7 +18,7 @@ namespace ThePalace.Core.Entities.Shared.Users
         [Str31]
         public string? UserName;
 
-        [EncryptedString(1, 31)]
+        [EncryptedString(1, 31, 32)]
         public string? WizPassword;
 
         public sint32 AuxFlags;

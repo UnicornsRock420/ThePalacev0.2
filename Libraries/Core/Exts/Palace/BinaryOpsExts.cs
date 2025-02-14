@@ -6,6 +6,7 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Enums.App;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
@@ -411,7 +412,17 @@ namespace ThePalace.Core.Exts.Palace
         #endregion
 
         #region Serialization/Deserialization Methods
-        public static void PalaceDeserialize(this Stream reader, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+        private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStruct);
+        private static List<MemberInfo> GetMembers(this Type type, BindingFlags flags = BindingFlags.Public | BindingFlags.Instance) =>
+            type
+                .GetProperties(flags)
+                .Cast<MemberInfo>()
+                .Union(type
+                    .GetFields(flags)
+                    .Cast<MemberInfo>())
+                .ToList();
+
+        public static void PalaceDeserialize(this Stream reader, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             if (obj == null ||
                 objType == null ||
@@ -419,20 +430,14 @@ namespace ThePalace.Core.Exts.Palace
 
             if (obj.Is<IStructSerializer>(out var serializer))
             {
-                serializer.Deserialize(ref refNum, reader, opts);
+                serializer.Deserialize(reader, opts);
 
                 return;
             }
 
             var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
-            var members = objType
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Cast<MemberInfo>()
-                .Union(objType
-                    .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                    .Cast<MemberInfo>())
-                .ToList();
+            var members = objType.GetMembers();
 
             foreach (var member in members)
             {
@@ -482,8 +487,41 @@ namespace ThePalace.Core.Exts.Palace
                     _attrs.Any(a => a is IgnoreDataMemberAttribute))
                 {
                     //throw new Exception(string.Format("Member (t:{0}, n:{1})", _type.Name, _name));
-                    Console.WriteLine("Member (t:{0}, n:{1})", _type.Name, _name);
+                    Console.WriteLine("Member (t:{0}, n:{1})", _type?.Name, _name);
                     continue;
+                }
+
+                if (_attrs.Any(a => a is PredicateAttribute))
+                {
+                    var predicate = _attrs
+                        .Where(a => a is PredicateAttribute)
+                        .Select(a => a as PredicateAttribute)
+                        .FirstOrDefault();
+                    if (predicate?.Property != null)
+                    {
+                        var _intValue = 0;
+
+                        if (predicate.Property is FieldInfo _fNfo)
+                        {
+                            _intValue = (int)(_fNfo.GetValue(obj) ?? 0);
+                        }
+                        else if (predicate.Property is PropertyInfo _pNfo)
+                        {
+                            _intValue = (int)(_pNfo.GetValue(obj) ?? 0);
+                        }
+
+                        switch (predicate.Operator)
+                        {
+                            case PredicateOperators.EqualTo:
+                                if (_intValue != (int)predicate.Value) continue;
+
+                                break;
+                            case PredicateOperators.NotEqualTo:
+                                if (_intValue == (int)predicate.Value) continue;
+
+                                break;
+                        }
+                    }
                 }
 
                 var byteSize = _attrs
@@ -613,6 +651,20 @@ namespace ThePalace.Core.Exts.Palace
                         continue;
 
                     case Type _t when _t == ByteExts.Types.ByteArray:
+                        var sizeDependencyMemberInfo = _attrs
+                            .Where(a => a is SizeDependencyAttribute)
+                            .Select(a => a as SizeDependencyAttribute)
+                            .SelectMany(a => a?.Properties ?? [])
+                            .FirstOrDefault();
+                        if (sizeDependencyMemberInfo is FieldInfo _fNfo)
+                        {
+                            byteSize = (int)(_fNfo.GetValue(obj) ?? 0);
+                        }
+                        else if (sizeDependencyMemberInfo is PropertyInfo _pNfo)
+                        {
+                            byteSize = (int)(_pNfo.GetValue(obj) ?? 0);
+                        }
+
                         if (byteSize > 0)
                         {
                             buffer = new byte[byteSize];
@@ -624,23 +676,26 @@ namespace ThePalace.Core.Exts.Palace
 
                         continue;
 
-                    case Type _t when _t is IStruct:
+                    default:
+                        if (_type.GetInterfaces().Contains(CONST_TYPE_ISTRUCT))
                         {
-                            result = _t.GetInstance();
+                            result = _type.GetInstance();
 
                             if (result.Is<IStructSerializer>(out serializer))
                             {
-                                serializer.Deserialize(ref refNum, reader, opts);
+                                serializer.Deserialize(reader, opts);
                             }
                             else
                             {
-                                reader.PalaceDeserialize(ref refNum, result, _type, opts);
+                                reader.PalaceDeserialize(result, _type, opts);
                             }
+
+                            _cb(member, result);
+
+                            continue;
                         }
 
-                        continue;
-
-                    default: return;
+                        return;
                 }
 
                 if (result == null)
@@ -685,7 +740,7 @@ namespace ThePalace.Core.Exts.Palace
             }
         }
 
-        public static void PalaceSerialize(this Stream writer, ref int refNum, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize(this Stream writer, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
         {
             if (obj == null ||
                 objType == null ||
@@ -693,16 +748,9 @@ namespace ThePalace.Core.Exts.Palace
 
             var streamPosition = writer.Position;
 
-            var doRefNumOnly = opts.IsSet<SerializerOptions, byte>(SerializerOptions.RefNumOnly);
             var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
 
-            var members = objType
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .Cast<MemberInfo>()
-                .Union(objType
-                    .GetFields(BindingFlags.Public | BindingFlags.Instance)
-                    .Cast<MemberInfo>())
-                .ToList();
+            var members = objType.GetMembers();
 
             var minByteSize = 0;
             var maxByteSize = 0;
@@ -740,31 +788,44 @@ namespace ThePalace.Core.Exts.Palace
 
                 if (_type == null ||
                     _name == null ||
-                    _value == null ||
                     _attrs.Any(a => a is IgnoreDataMemberAttribute))
                 {
                     //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
-                    Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value);
+                    Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type?.Name, _name, _value ?? default(object));
                     continue;
                 }
 
-                if (_attrs
-                    .Where(a => a is RefNumAttribute)
-                    .Any())
+                if (_attrs.Any(a => a is PredicateAttribute))
                 {
-                    refNum = (int)(object)_value;
-
-                    if (doRefNumOnly)
+                    var predicate = _attrs
+                        .Where(a => a is PredicateAttribute)
+                        .Select(a => a as PredicateAttribute)
+                        .FirstOrDefault();
+                    if (predicate?.Property != null)
                     {
-                        return;
+                        var _intValue = 0;
+
+                        if (predicate.Property is FieldInfo _fNfo)
+                        {
+                            _intValue = (int)(_fNfo.GetValue(obj) ?? 0);
+                        }
+                        else if (predicate.Property is PropertyInfo _pNfo)
+                        {
+                            _intValue = (int)(_pNfo.GetValue(obj) ?? 0);
+                        }
+
+                        switch (predicate.Operator)
+                        {
+                            case PredicateOperators.EqualTo:
+                                if (_intValue != (int)predicate.Value) continue;
+
+                                break;
+                            case PredicateOperators.NotEqualTo:
+                                if (_intValue == (int)predicate.Value) continue;
+
+                                break;
+                        }
                     }
-
-                    continue;
-                }
-
-                if (doRefNumOnly)
-                {
-                    continue;
                 }
 
                 var byteSize = _attrs
@@ -806,7 +867,7 @@ namespace ThePalace.Core.Exts.Palace
                     case Type _t when _t == Int64Exts.Types.Int64 || _t == UInt64Exts.Types.UInt64: byteSize = 8; break;
 
                     case Type _t when _t == StringExts.Types.String:
-                        var _str = (string)_value;
+                        var _str = ((string?)_value) ?? string.Empty;
 
                         if (_attrs.Any(a => a is PStringAttribute))
                         {
@@ -896,20 +957,44 @@ namespace ThePalace.Core.Exts.Palace
                         continue;
 
                     case Type _t when _t == ByteExts.Types.ByteArray:
+                        var sizeDependencyMemberInfo = _attrs
+                            .Where(a => a is SizeDependencyAttribute)
+                            .Select(a => a as SizeDependencyAttribute)
+                            .SelectMany(a => a?.Properties ?? [])
+                            .FirstOrDefault();
+                        if (sizeDependencyMemberInfo is FieldInfo _fNfo)
+                        {
+                            byteSize = (int)(_fNfo.GetValue(obj) ?? 0);
+                        }
+                        else if (sizeDependencyMemberInfo is PropertyInfo _pNfo)
+                        {
+                            byteSize = (int)(_pNfo.GetValue(obj) ?? 0);
+                        }
+
                         if (byteSize < 1)
                         {
-                            buffer = (byte[])(object)_value;
+                            buffer = ((byte[]?)(object?)_value) ?? [];
                             byteSize = buffer.Length;
                         }
 
                         break;
 
-                    case Type _t when _t is IStruct:
-                        writer.PalaceSerialize(ref refNum, _value, _type);
+                    default:
+                        if (_type.GetInterfaces().Contains(CONST_TYPE_ISTRUCT))
+                        {
+                            if (_value.Is<IStructSerializer>(out var serializer))
+                            {
+                                serializer.Serialize(writer, opts);
+                            }
+                            else
+                            {
+                                writer.PalaceSerialize(_value, _type);
+                            }
 
-                        continue;
+                            continue;
+                        }
 
-                    default: return;
+                        return;
                 }
 
                 switch (byteSize)
@@ -928,29 +1013,23 @@ namespace ThePalace.Core.Exts.Palace
                 (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
-        public static void PalaceSerialize<TStruct>(this Stream writer, ref int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize<TStruct>(this Stream writer, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
             where TStruct : IStruct
         {
             if (obj == null) return;
 
             var objType = typeof(TStruct);
-            var doObjIsIStructRefNum = obj.Is<IStructRefNum>();
 
             var msgBytes = (byte[]?)null;
             using (var ms = new MemoryStream())
             {
                 if (obj.Is<IStructSerializer>(out var serializer))
                 {
-                    if (doObjIsIStructRefNum)
-                    {
-                        ms.PalaceSerialize(ref refNum, obj, objType, SerializerOptions.RefNumOnly);
-                    }
-
-                    serializer.Serialize(ref refNum, ms, opts);
+                    serializer.Serialize(ms, opts);
                 }
                 else
                 {
-                    ms.PalaceSerialize(ref refNum, obj, opts);
+                    ms.PalaceSerialize(obj, objType, opts);
                 }
 
                 msgBytes = ms.ToArray();
@@ -965,15 +1044,15 @@ namespace ThePalace.Core.Exts.Palace
                     Length = (uint)(msgBytes?.Length ?? 0),
                 };
 
-                if (doObjIsIStructRefNum)
+                if (obj.Is<IStructRefNum>(out var _refNum))
                 {
-                    hdr.RefNum = refNum;
+                    hdr.RefNum = _refNum.RefNum;
                 }
 
                 var hdrBytes = (byte[]?)null;
                 using (var ms = new MemoryStream())
                 {
-                    ms.PalaceSerialize(ref refNum, hdr, typeof(MSG_Header), opts);
+                    ms.PalaceSerialize(hdr, typeof(MSG_Header), opts);
 
                     hdrBytes = ms.ToArray();
                 }

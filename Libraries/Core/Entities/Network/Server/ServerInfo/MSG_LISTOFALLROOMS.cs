@@ -1,4 +1,5 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using System.Runtime.Serialization;
+using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
@@ -12,7 +13,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
     [Mnemonic("rLst")]
     public partial class MSG_LISTOFALLROOMS : Core.EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
     {
-        [RefNum]
+        [IgnoreDataMember]
         public sint32 RefNum
         {
             get => this.Rooms?.Count ?? 0;
@@ -26,26 +27,23 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 
         public List<ListRec>? Rooms;
 
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             this.Rooms = [];
 
             while ((reader.Length - reader.Position) >= 12)
             {
                 var room = new ListRec();
-                reader.PalaceDeserialize(ref refNum, room, typeof(ListRec), opts);
+                reader.PalaceDeserialize(room, typeof(ListRec), opts);
                 this.Rooms.Add(room);
             }
-
-            if (this.Rooms.Count != refNum)
-                throw new InvalidDataException(nameof(MSG_LISTOFALLROOMS) + "-S2C: Deserialization Error!");
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             if ((this.Rooms?.Count ?? 0) > 0)
                 foreach (var room in this.Rooms)
-                    writer.PalaceSerialize(ref refNum, room, typeof(ListRec), opts);
+                    writer.PalaceSerialize(room, typeof(ListRec), opts);
         }
     }
 }

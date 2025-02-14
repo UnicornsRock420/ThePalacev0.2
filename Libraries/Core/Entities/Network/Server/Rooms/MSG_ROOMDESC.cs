@@ -12,12 +12,12 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms
     {
         public RoomRec? RoomInfo;
 
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }

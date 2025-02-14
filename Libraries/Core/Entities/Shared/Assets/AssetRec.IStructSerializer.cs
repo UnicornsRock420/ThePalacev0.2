@@ -5,12 +5,12 @@ namespace ThePalace.Core.Entities.Shared.Rooms.Assets
 {
     public partial class AssetRec : IStructSerializer
     {
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             throw new NotImplementedException();
         }

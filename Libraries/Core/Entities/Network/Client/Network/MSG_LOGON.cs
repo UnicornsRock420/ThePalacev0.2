@@ -7,6 +7,11 @@ namespace ThePalace.Core.Entities.Network.Client.Network
     [Mnemonic("regi")]
     public partial class MSG_LOGON : Core.EventParams, IProtocolC2S
     {
+        public MSG_LOGON()
+        {
+            RegInfo = new();
+        }
+
         public RegistrationRec? RegInfo;
     }
 }

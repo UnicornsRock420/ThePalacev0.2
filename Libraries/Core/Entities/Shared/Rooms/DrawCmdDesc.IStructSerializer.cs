@@ -11,7 +11,7 @@ namespace ThePalace.Core.Entities.Shared
         private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.Palace.AttributeExts.GetByteSize<MSG_Header>();
         private static readonly int CONST_INT_SIZEOF_POINT = Exts.Palace.AttributeExts.GetByteSize<Types.Point>();
 
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             DrawCmdInfo.NextOfst = reader.ReadInt16();
             DrawCmdInfo.Reserved = reader.ReadInt16();
@@ -107,7 +107,7 @@ namespace ThePalace.Core.Entities.Shared
             }
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             writer.WriteInt16(DrawCmdInfo.NextOfst);
             writer.WriteInt16(DrawCmdInfo.Reserved);

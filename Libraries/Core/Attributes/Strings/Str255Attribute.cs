@@ -2,7 +2,7 @@
 {
     public class Str255Attribute : PStringAttribute
     {
-        public Str255Attribute() : base(1, 255, 0)
+        public Str255Attribute() : base(1, 255, 256)
         {
         }
     }

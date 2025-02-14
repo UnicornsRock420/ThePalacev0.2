@@ -11,7 +11,7 @@ namespace ThePalace.Core.Entities.Shared
 {
     public partial class RoomDesc : IDisposable, IStructSerializer
     {
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             var roomNameOfst = (short)0;
             var pictNameOfst = (short)0;
@@ -242,7 +242,7 @@ namespace ThePalace.Core.Entities.Shared
             return;
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             using (var _data = new RawStream()) //RawData()
             using (var _blobData = new RawStream()) //RawData()
@@ -295,7 +295,7 @@ namespace ThePalace.Core.Entities.Shared
                                 {
                                     foreach (var state in spot.States)
                                     {
-                                        state.Serialize(ref refNum, ms, opts);
+                                        state.Serialize(ms, opts);
 
                                         //_blobData.WriteInt16(state.PictID);
                                         //_blobData.WriteInt16(0); //reserved
@@ -433,7 +433,7 @@ namespace ThePalace.Core.Entities.Shared
 
                     using (var ms = new MemoryStream())
                     {
-                        this.LooseProps[i].Serialize(ref refNum, ms);
+                        this.LooseProps[i].Serialize(ms);
 
                         _blobData.WriteBytes(ms.ToArray());
                     }

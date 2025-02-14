@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Shared
 {
     public partial class HotspotStateDesc : IStructSerializer
     {
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             StateInfo.PictID = reader.ReadInt16();
             StateInfo.Reserved = reader.ReadInt16();
@@ -14,12 +14,12 @@ namespace ThePalace.Core.Entities.Shared
             StateInfo.PicLoc = new Point(reader);
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             writer.WriteInt16(StateInfo.PictID);
             writer.WriteInt16(StateInfo.Reserved);
 
-            StateInfo.PicLoc.Serialize(ref refNum, writer);
+            StateInfo.PicLoc.Serialize(writer);
         }
     }
 }

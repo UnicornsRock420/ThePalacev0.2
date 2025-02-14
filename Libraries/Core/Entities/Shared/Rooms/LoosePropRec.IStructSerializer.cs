@@ -6,7 +6,7 @@ namespace ThePalace.Core.Entities.Shared
 {
     public partial class LoosePropRec : IStructSerializer
     {
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             this.NextOfst = reader.ReadInt16();
             this.Reserved = reader.ReadInt16();
@@ -19,12 +19,12 @@ namespace ThePalace.Core.Entities.Shared
             this.Loc = new Point(reader);
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             writer.WriteInt16(this.NextOfst);
             writer.WriteInt16(this.Reserved);
 
-            this.AssetSpec.Serialize(ref refNum, writer, opts);
+            this.AssetSpec.Serialize(writer, opts);
 
             writer.WriteInt32(this.Flags);
             writer.WriteInt32(this.RefCon);
@@ -32,7 +32,7 @@ namespace ThePalace.Core.Entities.Shared
             writer.WriteInt16(this.Loc.HAxis);
             writer.WriteInt16(this.Loc.VAxis);
 
-            this.Loc.Serialize(ref refNum, writer, opts);
+            this.Loc.Serialize(writer, opts);
         }
     }
 }

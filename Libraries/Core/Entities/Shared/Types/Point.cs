@@ -23,7 +23,7 @@ namespace ThePalace.Core.Entities.Shared.Types
         {
             var refNum = 0;
 
-            Deserialize(ref refNum, reader, SerializerOptions.None);
+            Deserialize(reader, SerializerOptions.None);
         }
         public Point(Point assetSpec)
         {
@@ -34,13 +34,13 @@ namespace ThePalace.Core.Entities.Shared.Types
         public sint16 VAxis;
         public sint16 HAxis;
 
-        public void Deserialize(ref int refNum, Stream reader, SerializerOptions opts = SerializerOptions.None)
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {
             VAxis = reader.ReadInt16();
             HAxis = reader.ReadInt16();
         }
 
-        public void Serialize(ref int refNum, Stream writer, SerializerOptions opts = SerializerOptions.None)
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
         {
             writer.WriteInt16(VAxis);
             writer.WriteInt16(HAxis);
