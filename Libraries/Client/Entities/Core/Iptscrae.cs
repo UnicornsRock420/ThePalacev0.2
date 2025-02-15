@@ -89,8 +89,6 @@ namespace ThePalace.Common.Desktop.Entities.Core
         public IptEvents Events { get; internal set; } = new();
         public IptVariables Variables { get; internal set; } = new();
 
-        public IptTracking() { }
-
         public void Dispose()
         {
             Events?.Clear();
