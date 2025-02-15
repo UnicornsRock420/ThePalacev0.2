@@ -8,7 +8,7 @@
 
         private static void CheckTTL()
         {
-            if (_KvTtl == 0 || DateTime.UtcNow.Subtract(_UpdateDate).Minutes > _KvTtl)
+            if (_RndGenerator == null || DateTime.UtcNow.Subtract(_UpdateDate).Minutes > _KvTtl)
             {
                 try
                 {

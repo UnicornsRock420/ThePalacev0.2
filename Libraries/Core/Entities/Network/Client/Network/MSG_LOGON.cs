@@ -12,6 +12,6 @@ namespace ThePalace.Core.Entities.Network.Client.Network
             RegInfo = new();
         }
 
-        public RegistrationRec? RegInfo;
+        public RegistrationRec RegInfo;
     }
 }

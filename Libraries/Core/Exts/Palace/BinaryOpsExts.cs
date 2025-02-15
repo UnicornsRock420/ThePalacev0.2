@@ -1,7 +1,5 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
@@ -12,7 +10,6 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ThePalace.Core.Exts.Palace
 {
@@ -984,7 +981,7 @@ namespace ThePalace.Core.Exts.Palace
                             }
                             else
                             {
-                                writer.PalaceSerialize(_value, _type);
+                                writer.PalaceSerialize(_value, _type, opts);
                             }
 
                             continue;
@@ -1009,7 +1006,7 @@ namespace ThePalace.Core.Exts.Palace
                 (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
         }
 
-        public static void PalaceSerialize<TStruct>(this Stream writer, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+        public static void PalaceSerialize<TStruct>(this Stream writer, int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
             where TStruct : IStruct
         {
             if (obj == null) return;
@@ -1043,6 +1040,10 @@ namespace ThePalace.Core.Exts.Palace
                 if (obj.Is<IStructRefNum>(out var _refNum))
                 {
                     hdr.RefNum = _refNum.RefNum;
+                }
+                else
+                {
+                    hdr.RefNum = refNum;
                 }
 
                 var hdrBytes = (byte[]?)null;

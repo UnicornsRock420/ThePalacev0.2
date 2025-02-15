@@ -49,6 +49,8 @@ namespace Sandbox
 
             BO_LOGON? test = null;
 
+            Experiment1();
+            Experiment2();
             Experiment3();
 
             //var taskManager = new TaskManager();
@@ -68,14 +70,17 @@ namespace Sandbox
         private static void Experiment1()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header();
+            var hdr = new MSG_Header
+            {
+                RefNum = 456,
+            };
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
-            var refNum = 456;
 
             using (var ms = new MemoryStream())
             {
                 ms.PalaceSerialize(
+                    hdr.RefNum,
                     new MSG_LISTOFALLROOMS
                     {
                         Rooms = new()
@@ -107,8 +112,7 @@ namespace Sandbox
 
                 ms.PalaceDeserialize(hdr, typeof(MSG_Header));
 
-                if ((ms.Length - ms.Position) != hdr.Length)
-                    throw new InvalidDataException(nameof(hdr));
+                if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
                 var eventType = hdr.EventType.ToString();
                 msgType = AppDomain.CurrentDomain
@@ -124,8 +128,7 @@ namespace Sandbox
                         msg,
                         msgType);
 
-                    if (((MSG_LISTOFALLROOMS)msg).Rooms.Count != refNum)
-                        throw new InvalidDataException(nameof(MSG_LISTOFALLROOMS) + "-S2C: Deserialization Error!");
+                    if (((MSG_LISTOFALLROOMS)msg).Rooms.Count != 2) throw new InvalidDataException(nameof(MSG_LISTOFALLROOMS) + "-S2C: Deserialization Error!");
                 }
             }
 
@@ -135,10 +138,12 @@ namespace Sandbox
         private static void Experiment2()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header();
+            var hdr = new MSG_Header
+            {
+                RefNum = 456,
+            };
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
-            var refNum = 456;
 
             using (var ms = new MemoryStream())
             {
@@ -147,6 +152,7 @@ namespace Sandbox
                 var ctr = (uint)Cipher.GetSeedFromReg(seed, crc);
 
                 ms.PalaceSerialize(
+                    hdr.RefNum,
                     new MSG_LOGON
                     {
                         RegInfo = new RegistrationRec
@@ -174,8 +180,7 @@ namespace Sandbox
 
                 ms.PalaceDeserialize(hdr, typeof(MSG_Header));
 
-                if ((ms.Length - ms.Position) != hdr.Length)
-                    throw new InvalidDataException(nameof(hdr));
+                if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
                 var eventType = hdr.EventType.ToString();
                 msgType = AppDomain.CurrentDomain
@@ -199,14 +204,17 @@ namespace Sandbox
         private static void Experiment3()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header();
+            var hdr = new MSG_Header
+            {
+                RefNum = RndGenerator.Next() % 1337,
+            };
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
-            var refNum = 456;
 
             using (var ms = new MemoryStream())
             {
                 ms.PalaceSerialize(
+                    hdr.RefNum,
                     new MSG_USERDESC
                     {
                         FaceNbr = 1,
@@ -227,8 +235,7 @@ namespace Sandbox
 
                 ms.PalaceDeserialize(hdr, typeof(MSG_Header));
 
-                if ((ms.Length - ms.Position) != hdr.Length)
-                    throw new InvalidDataException(nameof(hdr));
+                if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
                 var eventType = hdr.EventType.ToString();
                 msgType = AppDomain.CurrentDomain
