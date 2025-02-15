@@ -1,5 +1,6 @@
 using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Server.Entities.Business.Server.ServerInfo;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
@@ -10,9 +11,12 @@ using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Factories.Core;
+using ThePalace.Core.Factories.Threading;
 using ThePalace.Core.Helpers;
+using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
+using static ThePalace.Core.Factories.Threading.Job;
 using sint16 = System.Int16;
 
 namespace Sandbox
@@ -32,21 +36,6 @@ namespace Sandbox
             //// see https://aka.ms/applicationconfiguration.
             //ApplicationConfiguration.Initialize();
             //Application.Run(new Program());
-
-            //Func<string, bool>? where = l => l == "123";
-            //var test = new List<string> { "Test", "123" }
-            //    .Where(where)
-            //    .ToList();
-
-            //Experiment1();
-
-            //var iStructTypes = AppDomain.CurrentDomain
-            //    .GetAssemblies()
-            //    .SelectMany(t => t.GetTypes())
-            //    .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IStruct)));
-
-            //var container = new DIContainer();
-            //container.RegisterTypes(iStructTypes);
 
             BO_LISTOFALLROOMS? test = null;
 
@@ -75,13 +64,9 @@ namespace Sandbox
             Experiment2();
             Experiment3();
 
-            //var taskManager = new TaskManager();
-            //var job = taskManager.CreateTask(() =>
-            //{
-            //    Console.WriteLine("Test123");
-            //}, null, RunOptions.RunNow | RunOptions.RunOnce);
-
-            //taskManager.Run();
+            //Experiment4();
+            //Experiment5();
+            //Experiment6();
         }
 
         public Program()
@@ -89,6 +74,37 @@ namespace Sandbox
             InitializeComponent();
         }
 
+        private static void Experiment4()
+        {
+            Func<string, bool>? where = l => l == "123";
+            var test = new List<string> { "Test", "123" }
+                .Where(where)
+                .ToList();
+        }
+
+        private static void Experiment5()
+        {
+            var iStructTypes = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t => !t.IsInterface && t.GetInterfaces().Contains(typeof(IStruct)));
+
+            var container = new DIContainer();
+            container.RegisterTypes(iStructTypes);
+        }
+
+        private static void Experiment6()
+        {
+            var taskManager = new TaskManager();
+            var job = taskManager.CreateTask(() =>
+            {
+                Console.WriteLine("Test123");
+            }, null, RunOptions.RunNow | RunOptions.RunOnce);
+
+            taskManager.Run();
+        }
+
+        private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
         private static void Experiment1()
         {
             var packetBytes = (byte[]?)null;
@@ -132,7 +148,7 @@ namespace Sandbox
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                ms.PalaceDeserialize(hdr, typeof(MSG_Header));
+                ms.PalaceDeserialize(hdr, CONST_TYPE_MSG_Header);
 
                 if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
@@ -155,7 +171,6 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            //eventBus.Subscribe<MSG_LISTOFALLROOMS>(new BO_LISTOFALLROOMS());
             var boType = GetBOType(msg);
             eventBus.Publish(
                 null,
@@ -166,8 +181,6 @@ namespace Sandbox
                     RefNum = hdr.RefNum,
                     Request = msg,
                 });
-
-            //var boObj = DispatchBO(msg);
         }
 
         private static void Experiment2()
@@ -213,7 +226,7 @@ namespace Sandbox
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                ms.PalaceDeserialize(hdr, typeof(MSG_Header));
+                ms.PalaceDeserialize(hdr, CONST_TYPE_MSG_Header);
 
                 if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
@@ -234,7 +247,6 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            //eventBus.Subscribe<MSG_LOGON>(new BO_LOGON());
             var boType = GetBOType(msg);
             eventBus.Publish(
                 null,
@@ -245,8 +257,6 @@ namespace Sandbox
                     RefNum = hdr.RefNum,
                     Request = msg,
                 });
-
-            //var boObj = DispatchBO(msg);
         }
 
         private static void Experiment3()
@@ -281,7 +291,7 @@ namespace Sandbox
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                ms.PalaceDeserialize(hdr, typeof(MSG_Header));
+                ms.PalaceDeserialize(hdr, CONST_TYPE_MSG_Header);
 
                 if ((ms.Length - ms.Position) != hdr.Length) throw new InvalidDataException(nameof(hdr));
 
@@ -302,7 +312,6 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            //eventBus.Subscribe(typeof(BO_USERDESC));
             var boType = GetBOType(msg);
             eventBus.Publish(
                 null,
@@ -313,8 +322,6 @@ namespace Sandbox
                     RefNum = hdr.RefNum,
                     Request = msg,
                 });
-
-            //var boObj = DispatchBO(msg);
         }
 
         private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
@@ -347,55 +354,5 @@ namespace Sandbox
                 })
                 .FirstOrDefault();
         }
-
-        //private static IEventHandler DispatchBO(IProtocol msg)
-        //{
-        //    var msgType = msg.GetType();
-
-        //    var boType = AppDomain.CurrentDomain
-        //        .GetAssemblies()
-        //        .SelectMany(t =>
-        //            t.GetTypes()
-        //                .Where(t =>
-        //                {
-        //                    if (t.IsInterface) return false;
-
-        //                    var itrfs = t.GetInterfaces();
-
-        //                    if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
-
-        //                    if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
-
-        //                    return true;
-        //                }))
-        //        .Select(t =>
-        //        {
-        //            foreach (var i in t.GetInterfaces() ?? [])
-        //                if (i == CONST_TYPE_IEventHandler)
-        //                    return t;
-
-        //            return null;
-        //        })
-        //        .FirstOrDefault();
-        //    if (boType == null) return null;
-
-        //    var boObj = boType?.GetInstance<IEventHandler>();
-        //    if (boObj != null)
-        //    {
-        //        boObj.Handle(
-        //            new { },
-        //            new ProtocolEventParams
-        //            {
-        //                SourceID = 0,
-        //                RefNum = 123,
-        //                Request = (IProtocol?)msg,
-        //                ConnectionState = null,
-        //            });
-
-        //        return boObj;
-        //    }
-
-        //    return null;
-        //}
     }
 }
