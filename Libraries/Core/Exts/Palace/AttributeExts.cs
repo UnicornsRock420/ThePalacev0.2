@@ -113,10 +113,11 @@ namespace ThePalace.Core.Exts.Palace
                 .FirstOrDefault();
         }
 
-        public static int GetByteSize<T>()
+        public static int GetByteSize<T>() => GetByteSize(typeof(T));
+
+        public static int GetByteSize(this Type type)
         {
             var attribs = new List<ByteSizeAttribute>();
-            var type = typeof(T);
             switch (type)
             {
                 case Type _t when _t is Type:

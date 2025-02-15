@@ -499,7 +499,7 @@ namespace ThePalace.Core.Exts.Palace
         #endregion
 
         #region Serialization/Deserialization Methods
-        private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStructSerializer);
+        private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStruct);
         private static List<MemberInfo> GetMembers(this Type type, BindingFlags flags = BindingFlags.Public | BindingFlags.Instance) =>
             type
                 .GetProperties(flags)

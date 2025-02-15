@@ -5,6 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.Network
 {
+    [ByteSize(128)]
     [Mnemonic("regi")]
     public partial class MSG_LOGON : EventParams, IProtocolC2S
     {
