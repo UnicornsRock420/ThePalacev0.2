@@ -22,7 +22,7 @@ namespace ThePalace.Core.Exts.Palace
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
                         ?.Cast<MnemonicAttribute>() ?? []);
                     break;
-                case Type _e when _e is Enum || _e.IsEnum:
+                case Type _e when _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return null;
 
@@ -51,7 +51,7 @@ namespace ThePalace.Core.Exts.Palace
                         ?.GetCustomAttributes(Types.MnemonicAttribute, false)
                         ?.Cast<MnemonicAttribute>() ?? []);
                     break;
-                case Type _e when _e is Enum || _e.IsEnum:
+                case Type _e when _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 
@@ -91,7 +91,7 @@ namespace ThePalace.Core.Exts.Palace
                 //?.Cast<BitSizeAttribute>()
                 //?.Select(a => a.BitSize)
                 //?.FirstOrDefault() ?? 0;
-                case Type _e when _e is Enum || _e.IsEnum:
+                case Type _e when _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 
@@ -124,7 +124,7 @@ namespace ThePalace.Core.Exts.Palace
                         ?.GetCustomAttributes(Types.ByteSizeAttribute, false)
                         ?.Cast<ByteSizeAttribute>() ?? []);
                     break;
-                case Type _e when _e is Enum || _e.IsEnum:
+                case Type _e when _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return 0;
 

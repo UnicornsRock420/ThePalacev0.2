@@ -23,7 +23,7 @@ namespace System
                         ?.Cast<DescriptionAttribute>()
                         ?.Select(a => a.Description)
                         ?.FirstOrDefault();
-                case Type _e when _e is Enum || _e.IsEnum:
+                case Type _e when _e.IsEnum:
                     var key = _e?.ToString();
                     if (key == null) return null;
 

@@ -33,6 +33,25 @@ namespace ThePalace.Core.Factories.Core
             }
         }
 
+        public void Subscribe<TEventParams, TEventHandler>()
+            where TEventParams : IEventParams
+            where TEventHandler : IEventHandler<TEventParams>, new()
+        {
+            var eventType = typeof(TEventParams);
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            var handler = new TEventHandler();
+            if (handler == null) return;
+
+            if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
+            {
+                _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
         public void Subscribe(IEventHandler handler)
         {
             var eventType = handler.GetType();
@@ -51,6 +70,49 @@ namespace ThePalace.Core.Factories.Core
             if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
             {
                 _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
+        public void Subscribe(Type eventType)
+        {
+            if (eventType == null) return;
+
+            if (eventType.IsGenericType &&
+                eventType.GetGenericArguments().Length > 0)
+            {
+                eventType = eventType.GetGenericArguments().FirstOrDefault();
+                if (eventType == null) return;
+            }
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            var handler = eventType.GetInstance() as IEventHandler;
+            if (handler == null) return;
+
+            if (!_handlersDictionary.TryAdd(eventTypeName, [handler]))
+            {
+                _handlersDictionary[eventTypeName].Add(handler);
+            }
+        }
+
+        public async Task Publish<TEventType, TEventParams>(object? sender, TEventParams @event)
+            where TEventParams : IEventParams
+        {
+            var eventType = typeof(TEventType);
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+
+            var handlers = _handlersDictionary[eventTypeName];
+            if (handlers.Count < 1) return;
+
+            foreach (var eventHandler in handlers)
+            {
+                await eventHandler.Handle(sender, @event);
             }
         }
 
@@ -77,6 +139,24 @@ namespace ThePalace.Core.Factories.Core
         public async Task Publish(object? sender, IEventParams @event)
         {
             var eventType = @event.GetType();
+            if (eventType == null) return;
+
+            var eventTypeName = eventType.FullName;
+            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
+
+            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+
+            var handlers = _handlersDictionary[eventTypeName];
+            if (handlers.Count < 1) return;
+
+            foreach (var eventHandler in handlers)
+            {
+                await eventHandler.Handle(sender, @event);
+            }
+        }
+
+        public async Task Publish(object? sender, Type eventType, IEventParams @event)
+        {
             if (eventType == null) return;
 
             var eventTypeName = eventType.FullName;

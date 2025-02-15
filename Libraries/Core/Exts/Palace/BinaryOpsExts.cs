@@ -601,7 +601,7 @@ namespace ThePalace.Core.Exts.Palace
 
                 switch (_type)
                 {
-                    case Type _e when _e is Enum || _e.IsEnum: break;
+                    case Type _e when _e.IsEnum: break;
 
                     case Type _t when _t == ByteExts.Types.Byte || _t == SByteExts.Types.SByte: byteSize = 1; break;
                     case Type _t when _t == Int16Exts.Types.Int16 || _t == UInt16Exts.Types.UInt16: byteSize = 2; break;
@@ -866,7 +866,7 @@ namespace ThePalace.Core.Exts.Palace
 
                 switch (_type)
                 {
-                    case Type _e when _e is Enum || _e.IsEnum: break;
+                    case Type _e when _e.IsEnum: break;
 
                     case Type _t when _t == ByteExts.Types.Byte || _t == SByteExts.Types.SByte: byteSize = 1; break;
                     case Type _t when _t == Int16Exts.Types.Int16 || _t == UInt16Exts.Types.UInt16: byteSize = 2; break;

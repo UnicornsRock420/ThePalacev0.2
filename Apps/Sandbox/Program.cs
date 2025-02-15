@@ -1,5 +1,7 @@
 using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Server.Entities.Business.Client.Network;
+using ThePalace.Common.Server.Entities.Business.Server.ServerInfo;
+using ThePalace.Common.Server.Entities.Business.Shared.Users;
 using ThePalace.Core.Entities.EventParams;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
@@ -9,8 +11,8 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
@@ -46,8 +48,6 @@ namespace Sandbox
 
             //var container = new DIContainer();
             //container.RegisterTypes(iStructTypes);
-
-            BO_LOGON? test = null;
 
             Experiment1();
             Experiment2();
@@ -128,11 +128,22 @@ namespace Sandbox
                         msg,
                         msgType);
 
-                    if (((MSG_LISTOFALLROOMS)msg).Rooms.Count != 2) throw new InvalidDataException(nameof(MSG_LISTOFALLROOMS) + "-S2C: Deserialization Error!");
+                    if (((MSG_LISTOFALLROOMS)msg).Rooms.Count != hdr.RefNum) throw new InvalidDataException(nameof(MSG_LISTOFALLROOMS) + "-S2C: Deserialization Error!");
                 }
             }
 
-            var boObj = DispatchBO(msg);
+            var eventBus = EventBus.Instance;
+            eventBus.Subscribe<MSG_LISTOFALLROOMS>(new BO_LISTOFALLROOMS());
+            eventBus.Publish<MSG_LISTOFALLROOMS, ProtocolEventParams>(
+                null,
+                new ProtocolEventParams
+                {
+                    SourceID = 123,
+                    RefNum = hdr.RefNum,
+                    Request = msg,
+                });
+
+            //var boObj = DispatchBO(msg);
         }
 
         private static void Experiment2()
@@ -198,7 +209,18 @@ namespace Sandbox
                 }
             }
 
-            var boObj = DispatchBO(msg);
+            var eventBus = EventBus.Instance;
+            eventBus.Subscribe<MSG_LOGON>(new BO_LOGON());
+            eventBus.Publish<MSG_LOGON, ProtocolEventParams>(
+                null,
+                new ProtocolEventParams
+                {
+                    SourceID = 123,
+                    RefNum = hdr.RefNum,
+                    Request = msg,
+                });
+
+            //var boObj = DispatchBO(msg);
         }
 
         private static void Experiment3()
@@ -253,58 +275,70 @@ namespace Sandbox
                 }
             }
 
-            var boObj = DispatchBO(msg);
-        }
-
-        private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
-        private static IEventHandler DispatchBO(IProtocol msg)
-        {
-            var msgType = msg.GetType();
-
-            var boType = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(t =>
-                    t.GetTypes()
-                        .Where(t =>
-                        {
-                            if (t.IsInterface) return false;
-
-                            var itrfs = t.GetInterfaces();
-
-                            if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
-
-                            if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
-
-                            return true;
-                        }))
-                .Select(t =>
+            var eventBus = EventBus.Instance;
+            eventBus.Subscribe(typeof(BO_USERDESC));
+            eventBus.Publish(
+                null,
+                typeof(BO_USERDESC),
+                new ProtocolEventParams
                 {
-                    foreach (var i in t.GetInterfaces() ?? [])
-                        if (i == CONST_TYPE_IEventHandler)
-                            return t;
+                    SourceID = 123,
+                    RefNum = hdr.RefNum,
+                    Request = msg,
+                });
 
-                    return null;
-                })
-                .FirstOrDefault();
-            if (boType == null) return null;
-
-            var boObj = boType?.GetInstance<IEventHandler>();
-            if (boObj != null)
-            {
-                boObj.Handle(
-                    new { },
-                    new ProtocolEventParams
-                    {
-                        SourceID = 0,
-                        RefNum = 123,
-                        Request = (IProtocol?)msg,
-                        ConnectionState = null,
-                    });
-
-                return boObj;
-            }
-
-            return null;
+            //var boObj = DispatchBO(msg);
         }
+
+        //private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        //private static IEventHandler DispatchBO(IProtocol msg)
+        //{
+        //    var msgType = msg.GetType();
+
+        //    var boType = AppDomain.CurrentDomain
+        //        .GetAssemblies()
+        //        .SelectMany(t =>
+        //            t.GetTypes()
+        //                .Where(t =>
+        //                {
+        //                    if (t.IsInterface) return false;
+
+        //                    var itrfs = t.GetInterfaces();
+
+        //                    if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
+
+        //                    if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
+
+        //                    return true;
+        //                }))
+        //        .Select(t =>
+        //        {
+        //            foreach (var i in t.GetInterfaces() ?? [])
+        //                if (i == CONST_TYPE_IEventHandler)
+        //                    return t;
+
+        //            return null;
+        //        })
+        //        .FirstOrDefault();
+        //    if (boType == null) return null;
+
+        //    var boObj = boType?.GetInstance<IEventHandler>();
+        //    if (boObj != null)
+        //    {
+        //        boObj.Handle(
+        //            new { },
+        //            new ProtocolEventParams
+        //            {
+        //                SourceID = 0,
+        //                RefNum = 123,
+        //                Request = (IProtocol?)msg,
+        //                ConnectionState = null,
+        //            });
+
+        //        return boObj;
+        //    }
+
+        //    return null;
+        //}
     }
 }
