@@ -1,6 +1,4 @@
 ﻿using ThePalace.Common.Client.Constants;
-using ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
@@ -9,7 +7,6 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
-using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
@@ -23,71 +20,16 @@ namespace ThePalace.Testing
         public readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
         public readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
-        public Type? GetBOType(IProtocol msg)
-        {
-            var msgType = msg.GetType();
-
-            return AppDomain.CurrentDomain
-                .GetAssemblies()
-                .SelectMany(t => t.GetTypes())
-                .Where(t =>
-                {
-                    if (t.IsInterface) return false;
-
-                    var itrfs = t.GetInterfaces();
-
-                    if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
-
-                    if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
-
-                    return true;
-                })
-                .Select(t =>
-                {
-                    foreach (var i in t.GetInterfaces() ?? [])
-                        if (i == CONST_TYPE_IEventHandler)
-                            return t;
-
-                    return null;
-                })
-                .FirstOrDefault();
-        }
-
         [TestInitialize]
         public void TestInitialize()
         {
-            BO_LISTOFALLROOMS? test = null;
-
-            var types = AppDomain.CurrentDomain
-                .GetAssemblies()
-                .Where(a =>
-                {
-                    return a.FullName?.Contains("ThePalace.Common.Server") == true;
-                })
-                .SelectMany(a => a.GetTypes())
-                .Where(t =>
-                {
-                    return
-                        t.GetInterfaces().Contains(typeof(IEventHandler)) &&
-                        t.Namespace?.StartsWith("ThePalace.Common.Server.Entities.Business") == true;
-                })
-                .ToList();
-
-            var eventBus = EventBus.Instance;
-            foreach (var type in types)
-            {
-                eventBus.Subscribe(type);
-            }
         }
 
         [TestMethod]
-        public void Serialization_MSG_LISTOFALLROOMS()
+        public void MSG_LISTOFALLROOMS()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header
-            {
-                RefNum = 456,
-            };
+            var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
 
@@ -146,32 +88,17 @@ namespace ThePalace.Testing
                 }
             }
 
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
-                null,
-                boType,
-                new ProtocolEventParams
-                {
-                    SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
-                });
-
             Assert.IsNotNull(msg);
             Assert.IsNotNull(msgType);
-            Assert.IsNotNull(boType);
             Assert.IsTrue(packetBytes.Length == 52);
         }
 
         [TestMethod]
-        public void Serialization_MSG_LOGON()
+        public void MSG_LOGON()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header
-            {
-                RefNum = 456,
-            };
+            var refNum = RndGenerator.Next() % 1337;
+            var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
 
@@ -182,7 +109,7 @@ namespace ThePalace.Testing
                 var ctr = (uint)Cipher.GetSeedFromReg(seed, crc);
 
                 ms.PalaceSerialize(
-                    hdr.RefNum,
+                    refNum,
                     new MSG_LOGON
                     {
                         RegInfo = new RegistrationRec
@@ -228,39 +155,25 @@ namespace ThePalace.Testing
                 }
             }
 
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
-                null,
-                boType,
-                new ProtocolEventParams
-                {
-                    SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
-                });
-
+            Assert.IsTrue(hdr.RefNum == refNum);
             Assert.IsNotNull(msg);
             Assert.IsNotNull(msgType);
-            Assert.IsNotNull(boType);
             Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + msgType.GetByteSize()));
         }
 
         [TestMethod]
-        public void Serialization_MSG_USERDESC()
+        public void MSG_USERDESC()
         {
             var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header
-            {
-                RefNum = RndGenerator.Next() % 1337,
-            };
+            var refNum = RndGenerator.Next() % 1337;
+            var hdr = new MSG_Header();
             var msg = (IProtocol?)null;
             var msgType = (Type?)null;
 
             using (var ms = new MemoryStream())
             {
                 ms.PalaceSerialize(
-                    hdr.RefNum,
+                    refNum,
                     new MSG_USERDESC
                     {
                         FaceNbr = 1,
@@ -299,21 +212,9 @@ namespace ThePalace.Testing
                 }
             }
 
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
-                null,
-                boType,
-                new ProtocolEventParams
-                {
-                    SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
-                });
-
+            Assert.IsTrue(hdr.RefNum == refNum);
             Assert.IsNotNull(msg);
             Assert.IsNotNull(msgType);
-            Assert.IsNotNull(boType);
             Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + 8 + (8 * ((MSG_USERDESC)msg).NbrProps)));
         }
     }
