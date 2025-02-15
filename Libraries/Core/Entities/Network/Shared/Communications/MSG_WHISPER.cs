@@ -7,7 +7,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Communications
 {
     [DynamicSize]
     [Mnemonic("whis")]
-    public partial class MSG_WHISPER : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C, ICommunications
+    public partial class MSG_WHISPER : EventsBus.EventParams, IProtocolC2S, IProtocolS2C, ICommunications
     {
         public sint32 TargetID;
 

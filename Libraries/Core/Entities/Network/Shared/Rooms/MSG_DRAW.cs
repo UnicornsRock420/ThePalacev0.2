@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Shared.Rooms
 {
     [Mnemonic("draw")]
-    public partial class MSG_DRAW : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
+    public partial class MSG_DRAW : EventsBus.EventParams, IProtocolC2S, IProtocolS2C
     {
         public DrawCmdRec? DrawCmdInfo;
     }

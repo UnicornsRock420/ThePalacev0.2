@@ -4,7 +4,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Rooms
 {
     [Mnemonic("endr")]
-    public partial class MSG_ROOMDESCEND : Core.EventParams, IProtocolS2C
+    public partial class MSG_ROOMDESCEND : EventsBus.EventParams, IProtocolS2C
     {
     }
 }

@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Shared.Assets
 {
     [Mnemonic("qAst")]
-    public partial class MSG_ASSETQUERY : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
+    public partial class MSG_ASSETQUERY : EventsBus.EventParams, IProtocolC2S, IProtocolS2C
     {
         public LegacyAssetTypes AssetType;
         public AssetSpec AssetSpec;

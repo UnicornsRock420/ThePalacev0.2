@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Core.Factories.Core
 {
@@ -117,18 +117,7 @@ namespace ThePalace.Core.Factories.Core
             var eventType = typeof(TEventType);
             if (eventType == null) return;
 
-            var eventTypeName = eventType.FullName;
-            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
-
-            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
-
-            var handlers = _handlersDictionary[eventTypeName];
-            if (handlers.Count < 1) return;
-
-            foreach (var eventHandler in handlers)
-            {
-                await eventHandler.Handle(sender, @event);
-            }
+            await Publish(sender, eventType, @event);
         }
 
         public async Task Publish<TEventParams>(object? sender, TEventParams @event)
@@ -137,18 +126,7 @@ namespace ThePalace.Core.Factories.Core
             var eventType = typeof(TEventParams);
             if (eventType == null) return;
 
-            var eventTypeName = eventType.FullName;
-            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
-
-            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
-
-            var handlers = _handlersDictionary[eventTypeName];
-            if (handlers.Count < 1) return;
-
-            foreach (var eventHandler in handlers)
-            {
-                await eventHandler.Handle(sender, @event);
-            }
+            await Publish(sender, eventType, @event);
         }
 
         public async Task Publish(object? sender, IEventParams @event)
@@ -156,18 +134,7 @@ namespace ThePalace.Core.Factories.Core
             var eventType = @event.GetType();
             if (eventType == null) return;
 
-            var eventTypeName = eventType.FullName;
-            if (string.IsNullOrWhiteSpace(eventTypeName)) return;
-
-            if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
-
-            var handlers = _handlersDictionary[eventTypeName];
-            if (handlers.Count < 1) return;
-
-            foreach (var eventHandler in handlers)
-            {
-                await eventHandler.Handle(sender, @event);
-            }
+            await Publish(sender, eventType, @event);
         }
 
         public async Task Publish(object? sender, Type eventType, IEventParams @event)

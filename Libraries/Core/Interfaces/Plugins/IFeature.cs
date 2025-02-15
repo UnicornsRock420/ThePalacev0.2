@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Enums.App;
 
-namespace ThePalace.Core.Interfaces.Core
+namespace ThePalace.Core.Interfaces.Plugins
 {
     public interface IFeature : IDisposable
     {

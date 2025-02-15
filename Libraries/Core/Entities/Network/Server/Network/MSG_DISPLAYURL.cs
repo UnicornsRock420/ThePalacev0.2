@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [Mnemonic("durl")]
-    public partial class MSG_DISPLAYURL : Core.EventParams, IProtocolS2C
+    public partial class MSG_DISPLAYURL : EventsBus.EventParams, IProtocolS2C
     {
         [CString]
         public string? Url;

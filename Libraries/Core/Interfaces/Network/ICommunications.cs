@@ -2,7 +2,7 @@
 
 namespace ThePalace.Core.Interfaces.Network
 {
-    public interface ICommunications : IStruct
+    public interface ICommunications : IStruct, IProtocolEcho
     {
         string? Text { get; set; }
     }

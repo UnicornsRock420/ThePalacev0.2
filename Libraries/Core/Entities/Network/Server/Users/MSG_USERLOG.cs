@@ -5,7 +5,7 @@ using uint32 = System.UInt32;
 namespace ThePalace.Core.Entities.Network.Server.Users
 {
     [Mnemonic("log ")]
-    public partial class MSG_USERLOG : Core.EventParams, IProtocolS2C
+    public partial class MSG_USERLOG : EventsBus.EventParams, IProtocolS2C
     {
         public uint32 NbrUsers;
     }

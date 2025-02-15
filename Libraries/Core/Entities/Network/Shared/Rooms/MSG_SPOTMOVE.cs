@@ -7,7 +7,7 @@ using RoomID = System.Int16;
 namespace ThePalace.Core.Entities.Network.Shared.Rooms
 {
     [Mnemonic("coLs")]
-    public partial class MSG_SPOTMOVE : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C
+    public partial class MSG_SPOTMOVE : EventsBus.EventParams, IProtocolC2S, IProtocolS2C
     {
         public RoomID RoomID;
         public HotSpotID SpotID;

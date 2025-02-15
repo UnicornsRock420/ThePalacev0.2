@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Auth
 {
     [Mnemonic("autr")]
-    public partial class MSG_AUTHRESPONSE : Core.EventParams, IProtocolS2C
+    public partial class MSG_AUTHRESPONSE : EventsBus.EventParams, IProtocolS2C
     {
         [Str255]
         public string? NameAndPassword;

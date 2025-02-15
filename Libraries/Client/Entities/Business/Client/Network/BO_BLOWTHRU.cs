@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Common.Client.Entities.Business.Client.Network
 {

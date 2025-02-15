@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.Plugins;
 
-namespace ThePalace.Core.Entities.Threads
+namespace ThePalace.Core.Entities.Plugins
 {
     public partial class CmdTask : Disposable
     {

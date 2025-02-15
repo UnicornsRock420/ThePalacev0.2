@@ -1,9 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Core.Entities.Core
+namespace ThePalace.Core.Entities.EventsBus
 {
-    public abstract class EventParams : EventArgs, IEventParams
+    public abstract class EventParams : System.EventArgs, IEventParams
     {
         protected EventParams()
         {

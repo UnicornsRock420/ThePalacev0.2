@@ -1,6 +1,6 @@
 using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Server.Entities.Business.Server.ServerInfo;
-using ThePalace.Core.Entities.EventParams;
+using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
@@ -11,7 +11,7 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
-using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 

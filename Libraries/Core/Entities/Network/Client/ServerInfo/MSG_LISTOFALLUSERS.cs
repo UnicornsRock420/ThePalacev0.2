@@ -5,7 +5,7 @@ namespace ThePalace.Core.Entities.Network.Client.ServerInfo
 {
     [ByteSize(0)]
     [Mnemonic("uLst")]
-    public partial class MSG_LISTOFALLUSERS : Core.EventParams, IProtocolC2S
+    public partial class MSG_LISTOFALLUSERS : EventsBus.EventParams, IProtocolC2S
     {
     }
 }

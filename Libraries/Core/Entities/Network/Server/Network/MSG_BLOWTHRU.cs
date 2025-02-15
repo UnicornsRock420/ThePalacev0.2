@@ -9,7 +9,7 @@ namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [DynamicSize]
     [Mnemonic("blow")]
-    public partial class MSG_BLOWTHRU : Core.EventParams, IStructSerializer, IProtocolS2C
+    public partial class MSG_BLOWTHRU : EventsBus.EventParams, IStructSerializer, IProtocolS2C
     {
         public uint32 PluginTag;
         public uint8[] Embedded;

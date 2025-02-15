@@ -10,7 +10,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
 {
     [DynamicSize((8 * 9) + 8, 8)]
     [Mnemonic("usrD")]
-    public partial class MSG_USERDESC : Entities.Core.EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
+    public partial class MSG_USERDESC : EventsBus.EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
     {
         public sint16 FaceNbr;
         public sint16 ColorNbr;

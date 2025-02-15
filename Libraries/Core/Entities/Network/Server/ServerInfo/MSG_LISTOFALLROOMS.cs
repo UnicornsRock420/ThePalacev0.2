@@ -11,7 +11,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
     [DynamicSize]
     [Mnemonic("rLst")]
-    public partial class MSG_LISTOFALLROOMS : Core.EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
+    public partial class MSG_LISTOFALLROOMS : EventsBus.EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
     {
         [IgnoreDataMember]
         public sint32 RefNum

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Entities.Threads
+﻿namespace ThePalace.Core.Entities.Plugins
 {
     public delegate object CmdFnc(params object[] args);
 }

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.Rooms
 {
     [Mnemonic("ofNr")]
-    public partial class MSG_ROOMINFO : Core.EventParams, IProtocolC2S
+    public partial class MSG_ROOMINFO : EventsBus.EventParams, IProtocolC2S
     {
         public RoomRec? RoomInfo;
     }

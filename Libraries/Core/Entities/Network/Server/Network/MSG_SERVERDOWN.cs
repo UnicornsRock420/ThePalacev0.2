@@ -10,7 +10,7 @@ namespace ThePalace.Core.Entities.Network.Server.Network
 {
     [ByteSize(4)]
     [Mnemonic("down")]
-    public partial class MSG_SERVERDOWN : Core.EventParams, IStructRefNum, IProtocolS2C
+    public partial class MSG_SERVERDOWN : EventsBus.EventParams, IStructRefNum, IProtocolS2C
     {
         [IgnoreDataMember]
         public sint32 RefNum

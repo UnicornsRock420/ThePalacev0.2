@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ThePalace.Core.Entities.Threads
+namespace ThePalace.Core.Entities.Plugins
 {
     public partial class Cmd : IDisposable
     {

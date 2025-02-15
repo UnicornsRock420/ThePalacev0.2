@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Interfaces.Core;
+﻿using ThePalace.Core.Interfaces.Threading;
 using static ThePalace.Core.Factories.Threading.Job;
 
 namespace ThePalace.Core.Factories.Threading
