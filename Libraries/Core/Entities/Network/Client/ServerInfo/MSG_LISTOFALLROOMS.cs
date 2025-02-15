@@ -1,10 +1,11 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.ServerInfo
 {
     [Mnemonic("rLst")]
-    public partial class MSG_LISTOFALLROOMS : EventsBus.EventParams, IProtocolC2S
+    public partial class MSG_LISTOFALLROOMS : EventParams, IProtocolC2S
     {
     }
 }

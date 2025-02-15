@@ -1,5 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
@@ -11,7 +12,7 @@ namespace ThePalace.Core.Entities.Network.Server.ServerInfo
 {
     [DynamicSize]
     [Mnemonic("rLst")]
-    public partial class MSG_LISTOFALLROOMS : EventsBus.EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
+    public partial class MSG_LISTOFALLROOMS : EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
     {
         [IgnoreDataMember]
         public sint32 RefNum

@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
@@ -10,7 +11,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Users
 {
     [DynamicSize((8 * 9) + 8, 8)]
     [Mnemonic("usrD")]
-    public partial class MSG_USERDESC : EventsBus.EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
+    public partial class MSG_USERDESC : EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
     {
         public sint16 FaceNbr;
         public sint16 ColorNbr;

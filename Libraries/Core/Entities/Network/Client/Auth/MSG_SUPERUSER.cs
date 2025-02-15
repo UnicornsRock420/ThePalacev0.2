@@ -1,11 +1,12 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Client.Auth
 {
     [Mnemonic("susr")]
-    public partial class MSG_SUPERUSER : EventsBus.EventParams, IProtocolC2S
+    public partial class MSG_SUPERUSER : EventParams, IProtocolC2S
     {
         [Str127]
         public string Password;

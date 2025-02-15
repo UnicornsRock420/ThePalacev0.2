@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Entities.Shared.Types;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     public partial class HotspotDesc : IDisposable
     {

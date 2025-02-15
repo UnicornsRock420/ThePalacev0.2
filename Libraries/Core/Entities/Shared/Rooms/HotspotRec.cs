@@ -6,7 +6,7 @@ using HotspotID = System.Int16;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     [ByteSize(48)]
     public partial class HotspotRec : IStruct

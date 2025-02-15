@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     public partial class RoomDesc : RawStream, IStruct
     {

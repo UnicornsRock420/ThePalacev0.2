@@ -5,7 +5,7 @@ using RoomID = System.Int16;
 using sint16 = System.Int16;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     [ByteSize(40)]
     public partial class RoomRec : IStruct

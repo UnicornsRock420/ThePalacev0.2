@@ -4,7 +4,7 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     public partial class DrawCmdDesc : RawStream, IStructSerializer
     {

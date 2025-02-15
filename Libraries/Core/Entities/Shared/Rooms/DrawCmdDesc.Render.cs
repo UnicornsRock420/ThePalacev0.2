@@ -5,7 +5,7 @@ using ThePalace.Core.Enums.Palace;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared.Rooms
 {
     public partial class DrawCmdDesc
     {

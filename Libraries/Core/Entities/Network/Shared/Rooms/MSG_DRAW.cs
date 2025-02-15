@@ -1,11 +1,12 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.EventsBus;
+using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Shared.Rooms
 {
     [Mnemonic("draw")]
-    public partial class MSG_DRAW : EventsBus.EventParams, IProtocolC2S, IProtocolS2C
+    public partial class MSG_DRAW : EventParams, IProtocolC2S, IProtocolS2C
     {
         public DrawCmdRec? DrawCmdInfo;
     }
