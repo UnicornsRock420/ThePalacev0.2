@@ -214,6 +214,8 @@ namespace Sandbox
                         PropSpec =
                         [
                             new AssetSpec(12345),
+                            new AssetSpec(54321),
+                            new AssetSpec(918284),
                         ],
                     },
                     SerializerOptions.IncludeHeader);
