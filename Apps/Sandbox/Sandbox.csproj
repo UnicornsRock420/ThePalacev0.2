@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Libraries\Client\ThePalace.Common.Client.csproj" />
     <ProjectReference Include="..\..\Libraries\Core\ThePalace.Core.csproj" />
     <ProjectReference Include="..\..\Libraries\Desktop\ThePalace.Common.Desktop.csproj" />

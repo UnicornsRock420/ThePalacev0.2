@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Core\ThePalace.Core.csproj" />
     <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
     <ProjectReference Include="..\Network\ThePalace.Network.csproj" />

@@ -10,6 +10,7 @@
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Dapper.Extensions.MSSQL" Version="5.2.0" />
     <PackageReference Include="Dapper.StrongName" Version="2.1.66" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup>
