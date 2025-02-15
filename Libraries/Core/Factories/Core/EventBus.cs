@@ -77,14 +77,29 @@ namespace ThePalace.Core.Factories.Core
         {
             if (eventType == null) return;
 
-            if (eventType.IsGenericType &&
-                eventType.GetGenericArguments().Length > 0)
+            var _eventType = eventType;
+
+            if (!_eventType.IsGenericType)
             {
-                eventType = eventType.GetGenericArguments().FirstOrDefault();
-                if (eventType == null) return;
+                foreach (var type in _eventType.GetInterfaces())
+                {
+                    if (type.IsGenericType)
+                    {
+                        _eventType = type;
+
+                        break;
+                    }
+                }
             }
 
-            var eventTypeName = eventType.FullName;
+            if (_eventType.IsGenericType &&
+                _eventType.GetGenericArguments().Length > 0)
+            {
+                _eventType = _eventType.GetGenericArguments().FirstOrDefault();
+                if (_eventType == null) return;
+            }
+
+            var eventTypeName = _eventType.FullName;
             if (string.IsNullOrWhiteSpace(eventTypeName)) return;
 
             var handler = eventType.GetInstance() as IEventHandler;
@@ -159,7 +174,29 @@ namespace ThePalace.Core.Factories.Core
         {
             if (eventType == null) return;
 
-            var eventTypeName = eventType.FullName;
+            var _eventType = eventType;
+
+            if (!_eventType.IsGenericType)
+            {
+                foreach (var type in _eventType.GetInterfaces())
+                {
+                    if (type.IsGenericType)
+                    {
+                        _eventType = type;
+
+                        break;
+                    }
+                }
+            }
+
+            if (_eventType.IsGenericType &&
+                _eventType.GetGenericArguments().Length > 0)
+            {
+                _eventType = _eventType.GetGenericArguments().FirstOrDefault();
+                if (_eventType == null) return;
+            }
+
+            var eventTypeName = _eventType.FullName;
             if (string.IsNullOrWhiteSpace(eventTypeName)) return;
 
             if (!_handlersDictionary.ContainsKey(eventTypeName)) return;

@@ -1,7 +1,5 @@
 using ThePalace.Common.Client.Constants;
-using ThePalace.Common.Server.Entities.Business.Client.Network;
 using ThePalace.Common.Server.Entities.Business.Server.ServerInfo;
-using ThePalace.Common.Server.Entities.Business.Shared.Users;
 using ThePalace.Core.Entities.EventParams;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
@@ -13,6 +11,7 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 using sint16 = System.Int16;
 
@@ -48,6 +47,29 @@ namespace Sandbox
 
             //var container = new DIContainer();
             //container.RegisterTypes(iStructTypes);
+
+            BO_LISTOFALLROOMS? test = null;
+
+            var types = AppDomain.CurrentDomain
+                .GetAssemblies()
+                .Where(a =>
+                {
+                    return a.FullName?.Contains("ThePalace.Common.Server") == true;
+                })
+                .SelectMany(a => a.GetTypes())
+                .Where(t =>
+                {
+                    return
+                        t.GetInterfaces().Contains(typeof(IEventHandler)) &&
+                        t.Namespace?.StartsWith("ThePalace.Common.Server.Entities.Business") == true;
+                })
+                .ToList();
+
+            var eventBus = EventBus.Instance;
+            foreach (var type in types)
+            {
+                eventBus.Subscribe(type);
+            }
 
             Experiment1();
             Experiment2();
@@ -133,9 +155,11 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            eventBus.Subscribe<MSG_LISTOFALLROOMS>(new BO_LISTOFALLROOMS());
-            eventBus.Publish<MSG_LISTOFALLROOMS, ProtocolEventParams>(
+            //eventBus.Subscribe<MSG_LISTOFALLROOMS>(new BO_LISTOFALLROOMS());
+            var boType = GetBOType(msg);
+            eventBus.Publish(
                 null,
+                boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
@@ -210,9 +234,11 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            eventBus.Subscribe<MSG_LOGON>(new BO_LOGON());
-            eventBus.Publish<MSG_LOGON, ProtocolEventParams>(
+            //eventBus.Subscribe<MSG_LOGON>(new BO_LOGON());
+            var boType = GetBOType(msg);
+            eventBus.Publish(
                 null,
+                boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
@@ -276,10 +302,11 @@ namespace Sandbox
             }
 
             var eventBus = EventBus.Instance;
-            eventBus.Subscribe(typeof(BO_USERDESC));
+            //eventBus.Subscribe(typeof(BO_USERDESC));
+            var boType = GetBOType(msg);
             eventBus.Publish(
                 null,
-                typeof(BO_USERDESC),
+                boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
@@ -290,7 +317,37 @@ namespace Sandbox
             //var boObj = DispatchBO(msg);
         }
 
-        //private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        private static Type? GetBOType(IProtocol msg)
+        {
+            var msgType = msg.GetType();
+
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(t => t.GetTypes())
+                .Where(t =>
+                {
+                    if (t.IsInterface) return false;
+
+                    var itrfs = t.GetInterfaces();
+
+                    if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
+
+                    if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
+
+                    return true;
+                })
+                .Select(t =>
+                {
+                    foreach (var i in t.GetInterfaces() ?? [])
+                        if (i == CONST_TYPE_IEventHandler)
+                            return t;
+
+                    return null;
+                })
+                .FirstOrDefault();
+        }
+
         //private static IEventHandler DispatchBO(IProtocol msg)
         //{
         //    var msgType = msg.GetType();
