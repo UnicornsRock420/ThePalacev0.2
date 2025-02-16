@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Factories
+﻿namespace ThePalace.Network.Factories
 {
     public abstract partial class Singleton<T>
         where T : class, new()

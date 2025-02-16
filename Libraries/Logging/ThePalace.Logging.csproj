@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Singleton.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="C:\Users\RubberPinkDildos\.nuget\packages\system.diagnostics.diagnosticsource\9.0.1\contentFiles\any\net9.0\ILLink\ILLink.Descriptors.LibraryBuild.xml" />
   </ItemGroup>
 
@@ -38,6 +42,10 @@
         <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
         <PackageReference Include="System.Globalization" Version="4.3.0" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="Factories\Singleton.cs" />
     </ItemGroup>
 
 </Project>

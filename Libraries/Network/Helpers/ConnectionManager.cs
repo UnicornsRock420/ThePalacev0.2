@@ -1,12 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
-using ThePalace.Core.Factories;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
 
 namespace ThePalace.Network.Helpers
 {
-    public class ConnectionManager : IDisposable
+    public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
     {
         public void Dispose()
         {
@@ -33,9 +32,6 @@ namespace ThePalace.Network.Helpers
 
         private volatile ConcurrentDictionary<uint, ConnectionState> _connectionStates = new();
         public IReadOnlyDictionary<uint, ConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
-
-        private static ConnectionManager? _instance = null;
-        public static ConnectionManager Instance => _instance ??= new();
 
         public uint UserID
         {

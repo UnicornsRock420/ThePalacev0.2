@@ -9,11 +9,13 @@
   <ItemGroup>
     <Compile Remove="Constants\RegexConstants.cs" />
     <Compile Remove="LockContext.cs" />
+    <Compile Remove="Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Constants\RegexConstants.cs" />
     <None Include="Factories\LockContext.cs" />
+    <None Include="Factories\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>

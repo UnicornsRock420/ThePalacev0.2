@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using ThePalace.Core.Factories;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Helpers;
 using ThePalace.Network.Interfaces;
@@ -8,13 +7,6 @@ using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories
 {
-    public sealed class ServerOptions
-    {
-        public string HostAddress { get; set; }
-        public int BindPort { get; set; }
-        public int ListenBacklog { get; set; }
-    }
-
     public partial class AsyncTcpSocket : IDisposable
     {
         public AsyncTcpSocket()

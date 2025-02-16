@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using ThePalace.Logging.Factories;
 using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Logging.Entities
 {
-    public class LoggerHub : ILogger
+    public class LoggerHub : Singleton<LoggerHub>, ILogger
     {
         public LoggerHub()
         {
@@ -38,9 +39,6 @@ namespace ThePalace.Logging.Entities
 
         private readonly IConfiguration _configuration;
         public ILogger Logger { get; internal set; }
-
-        public static LoggerHub _instance;
-        public static LoggerHub Instance => _instance ??= new();
 
         public void Write(LogEvent logEvent) => Logger.Write(logEvent);
         public void Write(LogEventLevel level, string message) => Logger.Write(level, message);
