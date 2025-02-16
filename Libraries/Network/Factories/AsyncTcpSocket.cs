@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using Serilog.Events;
+using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using ThePalace.Core.Factories;
+using ThePalace.Logging.Entities;
 using ThePalace.Network.Helpers;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
@@ -75,9 +77,7 @@ namespace ThePalace.Network.Factories
 
                 listener.Listen(opts.ListenBacklog);
 
-#if DEBUG
-                Console.WriteLine("Listener Operational. Waiting for connections...");
-#endif
+                LoggerHub.Instance.Info("Listener Operational. Waiting for connections...");
 
                 while (!CancellationToken.IsCancellationRequested)
                 {
@@ -87,34 +87,26 @@ namespace ThePalace.Network.Factories
                     {
                         listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
                     }
-#if DEBUG
                     catch (SocketException ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        LoggerHub.Instance.Error(ex);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        LoggerHub.Instance.Error(ex);
                     }
-#else
-                    catch { }
-#endif
 
                     _signalEvent.WaitOne();
                 }
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
-#else
-            catch { }
-#endif
         }
 
         private void AcceptCallback(IAsyncResult ar)
@@ -128,25 +120,18 @@ namespace ThePalace.Network.Factories
             {
                 handler = listener?.EndAccept(ar);
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 handler = null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 handler = null;
             }
-#else
-            catch
-            {
-                handler = null;
-            }
-#endif
 
             if (handler == null) throw new SocketException();
 
@@ -167,18 +152,14 @@ namespace ThePalace.Network.Factories
             {
                 handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, new AsyncCallback(ReadCallback), connectionState);
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
-#else
-            catch { }
-#endif
 
             ConnectionReceived.Invoke(this, connectionState);
         }
@@ -200,10 +181,9 @@ namespace ThePalace.Network.Factories
                     return;
                 }
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -211,17 +191,8 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
-#else
-            catch (SocketException ex)
-            {
-                DropConnection(connectionState);
-
-                return;
-            }
-            catch { }
-#endif
 
             if (!IsConnected(connectionState))
             {
@@ -243,10 +214,9 @@ namespace ThePalace.Network.Factories
 
                 DataReceived.Invoke(this, connectionState);
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -254,11 +224,8 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
-#else
-            catch { }
-#endif
         }
 
         public static void Send(ConnectionState connectionState, byte[]? data)
@@ -280,10 +247,9 @@ namespace ThePalace.Network.Factories
 
                         connectionState.LastSent = DateTime.UtcNow;
                     }
-#if DEBUG
                     catch (SocketException ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        LoggerHub.Instance.Error(ex);
 
                         DropConnection(connectionState);
 
@@ -291,11 +257,8 @@ namespace ThePalace.Network.Factories
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        LoggerHub.Instance.Error(ex);
                     }
-#else
-                    catch { }
-#endif
                 }
             }
         }
@@ -311,10 +274,9 @@ namespace ThePalace.Network.Factories
             {
                 bytesSent = (uint)connectionState.Socket.EndSend(ar);
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -322,11 +284,8 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
             }
-#else
-            catch { }
-#endif
         }
 
         public static bool IsConnected(ConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
@@ -342,10 +301,9 @@ namespace ThePalace.Network.Factories
 
                 return connectionState.Socket?.Connected ?? false;
             }
-#if DEBUG
             catch (SocketException ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -353,16 +311,10 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                LoggerHub.Instance.Error(ex);
 
                 return false;
             }
-#else
-            catch
-            {
-                return false;
-            }
-#endif
         }
 
         public static void DropConnection(ConnectionState connectionState) =>

@@ -17,7 +17,7 @@ namespace ThePalace.Core.Entities.Core
                 .AddUserSecrets<DIContainer>()
                 .Build();
 
-            _logger = new LoggingHub(_configuration);
+            _logger = new LoggerHub(_configuration);
 
             Builder = new ContainerBuilder();
         }
