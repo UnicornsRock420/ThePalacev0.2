@@ -82,7 +82,7 @@ namespace ThePalace.Network.Factories
 
                     try
                     {
-                        listener.BeginAccept(new AsyncCallback(AcceptCallback), listener);
+                        listener.BeginAccept(_acceptCallback, listener);
                     }
                     catch (SocketException ex)
                     {
@@ -179,10 +179,8 @@ namespace ThePalace.Network.Factories
 
             if (handler == null) throw new SocketException();
 
-            var connectionState = ConnectionManager.CreateConnection(handler);
-            ConnectionManager.Instance.Register(connectionState);
-
-            // TODO: Check banlist record(s)
+            var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Instance);
+            if (connectionState == null) throw new SocketException();
 
             handler.SetKeepAlive();
 
@@ -190,11 +188,15 @@ namespace ThePalace.Network.Factories
 
             try
             {
-                handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, new AsyncCallback(ReceiveCallback), connectionState);
+                handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
             }
             catch (SocketException ex)
             {
                 LoggerHub.Instance.Error(ex);
+
+                DropConnection(connectionState);
+
+                return;
             }
             catch (Exception ex)
             {

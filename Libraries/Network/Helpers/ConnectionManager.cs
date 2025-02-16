@@ -27,9 +27,9 @@ namespace ThePalace.Network.Helpers
             GC.SuppressFinalize(this);
         }
 
-        private const ulong CONST_INT_UserIDCounterMax = 9999;
+        private const uint CONST_INT_UserIDCounterMax = 9999;
         private bool _isDisposed = false;
-        private ulong _userIDCounter = 0;
+        private uint _userIDCounter = 0;
 
         private volatile ConcurrentDictionary<uint, ConnectionState> _connectionStates = new();
         public IReadOnlyDictionary<uint, ConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
@@ -44,9 +44,7 @@ namespace ThePalace.Network.Helpers
                 if (_userIDCounter >= CONST_INT_UserIDCounterMax)
                     _userIDCounter = 0;
 
-                _userIDCounter++;
-
-                return (uint)_userIDCounter;
+                return (uint)++_userIDCounter;
             }
         }
 
@@ -95,7 +93,9 @@ namespace ThePalace.Network.Helpers
             foreach (var state in _connectionStates.ToList())
             {
                 if (connectionState.Equals(state) ||
-                    connectionState.Socket.Handle == state.Value.Socket.Handle)
+                    (connectionState.Socket?.Handle != null &&
+                    state.Value.Socket?.Handle != null &&
+                    connectionState.Socket?.Handle == state.Value.Socket?.Handle))
                 {
                     id = state.Key;
 
@@ -103,17 +103,29 @@ namespace ThePalace.Network.Helpers
                 }
             }
 
-            using (var @lock = LockContext.GetLock(_connectionStates))
-            {
-                _connectionStates.Remove(id, out var _);
-            }
+            if (id > 0)
+                using (var @lock = LockContext.GetLock(_connectionStates))
+                {
+                    _connectionStates.Remove(id, out var _);
+                }
         }
 
-        public static ConnectionState CreateConnection(Socket handler) =>
-            new ConnectionState
+        public static ConnectionState CreateConnection(Socket handler, ConnectionManager? instance = null)
+        {
+            // TODO: Check banlist record(s)
+
+            var result = new ConnectionState
             {
                 Socket = handler,
                 IPAddress = handler.GetIPAddress(),
             };
+
+            if (instance != null)
+            {
+                instance.Register(result);
+            }
+
+            return result;
+        }
     }
 }
