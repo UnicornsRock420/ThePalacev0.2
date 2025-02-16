@@ -6,7 +6,7 @@ using ThePalace.Network.Factories;
 
 namespace ThePalace.Network.Helpers
 {
-    internal class ConnectionManager : IDisposable
+    public class ConnectionManager : IDisposable
     {
         public void Dispose()
         {
