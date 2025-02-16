@@ -104,10 +104,12 @@ namespace ThePalace.Network.Helpers
             }
 
             if (id > 0)
+            {
                 using (var @lock = LockContext.GetLock(_connectionStates))
                 {
                     _connectionStates.Remove(id, out var _);
                 }
+            }
         }
 
         public static ConnectionState CreateConnection(Socket handler, ConnectionManager? instance = null)
