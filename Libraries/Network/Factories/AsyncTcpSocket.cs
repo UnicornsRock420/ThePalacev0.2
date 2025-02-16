@@ -230,9 +230,12 @@ namespace ThePalace.Network.Factories
                 return;
             }
 
-            connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
+            using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
+            {
+                connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
 
-            connectionState.LastReceived = DateTime.UtcNow;
+                connectionState.LastReceived = DateTime.UtcNow;
+            }
 
             try
             {

@@ -6,9 +6,6 @@ namespace ThePalace.Network.Entities
 {
     public partial class ConnectionState : EventArgs, IConnectionState
     {
-        internal object LockObject_BytesReceived { get; set; } = new();
-        internal object LockObject_Socket { get; set; } = new();
-
         public DateTime? LastReceived { get; internal set; } = null;
         public DateTime? LastSent { get; internal set; } = null;
         public MemoryStream BytesReceived { get; internal set; } = new();
