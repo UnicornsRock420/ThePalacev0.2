@@ -1,10 +1,9 @@
-﻿using Serilog.Events;
-using System.Collections.Concurrent;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using ThePalace.Core.Factories;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Helpers;
+using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories
@@ -18,24 +17,18 @@ namespace ThePalace.Network.Factories
 
     public partial class AsyncTcpSocket : IDisposable
     {
+        public AsyncTcpSocket()
+        {
+            _acceptCallback = new AsyncCallback(AcceptCallback);
+            _receiveCallback = new AsyncCallback(ReceiveCallback);
+            _sendCallback = new AsyncCallback(SendCallback);
+        }
+
         ~AsyncTcpSocket() => this.Dispose();
 
         public void Dispose()
         {
             _signalEvent.Set();
-
-            if (ConnectionStates != null)
-            {
-                using (var @lock = LockContext.GetLock(ConnectionStates))
-                {
-                    ConnectionStates.Values.ToList().ForEach(state =>
-                    {
-                        DropConnection(state);
-                    });
-                    ConnectionStates.Clear();
-                    ConnectionStates = null;
-                }
-            }
 
             GC.SuppressFinalize(this);
         }
@@ -47,10 +40,14 @@ namespace ThePalace.Network.Factories
             this.Dispose();
         }
 
+        private AsyncCallback _acceptCallback;
+        private AsyncCallback _receiveCallback;
+        private AsyncCallback _sendCallback;
+
         private volatile ManualResetEvent _signalEvent = new ManualResetEvent(false);
-        public volatile ConcurrentDictionary<uint, ConnectionState> ConnectionStates = new();
         public CancellationToken CancellationToken { get; private set; } = new();
 
+        public event EventHandler ConnectionEstablished;
         public event EventHandler ConnectionReceived;
         public event EventHandler DataReceived;
         public event EventHandler StateChanged;
@@ -109,6 +106,53 @@ namespace ThePalace.Network.Factories
             }
         }
 
+        public bool Connect(IConnectionState connectionState, string host, ushort port = 9998)
+        {
+            ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
+            ArgumentNullException.ThrowIfNull(host, nameof(host));
+
+            DropConnection(connectionState);
+
+            connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+            try
+            {
+                connectionState.Socket.Connect(host, port);
+
+                connectionState.Hostname = host;
+                connectionState.Port = port;
+            }
+            catch (Exception ex)
+            {
+                LoggerHub.Instance.Error(ex);
+
+                DropConnection(connectionState);
+            }
+
+            try
+            {
+                connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+
+                this.ConnectionEstablished?.Invoke(connectionState, null);
+
+                return true;
+            }
+            catch (SocketException ex)
+            {
+                LoggerHub.Instance.Error(ex);
+
+                DropConnection(connectionState);
+            }
+            catch (Exception ex)
+            {
+                LoggerHub.Instance.Error(ex);
+
+                DropConnection(connectionState);
+            }
+
+            return false;
+        }
+
         private void AcceptCallback(IAsyncResult ar)
         {
             _signalEvent.Set();
@@ -136,11 +180,7 @@ namespace ThePalace.Network.Factories
             if (handler == null) throw new SocketException();
 
             var connectionState = ConnectionManager.CreateConnection(handler);
-            using (var @lock = LockContext.GetLock(ConnectionStates))
-            {
-                var connectionId = ConnectionStates.Keys.Count > 0 ? ConnectionStates.Keys.Max() + 1 : 1;
-                this.ConnectionStates.TryAdd(connectionId, connectionState);
-            }
+            ConnectionManager.Instance.Register(connectionState);
 
             // TODO: Check banlist record(s)
 
@@ -150,7 +190,7 @@ namespace ThePalace.Network.Factories
 
             try
             {
-                handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, new AsyncCallback(ReadCallback), connectionState);
+                handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, new AsyncCallback(ReceiveCallback), connectionState);
             }
             catch (SocketException ex)
             {
@@ -164,7 +204,7 @@ namespace ThePalace.Network.Factories
             ConnectionReceived.Invoke(this, connectionState);
         }
 
-        private void ReadCallback(IAsyncResult ar)
+        private void ReceiveCallback(IAsyncResult ar)
         {
             var connectionState = (ConnectionState?)ar.AsyncState;
             if (connectionState?.Socket == null) throw new SocketException();
@@ -210,7 +250,7 @@ namespace ThePalace.Network.Factories
 
             try
             {
-                connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, new AsyncCallback(ReadCallback), connectionState);
+                connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
 
                 DataReceived.Invoke(this, connectionState);
             }
@@ -228,7 +268,7 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public static void Send(ConnectionState connectionState, byte[]? data)
+        public void Send(IConnectionState connectionState, byte[]? data)
         {
             if (connectionState?.Socket == null)
             {
@@ -243,7 +283,7 @@ namespace ThePalace.Network.Factories
                 {
                     try
                     {
-                        connectionState.Socket.BeginSend(data, 0, data.Length, 0, new AsyncCallback(SendCallback), connectionState);
+                        connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState);
 
                         connectionState.LastSent = DateTime.UtcNow;
                     }
@@ -265,7 +305,7 @@ namespace ThePalace.Network.Factories
 
         private static void SendCallback(IAsyncResult ar)
         {
-            var connectionState = (ConnectionState?)ar.AsyncState;
+            var connectionState = (IConnectionState?)ar.AsyncState;
             if (connectionState?.Socket == null) return;
 
             var bytesSent = (uint)0;
@@ -288,7 +328,7 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public static bool IsConnected(ConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
+        public static bool IsConnected(IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
         {
             var passiveIdleTimeout_Timespan = new TimeSpan(0, 0, passiveIdleTimeoutInSeconds);
 
@@ -317,7 +357,7 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public static void DropConnection(ConnectionState connectionState) =>
+        public static void DropConnection(IConnectionState connectionState) =>
             connectionState?.Socket?.DropConnection();
     }
 }

@@ -4,12 +4,18 @@ namespace ThePalace.Network.Interfaces
 {
     public interface IConnectionState
     {
-        DateTime? LastReceived { get; }
-        DateTime? LastSent { get; }
-        MemoryStream BytesReceived { get; }
-        byte[] Buffer { get; }
-        Socket? Socket { get; }
-        string? IPAddress { get; }
-        object State { get; }
+        string? Hostname { get; set; }
+        ushort Port { get; set; }
+
+        DateTime? LastReceived { get; set; }
+        DateTime? LastSent { get; set; }
+
+        MemoryStream BytesReceived { get; set; }
+        byte[] Buffer { get; set; }
+
+        Socket? Socket { get; set; }
+        string? IPAddress { get; set; }
+
+        object State { get; set; }
     }
 }

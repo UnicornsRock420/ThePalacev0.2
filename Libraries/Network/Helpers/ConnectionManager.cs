@@ -1,10 +1,114 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
+using ThePalace.Core.Factories;
 using ThePalace.Network.Entities;
+using ThePalace.Network.Factories;
 
 namespace ThePalace.Network.Helpers
 {
-    internal class ConnectionManager
+    internal class ConnectionManager : IDisposable
     {
+        public void Dispose()
+        {
+            if (_isDisposed) return;
+
+            _isDisposed = true;
+
+            if (_connectionStates != null)
+            {
+                using (var @lock = LockContext.GetLock(_connectionStates))
+                {
+                    _connectionStates.Values.ToList().ForEach(state => AsyncTcpSocket.DropConnection(state));
+                    _connectionStates.Clear();
+                }
+                _connectionStates = null;
+            }
+
+            GC.SuppressFinalize(this);
+        }
+
+        private const ulong CONST_INT_UserIDCounterMax = 9999;
+        private bool _isDisposed = false;
+        private ulong _userIDCounter = 0;
+
+        private volatile ConcurrentDictionary<uint, ConnectionState> _connectionStates = new();
+        public IReadOnlyDictionary<uint, ConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
+
+        private static ConnectionManager _instance;
+        public static ConnectionManager Instance => _instance ??= new();
+
+        public uint UserID
+        {
+            get
+            {
+                if (_userIDCounter >= CONST_INT_UserIDCounterMax)
+                    _userIDCounter = 0;
+
+                _userIDCounter++;
+
+                return (uint)_userIDCounter;
+            }
+        }
+
+        public uint Register(ConnectionState connectionState)
+        {
+            if (_isDisposed) return 0;
+
+            var result = UserID;
+
+            using (var @lock = LockContext.GetLock(_connectionStates))
+            {
+                _connectionStates.TryAdd(result, connectionState);
+            }
+
+            return result;
+        }
+
+        public uint Register(uint id, ConnectionState connectionState)
+        {
+            if (_isDisposed) return 0;
+
+            using (var @lock = LockContext.GetLock(_connectionStates))
+            {
+                _connectionStates.TryAdd(id, connectionState);
+            }
+
+            return id;
+        }
+
+        public void Unregister(uint id)
+        {
+            if (_isDisposed) return;
+
+            using (var @lock = LockContext.GetLock(_connectionStates))
+            {
+                _connectionStates.Remove(id, out var _);
+            }
+        }
+
+        public void Unregister(ConnectionState connectionState)
+        {
+            if (_isDisposed) return;
+
+            var id = (uint)0;
+
+            foreach (var state in _connectionStates.ToList())
+            {
+                if (connectionState.Equals(state) ||
+                    connectionState.Socket.Handle == state.Value.Socket.Handle)
+                {
+                    id = state.Key;
+
+                    break;
+                }
+            }
+
+            using (var @lock = LockContext.GetLock(_connectionStates))
+            {
+                _connectionStates.Remove(id, out var _);
+            }
+        }
+
         public static ConnectionState CreateConnection(Socket handler) =>
             new ConnectionState
             {
