@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using ThePalace.Network.Factories;
 
 namespace ThePalace.Network.Interfaces
 {
@@ -10,7 +11,7 @@ namespace ThePalace.Network.Interfaces
         DateTime? LastReceived { get; set; }
         DateTime? LastSent { get; set; }
 
-        MemoryStream BytesReceived { get; set; }
+        BufferStream BytesReceived { get; set; }
         byte[] Buffer { get; set; }
 
         Socket? Socket { get; set; }

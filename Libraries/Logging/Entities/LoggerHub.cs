@@ -40,7 +40,7 @@ namespace ThePalace.Logging.Entities
         public ILogger Logger { get; internal set; }
 
         public static LoggerHub _instance;
-        public static LoggerHub Instance => _instance ??= new LoggerHub();
+        public static LoggerHub Instance => _instance ??= new();
 
         public void Write(LogEvent logEvent) => Logger.Write(logEvent);
         public void Write(LogEventLevel level, string message) => Logger.Write(level, message);

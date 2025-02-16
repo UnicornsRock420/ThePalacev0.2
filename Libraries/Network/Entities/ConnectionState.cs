@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using ThePalace.Network.Constants;
+using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Network.Entities
@@ -12,7 +13,7 @@ namespace ThePalace.Network.Entities
         public DateTime? LastReceived { get; set; } = null;
         public DateTime? LastSent { get; set; } = null;
 
-        public MemoryStream BytesReceived { get; set; } = new();
+        public BufferStream BytesReceived { get; set; } = new();
         public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 
         public Socket? Socket { get; set; } = null;

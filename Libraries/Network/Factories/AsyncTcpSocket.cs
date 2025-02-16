@@ -52,27 +52,27 @@ namespace ThePalace.Network.Factories
         public event EventHandler DataReceived;
         public event EventHandler StateChanged;
 
-        public void Listen(ServerOptions opts)
+        public void Listen(string hostname, int port, int listenBacklog = 0)
         {
-            if (opts == null) throw new ArgumentNullException(nameof(opts));
+            ArgumentNullException.ThrowIfNull(hostname, nameof(hostname));
 
             var ipAddress = (IPAddress?)null;
 
-            if (string.IsNullOrWhiteSpace(opts.HostAddress) || !IPAddress.TryParse(opts.HostAddress, out ipAddress))
+            if (string.IsNullOrWhiteSpace(hostname) || !IPAddress.TryParse(hostname, out ipAddress))
             {
                 var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
                 ipAddress = ipHostInfo.AddressList[0];
             }
 
-            if (ipAddress == null) throw new Exception($"Cannot bind to {opts.HostAddress}:{opts.BindPort} (address:port)!");
+            if (ipAddress == null) throw new Exception($"Cannot bind to {hostname}:{port} (address:port)!");
 
             try
             {
                 var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                var localEndPoint = new IPEndPoint(IPAddress.Any, opts.BindPort);
+                var localEndPoint = new IPEndPoint(IPAddress.Any, port);
                 listener.Bind(localEndPoint);
 
-                listener.Listen(opts.ListenBacklog);
+                listener.Listen(listenBacklog);
 
                 LoggerHub.Instance.Info("Listener Operational. Waiting for connections...");
 
@@ -106,10 +106,10 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public bool Connect(IConnectionState connectionState, string host, ushort port = 9998)
+        public bool Connect(IConnectionState connectionState, string? hostname, ushort port = 9998)
         {
             ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
-            ArgumentNullException.ThrowIfNull(host, nameof(host));
+            ArgumentNullException.ThrowIfNull(hostname, nameof(hostname));
 
             DropConnection(connectionState);
 
@@ -117,9 +117,9 @@ namespace ThePalace.Network.Factories
 
             try
             {
-                connectionState.Socket.Connect(host, port);
+                connectionState.Socket.Connect(hostname, port);
 
-                connectionState.Hostname = host;
+                connectionState.Hostname = hostname;
                 connectionState.Port = port;
             }
             catch (Exception ex)

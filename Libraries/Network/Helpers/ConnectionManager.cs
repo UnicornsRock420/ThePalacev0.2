@@ -28,13 +28,13 @@ namespace ThePalace.Network.Helpers
         }
 
         private const uint CONST_INT_UserIDCounterMax = 9999;
-        private bool _isDisposed = false;
         private uint _userIDCounter = 0;
+        private bool _isDisposed = false;
 
         private volatile ConcurrentDictionary<uint, ConnectionState> _connectionStates = new();
         public IReadOnlyDictionary<uint, ConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
 
-        private static ConnectionManager _instance;
+        private static ConnectionManager? _instance = null;
         public static ConnectionManager Instance => _instance ??= new();
 
         public uint UserID
