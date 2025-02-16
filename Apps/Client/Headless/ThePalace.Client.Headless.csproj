@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Documentation\Media\ThePalace.Media.csproj" />
     <ProjectReference Include="..\..\..\Libraries\Client\ThePalace.Common.Client.csproj" />
     <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj" />
     <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj" />
