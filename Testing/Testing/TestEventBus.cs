@@ -1,5 +1,4 @@
-﻿using System.Runtime.ConstrainedExecution;
-using ThePalace.Common.Client.Constants;
+﻿using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
@@ -9,7 +8,6 @@ using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.EventsBus;
@@ -21,8 +19,7 @@ namespace ThePalace.Testing
     [TestClass]
     public sealed class TestEventBus
     {
-        public readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
-        public readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
         public Type? GetBOType(IProtocol msg)
         {
