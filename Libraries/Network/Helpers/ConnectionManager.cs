@@ -120,10 +120,7 @@ namespace ThePalace.Network.Helpers
                 IPAddress = handler.GetIPAddress(),
             };
 
-            if (instance != null)
-            {
-                instance.Register(result);
-            }
+            instance?.Register(result);
 
             return result;
         }
