@@ -1,15 +1,11 @@
-﻿using ThePalace.Common.Client.Constants;
-using ThePalace.Core.Entities.Network.Client.Network;
+﻿using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Network;
-using sint16 = System.Int16;
 
 namespace ThePalace.Testing
 {
@@ -29,28 +25,7 @@ namespace ThePalace.Testing
         {
             var packetBytes = (byte[]?)null;
 
-            var srcMsg = new MSG_LISTOFALLROOMS
-            {
-                Rooms = new()
-                {
-                    new()
-                    {
-                        PrimaryID = 1,
-                        Flags = (sint16)RoomFlags.NoPainting,
-                        RefNum = 12,
-
-                        Name = "Testing 123",
-                    },
-                    new()
-                    {
-                        PrimaryID = 2,
-                        Flags = (sint16)RoomFlags.WizardsOnly,
-                        RefNum = 24,
-
-                        Name = "Testing 456",
-                    },
-                }
-            };
+            var srcMsg = TestIStruct.MSG_LISTOFALLROOMS;
 
             var dstHdr = new MSG_Header();
             var dstMsg = (IProtocol?)null;
@@ -112,30 +87,8 @@ namespace ThePalace.Testing
         {
             var packetBytes = (byte[]?)null;
 
-            var seed = (uint)Cipher.WizKeytoSeed(ClientConstants.RegCodeSeed);
-            var crc = Cipher.ComputeLicenseCrc(seed);
-            var ctr = (uint)Cipher.GetSeedFromReg(seed, crc);
-
-            var refNum = RndGenerator.Next() % 1337;
-
-            var srcMsg = new MSG_LOGON
-            {
-                RegInfo = new RegistrationRec
-                {
-                    UserName = "Janus (Test Client)",
-                    Reserved = ClientConstants.ClientAgent,
-                    UlUploadCaps = (UploadCapabilities)0x41,
-                    UlDownloadCaps = (DownloadCapabilities)0x0151,
-                    Ul2DEngineCaps = (Upload2DEngineCaps)0x01,
-                    Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01,
-
-                    Crc = crc,
-                    Counter = ctr,
-
-                    PuidCRC = crc,
-                    PuidCtr = ctr,
-                }
-            };
+            var refNum = RndGenerator.Next(1337);
+            var srcMsg = TestIStruct.MSG_LOGON;
 
             var dstHdr = new MSG_Header();
             var dstMsg = (IProtocol?)null;
@@ -195,19 +148,8 @@ namespace ThePalace.Testing
         {
             var packetBytes = (byte[]?)null;
 
-            var refNum = RndGenerator.Next() % 1337;
-
-            var srcMsg = new MSG_USERDESC
-            {
-                FaceNbr = 1,
-                ColorNbr = 2,
-                PropSpec =
-                [
-                    new AssetSpec(12345),
-                    new AssetSpec(54321),
-                    new AssetSpec(918284),
-                ],
-            };
+            var refNum = RndGenerator.Next(1337);
+            var srcMsg = TestIStruct.MSG_USERDESC;
 
             var dstHdr = new MSG_Header();
             var dstMsg = (IProtocol?)null;

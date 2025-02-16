@@ -1,18 +1,9 @@
-﻿using ThePalace.Common.Client.Constants;
-using ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
+﻿using ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Network.Server.ServerInfo;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
-using sint16 = System.Int16;
 
 namespace ThePalace.Testing
 {
@@ -20,6 +11,7 @@ namespace ThePalace.Testing
     public sealed class TestEventBus
     {
         private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+        private static readonly EventBus CONST_EventBus = EventBus.Instance;
 
         public Type? GetBOType(IProtocol msg)
         {
@@ -81,42 +73,18 @@ namespace ThePalace.Testing
         [TestMethod]
         public void MSG_LISTOFALLROOMS()
         {
-            var packetBytes = (byte[]?)null;
-            var hdr = new MSG_Header();
-            var msg = (IProtocol?)new MSG_LISTOFALLROOMS
-            {
-                Rooms = new()
-                {
-                    new()
-                    {
-                        PrimaryID = 1,
-                        Flags = (sint16)RoomFlags.NoPainting,
-                        RefNum = 12,
+            var srcMsg = TestIStruct.MSG_LISTOFALLROOMS;
+            var srcMsgType = (Type?)TestIStruct.MSG_LISTOFALLROOMS.GetType();
 
-                        Name = "Testing 123",
-                    },
-                    new()
-                    {
-                        PrimaryID = 2,
-                        Flags = (sint16)RoomFlags.WizardsOnly,
-                        RefNum = 24,
-
-                        Name = "Testing 456",
-                    },
-                }
-            };
-            var msgType = (Type?)typeof(MSG_LISTOFALLROOMS);
-
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
+            var boType = GetBOType(srcMsg);
+            CONST_EventBus.Publish(
                 null,
                 boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
+                    RefNum = RndGenerator.Next(1337),
+                    Request = srcMsg,
                 });
 
             Assert.IsNotNull(boType);
@@ -125,46 +93,18 @@ namespace ThePalace.Testing
         [TestMethod]
         public void MSG_LOGON()
         {
-            var seed = (uint)Cipher.WizKeytoSeed(ClientConstants.RegCodeSeed);
-            var crc = Cipher.ComputeLicenseCrc(seed);
-            var ctr = (uint)Cipher.GetSeedFromReg(seed, crc);
+            var srcMsg = TestIStruct.MSG_LOGON;
+            var srcMsgType = (Type?)TestIStruct.MSG_LOGON.GetType();
 
-            var packetBytes = (byte[]?)null;
-            var refNum = RndGenerator.Next() % 1337;
-            var hdr = new MSG_Header
-            {
-                RefNum = refNum,
-            };
-            var msg = (IProtocol?)new MSG_LOGON
-            {
-                RegInfo = new RegistrationRec
-                {
-                    UserName = "Janus (Test Client)",
-                    Reserved = ClientConstants.ClientAgent,
-                    UlUploadCaps = (UploadCapabilities)0x41,
-                    UlDownloadCaps = (DownloadCapabilities)0x0151,
-                    Ul2DEngineCaps = (Upload2DEngineCaps)0x01,
-                    Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01,
-
-                    Crc = crc,
-                    Counter = ctr,
-
-                    PuidCRC = crc,
-                    PuidCtr = ctr,
-                }
-            };
-            var msgType = (Type?)typeof(MSG_LOGON);
-
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
+            var boType = GetBOType(srcMsg);
+            CONST_EventBus.Publish(
                 null,
                 boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
+                    RefNum = RndGenerator.Next(1337),
+                    Request = srcMsg,
                 });
 
             Assert.IsNotNull(boType);
@@ -173,35 +113,18 @@ namespace ThePalace.Testing
         [TestMethod]
         public void MSG_USERDESC()
         {
-            var packetBytes = (byte[]?)null;
-            var refNum = RndGenerator.Next() % 1337;
-            var hdr = new MSG_Header
-            {
-                RefNum = refNum,
-            };
-            var msg = (IProtocol?)new MSG_USERDESC
-            {
-                FaceNbr = 1,
-                ColorNbr = 2,
-                PropSpec =
-                [
-                    new AssetSpec(12345),
-                    new AssetSpec(54321),
-                    new AssetSpec(918284),
-                ],
-            };
-            var msgType = (Type?)typeof(MSG_USERDESC);
+            var srcMsg = TestIStruct.MSG_USERDESC;
+            var srcMsgType = (Type?)TestIStruct.MSG_USERDESC.GetType();
 
-            var eventBus = EventBus.Instance;
-            var boType = GetBOType(msg);
-            eventBus.Publish(
+            var boType = GetBOType(srcMsg);
+            CONST_EventBus.Publish(
                 null,
                 boType,
                 new ProtocolEventParams
                 {
                     SourceID = 123,
-                    RefNum = hdr.RefNum,
-                    Request = msg,
+                    RefNum = RndGenerator.Next(1337),
+                    Request = srcMsg,
                 });
 
             Assert.IsNotNull(boType);
