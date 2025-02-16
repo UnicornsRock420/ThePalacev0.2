@@ -6,7 +6,7 @@ namespace ThePalace.Network.Interfaces
     {
         DateTime? LastReceived { get; }
         DateTime? LastSent { get; }
-        List<byte> BytesReceived { get; }
+        MemoryStream BytesReceived { get; }
         byte[] Buffer { get; }
         Socket? Socket { get; }
         string? IPAddress { get; }

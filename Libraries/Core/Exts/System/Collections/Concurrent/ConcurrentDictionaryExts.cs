@@ -20,7 +20,7 @@ namespace System.Collections.Concurrent
 
         public static TValue GetValueLocked<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> values, TKey key)
         {
-            using (var @lock = new LockContext(values))
+            using (var @lock = LockContext.GetLock(values))
             {
                 return values != null && values.ContainsKey(key) ? values[key] : default;
             }

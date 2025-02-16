@@ -24,7 +24,7 @@ namespace ThePalace.Network.Factories
 
             if (ConnectionStates != null)
             {
-                lock (ConnectionStates)
+                using (var @lock = LockContext.GetLock(ConnectionStates))
                 {
                     ConnectionStates.Values.ToList().ForEach(state =>
                     {
@@ -151,7 +151,7 @@ namespace ThePalace.Network.Factories
             if (handler == null) throw new SocketException();
 
             var connectionState = ConnectionManager.CreateConnection(handler);
-            using (var @lock = new LockContext(ConnectionStates))
+            using (var @lock = LockContext.GetLock(ConnectionStates))
             {
                 var connectionId = ConnectionStates.Keys.Count > 0 ? ConnectionStates.Keys.Max() + 1 : 1;
                 this.ConnectionStates.TryAdd(connectionId, connectionState);
@@ -230,7 +230,7 @@ namespace ThePalace.Network.Factories
                 return;
             }
 
-            connectionState.BytesReceived.AddRange(connectionState.Buffer[0..bytesReceived]);
+            connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
 
             connectionState.LastReceived = DateTime.UtcNow;
 
@@ -269,7 +269,7 @@ namespace ThePalace.Network.Factories
 
             if ((data?.Length ?? 0) > 0)
             {
-                using (var @lock = new LockContext(connectionState.Socket))
+                using (var @lock = LockContext.GetLock(connectionState.Socket))
                 {
                     try
                     {

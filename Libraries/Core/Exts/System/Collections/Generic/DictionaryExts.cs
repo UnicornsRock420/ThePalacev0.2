@@ -21,7 +21,7 @@ namespace System.Collections.Generic
 
         public static TValue GetValueLocked<TKey, TValue>(this Dictionary<TKey, TValue> values, TKey key)
         {
-            using (var @lock = new LockContext(values))
+            using (var @lock = LockContext.GetLock(values))
             {
                 return values.ContainsKey(key) ? values[key] : default;
             }
