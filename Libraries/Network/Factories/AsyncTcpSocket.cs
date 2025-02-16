@@ -337,10 +337,10 @@ namespace ThePalace.Network.Factories
             {
                 if (connectionState.LastReceived.HasValue && DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
                 {
-                    return !connectionState.Socket.Poll(1, SelectMode.SelectRead);
+                    return (!connectionState.Socket?.Poll(1, SelectMode.SelectRead)) ?? false;
                 }
 
-                return connectionState.Socket.Connected;
+                return connectionState.Socket?.Connected ?? false;
             }
 #if DEBUG
             catch (SocketException ex)
