@@ -79,7 +79,7 @@ namespace ThePalace.Testing
                     .Where(t =>
                         t.GetInterfaces().Contains(CONST_TYPE_IProtocolS2C) &&
                         t.Name == eventType)
-                   .FirstOrDefault();
+                    .FirstOrDefault();
                 if (dstMsgType != null)
                 {
                     dstMsg = (IProtocol?)dstMsgType.GetInstance();
@@ -158,10 +158,11 @@ namespace ThePalace.Testing
 
                 var eventType = dstHdr.EventType.ToString();
                 dstMsgType = AppDomain.CurrentDomain
-                   .GetAssemblies()
-                   .SelectMany(t => t.GetTypes())
-                   .Where(t => t.Name == eventType)
-                   .FirstOrDefault();
+                    .GetAssemblies()
+                    .Where(a => a.FullName.Contains("ThePalace"))
+                    .SelectMany(t => t.GetTypes())
+                    .Where(t => t.Name == eventType)
+                    .FirstOrDefault();
                 if (dstMsgType != null)
                 {
                     dstMsg = (IProtocol?)dstMsgType.GetInstance();
@@ -229,10 +230,11 @@ namespace ThePalace.Testing
 
                 var eventType = dstHdr.EventType.ToString();
                 dstMsgType = AppDomain.CurrentDomain
-                   .GetAssemblies()
-                   .SelectMany(t => t.GetTypes())
-                   .Where(t => t.Name == eventType)
-                   .FirstOrDefault();
+                    .GetAssemblies()
+                    .Where(a => a.FullName.Contains("ThePalace"))
+                    .SelectMany(t => t.GetTypes())
+                    .Where(t => t.Name == eventType)
+                    .FirstOrDefault();
                 if (dstMsgType != null)
                 {
                     dstMsg = (IProtocol?)dstMsgType.GetInstance();
