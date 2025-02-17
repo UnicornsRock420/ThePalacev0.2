@@ -20,7 +20,7 @@ namespace System
 
     public static class StringExts
     {
-        private const string STRING_KEY_CANNOT_BE_NULL = "Key cannot be null";
+        private const string CONST_STR_KEY_CANNOT_BE_NULL = "Key cannot be null";
         private const char CHAR_UNDERSCORE = '_';
         private const char CHAR_PERIOD = '.';
 
@@ -132,7 +132,7 @@ namespace System
         {
             key = key?.Trim();
 
-            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), STRING_KEY_CANNOT_BE_NULL);
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), CONST_STR_KEY_CANNOT_BE_NULL);
 
             key = string.Concat(key
                 .ToCharArray()
@@ -141,7 +141,7 @@ namespace System
                     c == CHAR_PERIOD)
                 .ToArray());
 
-            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), STRING_KEY_CANNOT_BE_NULL);
+            if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), CONST_STR_KEY_CANNOT_BE_NULL);
 
             if (toLower) key = key.ToLowerInvariant();
             else if (toUpper) key = key.ToUpperInvariant();

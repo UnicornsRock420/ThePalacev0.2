@@ -64,38 +64,42 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
             try
             {
+                var position = 0L;
+
                 for (var i = 0; i < nbrHotspots; i++)
                 {
                     this.Seek(hotspotOfst + Exts.Palace.AttributeExts.GetByteSize<HotspotRec>() * i);
+
+                    position = this._stream.Position;
 
                     var h = new HotspotDesc
                     {
                         Vortexes = new(),
                         States = new(),
                     };
-                    this.PeekSInt32(); //scriptEventMask
-                    h.SpotInfo.Flags = (HotspotFlags)this.PeekSInt32();
-                    this.PeekSInt32(); //secureInfo
-                    this.PeekSInt32(); //refCon
+                    this.PeekSInt32(position += 4); //scriptEventMask
+                    h.SpotInfo.Flags = (HotspotFlags)this.PeekSInt32(position += 4);
+                    this.PeekSInt32(position += 4); //secureInfo
+                    this.PeekSInt32(position += 4); //refCon
 
-                    var vAxis = this.PeekSInt16();
-                    var hAxis = this.PeekSInt16();
+                    var vAxis = this.PeekSInt16(position += 2);
+                    var hAxis = this.PeekSInt16(position += 2);
                     h.SpotInfo.Loc = new Types.Point(vAxis, hAxis);
 
-                    h.SpotInfo.HotspotID = this.PeekSInt16();
-                    h.SpotInfo.Dest = this.PeekSInt16();
-                    h.SpotInfo.NbrPts = this.PeekSInt16();
-                    h.SpotInfo.PtsOfst = this.PeekSInt16();
-                    h.SpotInfo.Type = (HotspotTypes)this.PeekSInt16();
-                    this.PeekSInt16(); //groupID
-                    this.PeekSInt16(); //nbrScripts
-                    this.PeekSInt16(); //scriptRecOfst
-                    h.SpotInfo.State = this.PeekSInt16();
-                    h.SpotInfo.NbrStates = this.PeekSInt16();
-                    h.SpotInfo.StateRecOfst = this.PeekSInt16();
-                    h.SpotInfo.NameOfst = this.PeekSInt16();
-                    h.SpotInfo.ScriptTextOfst = this.PeekSInt16();
-                    this.PeekSInt16(); //alignReserved
+                    h.SpotInfo.HotspotID = this.PeekSInt16(position += 2);
+                    h.SpotInfo.Dest = this.PeekSInt16(position += 2);
+                    h.SpotInfo.NbrPts = this.PeekSInt16(position += 2);
+                    h.SpotInfo.PtsOfst = this.PeekSInt16(position += 2);
+                    h.SpotInfo.Type = (HotspotTypes)this.PeekSInt16(position += 2);
+                    this.PeekSInt16(position += 2); //groupID
+                    this.PeekSInt16(position += 2); //nbrScripts
+                    this.PeekSInt16(position += 2); //scriptRecOfst
+                    h.SpotInfo.State = this.PeekSInt16(position += 2);
+                    h.SpotInfo.NbrStates = this.PeekSInt16(position += 2);
+                    h.SpotInfo.StateRecOfst = this.PeekSInt16(position += 2);
+                    h.SpotInfo.NameOfst = this.PeekSInt16(position += 2);
+                    h.SpotInfo.ScriptTextOfst = this.PeekSInt16(position += 2);
+                    this.PeekSInt16(position += 2); //alignReserved
 
                     if (h.SpotInfo.NameOfst > 0 && h.SpotInfo.NameOfst < this.Count)
                         h.Name = this.PeekPString(32, 1, h.SpotInfo.NameOfst);
@@ -108,8 +112,10 @@ namespace ThePalace.Core.Entities.Shared.Rooms
                         {
                             this.Seek(h.SpotInfo.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
 
-                            vAxis = this.PeekSInt16();
-                            hAxis = this.PeekSInt16();
+                            position = this._stream.Position;
+
+                            vAxis = this.PeekSInt16(position += 2);
+                            hAxis = this.PeekSInt16(position += 2);
                             var p = new Types.Point(vAxis, hAxis);
 
                             h.Vortexes.Add(p);
@@ -119,12 +125,14 @@ namespace ThePalace.Core.Entities.Shared.Rooms
                     {
                         this.Seek(h.SpotInfo.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>());
 
-                        var hs = new HotspotStateDesc();
-                        hs.StateInfo.PictID = this.PeekSInt16();
-                        this.PeekSInt16(); //reserved
+                        position = this._stream.Position;
 
-                        vAxis = this.PeekSInt16();
-                        hAxis = this.PeekSInt16();
+                        var hs = new HotspotStateDesc();
+                        hs.StateInfo.PictID = this.PeekSInt16(position += 2);
+                        this.PeekSInt16(position += 2); //reserved
+
+                        vAxis = this.PeekSInt16(position += 2);
+                        hAxis = this.PeekSInt16(position += 2);
                         hs.StateInfo.PicLoc = new Types.Point(vAxis, hAxis);
 
                         h.States.Add(hs);
@@ -144,15 +152,19 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
             try
             {
+                var position = 0L;
+
                 for (var i = 0; i < nbrPictures; i++)
                 {
                     this.Seek(pictureOfst + Exts.Palace.AttributeExts.GetByteSize<PictureRec>() * i);
 
+                    position = this._stream.Position;
+
                     var pict = new PictureRec();
-                    pict.RefCon = this.PeekSInt32();
-                    pict.PicID = this.PeekSInt16();
-                    pict.PicNameOfst = this.PeekSInt16();
-                    pict.TransColor = this.PeekSInt16();
+                    pict.RefCon = this.PeekSInt32(position += 4);
+                    pict.PicID = this.PeekSInt16(position += 2);
+                    pict.PicNameOfst = this.PeekSInt16(position += 2);
+                    pict.TransColor = this.PeekSInt16(position += 2);
                     this.PeekSInt16(); //reserved
 
                     if (pict.PicNameOfst > 0 &&
@@ -175,18 +187,21 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
             try
             {
+                var position = 0L;
                 var ofst = firstDrawCmd;
 
                 for (var i = 0; i < nbrDrawCmds; i++)
                 {
                     this.Seek(ofst);
 
+                    position = this._stream.Position;
+
                     var drawCmd = new DrawCmdDesc();
-                    ofst = drawCmd.DrawCmdInfo.NextOfst = this.PeekSInt16();
+                    ofst = drawCmd.DrawCmdInfo.NextOfst = this.PeekSInt16(position += 2);
                     this.PeekSInt16(); //reserved
-                    drawCmd.DrawCmdInfo.DrawCmd = this.PeekSInt16();
-                    drawCmd.DrawCmdInfo.CmdLength = this.PeekUInt16();
-                    drawCmd.DrawCmdInfo.DataOfst = this.PeekSInt16();
+                    drawCmd.DrawCmdInfo.DrawCmd = this.PeekSInt16(position += 2);
+                    drawCmd.DrawCmdInfo.CmdLength = this.PeekUInt16(position += 2);
+                    drawCmd.DrawCmdInfo.DataOfst = this.PeekSInt16(position += 2);
                     drawCmd.Data = this.Data
                         .Skip(drawCmd.DrawCmdInfo.DataOfst)
                         .Take(drawCmd.DrawCmdInfo.CmdLength)
@@ -207,25 +222,28 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
             try
             {
+                var position = 0L;
                 var ofst = firstLProp;
 
                 for (var i = 0; i < nbrLProps; i++)
                 {
                     this.Seek(ofst);
 
-                    var prop = new LoosePropRec();
-                    ofst = prop.NextOfst = this.PeekSInt16();
-                    this.PeekSInt16(); //reserved
+                    position = this._stream.Position;
 
-                    var id = this.PeekSInt32();
-                    var crc = (uint)this.PeekSInt32();
+                    var prop = new LoosePropRec();
+                    ofst = prop.NextOfst = this.PeekSInt16(position += 2);
+                    this.PeekSInt16(position += 2); //reserved
+
+                    var id = this.PeekSInt32(position += 4);
+                    var crc = (uint)this.PeekSInt32(position += 4);
                     prop.AssetSpec = new AssetSpec(id, crc);
 
-                    prop.Flags = this.PeekSInt32();
-                    this.PeekSInt32(); //refCon
+                    prop.Flags = this.PeekSInt32(position += 4);
+                    this.PeekSInt32(position += 4); //refCon
 
-                    var vAxis = this.PeekSInt16();
-                    var hAxis = this.PeekSInt16();
+                    var vAxis = this.PeekSInt16(position += 2);
+                    var hAxis = this.PeekSInt16(position += 2);
                     prop.Loc = new Types.Point(hAxis, vAxis);
 
                     this.LooseProps.Add(prop);

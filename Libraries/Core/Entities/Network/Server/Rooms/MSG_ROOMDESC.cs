@@ -11,16 +11,12 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms
     [Mnemonic("room")]
     public partial class MSG_ROOMDESC : EventParams, IStructSerializer, IProtocolS2C
     {
-        public RoomRec? RoomInfo;
+        public RoomDesc? RoomInfo;
 
-        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
-        {
-            throw new NotImplementedException();
-        }
+        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None) =>
+            RoomInfo.Deserialize(reader, opts);
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
-        {
-            throw new NotImplementedException();
-        }
+        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None) =>
+            RoomInfo.Serialize(writer, opts);
     }
 }

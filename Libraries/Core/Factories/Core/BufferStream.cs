@@ -42,11 +42,11 @@
             this.ValidateBufferArgs(buffer, offset, count);
 
             var iRemainingBytesToRead = count;
-
             var iTotalBytesRead = 0;
 
             //Read until we hit the requested count, or until we hav nothing left to read
-            while (iTotalBytesRead <= count && _chunks.Count > 0)
+            while (iTotalBytesRead <= count &&
+                this._chunks.Count > 0)
             {
                 //Get first chunk from the queue
                 var chunk = this._chunks.Peek();
@@ -82,11 +82,11 @@
             return iTotalBytesRead;
         }
 
-        private void ValidateBufferArgs(byte[] buffer, int offset, int count)
+        private void ValidateBufferArgs(byte[]? buffer, int offset, int count)
         {
             if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "offset must be non-negative");
             if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "count must be non-negative");
-            if ((buffer.Length - offset) < count) throw new ArgumentException("requested count exceeds available size");
+            if (((buffer?.Length ?? 0) - offset) < count) throw new ArgumentException("requested count exceeds available size");
         }
 
         /// <summary>
@@ -107,10 +107,8 @@
             this._chunks.Enqueue(new Chunk(bufSave));
         }
 
-        public override bool CanSeek
-        {
-            get { return false; }
-        }
+        public override bool CanSeek => false;
+        public bool CanSeekOveride { get; set; } = false;
 
         /// <summary>
         /// Always returns 0
@@ -119,13 +117,50 @@
         {
             //We're always at the start of the stream, because as the stream purges what we've read
             get => 0;
-            set => throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
+            set
+            {
+                if (!CanSeekOveride) throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
+
+                var iRemainingBytesToRead = (int)value;
+                var iTotalBytesRead = 0;
+
+                //Read until we hit the requested count, or until we hav nothing left to read
+                while (iTotalBytesRead <= value &&
+                    this._chunks.Count > 0)
+                {
+                    //Get first chunk from the queue
+                    var chunk = this._chunks.Peek();
+
+                    //Determine how much of the chunk there is left to read
+                    var iUnreadChunkLength = chunk.Length - chunk.Position;
+
+                    //Determine how much of the unread part of the chunk we can actually read
+                    var iBytesToRead = Math.Min(iUnreadChunkLength, iRemainingBytesToRead);
+
+                    if (iBytesToRead > 0)
+                    {
+                        iTotalBytesRead += iBytesToRead;
+                        iRemainingBytesToRead -= iBytesToRead;
+
+                        //If the entire chunk has been read,  remove it
+                        if (chunk.Position + iBytesToRead >= chunk.Data.Length)
+                        {
+                            this._chunks.Dequeue();
+                        }
+                        else
+                        {
+                            //Otherwise just update the chunk read start index, so we know where to start reading on the next call
+                            chunk.Position += iBytesToRead;
+                        }
+                    }
+                    else break;
+                }
+            }
         }
 
         public override bool CanWrite => true;
 
-        public override long Seek(long offset, SeekOrigin origin) =>
-            throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
+        public override long Seek(long offset, SeekOrigin origin) => this.Position = offset;
 
         public override void SetLength(long value) =>
             throw new NotSupportedException(string.Format("{0} length can not be changed", this.GetType().Name));
