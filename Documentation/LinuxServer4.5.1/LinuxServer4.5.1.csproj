@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="bin\pserver" />
+    <None Include="bin\psfront" />
+    <None Include="bin\start-palace.sh" />
+    <None Include="bin\stop-palace.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Media\amen.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
