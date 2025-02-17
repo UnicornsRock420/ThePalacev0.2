@@ -1,0 +1,8 @@
+services:
+  palace-container:
+#    image: palace-image
+    build: .
+    ports:
+      - "2222:2222"
+      - "9998:9998"
+    restart: always

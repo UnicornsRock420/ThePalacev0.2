@@ -78,6 +78,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Testing", "Testin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Media", "Documentation\Media\ThePalace.Media.csproj", "{51F91939-0CBE-4D13-9A0C-699AAF61A935}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinuxServer4.5.1", "Documentation\LinuxServer4.5.1\LinuxServer4.5.1.csproj", "{A0285139-0032-4CB0-81A8-CBA073EFF367}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -168,6 +170,10 @@ Global
 		{51F91939-0CBE-4D13-9A0C-699AAF61A935}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51F91939-0CBE-4D13-9A0C-699AAF61A935}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51F91939-0CBE-4D13-9A0C-699AAF61A935}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -201,5 +207,6 @@ Global
 		{7ED044DB-FC14-4C6A-A6D6-36931E5C5BF5} = {AD688A9F-5139-46CE-BCBE-40B813EB5D1E}
 		{151F6E31-D055-4EE5-96DB-F6CAC7BB6826} = {C77C71AD-04D7-4465-AA32-B6E614EA2850}
 		{51F91939-0CBE-4D13-9A0C-699AAF61A935} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
+		{A0285139-0032-4CB0-81A8-CBA073EFF367} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
 	EndGlobalSection
 EndGlobal
