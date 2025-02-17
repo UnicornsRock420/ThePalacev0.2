@@ -1,4 +1,5 @@
 using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Factories.Threading;
 using ThePalace.Core.Interfaces.Data;
 using static ThePalace.Core.Factories.Threading.Job;
@@ -20,6 +21,10 @@ namespace Sandbox
             //// see https://aka.ms/applicationconfiguration.
             //ApplicationConfiguration.Initialize();
             //Application.Run(new Program());
+
+            var data = File.ReadAllText(@"Data\MSG_ROOMDESC.data").FromHex();
+            var roomDesc = new RoomDesc(data);
+            roomDesc.Deserialize(roomDesc.Stream);
 
             //Experiment4();
             //Experiment5();

@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 using uint8 = System.Byte;
@@ -30,6 +29,8 @@ namespace ThePalace.Core.Entities.Shared.Rooms
         }
         public RoomDesc(uint8[]? data = null) : base(data)
         {
+            this.RoomInfo = new();
+
             this.HotSpots = new();
             this.Pictures = new();
             this.DrawCmds = new();

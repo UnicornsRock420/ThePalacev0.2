@@ -194,11 +194,14 @@ namespace System
         {
             value = RegexConstants.REGEX_HEX_FILTER.Replace(value, string.Empty);
 
-            var hexBytes = RegexConstants.REGEX_HEX_SPLIT.Split(value);
+            var hexBytes = RegexConstants.REGEX_HEX_SPLIT
+                .Split(value)
+                .Where(v => !string.IsNullOrWhiteSpace(v))
+                .ToArray();
             if (hexBytes.Length % 2 != 0) return [];
 
             return hexBytes
-                .Select(s => Convert.ToByte(s))
+                .Select(s => Convert.ToByte(s, 16))
                 .ToArray();
         }
 

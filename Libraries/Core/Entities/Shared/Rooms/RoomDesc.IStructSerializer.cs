@@ -1,11 +1,10 @@
 ﻿using System.Buffers;
 using System.Diagnostics;
 using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Shared.Rooms;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
-using ThePalace.Core.Entities.Shared.Types;
 
 namespace ThePalace.Core.Entities.Shared.Rooms
 {

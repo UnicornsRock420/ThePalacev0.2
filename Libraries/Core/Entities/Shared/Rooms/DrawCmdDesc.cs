@@ -2,6 +2,11 @@
 {
     public partial class DrawCmdDesc
     {
+        public DrawCmdDesc()
+        {
+            DrawCmdInfo = new();
+        }
+
         public DrawCmdRec DrawCmdInfo;
     }
 }

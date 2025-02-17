@@ -7,6 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="Data\MSG_ROOMDESC.data">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Media\amen.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

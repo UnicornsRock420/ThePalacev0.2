@@ -121,7 +121,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (sbyte)this._stream.ReadByte();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -151,7 +151,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (short)this._stream.ReadUInt16();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -181,7 +181,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._stream.ReadInt32();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -211,7 +211,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadByte();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -241,7 +241,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._stream.ReadUInt16();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -271,7 +271,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._stream.ReadUInt32();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -339,7 +339,7 @@ namespace ThePalace.Core.Entities.Core
                 if (readCount < 1) throw new EndOfStreamException();
             }
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -377,7 +377,7 @@ namespace ThePalace.Core.Entities.Core
 
             } while (stringBytes.Count <= 0x7FFF);
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -412,7 +412,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadByte();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -438,7 +438,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadInt16();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -464,7 +464,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadInt32();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -490,7 +490,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadUInt16();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -516,7 +516,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = (byte)this._stream.ReadUInt32();
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -571,7 +571,7 @@ namespace ThePalace.Core.Entities.Core
             var buffer = new byte[length];
             this._stream.Read(buffer, 0, buffer.Length);
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -634,7 +634,7 @@ namespace ThePalace.Core.Entities.Core
                     .Take(length)
                     .ToArray());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -648,7 +648,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WriteInt16());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -662,7 +662,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WriteInt32());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -676,7 +676,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WriteUInt16());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -690,7 +690,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WriteUInt32());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -709,7 +709,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WritePString(max, size, modulo));
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
@@ -723,7 +723,7 @@ namespace ThePalace.Core.Entities.Core
 
             this._stream.Write(value.WriteCString());
 
-            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, byte>(opts))
+            if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts))
             {
                 this._stream.Position = _position;
             }
