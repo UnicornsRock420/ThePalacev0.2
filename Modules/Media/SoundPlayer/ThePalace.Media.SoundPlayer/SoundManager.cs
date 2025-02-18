@@ -10,7 +10,25 @@ namespace ThePalace.Media.SoundPlayer
         private const int CONST_INT_MaxPlayerCount = 30;
         private static readonly LibVLC _libVlc;
         private readonly MediaPlayer _libVlcPlayer;
-        private readonly ConcurrentDictionary<string, Tuple<DateTime, string, LibVLCSharp.Shared.Media>> _libVlcMedia;
+
+        private class SndLog
+        {
+            private SndLog()
+            {
+                LastUsed = DateTime.UtcNow;
+            }
+            public SndLog(string path) : this()
+            {
+                Path = path;
+                Media = new LibVLCSharp.Shared.Media(_libVlc, path);
+            }
+
+            public DateTime LastUsed { get; set; }
+            public string Path { get; private set; }
+            public LibVLCSharp.Shared.Media Media { get; private set; }
+        }
+
+        private readonly ConcurrentDictionary<string, SndLog> _libVlcMedia;
 
         static SoundManager()
         {
@@ -29,7 +47,7 @@ namespace ThePalace.Media.SoundPlayer
         {
             _libVlcPlayer.Dispose();
 
-            _libVlcMedia.ToList().ForEach(m => { try { m.Value.Item3.Dispose(); } catch { } });
+            _libVlcMedia.ToList().ForEach(m => { try { m.Value.Media.Dispose(); } catch { } });
             _libVlcMedia?.Clear();
         }
 
@@ -46,26 +64,24 @@ namespace ThePalace.Media.SoundPlayer
                 try
                 {
                     if (!_libVlcMedia.ContainsKey(filename) ||
-                        _libVlcMedia[filename].Item2 != _path)
+                        _libVlcMedia[filename].Path != _path)
                     {
                         using (var @lock = LockContext.GetLock(_libVlcMedia))
                         {
                             if (_libVlcMedia.ContainsKey(filename))
                             {
-                                _libVlcMedia[filename].Item3.Dispose();
+                                _libVlcMedia[filename].Media.Dispose();
                             }
 
                             if (_libVlcMedia.Count >= CONST_INT_MaxPlayerCount)
                             {
-                                var _player = _libVlcMedia.OrderBy(m => m.Value.Item1).FirstOrDefault();
-                                _player.Value.Item3.Dispose();
+                                var _player = _libVlcMedia.OrderBy(m => m.Value.LastUsed).FirstOrDefault();
+                                _player.Value.Media.Dispose();
 
                                 _libVlcMedia.Remove(_player.Key);
                             }
 
-                            var media = new LibVLCSharp.Shared.Media(_libVlc, path);
-
-                            _libVlcMedia[filename] = new(DateTime.UtcNow, _path, media);
+                            _libVlcMedia[filename] = new SndLog(_path);
                         }
                     }
 
@@ -85,7 +101,11 @@ namespace ThePalace.Media.SoundPlayer
 
                 if (_libVlcMedia.ContainsKey(filename))
                 {
-                    _libVlcPlayer.Play(_libVlcMedia[filename].Item3);
+                    var media = _libVlcMedia[filename];
+
+                    media.LastUsed = DateTime.UtcNow;
+
+                    _libVlcPlayer.Play(media.Media);
                 }
             }
         }
