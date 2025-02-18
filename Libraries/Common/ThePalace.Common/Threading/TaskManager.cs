@@ -7,15 +7,9 @@ namespace ThePalace.Common.Threading
 {
     public partial class TaskManager : Singleton<TaskManager>, IDisposable
     {
-        static TaskManager()
-        {
-            _globalToken = CancellationTokenFactory.NewToken();
-        }
+        static TaskManager() => _globalToken = CancellationTokenFactory.NewToken();
 
-        public TaskManager()
-        {
-            _jobs = new();
-        }
+        public TaskManager() => _jobs = new();
 
         ~TaskManager() => Dispose();
 

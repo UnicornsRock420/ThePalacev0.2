@@ -14,13 +14,13 @@ namespace ThePalace.Client.Desktop
         {
             var task = (Task?)null;
 
-            task = TaskManager.Instance.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(() =>
                 {
                     // TODO: UI
 
                     Application.Run(new Program());
 
-                    TaskManager.Instance.Shutdown();
+                    TaskManager.Current.Shutdown();
                 },
                 null,
                 Job.RunOptions.UseSleepInterval,
@@ -30,7 +30,7 @@ namespace ThePalace.Client.Desktop
                 _jobs["UI"] = task.Id;
             }
 
-            task = TaskManager.Instance.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(() =>
                 {
                     // TODO: Networking
                 },
@@ -41,7 +41,7 @@ namespace ThePalace.Client.Desktop
                 _jobs["Networking"] = task.Id;
             }
 
-            task = TaskManager.Instance.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(() =>
                 {
                     // TODO: Media
                 },
@@ -56,7 +56,7 @@ namespace ThePalace.Client.Desktop
             //// see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            TaskManager.Instance.Run();
+            TaskManager.Current.Run();
         }
 
         public Program()

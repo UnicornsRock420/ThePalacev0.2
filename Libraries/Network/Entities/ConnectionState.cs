@@ -13,6 +13,7 @@ namespace ThePalace.Network.Entities
         public DateTime? LastReceived { get; set; } = null;
         public DateTime? LastSent { get; set; } = null;
 
+        public BufferStream BytesSent { get; set; } = new();
         public BufferStream BytesReceived { get; set; } = new();
         public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 

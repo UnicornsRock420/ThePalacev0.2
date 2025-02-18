@@ -66,7 +66,7 @@ namespace ThePalace.Network.Factories
 
                 listener.Listen(listenBacklog);
 
-                LoggerHub.Instance.Info("Listener Operational. Waiting for connections...");
+                LoggerHub.Current.Info("Listener Operational. Waiting for connections...");
 
                 while (!CancellationToken.IsCancellationRequested)
                 {
@@ -78,11 +78,11 @@ namespace ThePalace.Network.Factories
                     }
                     catch (SocketException ex)
                     {
-                        LoggerHub.Instance.Error(ex);
+                        LoggerHub.Current.Error(ex);
                     }
                     catch (Exception ex)
                     {
-                        LoggerHub.Instance.Error(ex);
+                        LoggerHub.Current.Error(ex);
                     }
 
                     _signalEvent.WaitOne();
@@ -90,11 +90,11 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
         }
 
@@ -116,7 +116,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
             }
@@ -131,13 +131,13 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
             }
@@ -158,20 +158,20 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 handler = null;
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 handler = null;
             }
 
             if (handler == null) throw new SocketException();
 
-            var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Instance);
+            var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
             if (connectionState == null) throw new SocketException();
 
             handler.SetKeepAlive();
@@ -184,7 +184,7 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -192,7 +192,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
 
             ConnectionReceived.Invoke(this, connectionState);
@@ -217,7 +217,7 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -225,7 +225,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
 
             if (!IsConnected(connectionState))
@@ -250,7 +250,7 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -258,7 +258,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
         }
 
@@ -283,7 +283,7 @@ namespace ThePalace.Network.Factories
                     }
                     catch (SocketException ex)
                     {
-                        LoggerHub.Instance.Error(ex);
+                        LoggerHub.Current.Error(ex);
 
                         DropConnection(connectionState);
 
@@ -291,7 +291,7 @@ namespace ThePalace.Network.Factories
                     }
                     catch (Exception ex)
                     {
-                        LoggerHub.Instance.Error(ex);
+                        LoggerHub.Current.Error(ex);
                     }
                 }
             }
@@ -310,7 +310,7 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -318,7 +318,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
             }
         }
 
@@ -337,7 +337,7 @@ namespace ThePalace.Network.Factories
             }
             catch (SocketException ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 DropConnection(connectionState);
 
@@ -345,7 +345,7 @@ namespace ThePalace.Network.Factories
             }
             catch (Exception ex)
             {
-                LoggerHub.Instance.Error(ex);
+                LoggerHub.Current.Error(ex);
 
                 return false;
             }

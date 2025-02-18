@@ -5,8 +5,8 @@
     {
         protected Singleton() { }
 
-        private static Lazy<T> _instance = new Lazy<T>();
+        private static Lazy<T> _current = new Lazy<T>();
 
-        public static T Instance => _instance.Value;
+        public static T Current => _current.Value;
     }
 }
