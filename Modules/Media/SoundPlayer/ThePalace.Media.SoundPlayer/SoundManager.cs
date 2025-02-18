@@ -10,12 +10,6 @@ namespace ThePalace.Media.SoundPlayer
         private const int CONST_INT_MaxPlayerCount = 30;
         private readonly ConcurrentDictionary<string, Tuple<DateTime, string>> _players;
 
-        [DllImport("winmm.dll", EntryPoint = "mciSendString")]
-        private static extern long _mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallback);
-
-        [DllImport("winmm.dll", EntryPoint = "PlaySound")]
-        private static extern long _playSound(string file, int module, int flags);
-
         public SoundManager()
         {
             _players = new();
@@ -48,7 +42,8 @@ namespace ThePalace.Media.SoundPlayer
             SND_RING = 0x00100000, /* Treat this as a "ring" from a communications app - don't duck me */
             SND_SYSTEM = 0x00200000 /* Treat this as a system sound */
         }
-
+        [DllImport("winmm.dll", EntryPoint = "PlaySound")]
+        private static extern long _playSound(string file, int module, int flags);
         public void PlaySound(string path, PlaySoundFlags flags = PlaySoundFlags.SND_LOOP)
         {
             if (File.Exists(path))
@@ -56,6 +51,9 @@ namespace ThePalace.Media.SoundPlayer
                 _playSound(path, 0, (int)flags);
             }
         }
+
+        [DllImport("winmm.dll", EntryPoint = "mciSendString")]
+        private static extern long _mciSendString(string strCommand, StringBuilder strReturn, int iReturnLength, IntPtr hwndCallback);
 
         public bool Load(string path)
         {

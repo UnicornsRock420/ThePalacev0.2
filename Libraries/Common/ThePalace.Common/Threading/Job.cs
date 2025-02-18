@@ -50,14 +50,19 @@ namespace ThePalace.Common.Threading
             JobState = null;
         }
 
-        public Job(Action? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval) : this()
+        public Job(Action? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
             JobState = jobState;
             Options = opts;
 
-            if ((Options & RunOptions.UseManualResetEvent) == RunOptions.UseManualResetEvent)
+            if (sleepInterval != null)
+            {
+                SleepInterval = sleepInterval.Value;
+            }
+
+            if ((opts & RunOptions.UseManualResetEvent) == RunOptions.UseManualResetEvent)
             {
                 _resetEvent = new(false);
             }
@@ -65,7 +70,7 @@ namespace ThePalace.Common.Threading
             Build(Cmd = cmd);
         }
 
-        internal Job(Job parent) : this(parent.Cmd, parent.JobState, parent.Options)
+        internal Job(Job parent) : this(parent.Cmd, parent.JobState, parent.Options, parent.SleepInterval)
         {
             ParentId = parent.Id;
             Cmd = parent.Cmd;
@@ -198,6 +203,8 @@ namespace ThePalace.Common.Threading
                     _errors.Add(runLog.Exception = ex);
                 }
 
+                _token.Token.ThrowIfCancellationRequested();
+
                 if (_runLogs.Count >= _CONST_INT_ERRORLIMIT)
                     _runLogs.RemoveAt(0);
 
@@ -207,7 +214,7 @@ namespace ThePalace.Common.Threading
 
                 if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
 
-                Token.ThrowIfCancellationRequested();
+                _token.Token.ThrowIfCancellationRequested();
 
                 if (doUseManualResetEvent)
                 {

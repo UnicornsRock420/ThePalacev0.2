@@ -1,4 +1,5 @@
-﻿using ThePalace.Common.Factories;
+﻿using System.Linq;
+using ThePalace.Common.Factories;
 using ThePalace.Common.Interfaces.Threading;
 using static ThePalace.Common.Threading.Job;
 
@@ -20,12 +21,15 @@ namespace ThePalace.Common.Threading
 
         public void Dispose()
         {
-            if (_globalToken.IsCancellationRequested == false)
+            if (!_globalToken.IsCancellationRequested)
             {
-                try { _globalToken.Cancel(); } catch { }
+                try { _globalToken.CancelAsync(); } catch { }
+
+                Thread.Sleep(450);
 
                 _jobs.Values
-                    .SelectMany(j => j._subJobs)
+                    .Union(_jobs.Values
+                        .SelectMany(j => j._subJobs ?? []))
                     .ToList()
                     .ForEach(j =>
                     {
@@ -36,10 +40,12 @@ namespace ThePalace.Common.Threading
                     });
                 _jobs.Clear();
 
-                Thread.Sleep(1500);
+                Thread.Sleep(450);
+
+                _globalToken.Dispose();
             }
 
-            _globalToken.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         private static readonly CancellationTokenSource _globalToken;
@@ -49,11 +55,11 @@ namespace ThePalace.Common.Threading
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
-        public Task CreateTask(Action cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval)
+        public Task CreateTask(Action cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
         {
             if (_globalToken.IsCancellationRequested) return null;
 
-            var job = new Job(cmd, jobState, opts);
+            var job = new Job(cmd, jobState, opts, sleepInterval);
 
             _jobs.Add(job.Id, job);
 
@@ -128,12 +134,13 @@ namespace ThePalace.Common.Threading
         public void Run(int sleepInterval = 750, CancellationToken? token = null)
         {
             while (!GlobalToken.IsCancellationRequested &&
-                !(!token.HasValue || token.Value.IsCancellationRequested))
+                (!token.HasValue || !token.Value.IsCancellationRequested))
             {
                 Cleanup();
 
                 var jobs = _jobs.Values
-                    .SelectMany(j => j._subJobs)
+                    .Union(_jobs.Values
+                        .SelectMany(j => j._subJobs))
                     .ToList();
                 foreach (var job in jobs)
                 {
