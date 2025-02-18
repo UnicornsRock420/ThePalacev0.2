@@ -1,7 +1,6 @@
 ﻿using ThePalace.Client.Desktop.Enums;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Core.Helpers;
-using ThePalace.Network.Constants;
+using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.Gfx
 {
@@ -136,7 +135,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             #endregion
             #region Word(s) & Line Formatting
 
-            var words = ThePalace.Core.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
+            var words = ThePalace.Common.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
             var lines = new List<string>();
             var line = new List<string>();
 

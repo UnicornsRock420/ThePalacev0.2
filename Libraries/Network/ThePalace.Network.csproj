@@ -14,8 +14,6 @@
 
   <ItemGroup>
     <None Include="Constants\RegexConstants.cs" />
-    <None Include="Factories\LockContext.cs" />
-    <None Include="Factories\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,7 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\ThePalace.Common\ThePalace.Common.csproj" />
     <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

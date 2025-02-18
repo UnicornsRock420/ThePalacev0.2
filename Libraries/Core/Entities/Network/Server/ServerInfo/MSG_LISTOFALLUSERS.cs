@@ -3,7 +3,7 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;

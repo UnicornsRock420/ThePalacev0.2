@@ -50,8 +50,6 @@
     <None Include="Factories\Filesystem\PropPIDSStream.cs" />
     <None Include="Factories\Filesystem\PropPROPSStream.cs" />
     <None Include="Factories\Filesystem\PropPRPStream.cs" />
-    <None Include="Factories\Core\LockContext.cs" />
-    <None Include="Factories\Core\Singleton.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,7 +94,6 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.Map" Version="2.0.0" />
-    <PackageReference Include="SharpZipLib" Version="1.4.2" />
     <PackageReference Include="System.Buffers" Version="4.6.0" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
@@ -113,9 +110,6 @@
     <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
     <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
-    <PackageReference Include="System.Runtime" Version="4.3.1" />
-    <PackageReference Include="System.Runtime.Caching" Version="9.0.2" />
-    <PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
     <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.2" />
     <PackageReference Include="System.Text.Encodings.Web" Version="9.0.2" />

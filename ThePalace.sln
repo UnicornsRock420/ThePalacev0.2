@@ -80,6 +80,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Media", "Document
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinuxServer4.5.1", "Documentation\LinuxServer4.5.1\LinuxServer4.5.1.csproj", "{A0285139-0032-4CB0-81A8-CBA073EFF367}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Media.SoundPlayer", "Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj", "{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Common", "Libraries\Common\ThePalace.Common\ThePalace.Common.csproj", "{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,6 +178,14 @@ Global
 		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0285139-0032-4CB0-81A8-CBA073EFF367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -208,5 +220,7 @@ Global
 		{151F6E31-D055-4EE5-96DB-F6CAC7BB6826} = {C77C71AD-04D7-4465-AA32-B6E614EA2850}
 		{51F91939-0CBE-4D13-9A0C-699AAF61A935} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
 		{A0285139-0032-4CB0-81A8-CBA073EFF367} = {E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D}
+		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA} = {287C2C29-2017-49FD-A44B-F4BB682F516D}
+		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
 	EndGlobalSection
 EndGlobal

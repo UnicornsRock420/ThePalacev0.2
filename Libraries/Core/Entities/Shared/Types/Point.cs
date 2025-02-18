@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Common.Helpers;
+using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
 using sint16 = System.Int16;
 

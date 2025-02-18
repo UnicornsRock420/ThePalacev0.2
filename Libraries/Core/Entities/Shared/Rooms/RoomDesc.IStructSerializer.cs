@@ -3,7 +3,7 @@ using System.Diagnostics;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared.Rooms
@@ -68,7 +68,7 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
                 for (var i = 0; i < nbrHotspots; i++)
                 {
-                    this.Seek(hotspotOfst + Exts.Palace.AttributeExts.GetByteSize<HotspotRec>() * i);
+                    this.Seek(hotspotOfst + Exts.AttributeExts.GetByteSize<HotspotRec>() * i);
 
                     position = this._stream.Position;
 
@@ -107,10 +107,10 @@ namespace ThePalace.Core.Entities.Shared.Rooms
                     if (h.SpotInfo.ScriptTextOfst > 0 && h.SpotInfo.ScriptTextOfst < this.Count)
                         h.Script = this.ReadCString(h.SpotInfo.ScriptTextOfst);
 
-                    if (h.SpotInfo.NbrPts > 0 && h.SpotInfo.PtsOfst > 0 && h.SpotInfo.PtsOfst < this.Count - Exts.Palace.AttributeExts.GetByteSize<Types.Point?>() * h.SpotInfo.NbrPts)
+                    if (h.SpotInfo.NbrPts > 0 && h.SpotInfo.PtsOfst > 0 && h.SpotInfo.PtsOfst < this.Count - Exts.AttributeExts.GetByteSize<Types.Point?>() * h.SpotInfo.NbrPts)
                         for (var s = 0; s < h.SpotInfo.NbrPts; s++)
                         {
-                            this.Seek(h.SpotInfo.PtsOfst + s * Exts.Palace.AttributeExts.GetByteSize<Types.Point?>());
+                            this.Seek(h.SpotInfo.PtsOfst + s * Exts.AttributeExts.GetByteSize<Types.Point?>());
 
                             position = this._stream.Position;
 
@@ -123,7 +123,7 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
                     for (var s = 0; s < h.SpotInfo.NbrStates; s++)
                     {
-                        this.Seek(h.SpotInfo.StateRecOfst + s * Exts.Palace.AttributeExts.GetByteSize<HotspotStateRec>());
+                        this.Seek(h.SpotInfo.StateRecOfst + s * Exts.AttributeExts.GetByteSize<HotspotStateRec>());
 
                         position = this._stream.Position;
 
@@ -156,7 +156,7 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
                 for (var i = 0; i < nbrPictures; i++)
                 {
-                    this.Seek(pictureOfst + Exts.Palace.AttributeExts.GetByteSize<PictureRec>() * i);
+                    this.Seek(pictureOfst + Exts.AttributeExts.GetByteSize<PictureRec>() * i);
 
                     position = this._stream.Position;
 
@@ -424,8 +424,8 @@ namespace ThePalace.Core.Entities.Shared.Rooms
                         for (var i = 0; i < (this.DrawCmds?.Count ?? 0); i++)
                         {
                             this.DrawCmds[i].DrawCmdInfo.CmdLength = (ushort)this.DrawCmds[i].Data.Length;
-                            this.DrawCmds[i].DrawCmdInfo.DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
-                            this.DrawCmds[i].DrawCmdInfo.NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.Palace.AttributeExts.GetByteSize<DrawCmdRec>());
+                            this.DrawCmds[i].DrawCmdInfo.DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
+                            this.DrawCmds[i].DrawCmdInfo.NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.AttributeExts.GetByteSize<DrawCmdRec>());
 
                             tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.NextOfst);
                             tmp1.WriteInt16(0); //reserved
@@ -446,7 +446,7 @@ namespace ThePalace.Core.Entities.Shared.Rooms
 
                 for (var i = 0; i < (this.LooseProps?.Count ?? 0); i++)
                 {
-                    this.LooseProps[i].NextOfst = (short)(i == this.LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.Palace.AttributeExts.GetByteSize<LoosePropRec>());
+                    this.LooseProps[i].NextOfst = (short)(i == this.LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.AttributeExts.GetByteSize<LoosePropRec>());
 
                     using (var ms = new MemoryStream())
                     {

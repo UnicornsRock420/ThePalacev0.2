@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Exts.Palace;
+using ThePalace.Core.Exts;
 
 namespace ThePalace.Core.Helpers
 {
@@ -199,7 +199,7 @@ namespace ThePalace.Core.Helpers
 
             for (var j = 0; j < source.Length; j++)
             {
-                if (RegexConstants.REGEX_ALPHANUMERIC_SINGLECHARACTER.IsMatch(source[j].ToString()))
+                if (Common.Constants.RegexConstants.REGEX_ALPHANUMERIC_SINGLECHARACTER.IsMatch(source[j].ToString()))
                 {
                     dest.Append(source[j]);
                 }

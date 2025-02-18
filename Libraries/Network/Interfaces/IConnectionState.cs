@@ -1,5 +1,5 @@
 ﻿using System.Net.Sockets;
-using ThePalace.Network.Factories;
+using ThePalace.Common.Factories;
 
 namespace ThePalace.Network.Interfaces
 {

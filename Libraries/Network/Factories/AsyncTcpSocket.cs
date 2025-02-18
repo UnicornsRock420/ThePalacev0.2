@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using ThePalace.Common.Factories;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Helpers;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 

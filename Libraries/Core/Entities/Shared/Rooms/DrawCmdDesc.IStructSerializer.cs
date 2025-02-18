@@ -1,15 +1,14 @@
 ﻿using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Exts.Palace;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared.Rooms
 {
     public partial class DrawCmdDesc : RawStream, IStructSerializer
     {
-        private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.Palace.AttributeExts.GetByteSize<MSG_Header>();
-        private static readonly int CONST_INT_SIZEOF_POINT = Exts.Palace.AttributeExts.GetByteSize<Types.Point>();
+        private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.AttributeExts.GetByteSize<MSG_Header>();
+        private static readonly int CONST_INT_SIZEOF_POINT = Exts.AttributeExts.GetByteSize<Types.Point>();
 
         public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
         {

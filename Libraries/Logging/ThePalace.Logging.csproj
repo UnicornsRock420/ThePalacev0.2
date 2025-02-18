@@ -45,7 +45,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Include="Factories\Singleton.cs" />
+      <ProjectReference Include="..\Common\ThePalace.Common\ThePalace.Common.csproj" />
     </ItemGroup>
 
 </Project>
