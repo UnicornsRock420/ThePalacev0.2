@@ -27,7 +27,8 @@ namespace Sandbox
             var roomDesc = new RoomDesc(data);
             roomDesc.Deserialize(roomDesc.Stream);
 
-            SoundManager.Instance.Play(@"Media\Chime.mp3", true);
+            SoundManager.Instance.Play(@"Media\WompWomp.mp3", true);
+            //SoundManager.Instance.PlaySound(@"Media\Boing.wav", SoundManager.PlaySoundFlags.SND_ASYNC | SoundManager.PlaySoundFlags.SND_NOWAIT | SoundManager.PlaySoundFlags.SND_SYSTEM);
 
             //Experiment4();
             //Experiment5();

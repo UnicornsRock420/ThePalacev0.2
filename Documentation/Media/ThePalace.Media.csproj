@@ -25,6 +25,9 @@
     <None Update="Media\Boing.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Media\Boing.wav">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Media\boom.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
