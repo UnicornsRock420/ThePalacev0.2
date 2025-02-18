@@ -32,7 +32,7 @@ namespace ThePalace.Media.SoundPlayer
 
         static SoundManager()
         {
-            _libVlc = new("--file-caching=0");
+            _libVlc = new("--file-caching=0");  //--input-repeat=#
         }
 
         public SoundManager()
@@ -93,7 +93,7 @@ namespace ThePalace.Media.SoundPlayer
             return false;
         }
 
-        public void Play(string? path = null, bool loop = false)
+        public void Play(string? path = null)
         {
             if (Load(path))
             {
@@ -108,6 +108,11 @@ namespace ThePalace.Media.SoundPlayer
                     _libVlcPlayer.Play(media.Media);
                 }
             }
+        }
+
+        public void Pause()
+        {
+            _libVlcPlayer.Pause();
         }
 
         public void Stop()

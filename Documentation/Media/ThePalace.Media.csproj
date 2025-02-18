@@ -76,6 +76,9 @@
     <None Update="Media\endoftime.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Media\Fader.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Media\fazein.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

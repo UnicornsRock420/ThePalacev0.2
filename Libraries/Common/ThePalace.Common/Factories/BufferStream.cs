@@ -24,11 +24,25 @@
             public int Length => Data?.Length ?? 0;
         }
 
+        public BufferStream() => this._chunks = new();
+
         //Maintains the streams data.The Queue object provides an easy and efficient way to add and remove data
         //Each item in the queue represents each write to the stream.Every call to write translates to an item in the queue
         private Queue<Chunk> _chunks;
 
-        public BufferStream() => this._chunks = new();
+        public byte[] Dequeue()
+        {
+            if ((this._chunks?.Count ?? 0) < 1) return [];
+
+            var chunk = this._chunks.Dequeue();
+            if (chunk?.Position == 0) return chunk.Data;
+
+            var count = chunk.Length - chunk.Position;
+            var result = new byte[count];
+            Buffer.BlockCopy(chunk.Data, chunk.Position, result, 0, count);
+
+            return result;
+        }
 
         /// <summary>
         /// Reads up to count bytes from the stream, and removes the read data from the stream.
@@ -148,6 +162,8 @@
             throw new NotSupportedException(string.Format("{0} length can not be changed", this.GetType().Name));
 
         public override bool CanRead => true;
+
+        public long Count => (this._chunks?.Count ?? 0);
 
         public override long Length =>
             (this._chunks?.Count ?? 0) < 1 ? 0 : this._chunks.Sum(b => b.Length - b.Position);
