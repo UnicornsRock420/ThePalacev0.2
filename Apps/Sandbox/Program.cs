@@ -2,6 +2,7 @@ using ThePalace.Common.Threading;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Data;
+using ThePalace.Media.SoundPlayer;
 using static ThePalace.Common.Threading.Job;
 
 namespace Sandbox
@@ -25,6 +26,8 @@ namespace Sandbox
             var data = File.ReadAllText(@"Data\MSG_ROOMDESC.data").FromHex();
             var roomDesc = new RoomDesc(data);
             roomDesc.Deserialize(roomDesc.Stream);
+
+            SoundManager.Instance.Play(@"Media\Chime.mp3", true);
 
             //Experiment4();
             //Experiment5();

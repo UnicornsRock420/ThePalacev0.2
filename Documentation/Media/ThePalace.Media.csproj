@@ -130,6 +130,9 @@
     <None Update="Media\Whispers.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Media\WompWomp.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Media\Yawn.mp3">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
