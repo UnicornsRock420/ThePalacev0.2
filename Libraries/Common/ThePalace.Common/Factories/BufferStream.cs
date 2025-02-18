@@ -37,10 +37,8 @@
         /// <param name="offset"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public override int Read(byte[] buffer, int offset, int count)
+        private int _read(byte[] buffer, int offset, int count)
         {
-            this.ValidateBufferArgs(buffer, offset, count);
-
             var iRemainingBytesToRead = count;
             var iTotalBytesRead = 0;
 
@@ -59,8 +57,11 @@
 
                 if (iBytesToRead > 0)
                 {
-                    //Read from the chunk into the buffer
-                    Buffer.BlockCopy(chunk.Data, chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
+                    if (buffer != null)
+                    {
+                        //Read from the chunk into the buffer
+                        Buffer.BlockCopy(chunk.Data, chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
+                    }
 
                     iTotalBytesRead += iBytesToRead;
                     iRemainingBytesToRead -= iBytesToRead;
@@ -80,6 +81,20 @@
             }
 
             return iTotalBytesRead;
+        }
+
+        /// <summary>
+        /// Reads up to count bytes from the stream, and removes the read data from the stream.
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="offset"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            this.ValidateBufferArgs(buffer, offset, count);
+
+            return this._read(buffer, offset, count);
         }
 
         private void ValidateBufferArgs(byte[]? buffer, int offset, int count)
@@ -107,7 +122,7 @@
             this._chunks.Enqueue(new Chunk(bufSave));
         }
 
-        public override bool CanSeek => false;
+        public override bool CanSeek => CanSeekOveride;
         public bool CanSeekOveride { get; set; } = false;
 
         /// <summary>
@@ -119,42 +134,9 @@
             get => 0;
             set
             {
-                if (!CanSeekOveride) throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
+                if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
 
-                var iRemainingBytesToRead = (int)value;
-                var iTotalBytesRead = 0;
-
-                //Read until we hit the requested count, or until we hav nothing left to read
-                while (iTotalBytesRead <= value &&
-                    this._chunks.Count > 0)
-                {
-                    //Get first chunk from the queue
-                    var chunk = this._chunks.Peek();
-
-                    //Determine how much of the chunk there is left to read
-                    var iUnreadChunkLength = chunk.Length - chunk.Position;
-
-                    //Determine how much of the unread part of the chunk we can actually read
-                    var iBytesToRead = Math.Min(iUnreadChunkLength, iRemainingBytesToRead);
-
-                    if (iBytesToRead > 0)
-                    {
-                        iTotalBytesRead += iBytesToRead;
-                        iRemainingBytesToRead -= iBytesToRead;
-
-                        //If the entire chunk has been read,  remove it
-                        if (chunk.Position + iBytesToRead >= chunk.Data.Length)
-                        {
-                            this._chunks.Dequeue();
-                        }
-                        else
-                        {
-                            //Otherwise just update the chunk read start index, so we know where to start reading on the next call
-                            chunk.Position += iBytesToRead;
-                        }
-                    }
-                    else break;
-                }
+                this._read(null, 0, (int)value);
             }
         }
 
