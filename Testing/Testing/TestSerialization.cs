@@ -10,7 +10,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Testing
 {
     [TestClass]
-    public sealed class TestSerialization
+    public partial class TestSerialization
     {
         private static readonly Type CONST_TYPE_IProtocolS2C = typeof(IProtocolS2C);
         private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);

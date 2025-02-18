@@ -3,7 +3,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Core.Factories.Core
 {
-    public sealed class EventBus : IEventsBus
+    public partial class EventBus : IEventsBus
     {
         private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary;
 

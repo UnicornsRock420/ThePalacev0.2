@@ -1,10 +1,11 @@
+using System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 
 namespace ThePalace.Client.Desktop
 {
     public partial class Program : Form
     {
-        private static readonly Dictionary<string, int> _jobs = new();
+        private static readonly ConcurrentDictionary<string, int> _jobs = new();
 
         /// <summary>
         ///  The main entry point for the application.
@@ -32,13 +33,24 @@ namespace ThePalace.Client.Desktop
 
             task = TaskManager.Current.CreateTask(() =>
                 {
-                    // TODO: Networking
+                    // TODO: Networking-Receive
                 },
                 null,
                 Job.RunOptions.UseManualResetEvent);
             if (task != null)
             {
-                _jobs["Networking"] = task.Id;
+                _jobs["Networking-Receive"] = task.Id;
+            }
+
+            task = TaskManager.Current.CreateTask(() =>
+                {
+                    // TODO: Networking-Send
+                },
+                null,
+                Job.RunOptions.UseManualResetEvent);
+            if (task != null)
+            {
+                _jobs["Networking-Send"] = task.Id;
             }
 
             task = TaskManager.Current.CreateTask(() =>

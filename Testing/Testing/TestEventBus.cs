@@ -8,7 +8,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Testing
 {
     [TestClass]
-    public sealed class TestEventBus
+    public partial class TestEventBus
     {
         private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
         private static readonly EventBus CONST_EventBus = EventBus.Instance;

@@ -1,19 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
+using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Core.Client.Core
 {
     public delegate void HotKeyAction(ISessionState sessionState, Keys keys, object sender = null);
 
-    public sealed class HotKeyManager : Disposable
+    public partial class HotKeyManager : SingletonDisposable<HotKeyManager>
     {
-        private static readonly Lazy<HotKeyManager> _current = new();
-        public static HotKeyManager Current => _current.Value;
-
         private ConcurrentDictionary<Keys, HotKeyBinding> _keyBindings = new();
         public IReadOnlyDictionary<Keys, HotKeyBinding> KeyBindings => _keyBindings.AsReadOnly();
 

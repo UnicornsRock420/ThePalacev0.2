@@ -9,12 +9,9 @@ using ThePalace.Core.Client.Core;
 
 namespace ThePalace.Common.Desktop.Factories
 {
-    public sealed class FormsManager : ApplicationContext, IDisposable
+    public partial class FormsManager : SingletonApplicationContext<FormsManager>, IDisposable
     {
-        private bool IsDisposed = false;
-
-        private static readonly Lazy<FormsManager> _current = new();
-        public static FormsManager Current => _current.Value;
+        protected bool IsDisposed = false;
 
         private readonly DisposableDictionary<string, FormBase> _forms = new();
         public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
