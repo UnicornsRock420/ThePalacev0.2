@@ -2,5 +2,6 @@
 {
     public interface ISessionState
     {
+        Guid Id { get; }
     }
 }
