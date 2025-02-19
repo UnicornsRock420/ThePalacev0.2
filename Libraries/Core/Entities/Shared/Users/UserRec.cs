@@ -23,7 +23,7 @@ namespace ThePalace.Core.Entities.Shared
             GC.SuppressFinalize(this);
         }
 
-        public UserID UserID;
+        public UserID UserId;
         public Point RoomPos;
 
         [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)

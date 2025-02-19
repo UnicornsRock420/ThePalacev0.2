@@ -1,7 +1,10 @@
-﻿namespace ThePalace.Common.Desktop.Interfaces
+﻿using System.Collections.Concurrent;
+using ThePalace.Core.Interfaces.Core;
+
+namespace ThePalace.Common.Desktop.Interfaces
 {
-    public interface IUISessionState
+    public interface IUISessionState : ISessionState
     {
-        //object ScriptState;
+        ConcurrentDictionary<string, object> Extended { get; }
     }
 }

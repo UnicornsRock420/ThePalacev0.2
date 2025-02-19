@@ -4,6 +4,7 @@ using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Media.SoundPlayer;
 using static ThePalace.Common.Threading.Job;
+using static ThePalace.Media.SoundPlayer.SoundManager;
 
 namespace Sandbox
 {
@@ -27,12 +28,10 @@ namespace Sandbox
             var roomDesc = new RoomDesc(data);
             roomDesc.Deserialize(roomDesc.Stream);
 
-            SoundManager.Current.Play(@"Media\Yes.mp3");
-            SoundManager.Current.PlaySound(@"Media\Boing.wav", SoundManager.PlaySoundFlags.SND_ASYNC | SoundManager.PlaySoundFlags.SND_NOWAIT | SoundManager.PlaySoundFlags.SND_SYSTEM | SoundManager.PlaySoundFlags.SND_LOOP);
-
             //Experiment4();
             //Experiment5();
             //Experiment6();
+            //Experiment7();
         }
 
         public Program()
@@ -70,5 +69,10 @@ namespace Sandbox
             taskManager.Run();
         }
 
+        private static void Experiment7()
+        {
+            SoundManager.Current.Play(@"Media\Yes.mp3");
+            SoundManager.Current.PlaySound(@"Media\Boing.wav", PlaySoundFlags.SND_ASYNC | PlaySoundFlags.SND_NOWAIT | PlaySoundFlags.SND_SYSTEM | PlaySoundFlags.SND_LOOP);
+        }
     }
 }

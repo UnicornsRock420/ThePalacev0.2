@@ -55,7 +55,7 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
             return g;
         }
 
-        public void Load(IUISessionState sessionState, LayerLoadingTypes type, string srcPath, int width = 0, int height = 0)
+        public void Load(IDesktopSessionState sessionState, LayerLoadingTypes type, string srcPath, int width = 0, int height = 0)
         {
             if (srcPath == null) throw new ArgumentNullException(nameof(srcPath));
 

@@ -23,26 +23,13 @@ namespace ThePalace.Core.Factories.Core
             GC.SuppressFinalize(this);
         }
 
-        public T CreateSession<T>()
-            where T : class, ISessionState, new()
-        {
-            if (this.IsDisposed) return default;
-
-            var sessionState = new T() as ISessionState;
-            if (sessionState == null)
-                throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", typeof(T).GetType().Name));
-
-            _sessions.TryAdd(sessionState.Id, sessionState);
-            return sessionState as T;
-        }
-
         public object CreateSession(Type type)
         {
             if (this.IsDisposed) return null;
 
             var sessionState = type.GetInstance() as ISessionState;
             if (sessionState == null)
-                throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", typeof(T).GetType().Name));
+                throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", type.Name));
 
             _sessions.TryAdd(sessionState.Id, sessionState);
             return sessionState;
