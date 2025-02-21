@@ -13,6 +13,10 @@ namespace ThePalace.Client.Desktop
         [STAThread]
         public static void Main()
         {
+            //// To customize application configuration such as set high DPI settings or default font,
+            //// see https://aka.ms/applicationconfiguration.
+            ApplicationConfiguration.Initialize();
+
             var task = (Task?)null;
 
             task = TaskManager.Current.CreateTask(() =>
@@ -63,10 +67,6 @@ namespace ThePalace.Client.Desktop
             {
                 _jobs["Media"] = task.Id;
             }
-
-            //// To customize application configuration such as set high DPI settings or default font,
-            //// see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
 
             TaskManager.Current.Run();
         }

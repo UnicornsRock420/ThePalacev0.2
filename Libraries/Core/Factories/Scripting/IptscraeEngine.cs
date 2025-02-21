@@ -2,13 +2,13 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ThePalace.Common.Helpers;
+using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Core;
 
-namespace ThePalace.Common.Desktop.Entities.Core
+namespace ThePalace.Core.Factories.Scripting
 {
     using IptAtomList = List<IptVariable>;
 
@@ -2090,11 +2090,13 @@ namespace ThePalace.Common.Desktop.Entities.Core
                                 throw new Exception($"Wrong datatype {register1.Type}...");
                             }
 
+                            var atom = register1.Value as IptAtomList;
+
                             iptTracking.Break = false;
 
-                            for (var j = 0; !iptTracking.Break && j < (register1.Value as IptAtomList).Count; j++)
+                            for (var j = 0; !iptTracking.Break && j < atom.Count; j++)
                             {
-                                iptTracking.Stack.Push((register1.Value as IptAtomList)[j]);
+                                iptTracking.Stack.Push(atom[j]);
 
                                 Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
                             }
@@ -3569,6 +3571,39 @@ namespace ThePalace.Common.Desktop.Entities.Core
                         default: throw new Exception($"Wrong datatype {register.Type}...");
                     }
                 }) },
+            { "COALESCE", (IptCommandFnc)((iptTracking, recursionDepth) =>
+                {
+                    var register1 = popStack(iptTracking);
+                    var register2 = popStack(iptTracking);
+
+                    switch (register2.Type)
+                    {
+                        case IptVariableTypes.Array:
+                            if (register1.Type != IptVariableTypes.String &&
+                                register1.Type != IptVariableTypes.Bool &&
+                                register1.Type != IptVariableTypes.Integer &&
+                                register1.Type != IptVariableTypes.Decimal)
+                            {
+                                throw new Exception($"Wrong datatype {register1.Type}...");
+                            }
+
+                            var atom = register2.Value as IptAtomList;
+
+                            for (var j = 0; j < atom.Count; j++)
+                            {
+                                if (atom[j].Type != register1.Type ||
+                                    atom[j].Value != register1.Value)
+                                {
+                                    iptTracking.Stack.Push(atom[j]);
+
+                                    break;
+                                }
+                            }
+
+                            break;
+                        default: throw new Exception($"Wrong datatype {register2.Type}...");
+                    }
+                }) },
             // End Math Commands
             #endregion
 
@@ -3658,7 +3693,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 } },
             { "%", new IptOperator
                 {
-                    Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Mod,
+                    Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Modulo,
                     OpFnc = (register1, register2) =>
                         new IptVariable
                         {
@@ -3763,7 +3798,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
                 } },
             { "%=", new IptOperator
                 {
-                    Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Mod,
+                    Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Modulo,
                     OpFnc = (register1, register2) =>
                         new IptVariable
                         {

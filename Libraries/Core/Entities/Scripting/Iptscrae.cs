@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 using ThePalace.Core.Enums.Palace;
 using Timer = System.Timers.Timer;
 
-namespace ThePalace.Common.Desktop.Entities.Core
+namespace ThePalace.Core.Entities.Scripting
 {
     using IptAlarms = List<IptAlarm>;
     using IptAtomList = List<IptVariable>;

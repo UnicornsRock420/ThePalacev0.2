@@ -15,6 +15,6 @@ namespace ThePalace.Core.Entities.Network.Shared.Core
         public UserDesc? UserDesc { get; set; } = null;
         public RegistrationRec? RegInfo { get; set; } = null;
 
-        public object? ScriptState { get; set; } = null;
+        public object? State { get; set; } = null;
     }
 }

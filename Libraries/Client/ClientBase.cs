@@ -2,5 +2,8 @@
 {
     public partial class ClientBase
     {
+        public void Run()
+        {
+        }
     }
 }

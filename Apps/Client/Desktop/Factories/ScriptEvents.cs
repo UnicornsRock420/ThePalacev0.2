@@ -58,7 +58,7 @@ namespace ThePalace.Client.Desktop.Factories
 #endif
 
                     if (eventType != IptEventTypes.UnhandledError)
-                        this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptState);
+                        this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.State);
                 }
             }
         }

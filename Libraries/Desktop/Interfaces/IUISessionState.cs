@@ -6,5 +6,7 @@ namespace ThePalace.Common.Desktop.Interfaces
     public interface IUISessionState : ISessionState
     {
         ConcurrentDictionary<string, object> Extended { get; }
+
+        object? ScriptState { get; set; }
     }
 }

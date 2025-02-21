@@ -7,7 +7,6 @@ using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
@@ -15,12 +14,13 @@ using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Network.Shared.Communications;
 using ThePalace.Core.Entities.Network.Shared.Network;
+using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
 using ThePalace.Network.Factories;
 
-namespace ThePalace.Core.Desktop.Plugins.Features.GUI
+namespace ThePalace.Client.Desktop
 {
     public partial class App : Disposable
     {
@@ -111,12 +111,12 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
             //}
         }
 
-        public object Initialize(params object[] args)
+        public void Initialize(params object[] args)
         {
-            if (this.IsDisposed) return null;
+            if (this.IsDisposed) return;
 
             this._sessionState = args.FirstOrDefault() as IDesktopSessionState;
-            if (this._sessionState == null) return null;
+            if (this._sessionState == null) return;
 
             foreach (var type in CONST_eventTypes)
             {
@@ -176,7 +176,7 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
             //    return;
             //}, null);
 
-            return null;
+            return;
         }
 
         internal void RefreshScreen(object sender, EventArgs e)
@@ -271,37 +271,37 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this._sessionState, null, this._sessionState.State);
             });
             form.MouseUp += new MouseEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this._sessionState, null, this._sessionState.State);
             });
             form.MouseDown += new MouseEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this._sessionState, null, this._sessionState.State);
             });
             form.DragEnter += new DragEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
             });
             form.DragLeave += new EventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
             });
             form.DragOver += new DragEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
             });
             form.Resize += new EventHandler((sender, e) =>
             {
@@ -750,7 +750,7 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
                             return;
                         }
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this._sessionState, null, this._sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this._sessionState, null, this._sessionState.State);
 
                         if (e.KeyCode == Keys.Enter)
                         {
@@ -801,7 +801,7 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
                                     //ScriptEvents.Current.Invoke(IptEventTypes.Chat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
                                     //ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
 
-                                    var iptTracking = this._sessionState.ScriptState as IptTracking;
+                                    var iptTracking = this._sessionState.State as IptTracking;
                                     if (iptTracking != null)
                                     {
                                         if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
@@ -827,7 +827,7 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
 
                         if (!AsyncTcpSocket.IsConnected(this._sessionState?.ConnectionState)) return;
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this._sessionState, null, this._sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this._sessionState, null, this._sessionState.State);
                     });
 
                     this._sessionState.RegisterControl(nameof(txtInput), txtInput);
@@ -1040,9 +1040,9 @@ namespace ThePalace.Core.Desktop.Plugins.Features.GUI
                             }
 
                             if (url != null &&
-                                Constants.RegexConstants.REGEX_PALACEURL.IsMatch(url))
+                                ThePalace.Core.Constants.RegexConstants.REGEX_PALACEURL.IsMatch(url))
                             {
-                                var match = Constants.RegexConstants.REGEX_PALACEURL.Match(url);
+                                var match = ThePalace.Core.Constants.RegexConstants.REGEX_PALACEURL.Match(url);
                                 if (match.Groups.Count < 2) break;
 
                                 var host = match.Groups[1].Value;

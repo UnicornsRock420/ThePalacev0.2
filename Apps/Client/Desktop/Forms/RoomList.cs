@@ -1,6 +1,6 @@
 ﻿using ThePalace.Common.Desktop.Forms.Core;
 
-namespace ThePalace.Core.Desktop.Plugins.Forms
+namespace ThePalace.Client.Desktop.Forms
 {
     public partial class RoomList : FormBase
     {

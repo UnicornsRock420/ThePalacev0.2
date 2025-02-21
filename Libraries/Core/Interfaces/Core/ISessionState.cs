@@ -14,6 +14,6 @@ namespace ThePalace.Core.Interfaces.Core
         UserDesc? UserDesc { get; set; }
         RegistrationRec? RegInfo { get; set; }
 
-        object? ScriptState { get; set; }
+        object? State { get; set; }
     }
 }

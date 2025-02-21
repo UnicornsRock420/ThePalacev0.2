@@ -19,5 +19,7 @@ namespace ThePalace.Common.Desktop.Entities.Core
         public IConnectionState ConnectionState { get; set; }
         public UserDesc UserDesc { get; set; } = new();
         public RegistrationRec RegInfo { get; set; } = new();
+
+        public object? ScriptState { get; set; }
     }
 }
