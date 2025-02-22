@@ -31,8 +31,7 @@ namespace ThePalace.Client.Desktop.Factories
 
             ApiManager.Current.RegisterApi(nameof(this.ExecuteMacro), this.ExecuteMacro);
         }
-        ~AssetsManager() =>
-            Dispose(false);
+        ~AssetsManager() => Dispose(false);
 
         public override void Dispose()
         {

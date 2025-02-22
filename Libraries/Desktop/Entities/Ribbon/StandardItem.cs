@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace ThePalace.Client.Desktop.Entities.Ribbon
+namespace ThePalace.Common.Desktop.Entities.Ribbon
 {
     public abstract class StandardItem : ItemBase
     {

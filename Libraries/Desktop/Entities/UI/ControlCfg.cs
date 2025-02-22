@@ -32,9 +32,14 @@ namespace ThePalace.Common.Desktop.Entities.UI
         public EventHandler Refresh;
         public EventHandler Click;
         public EventHandler DblClick;
+        public MouseEventHandler MouseMove;
+        public MouseEventHandler MouseUp;
+        public MouseEventHandler MouseDown;
         public MouseEventHandler MouseHover;
         public MouseEventHandler MouseExit;
         public ScrollEventHandler Scroll;
-        public BehaviorDragDropEventHandler DragDrop;
+        public DragEventHandler DragEnter;
+        public EventHandler DragLeave;
+        public DragEventHandler DragOver;
     }
 }

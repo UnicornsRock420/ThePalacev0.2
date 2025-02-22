@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using ThePalace.Common.Interfaces.Plugins;
 
-namespace ThePalace.Common.Entities.Plugins
+namespace ThePalace.Common.Threading
 {
     public partial class CmdTask : Disposable
     {

@@ -15,6 +15,7 @@ namespace ThePalace.Common.Desktop.Interfaces
         IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers { get; }
 
         bool Visible { get; set; }
+        double Scale { get; set; }
         int ScreenWidth { get; set; }
         int ScreenHeight { get; set; }
 
@@ -23,6 +24,9 @@ namespace ThePalace.Common.Desktop.Interfaces
 
         RoomDesc RoomInfo { get; set; }
         ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; }
+
+        string ServerName { get; set; }
+        int ServerPopulation { get; set; }
 
         AssetSpec SelectedProp { get; set; }
         UserDesc SelectedUser { get; set; }

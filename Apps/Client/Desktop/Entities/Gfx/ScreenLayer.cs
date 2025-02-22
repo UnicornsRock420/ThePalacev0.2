@@ -91,8 +91,8 @@ namespace ThePalace.Client.Desktop.Entities.Gfx
 
                 if (Type == ScreenLayers.Base)
                 {
-                    //sessionState.ScreenWidth = backgroundImage.Width;
-                    //sessionState.ScreenHeight = backgroundImage.Height;
+                    sessionState.ScreenWidth = backgroundImage.Width;
+                    sessionState.ScreenHeight = backgroundImage.Height;
                 }
             }
         }

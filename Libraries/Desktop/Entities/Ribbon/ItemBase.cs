@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using ThePalace.Common.Desktop.Entities.Core;
 
-namespace ThePalace.Client.Desktop.Entities.Ribbon
+namespace ThePalace.Common.Desktop.Entities.Ribbon
 {
     public abstract class ItemBase : IDisposable
     {
@@ -119,26 +119,13 @@ namespace ThePalace.Client.Desktop.Entities.Ribbon
             Parse(typeof(T).Name);
         public static Type Parse(string nodeType)
         {
-            switch (nodeType)
-            {
-                case nameof(Separator): return typeof(Separator);
-                case nameof(Bookmarks): return typeof(Bookmarks);
-                case nameof(Connection): return typeof(Connection);
-                case nameof(LiveDirectory): return typeof(LiveDirectory);
-                case nameof(DoorOutlines): return typeof(DoorOutlines);
-                case nameof(UserNametags): return typeof(UserNametags);
-                case nameof(Chatlog): return typeof(Chatlog);
-                case nameof(Tabs): return typeof(Tabs);
-                case nameof(Terminal): return typeof(Terminal);
-                case nameof(SuperUser): return typeof(SuperUser);
-                case nameof(Draw): return typeof(Draw);
-                case nameof(GoBack): return typeof(GoBack);
-                case nameof(GoForward): return typeof(GoForward);
-                case nameof(UsersList): return typeof(UsersList);
-                case nameof(RoomsList): return typeof(RoomsList);
-                case nameof(Sounds): return typeof(Sounds);
-                default: return null;
-            }
+            return AppDomain.CurrentDomain
+                .GetAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t =>
+                    t.Namespace.StartsWith("ThePalace.Client.Desktop.Entities.Ribbon") &&
+                    t.Name == nodeType)
+                .FirstOrDefault();
         }
 
         public static ItemBase Instance<T>() =>
@@ -152,11 +139,11 @@ namespace ThePalace.Client.Desktop.Entities.Ribbon
 
             switch (nodeType)
             {
-                case nameof(GoBack):
-                case nameof(GoForward):
-                case nameof(UsersList):
-                case nameof(RoomsList):
-                case nameof(Sounds):
+                case "GoBack":
+                case "GoForward":
+                case "UsersList":
+                case "RoomsList":
+                case "Sounds":
                     if (buttonType == "ddl")
                     {
                         result.Type = buttonType;

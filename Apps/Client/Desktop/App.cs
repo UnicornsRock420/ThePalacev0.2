@@ -13,6 +13,7 @@ using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Network.Shared.Communications;
+using ThePalace.Core.Entities.Network.Shared.Core;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
@@ -91,6 +92,10 @@ namespace ThePalace.Client.Desktop
         public App()
         {
             this._managedResources.Add(_contextMenu);
+
+            var sessionState = new DesktopSessionState();
+
+            Initialize(sessionState);
         }
         ~App() => this.Dispose(false);
 
@@ -111,22 +116,24 @@ namespace ThePalace.Client.Desktop
             //}
         }
 
-        public void Initialize(params object[] args)
+        public void Initialize(IDesktopSessionState sessionState)
         {
-            if (this.IsDisposed) return;
+            if (this.IsDisposed ||
+                sessionState == null) return;
 
-            this._sessionState = args.FirstOrDefault() as IDesktopSessionState;
-            if (this._sessionState == null) return;
+            this._sessionState = sessionState;
 
             foreach (var type in CONST_eventTypes)
             {
                 ScriptEvents.Current.RegisterEvent(type, this.RefreshScreen);
             }
 
-            ApiManager.Current.RegisterApi(nameof(this.ShowConnectionForm), this.ShowConnectionForm);
-            ApiManager.Current.RegisterApi(nameof(this.toolStripDropdownlist_Click), this.toolStripDropdownlist_Click);
-            ApiManager.Current.RegisterApi(nameof(this.toolStripMenuItem_Click), this.toolStripMenuItem_Click);
-            ApiManager.Current.RegisterApi(nameof(this.contextMenuItem_Click), this.contextMenuItem_Click);
+            //ApiManager.Current.RegisterApi(nameof(this.ShowConnectionForm), this.ShowConnectionForm);
+            //ApiManager.Current.RegisterApi(nameof(this.toolStripDropdownlist_Click), this.toolStripDropdownlist_Click);
+            //ApiManager.Current.RegisterApi(nameof(this.toolStripMenuItem_Click), this.toolStripMenuItem_Click);
+            //ApiManager.Current.RegisterApi(nameof(this.contextMenuItem_Click), this.contextMenuItem_Click);
+
+            ShowAppForm();
 
 #if WINDOWS10_0_17763_0_OR_GREATER
             if (Toast.Current.Value)

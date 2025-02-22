@@ -1,4 +1,5 @@
-﻿using ThePalace.Common.Interfaces.Threading;
+﻿using System.Collections.Concurrent;
+using ThePalace.Common.Interfaces.Threading;
 
 namespace ThePalace.Common.Threading
 {
@@ -47,6 +48,7 @@ namespace ThePalace.Common.Threading
             Failures = 0;
 
             SleepInterval = TimeSpan.FromMilliseconds(1500);
+            Queue = new();
             JobState = null;
         }
 
@@ -86,15 +88,19 @@ namespace ThePalace.Common.Threading
             try { _token?.Dispose(); } catch { }
             try { Task?.Dispose(); } catch { }
 
-            _subJobs?.ForEach(j => { try { j?.Dispose(); } catch { } });
+            _subJobs?.ToList()?.ForEach(j => { try { j?.Dispose(); } catch { } });
             _subJobs?.Clear();
 
-            _runLogs?.ForEach(l => { try { l.Exception = null; } catch { } });
+            _runLogs?.ToList()?.ForEach(l => { try { l.Exception = null; } catch { } });
             _runLogs?.Clear();
             _runLogs = null;
 
             _errors?.Clear();
             _errors = null;
+
+            Queue?.ToList()?.ForEach(l => { if (l is IDisposable i) try { i?.Dispose(); } catch { } });
+            Queue?.Clear();
+            Queue = null;
 
             JobState = null;
 
@@ -125,7 +131,8 @@ namespace ThePalace.Common.Threading
         public int Failures { get; protected set; }
         internal readonly ManualResetEvent _resetEvent;
         public TimeSpan SleepInterval { get; set; }
-        public IJobState? JobState { get; set; }
+        public virtual ConcurrentQueue<Cmd> Queue { get; protected set; }
+        public virtual IJobState? JobState { get; set; }
 
         public void EventSet() => _resetEvent?.Set();
         public void EventReset() => _resetEvent?.Reset();

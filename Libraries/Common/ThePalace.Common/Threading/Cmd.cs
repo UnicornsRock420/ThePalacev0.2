@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Entities.Plugins
+﻿namespace ThePalace.Common.Threading
 {
     public partial class Cmd : IDisposable
     {

@@ -1,5 +1,6 @@
 ﻿using System.Timers;
-using ThePalace.Client.Desktop.Entities.Ribbon;
+using ThePalace.Common.Desktop.Entities.Ribbon;
+using ThePalace.Common.Desktop.Factories;
 
 namespace ThePalace.Client.Desktop.Entities.Core
 {
@@ -34,25 +35,25 @@ namespace ThePalace.Client.Desktop.Entities.Core
         {
             base.OnRenderButtonBackground(e);
 
-            //var ribbonItem = SettingsManager.SystemSettings.Ribbon[e.Item.Name];
-            //if (ribbonItem?.HoverFrames != null)
-            //{
-            //    if (!e.Item.Selected)
-            //    {
-            //        _timer.Stop();
+            var ribbonItem = SettingsManager.SystemSettings.Ribbon[e.Item.Name];
+            if (ribbonItem?.HoverFrames != null)
+            {
+                if (!e.Item.Selected)
+                {
+                    _timer.Stop();
 
-            //        _item1 = null;
-            //        _item2 = null;
-            //    }
-            //    else
-            //    {
-            //        _item1 = e.Item;
-            //        _item2 = ribbonItem;
-            //        _item2.ResetFrames();
+                    _item1 = null;
+                    _item2 = null;
+                }
+                else
+                {
+                    _item1 = e.Item;
+                    _item2 = ribbonItem;
+                    _item2.ResetFrames();
 
-            //        _timer.Start();
-            //    }
-            //}
+                    _timer.Start();
+                }
+            }
         }
     }
 }
