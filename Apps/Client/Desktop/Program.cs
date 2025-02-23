@@ -103,7 +103,7 @@ namespace ThePalace.Client.Desktop
 
                     TaskManager.Current.Run();
 
-                    TaskManager.Current.Shutdown();
+                    FormsManager.Current.Dispose();
                 },
                 null,
                 RunOptions.UseSleepInterval | RunOptions.RunNow);
@@ -113,6 +113,8 @@ namespace ThePalace.Client.Desktop
             }
 
             Application.Run(FormsManager.Current);
+
+            TaskManager.Current.Shutdown();
         }
 
         private ContextMenuStrip _contextMenu = new();
