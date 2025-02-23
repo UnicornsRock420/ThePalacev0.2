@@ -56,6 +56,8 @@ namespace ThePalace.Common.Threading
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
+            sleepInterval ??= TimeSpan.FromMilliseconds(750);
+
             JobState = jobState;
             Options = opts;
 

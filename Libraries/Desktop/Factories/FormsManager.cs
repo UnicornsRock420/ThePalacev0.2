@@ -76,7 +76,7 @@ namespace ThePalace.Common.Desktop.Factories
             }
         }
 
-        //public static void InitializeUIUserRec(UserRec user)
+        //public static void InitializeUIUserRec(UserDesc user)
         //{
         //    user.Extended.TryAdd(@"MessageQueue", new ConcurrentQueue<MsgBubble>());
         //    user.Extended.TryAdd(@"CurrentMessage", null);

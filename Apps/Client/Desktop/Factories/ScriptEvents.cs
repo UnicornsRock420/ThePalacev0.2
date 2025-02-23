@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
+using ThePalace.Logging.Entities;
 
 namespace ThePalace.Client.Desktop.Factories
 {
@@ -28,12 +28,14 @@ namespace ThePalace.Client.Desktop.Factories
         {
             if (IsDisposed) return;
 
-            base.Dispose();
-
             foreach (var @event in _events.Values)
                 try { @event?.Clear(); } catch { }
             _events.Clear();
             _events = null;
+
+            base.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         public void Invoke(IptEventTypes eventType, ISessionState sessionState, IProtocol packet, object scriptState = null)
@@ -53,9 +55,7 @@ namespace ThePalace.Client.Desktop.Factories
                 }
                 catch (Exception ex)
                 {
-#if DEBUG
-                    Debug.WriteLine(ex.Message);
-#endif
+                    LoggerHub.Current.Error(ex);
 
                     if (eventType != IptEventTypes.UnhandledError)
                         this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.State);

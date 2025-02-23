@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using ThePalace.Client.Desktop.Entities.Gfx;
@@ -18,6 +17,8 @@ using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
+using ThePalace.Logging.Entities;
+using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 
@@ -35,37 +36,35 @@ namespace ThePalace.Client.Desktop.Entities.Core
         public DateTime? LastActivity { get; set; } = null;
         public HistoryManager History { get; private set; } = new();
         public TabPage TabPage { get; set; } = null;
-        public double Scale { get; set; }
+        public double Scale { get; set; } = 1.0D;
         public int ScreenWidth { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
         public int ScreenHeight { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
 
         public AssetSpec SelectedProp { get; set; } = null;
-        public UserRec SelectedUser { get; set; } = null;
-        public HotspotRec SelectedHotSpot { get; set; } = null;
+        public UserDesc SelectedUser { get; set; } = null;
+        public HotspotDesc SelectedHotSpot { get; set; } = null;
 
         private DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
         public IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers => _uiLayers.AsReadOnly();
 
-        public RoomDesc RoomInfo { get; set; }
-        public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; }
-        UserDesc IDesktopSessionState.SelectedUser { get; set; }
-        HotspotDesc IDesktopSessionState.SelectedHotSpot { get; set; }
+        public RoomDesc RoomInfo { get; set; } = null;
+        public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
 
-        public ConcurrentDictionary<string, object> Extended => throw new NotImplementedException();
+        public ConcurrentDictionary<string, object> Extended { get; set; } = new();
 
-        public object? ScriptState { get; set; }
+        public object? ScriptState { get; set; } = null;
 
-        public Guid Id => throw new NotImplementedException();
+        public Guid Id { get; } = Guid.NewGuid();
 
         public uint UserId { get; set; }
-        public IConnectionState? ConnectionState { get; set; }
-        public UserDesc? UserDesc { get; set; }
-        public RegistrationRec? RegInfo { get; set; }
+        public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
+        public UserDesc? UserDesc { get; set; } = new();
+        public RegistrationRec? RegInfo { get; set; } = new();
         public object? State { get; set; }
 
-        public string? MediaUrl { get; set; }
-        public string? ServerName { get; set; }
-        public int ServerPopulation { get; set; }
+        public string? MediaUrl { get; set; } = string.Empty;
+        public string? ServerName { get; set; } = string.Empty;
+        public int ServerPopulation { get; set; } = 0;
 
         public void RefreshUI()
         {
@@ -290,7 +289,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
                         this._uiLayers[layer].Unload();
                     }
 
-                    this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Core.Desktop.Core.Resources.backgrounds.aephixcorelogo.png");
+                    this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
                 }
                 else if (layers.Contains(ScreenLayers.Base))
                 {
@@ -315,29 +314,27 @@ namespace ThePalace.Client.Desktop.Entities.Core
 
                     if (this.RoomInfo.Picture !=
                         this._uiLayers[ScreenLayers.Base].Image?.Tag?.ToString())
-                        this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Core.Desktop.Core.Resources.backgrounds.clouds.jpg");
+                        this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.clouds.jpg");
                 }
             }
             catch (Exception ex)
             {
-#if DEBUG
-                Debug.WriteLine($"RefreshScreen.Base: {ex.Message}");
-#endif
+                LoggerHub.Current.Error(ex);
             }
 
             var imgScreen = GetControl("imgScreen") as PictureBox;
             if (imgScreen != null)
                 try
                 {
-                    //var img = null as Bitmap;
-                    //if (imgScreen.Image == null ||
-                    //    imgScreen.Image.Width != this.ScreenWidth ||
-                    //    imgScreen.Image.Height != this.ScreenHeight)
-                    //{
-                    //    try { imgScreen.Image?.Dispose(); } catch { }
-                    var img = new Bitmap(this.ScreenWidth, this.ScreenHeight);
-                    img.MakeTransparent(Color.Transparent);
-                    //}
+                    var img = null as Bitmap;
+                    if (imgScreen.Image == null ||
+                        imgScreen.Image.Width != this.ScreenWidth ||
+                        imgScreen.Image.Height != this.ScreenHeight)
+                    {
+                        try { imgScreen.Image?.Dispose(); } catch { }
+                        img = new Bitmap(this.ScreenWidth, this.ScreenHeight);
+                        img.MakeTransparent(Color.Transparent);
+                    }
 
                     using (var g = Graphics.FromImage(img))
                     {
@@ -389,9 +386,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
                 }
                 catch (Exception ex)
                 {
-#if DEBUG
-                    Debug.WriteLine(ex.Message);
-#endif
+                    LoggerHub.Current.Error(ex);
                 }
         }
 
@@ -477,9 +472,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
             }
             catch (Exception ex)
             {
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-#endif
+                LoggerHub.Current.Error(ex);
             }
         }
         private void ScreenLayer_LooseProp(Graphics g)
@@ -499,9 +492,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
                         }
                         catch (Exception ex)
                         {
-#if DEBUG
-                            Debug.WriteLine(ex.Message);
-#endif
+                            LoggerHub.Current.Error(ex);
 
                             continue;
                         }
@@ -670,9 +661,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
                                 }
                                 catch (Exception ex)
                                 {
-#if DEBUG
-                                    Debug.WriteLine(ex.Message);
-#endif
+                                    LoggerHub.Current.Error(ex);
                                 }
 
                             if (asset.Image != null)

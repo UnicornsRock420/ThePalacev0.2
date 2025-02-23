@@ -5,7 +5,6 @@ using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Gfx;
 using ThePalace.Client.Desktop.Entities.Ribbon;
-using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Constants;
@@ -22,6 +21,7 @@ using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
+using ThePalace.Core.Factories.Core;
 using ThePalace.Network.Factories;
 using static ThePalace.Common.Threading.Job;
 
@@ -39,65 +39,75 @@ namespace ThePalace.Client.Desktop
             //// see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            var task = (Task?)null;
-            var uiLoaded = false;
+            var job = (Job?)null;
 
-            task = TaskManager.Current.CreateTask((Action<ConcurrentQueue<Cmd>>)(q =>
+            job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: GUI
 
-                    if (!uiLoaded)
+                    if (q.Count > 0 &&
+                        q.TryDequeue(out Cmd cmd))
                     {
-                        uiLoaded = true;
+                        if (cmd.Values != null)
+                            cmd.CmdFnc(cmd.Values);
+                        else
+                            cmd.CmdFnc();
+                    }
+                },
+                null,
+                RunOptions.UseSleepInterval);
+            if (job != null)
+            {
+                _jobs[ThreadQueues.GUI] = job;
 
-                        var sessionState = new DesktopSessionState();
+                job.Queue.Enqueue(new Cmd()
+                {
+                    CmdFnc = a =>
+                    {
+                        var sessionState = SessionManager.Current.CreateSession<DesktopSessionState>();
                         var app = new Program();
 
                         app.Initialize(sessionState);
+
+                        return null;
                     }
-                }),
-                null,
-                RunOptions.UseSleepInterval,
-                new TimeSpan(750));
-            if (task != null)
-            {
-                _jobs[ThreadQueues.GUI.ToString()] = task.Id;
+                });
             }
 
-            task = TaskManager.Current.CreateTask(q =>
+            job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Network_Receive
                 },
                 null,
                 RunOptions.UseManualResetEvent);
-            if (task != null)
+            if (job != null)
             {
-                _jobs[ThreadQueues.Network_Receive.ToString()] = task.Id;
+                _jobs[ThreadQueues.Network_Receive] = job;
             }
 
-            task = TaskManager.Current.CreateTask(q =>
+            job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Network_Send
                 },
                 null,
                 RunOptions.UseManualResetEvent);
-            if (task != null)
+            if (job != null)
             {
-                _jobs[ThreadQueues.Network_Send.ToString()] = task.Id;
+                _jobs[ThreadQueues.Network_Send] = job;
             }
 
-            task = TaskManager.Current.CreateTask(q =>
+            job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Media
                 },
                 null,
-                RunOptions.UseSleepInterval | RunOptions.RunNow);
-            if (task != null)
+                RunOptions.UseManualResetEvent);
+            if (job != null)
             {
-                _jobs[ThreadQueues.Media.ToString()] = task.Id;
+                _jobs[ThreadQueues.Media] = job;
             }
 
-            task = TaskManager.Current.CreateTask(q =>
+            job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Core
 
@@ -107,9 +117,9 @@ namespace ThePalace.Client.Desktop
                 },
                 null,
                 RunOptions.UseSleepInterval | RunOptions.RunNow);
-            if (task != null)
+            if (job != null)
             {
-                _jobs[ThreadQueues.Core.ToString()] = task.Id;
+                _jobs[ThreadQueues.Core] = job;
             }
 
             Application.Run(FormsManager.Current);
@@ -143,7 +153,7 @@ namespace ThePalace.Client.Desktop
             { new IptEventTypes[] { IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew }, new ScreenLayers[] { ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage } },
         }.AsReadOnly();
 
-        private static readonly ConcurrentDictionary<string, int> _jobs = new();
+        private static readonly ConcurrentDictionary<ThreadQueues, Job> _jobs = new();
 
         public Program()
         {
@@ -839,7 +849,7 @@ namespace ThePalace.Client.Desktop
                                     //    }
                                     //    catch (Exception ex)
                                     //    {
-                                    //        Debug.WriteLine(ex.Message);
+                                    //        LoggerHub.Current.Error(ex);
                                     //    }
 
                                     //    return null;
