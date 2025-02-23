@@ -49,9 +49,11 @@ namespace ThePalace.Common.Threading
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
-        public Task CreateTask(Action<ConcurrentQueue<Cmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+        public Job CreateTask(Action<ConcurrentQueue<Cmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
         {
             if (_globalToken.IsCancellationRequested) return null;
+
+            sleepInterval ??= TimeSpan.FromMilliseconds(750);
 
             var job = new Job(cmd, jobState, opts, sleepInterval);
 
@@ -62,7 +64,7 @@ namespace ThePalace.Common.Threading
                 job.Task.Start();
             }
 
-            return job.Task;
+            return job;
         }
 
         public async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
@@ -125,8 +127,10 @@ namespace ThePalace.Common.Threading
             }
         }
 
-        public void Run(int sleepInterval = 750, CancellationToken? token = null)
+        public void Run(TimeSpan? sleepInterval = null, CancellationToken? token = null)
         {
+            sleepInterval ??= TimeSpan.FromMilliseconds(750);
+
             while (!GlobalToken.IsCancellationRequested &&
                 (!token.HasValue || !token.Value.IsCancellationRequested))
             {
@@ -154,7 +158,7 @@ namespace ThePalace.Common.Threading
                 if (token.HasValue)
                     token.Value.ThrowIfCancellationRequested();
 
-                Thread.Sleep(sleepInterval);
+                Thread.Sleep((int)sleepInterval.Value.TotalMilliseconds);
             }
         }
 

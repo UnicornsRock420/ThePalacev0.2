@@ -23,6 +23,10 @@ namespace ThePalace.Core.Factories.Core
             GC.SuppressFinalize(this);
         }
 
+        public T CreateSession<T>()
+            where T : ISessionState =>
+            (T)CreateSession(typeof(T));
+
         public object CreateSession(Type type)
         {
             if (this.IsDisposed) return null;
