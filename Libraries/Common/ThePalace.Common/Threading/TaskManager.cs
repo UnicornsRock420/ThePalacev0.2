@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using System.Collections.Concurrent;
 using ThePalace.Common.Factories;
 using ThePalace.Common.Interfaces.Threading;
 using static ThePalace.Common.Threading.Job;
@@ -49,7 +49,7 @@ namespace ThePalace.Common.Threading
 
         public static CancellationToken GlobalToken => _globalToken.Token;
 
-        public Task CreateTask(Action cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+        public Task CreateTask(Action<ConcurrentQueue<Cmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
         {
             if (_globalToken.IsCancellationRequested) return null;
 

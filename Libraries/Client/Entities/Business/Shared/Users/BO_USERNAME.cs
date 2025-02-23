@@ -1,4 +1,5 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Core.Attributes.Core;
+using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 

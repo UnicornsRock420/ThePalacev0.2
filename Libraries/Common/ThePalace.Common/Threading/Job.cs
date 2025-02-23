@@ -52,7 +52,7 @@ namespace ThePalace.Common.Threading
             JobState = null;
         }
 
-        public Job(Action? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null) : this()
+        public Job(Action<ConcurrentQueue<Cmd>>? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null) : this()
         {
             if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
@@ -107,7 +107,7 @@ namespace ThePalace.Common.Threading
             GC.SuppressFinalize(this);
         }
 
-        internal readonly Action Cmd;
+        internal readonly Action<ConcurrentQueue<Cmd>> Cmd;
         internal Task Task;
 
         private const int _CONST_INT_LOGLIMIT = 20;
@@ -157,7 +157,7 @@ namespace ThePalace.Common.Threading
             jobs.ForEach(t => t.Cancel());
         }
 
-        public void Build(Action? cmd = null, CancellationToken? token = null)
+        public void Build(Action<ConcurrentQueue<Cmd>>? cmd = null, CancellationToken? token = null)
         {
             if (Task != null)
             {
@@ -165,7 +165,10 @@ namespace ThePalace.Common.Threading
                 try { Task?.Dispose(); } catch { }
             }
 
-            Task = new Task(cmd ?? Cmd, token ?? _token.Token);
+            Task = new Task(() =>
+            {
+                (cmd ?? Cmd)(Queue);
+            }, token ?? _token.Token);
         }
 
         public async Task<int> Run()

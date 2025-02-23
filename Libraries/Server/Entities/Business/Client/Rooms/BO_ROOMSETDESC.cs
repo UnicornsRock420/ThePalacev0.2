@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.Network.Client.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 

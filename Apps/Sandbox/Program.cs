@@ -61,7 +61,7 @@ namespace Sandbox
         private static void Experiment6()
         {
             var taskManager = new TaskManager();
-            var job = taskManager.CreateTask(() =>
+            var job = taskManager.CreateTask(q =>
             {
                 Console.WriteLine("Test123");
             }, null, RunOptions.RunNow | RunOptions.RunOnce);

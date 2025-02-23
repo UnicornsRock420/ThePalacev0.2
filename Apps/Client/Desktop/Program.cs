@@ -1,5 +1,8 @@
 using System.Collections.Concurrent;
+using ThePalace.Client.Desktop.Entities.Core;
+using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Threading;
+using static ThePalace.Common.Threading.Job;
 
 namespace ThePalace.Client.Desktop
 {
@@ -18,57 +21,77 @@ namespace ThePalace.Client.Desktop
             ApplicationConfiguration.Initialize();
 
             var task = (Task?)null;
+            var uiLoaded = false;
 
-            task = TaskManager.Current.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: UI
 
-                    Application.Run(new Program());
+                    if (!uiLoaded)
+                    {
+                        uiLoaded = true;
 
-                    TaskManager.Current.Shutdown();
+                        var sessionState = new DesktopSessionState();
+                        var app = new App();
+
+                        app.Initialize(sessionState);
+                    }
                 },
                 null,
-                Job.RunOptions.UseSleepInterval,
+                RunOptions.UseSleepInterval,
                 new TimeSpan(750));
             if (task != null)
             {
                 _jobs["UI"] = task.Id;
             }
 
-            task = TaskManager.Current.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Networking-Receive
                 },
                 null,
-                Job.RunOptions.UseManualResetEvent);
+                RunOptions.UseManualResetEvent);
             if (task != null)
             {
                 _jobs["Networking-Receive"] = task.Id;
             }
 
-            task = TaskManager.Current.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Networking-Send
                 },
                 null,
-                Job.RunOptions.UseManualResetEvent);
+                RunOptions.UseManualResetEvent);
             if (task != null)
             {
                 _jobs["Networking-Send"] = task.Id;
             }
 
-            task = TaskManager.Current.CreateTask(() =>
+            task = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: Media
                 },
                 null,
-                Job.RunOptions.UseManualResetEvent);
+                RunOptions.UseManualResetEvent);
             if (task != null)
             {
                 _jobs["Media"] = task.Id;
             }
 
-            TaskManager.Current.Run();
+            task = TaskManager.Current.CreateTask(q =>
+                {
+                    TaskManager.Current.Run();
+
+                    TaskManager.Current.Shutdown();
+                },
+                null,
+                RunOptions.UseSleepInterval | RunOptions.RunNow);
+            if (task != null)
+            {
+                _jobs["Media"] = task.Id;
+            }
+
+            Application.Run(FormsManager.Current);
         }
 
         public Program()

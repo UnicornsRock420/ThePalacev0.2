@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Data;
+using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Gfx;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -11,9 +12,9 @@ using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Entities.Network.Shared.Core;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
@@ -28,51 +29,13 @@ namespace ThePalace.Client.Desktop
         private ContextMenuStrip _contextMenu = new();
         private IDesktopSessionState _sessionState = null;
 
-        private static readonly IptEventTypes[] CONST_eventTypes = new IptEventTypes[]
-        {
-            IptEventTypes.ColorChange,
-            IptEventTypes.FaceChange,
-            IptEventTypes.InChat,
-            IptEventTypes.Lock,
-            IptEventTypes.LoosePropAdded,
-            IptEventTypes.LoosePropDeleted,
-            IptEventTypes.LoosePropMoved,
-            IptEventTypes.MsgAssetSend,
-            IptEventTypes.MsgDraw,
-            IptEventTypes.MsgHttpServer,
-            IptEventTypes.MsgPictDel,
-            IptEventTypes.MsgPictMove,
-            IptEventTypes.MsgPictNew,
-            IptEventTypes.MsgServerInfo,
-            IptEventTypes.MsgSpotDel,
-            IptEventTypes.MsgSpotMove,
-            IptEventTypes.MsgSpotNew,
-            IptEventTypes.MsgUserDesc,
-            IptEventTypes.MsgUserList,
-            IptEventTypes.MsgUserLog,
-            IptEventTypes.MsgUserProp,
-            IptEventTypes.MsgUserStatus,
-            IptEventTypes.NameChange,
-            IptEventTypes.RoomLoad,
-            IptEventTypes.SignOn,
-            IptEventTypes.StateChange,
-            IptEventTypes.UnLock,
-            IptEventTypes.UserEnter,
-            IptEventTypes.UserLeave,
-            IptEventTypes.UserMove,
-        };
+        private static readonly IptEventTypes[] CONST_eventTypes = Enum.GetValues<IptEventTypes>()
+            .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
+            .ToArray();
 
-        private static readonly IptEventTypes[] CONST_uiRefreshEvents = new IptEventTypes[]
-        {
-            IptEventTypes.MsgServerInfo,
-            IptEventTypes.MsgUserLog,
-            IptEventTypes.MsgUserList,
-            IptEventTypes.MsgUserStatus,
-            IptEventTypes.RoomLoad,
-            IptEventTypes.SignOn,
-            IptEventTypes.UserEnter,
-            IptEventTypes.UserLeave,
-        };
+        private static readonly IptEventTypes[] CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
+            .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
+            .ToArray();
 
         private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings = new Dictionary<IptEventTypes[], ScreenLayers[]>
         {
@@ -92,10 +55,6 @@ namespace ThePalace.Client.Desktop
         public App()
         {
             this._managedResources.Add(_contextMenu);
-
-            var sessionState = new DesktopSessionState();
-
-            Initialize(sessionState);
         }
         ~App() => this.Dispose(false);
 

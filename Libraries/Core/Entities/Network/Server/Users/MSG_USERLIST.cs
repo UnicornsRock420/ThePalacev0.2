@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Interfaces.Data;

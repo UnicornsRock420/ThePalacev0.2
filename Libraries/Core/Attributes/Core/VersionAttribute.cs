@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Attributes.Serialization
+﻿namespace ThePalace.Core.Attributes.Core
 {
     public class VersionAttribute : Attribute
     {
@@ -26,7 +26,7 @@
         public VersionAttribute(
             string? version)
         {
-            _version = ThePalace.Common.Constants.RegexConstants.REGEX_NONNUMERIC_FILTER.Replace(version, string.Empty);
+            _version = Common.Constants.RegexConstants.REGEX_NONNUMERIC_FILTER.Replace(version, string.Empty);
         }
 
         private readonly string _version = string.Empty;
