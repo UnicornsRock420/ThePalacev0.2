@@ -5,6 +5,7 @@ using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Gfx;
 using ThePalace.Client.Desktop.Entities.Ribbon;
+using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Constants;
@@ -42,47 +43,47 @@ namespace ThePalace.Client.Desktop
             var uiLoaded = false;
 
             task = TaskManager.Current.CreateTask((Action<ConcurrentQueue<Cmd>>)(q =>
-            {
-                // TODO: UI
-
-                if (!uiLoaded)
                 {
-                    uiLoaded = true;
+                    // TODO: GUI
 
-                    var sessionState = new DesktopSessionState();
-                    var app = new Program();
+                    if (!uiLoaded)
+                    {
+                        uiLoaded = true;
 
-                    app.Initialize(sessionState);
-                }
-            }),
+                        var sessionState = new DesktopSessionState();
+                        var app = new Program();
+
+                        app.Initialize(sessionState);
+                    }
+                }),
                 null,
                 RunOptions.UseSleepInterval,
                 new TimeSpan(750));
             if (task != null)
             {
-                _jobs["UI"] = task.Id;
+                _jobs[ThreadQueues.GUI.ToString()] = task.Id;
             }
 
             task = TaskManager.Current.CreateTask(q =>
-            {
-                // TODO: Networking-Receive
-            },
+                {
+                    // TODO: Network_Receive
+                },
                 null,
                 RunOptions.UseManualResetEvent);
             if (task != null)
             {
-                _jobs["Networking-Receive"] = task.Id;
+                _jobs[ThreadQueues.Network_Receive.ToString()] = task.Id;
             }
 
             task = TaskManager.Current.CreateTask(q =>
-            {
-                // TODO: Networking-Send
-            },
+                {
+                    // TODO: Network_Send
+                },
                 null,
                 RunOptions.UseManualResetEvent);
             if (task != null)
             {
-                _jobs["Networking-Send"] = task.Id;
+                _jobs[ThreadQueues.Network_Send.ToString()] = task.Id;
             }
 
             task = TaskManager.Current.CreateTask(q =>
@@ -90,14 +91,16 @@ namespace ThePalace.Client.Desktop
                 // TODO: Media
             },
                 null,
-                RunOptions.UseManualResetEvent);
+                RunOptions.UseSleepInterval | RunOptions.RunNow);
             if (task != null)
             {
-                _jobs["Media"] = task.Id;
+                _jobs[ThreadQueues.Media.ToString()] = task.Id;
             }
 
             task = TaskManager.Current.CreateTask(q =>
             {
+                // TODO: Core
+
                 TaskManager.Current.Run();
 
                 TaskManager.Current.Shutdown();
@@ -106,7 +109,7 @@ namespace ThePalace.Client.Desktop
                 RunOptions.UseSleepInterval | RunOptions.RunNow);
             if (task != null)
             {
-                _jobs["Media"] = task.Id;
+                _jobs[ThreadQueues.Core.ToString()] = task.Id;
             }
 
             Application.Run(FormsManager.Current);
@@ -183,21 +186,20 @@ namespace ThePalace.Client.Desktop
             ShowAppForm();
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-            if (Toast.Current.Value)
-                TaskManager.Current.DispatchToast(new ToastCfg
-                {
-                    ExpirationTime = DateTime.Now.AddMinutes(1),
-                    Args = (IReadOnlyDictionary<string, object>)new Dictionary<string, object>
-                    {
-                        { "action", "whisperMsg" },
-                        { "connectionId", 123 },
-                        { "conversationId", 456 },
-                    },
-                    Text = (IReadOnlyList<string>)new List<string>
-                    {
-                        "Beat it like it owes you money!",
-                    },
-                });
+            //TaskManager.Current.DispatchToast(new ToastCfg
+            //{
+            //    ExpirationTime = DateTime.Now.AddMinutes(1),
+            //    Args = (IReadOnlyDictionary<string, object>)new Dictionary<string, object>
+            //    {
+            //        { "action", "whisperMsg" },
+            //        { "connectionId", 123 },
+            //        { "conversationId", 456 },
+            //    },
+            //    Text = (IReadOnlyList<string>)new List<string>
+            //    {
+            //        "Beat it like it owes you money!",
+            //    },
+            //});
 #endif
 
             //TaskManager.Current.CreateTask(() =>
