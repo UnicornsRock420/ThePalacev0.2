@@ -69,6 +69,10 @@ namespace ThePalace.Client.Desktop
 
                         app.Initialize(sessionState);
 
+                        Application.Run(FormsManager.Current);
+
+                        TaskManager.Current.Shutdown();
+
                         return null;
                     }
                 });
@@ -107,24 +111,24 @@ namespace ThePalace.Client.Desktop
                 _jobs[ThreadQueues.Media] = job;
             }
 
-            job = TaskManager.Current.CreateTask(q =>
-                {
-                    // TODO: Core
+            //job = TaskManager.Current.CreateTask(q =>
+            //    {
+            //        // TODO: Core
 
-                    TaskManager.Current.Run();
+            //        TaskManager.Current.Run();
 
-                    FormsManager.Current.Dispose();
-                },
-                null,
-                RunOptions.UseSleepInterval | RunOptions.RunNow);
-            if (job != null)
-            {
-                _jobs[ThreadQueues.Core] = job;
-            }
+            //        FormsManager.Current.Dispose();
+            //    },
+            //    null,
+            //    RunOptions.UseSleepInterval | RunOptions.RunNow);
+            //if (job != null)
+            //{
+            //    _jobs[ThreadQueues.Core] = job;
+            //}
 
-            Application.Run(FormsManager.Current);
+            TaskManager.Current.Run();
 
-            TaskManager.Current.Shutdown();
+            FormsManager.Current.Dispose();
         }
 
         private ContextMenuStrip _contextMenu = new();
@@ -1072,10 +1076,10 @@ namespace ThePalace.Client.Desktop
                 connectionForm.Show();
                 connectionForm.Focus();
 
-                this._sessionState.RefreshScreen(ScreenLayers.Base);
-                this._sessionState.RefreshUI();
-                this._sessionState.RefreshScreen();
-                this._sessionState.RefreshRibbon();
+                //this._sessionState.RefreshScreen(ScreenLayers.Base);
+                //this._sessionState.RefreshUI();
+                //this._sessionState.RefreshScreen();
+                //this._sessionState.RefreshRibbon();
             }
         }
 

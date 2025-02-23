@@ -28,6 +28,9 @@ namespace ThePalace.Client.Desktop.Entities.UI
     {
         private static readonly IReadOnlyList<ScreenLayers> _layerTypes = Enum.GetValues<ScreenLayers>().AsReadOnly();
 
+        private DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
+        public IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers => _uiLayers.AsReadOnly();
+
         private DisposableDictionary<string, IDisposable> _uiControls = new();
         public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
 
@@ -43,9 +46,6 @@ namespace ThePalace.Client.Desktop.Entities.UI
         public AssetSpec SelectedProp { get; set; } = null;
         public UserDesc SelectedUser { get; set; } = null;
         public HotspotDesc SelectedHotSpot { get; set; } = null;
-
-        private DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
-        public IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers => _uiLayers.AsReadOnly();
 
         public RoomDesc RoomInfo { get; set; } = null;
         public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
