@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using ThePalace.Client.Desktop.Entities.Gfx;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
+using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
@@ -22,14 +22,14 @@ using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Client.Desktop.Entities.Core
+namespace ThePalace.Client.Desktop.Entities.UI
 {
     public partial class DesktopSessionState : IDesktopSessionState
     {
         private static readonly IReadOnlyList<ScreenLayers> _layerTypes = Enum.GetValues<ScreenLayers>().AsReadOnly();
 
         private DisposableDictionary<string, IDisposable> _uiControls = new();
-        public IReadOnlyDictionary<string, IDisposable> UIControls => this._uiControls.AsReadOnly();
+        public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
 
         // UI Info
         public bool Visible { get; set; } = true;
@@ -68,7 +68,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
 
         public void RefreshUI()
         {
-            var isConnected = AsyncTcpSocket.IsConnected(this.ConnectionState);
+            var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
 
             var form = GetForm("SessionStateManager");
             if (form == null) return;
@@ -85,8 +85,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
             }
             else
             {
-                form.Text = $"Connected: {this.ServerName} - {this.RoomInfo.Name}";
-                labelInfo.Text = $"Users ({this.RoomUsers.Count(u => u.Key != 0)}/{this.ServerPopulation})";
+                form.Text = $"Connected: {ServerName} - {RoomInfo.Name}";
+                labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
             }
 
             var imgScreen = GetControl("imgScreen") as PictureBox;
@@ -95,8 +95,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
                 toolStrip.Size = new Size(form.Width, form.Height);
                 toolStrip.Location = new System.Drawing.Point(0, 0);
 
-                var width = this.ScreenWidth;
-                var height = this.ScreenHeight;
+                var width = ScreenWidth;
+                var height = ScreenHeight;
 
                 if (width < 1) width = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
                 if (height < 1) height = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
@@ -121,7 +121,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
         }
         public void RefreshRibbon()
         {
-            var isConnected = AsyncTcpSocket.IsConnected(this.ConnectionState);
+            var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
 
             var toolStrip = GetControl("toolStrip") as ToolStrip;
             if (toolStrip == null) return;
@@ -176,12 +176,12 @@ namespace ThePalace.Client.Desktop.Entities.Core
                                 break;
                             case nameof(GoBack):
                                 condition =
-                                    (History.History.Count > 0) &&
+                                    History.History.Count > 0 &&
                                     (!History.Position.HasValue || History.History.Keys.Min() != History.Position.Value);
                                 break;
                             case nameof(GoForward):
                                 condition =
-                                    (History.History.Count > 0) &&
+                                    History.History.Count > 0 &&
                                     History.Position.HasValue &&
                                     History.History.Keys.Max() != History.Position.Value;
                                 break;
@@ -209,7 +209,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
         public FormBase GetForm(string friendlyName)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName))
-                return this._uiControls.GetValue(friendlyName) as FormBase;
+                return _uiControls.GetValue(friendlyName) as FormBase;
 
             return null;
         }
@@ -217,7 +217,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
             where T : FormBase
         {
             if (!string.IsNullOrWhiteSpace(friendlyName))
-                return this._uiControls.GetValue(friendlyName) as T;
+                return _uiControls.GetValue(friendlyName) as T;
 
             return default;
         }
@@ -226,20 +226,20 @@ namespace ThePalace.Client.Desktop.Entities.Core
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 form != null)
-                this._uiControls?.TryAdd(friendlyName, form);
+                _uiControls?.TryAdd(friendlyName, form);
         }
 
         public void UnregisterForm(string friendlyName, FormBase form)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 form != null)
-                this._uiControls?.TryRemove(friendlyName, out var _);
+                _uiControls?.TryRemove(friendlyName, out var _);
         }
 
         public Control GetControl(string friendlyName)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName))
-                return this._uiControls.GetValue(friendlyName) as Control;
+                return _uiControls.GetValue(friendlyName) as Control;
 
             return null;
         }
@@ -248,73 +248,73 @@ namespace ThePalace.Client.Desktop.Entities.Core
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 control != null)
-                this._uiControls?.TryAdd(friendlyName, control);
+                _uiControls?.TryAdd(friendlyName, control);
         }
 
         public void RegisterControl(string friendlyName, IDisposable control)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 control != null)
-                this._uiControls?.TryAdd(friendlyName, control);
+                _uiControls?.TryAdd(friendlyName, control);
         }
 
         public void UnregisterForm(string friendlyName, Control control)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 control != null)
-                this._uiControls?.TryRemove(friendlyName, out var _);
+                _uiControls?.TryRemove(friendlyName, out var _);
         }
 
         public void UnregisterForm(string friendlyName, IDisposable control)
         {
             if (!string.IsNullOrWhiteSpace(friendlyName) &&
                 control != null)
-                this._uiControls?.TryRemove(friendlyName, out var _);
+                _uiControls?.TryRemove(friendlyName, out var _);
         }
 
         public void RefreshScreen(params ScreenLayers[] layers)
         {
             if (layers.Length > 0)
-                this.RefreshLayers(layers);
+                RefreshLayers(layers);
 
             try
             {
-                var isConnected = AsyncTcpSocket.IsConnected(this.ConnectionState);
+                var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
                 if (!isConnected)
                 {
                     foreach (var layer in _layerTypes)
                     {
                         if (layer == ScreenLayers.Base) continue;
 
-                        this._uiLayers[layer].Unload();
+                        _uiLayers[layer].Unload();
                     }
 
-                    this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
+                    _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
                 }
                 else if (layers.Contains(ScreenLayers.Base))
                 {
                     var filePath = null as string;
 
-                    if (!string.IsNullOrWhiteSpace(this.MediaUrl) &&
-                        !string.IsNullOrWhiteSpace(this.ServerName) &&
-                        !string.IsNullOrWhiteSpace(this.RoomInfo.Picture))
+                    if (!string.IsNullOrWhiteSpace(MediaUrl) &&
+                        !string.IsNullOrWhiteSpace(ServerName) &&
+                        !string.IsNullOrWhiteSpace(RoomInfo.Picture))
                     {
-                        var fileName = ThePalace.Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(this.RoomInfo.Picture, @"_");
+                        var fileName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(RoomInfo.Picture, @"_");
                         filePath = Path.Combine(Environment.CurrentDirectory, "Media", fileName);
 
                         if (!File.Exists(filePath))
                         {
-                            var _serverName = ThePalace.Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(this.ServerName, @" ").Trim();
+                            var _serverName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
                             filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, fileName);
                         }
 
                         if (File.Exists(filePath))
-                            this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Filesystem, filePath);
+                            _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Filesystem, filePath);
                     }
 
-                    if (this.RoomInfo.Picture !=
-                        this._uiLayers[ScreenLayers.Base].Image?.Tag?.ToString())
-                        this._uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.clouds.jpg");
+                    if (RoomInfo.Picture !=
+                        _uiLayers[ScreenLayers.Base].Image?.Tag?.ToString())
+                        _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.clouds.jpg");
                 }
             }
             catch (Exception ex)
@@ -328,11 +328,11 @@ namespace ThePalace.Client.Desktop.Entities.Core
                 {
                     var img = null as Bitmap;
                     if (imgScreen.Image == null ||
-                        imgScreen.Image.Width != this.ScreenWidth ||
-                        imgScreen.Image.Height != this.ScreenHeight)
+                        imgScreen.Image.Width != ScreenWidth ||
+                        imgScreen.Image.Height != ScreenHeight)
                     {
                         try { imgScreen.Image?.Dispose(); } catch { }
-                        img = new Bitmap(this.ScreenWidth, this.ScreenHeight);
+                        img = new Bitmap(ScreenWidth, ScreenHeight);
                         img.MakeTransparent(Color.Transparent);
                     }
 
@@ -346,19 +346,19 @@ namespace ThePalace.Client.Desktop.Entities.Core
 
                         foreach (var layer in _layerTypes)
                         {
-                            if (!this._uiLayers[layer].Visible ||
-                                this._uiLayers[layer].Opacity == 0F ||
-                                this._uiLayers[layer].Image == null) continue;
+                            if (!_uiLayers[layer].Visible ||
+                                _uiLayers[layer].Opacity == 0F ||
+                                _uiLayers[layer].Image == null) continue;
 
-                            lock (this._uiLayers[layer])
+                            lock (_uiLayers[layer])
                             {
                                 var imgAttributes = null as ImageAttributes;
 
-                                if (this._uiLayers[layer].Opacity < 1.0F)
+                                if (_uiLayers[layer].Opacity < 1.0F)
                                 {
                                     var matrix = new ColorMatrix
                                     {
-                                        Matrix33 = this._uiLayers[layer].Opacity,
+                                        Matrix33 = _uiLayers[layer].Opacity,
                                     };
 
                                     imgAttributes = new();
@@ -366,14 +366,14 @@ namespace ThePalace.Client.Desktop.Entities.Core
                                 }
 
                                 g.DrawImage(
-                                    this._uiLayers[layer].Image,
+                                    _uiLayers[layer].Image,
                                     new Rectangle(
                                         0, 0,
                                         img.Width,
                                         img.Height),
                                     0, 0,
-                                    this._uiLayers[layer].Image.Width,
-                                    this._uiLayers[layer].Image.Height,
+                                    _uiLayers[layer].Image.Width,
+                                    _uiLayers[layer].Image.Height,
                                     GraphicsUnit.Pixel,
                                     imgAttributes);
                             }
@@ -396,7 +396,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
             {
                 if (layer == ScreenLayers.Base) continue;
 
-                this._uiLayers[layer].Visible = visible;
+                _uiLayers[layer].Visible = visible;
             }
         }
 
@@ -406,41 +406,41 @@ namespace ThePalace.Client.Desktop.Entities.Core
             {
                 if (layer == ScreenLayers.Base) continue;
 
-                this._uiLayers[layer].Opacity = opacity;
-                this._uiLayers[layer].Visible = opacity != 0F;
+                _uiLayers[layer].Opacity = opacity;
+                _uiLayers[layer].Visible = opacity != 0F;
             }
         }
 
         private void RefreshLayers(params ScreenLayers[] layers)
         {
-            if (!this.Visible ||
-                this.ScreenWidth < 1 ||
-                this.ScreenHeight < 1) return;
+            if (!Visible ||
+                ScreenWidth < 1 ||
+                ScreenHeight < 1) return;
 
             try
             {
                 foreach (var layer in layers)
                 {
-                    lock (this._uiLayers[layer])
+                    lock (_uiLayers[layer])
                     {
                         if (layer == ScreenLayers.Base) continue;
 
                         switch (layer)
                         {
                             case ScreenLayers.DimRoom:
-                                if (this._uiLayers[layer].Opacity == 1F)
+                                if (_uiLayers[layer].Opacity == 1F)
                                 {
-                                    this._uiLayers[layer].Unload();
+                                    _uiLayers[layer].Unload();
 
                                     break;
                                 }
-                                else if (this._uiLayers[layer].Image != null) break;
+                                else if (_uiLayers[layer].Image != null) break;
 
                                 goto default;
                             default:
-                                using (var g = this._uiLayers[layer].Initialize(this.ScreenWidth, this.ScreenHeight))
+                                using (var g = _uiLayers[layer].Initialize(ScreenWidth, ScreenHeight))
                                 {
-                                    if (!this._uiLayers[layer].Visible) continue;
+                                    if (!_uiLayers[layer].Visible) continue;
 
                                     g.InterpolationMode = SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
                                     g.PixelOffsetMode = SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
@@ -448,18 +448,18 @@ namespace ThePalace.Client.Desktop.Entities.Core
 
                                     switch (layer)
                                     {
-                                        case ScreenLayers.LooseProp: this.ScreenLayer_LooseProp(g); break;
-                                        case ScreenLayers.SpotImage: this.ScreenLayer_SpotImage(g); break;
-                                        case ScreenLayers.BottomPaint: this.ScreenLayer_BottomPaint(g); break;
-                                        case ScreenLayers.SpotNametag: this.ScreenLayer_SpotNametag(g); break;
-                                        case ScreenLayers.UserProp: this.ScreenLayer_UserProp(g); break;
-                                        case ScreenLayers.UserNametag: this.ScreenLayer_UserNametag(g); break;
-                                        case ScreenLayers.ScriptedImage: this.ScreenLayer_ScriptedImage(g); break;
-                                        case ScreenLayers.ScriptedText: this.ScreenLayer_ScriptedText(g); break;
-                                        case ScreenLayers.SpotBorder: this.ScreenLayer_SpotBorder(g); break;
-                                        case ScreenLayers.TopPaint: this.ScreenLayer_TopPaint(g); break;
-                                        case ScreenLayers.DimRoom: this.ScreenLayer_DimRoom(g); break;
-                                        case ScreenLayers.Messages: this.ScreenLayer_Messages(g); break;
+                                        case ScreenLayers.LooseProp: ScreenLayer_LooseProp(g); break;
+                                        case ScreenLayers.SpotImage: ScreenLayer_SpotImage(g); break;
+                                        case ScreenLayers.BottomPaint: ScreenLayer_BottomPaint(g); break;
+                                        case ScreenLayers.SpotNametag: ScreenLayer_SpotNametag(g); break;
+                                        case ScreenLayers.UserProp: ScreenLayer_UserProp(g); break;
+                                        case ScreenLayers.UserNametag: ScreenLayer_UserNametag(g); break;
+                                        case ScreenLayers.ScriptedImage: ScreenLayer_ScriptedImage(g); break;
+                                        case ScreenLayers.ScriptedText: ScreenLayer_ScriptedText(g); break;
+                                        case ScreenLayers.SpotBorder: ScreenLayer_SpotBorder(g); break;
+                                        case ScreenLayers.TopPaint: ScreenLayer_TopPaint(g); break;
+                                        case ScreenLayers.DimRoom: ScreenLayer_DimRoom(g); break;
+                                        case ScreenLayers.Messages: ScreenLayer_Messages(g); break;
                                     }
 
                                     g.Save();
@@ -477,7 +477,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
         }
         private void ScreenLayer_LooseProp(Graphics g)
         {
-            var looseProps = this.RoomInfo?.LooseProps
+            var looseProps = RoomInfo?.LooseProps
                 ?.ToList() ?? [];
             if (looseProps.Count > 0)
                 foreach (var looseProp in looseProps)
@@ -523,8 +523,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
         }
         private void ScreenLayer_SpotImage(Graphics g)
         {
-            if ((this.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                foreach (var spot in this.RoomInfo.HotSpots)
+            if ((RoomInfo?.HotSpots?.Count ?? 0) > 0)
+                foreach (var spot in RoomInfo.HotSpots)
                 {
                     var nbrStates = spot.States?.Count ?? 0;
                     if (nbrStates < 1 ||
@@ -535,18 +535,18 @@ namespace ThePalace.Client.Desktop.Entities.Core
                     if (state == null ||
                         state.StateInfo.PictID < 1) continue;
 
-                    var pictName = this.RoomInfo?.Pictures
+                    var pictName = RoomInfo?.Pictures
                         ?.Where(p => p.PicID == state.StateInfo.PictID)
                         ?.Select(p => p.Name)
                         ?.FirstOrDefault();
                     if (pictName == null) continue;
 
-                    var _pictName = ThePalace.Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(pictName, @"_");
+                    var _pictName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(pictName, @"_");
                     var filePath = Path.Combine(Environment.CurrentDirectory, "Media", _pictName);
 
                     if (!File.Exists(filePath))
                     {
-                        var _serverName = ThePalace.Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(this.ServerName, @" ").Trim();
+                        var _serverName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
                         filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, _pictName);
                     }
 
@@ -556,8 +556,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
                         g.DrawImage(
                             pict,
                             new Rectangle(
-                                spot.SpotInfo.Loc.HAxis - state.StateInfo.PicLoc.HAxis - (pict.Width / 2),
-                                spot.SpotInfo.Loc.VAxis - state.StateInfo.PicLoc.VAxis - (pict.Height / 2),
+                                spot.SpotInfo.Loc.HAxis - state.StateInfo.PicLoc.HAxis - pict.Width / 2,
+                                spot.SpotInfo.Loc.VAxis - state.StateInfo.PicLoc.VAxis - pict.Height / 2,
                                 pict.Width,
                                 pict.Height),
                             0, 0,
@@ -570,8 +570,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
             ScreenLayer_Paint(g, false);
         private void ScreenLayer_SpotNametag(Graphics g)
         {
-            var spots = this.RoomInfo?.HotSpots
-                ?.Where(h => ((HotspotFlags)h.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
+            var spots = RoomInfo?.HotSpots
+                ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
                 ?.ToList() ?? new();
             if (spots.Count > 0)
             {
@@ -616,8 +616,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
             var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
 
             var users = null as List<UserDesc>;
-            lock (this.RoomUsers)
-                users = this.RoomUsers.Values
+            lock (RoomUsers)
+                users = RoomUsers.Values
                     .Where(u =>
                         !(u.UserInfo.UserId < 1 ||
                         u.UserInfo.RoomPos == null))
@@ -629,10 +629,10 @@ namespace ThePalace.Client.Desktop.Entities.Core
                     var y = u.UserInfo.RoomPos.VAxis - halfPropHeight;
 
                     if (x < -halfPropWidth) x = -halfPropWidth;
-                    else if (x > this.ScreenWidth + halfPropWidth) x = this.ScreenWidth + halfPropWidth;
+                    else if (x > ScreenWidth + halfPropWidth) x = ScreenWidth + halfPropWidth;
 
                     if (y < -halfPropHeight) y = -halfPropHeight;
-                    else if (y > this.ScreenHeight + halfPropHeight) y = this.ScreenHeight + halfPropHeight;
+                    else if (y > ScreenHeight + halfPropHeight) y = ScreenHeight + halfPropHeight;
 
                     //if (x < 0 ||
                     //    y < 0) continue;
@@ -732,8 +732,8 @@ namespace ThePalace.Client.Desktop.Entities.Core
             var padding = 2;
 
             var users = null as List<UserDesc>;
-            lock (this.RoomUsers)
-                users = this.RoomUsers.Values.ToList();
+            lock (RoomUsers)
+                users = RoomUsers.Values.ToList();
 
             if ((users?.Count ?? 0) > 0)
                 foreach (var u in users)
@@ -752,10 +752,10 @@ namespace ThePalace.Client.Desktop.Entities.Core
                         var y = u.UserInfo.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
 
                         if (x < -halfPropWidth) x = -halfPropWidth;
-                        else if (x > this.ScreenWidth + halfPropWidth) x = this.ScreenWidth + halfPropWidth;
+                        else if (x > ScreenWidth + halfPropWidth) x = ScreenWidth + halfPropWidth;
 
                         if (y < -halfPropHeight) y = -halfPropHeight;
-                        else if (y > this.ScreenHeight + halfPropHeight) y = this.ScreenHeight + halfPropHeight;
+                        else if (y > ScreenHeight + halfPropHeight) y = ScreenHeight + halfPropHeight;
 
                         //if (x < 0 ||
                         //    y < 0) continue;
@@ -784,7 +784,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
         }
         private void ScreenLayer_SpotBorder(Graphics g)
         {
-            var spots = this.RoomInfo?.HotSpots
+            var spots = RoomInfo?.HotSpots
                 ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame)
                 ?.ToList() ?? [];
             if (spots.Count > 0)
@@ -803,13 +803,13 @@ namespace ThePalace.Client.Desktop.Entities.Core
             ScreenLayer_Paint(g, true);
         private void ScreenLayer_DimRoom(Graphics g)
         {
-            g.FillRectangle(Brushes.Black, 0, 0, this.ScreenWidth, this.ScreenHeight);
+            g.FillRectangle(Brushes.Black, 0, 0, ScreenWidth, ScreenHeight);
         }
         private void ScreenLayer_Messages(Graphics g)
         {
             var users = null as List<UserDesc>;
-            lock (this.RoomUsers)
-                users = this.RoomUsers.Values.ToList();
+            lock (RoomUsers)
+                users = RoomUsers.Values.ToList();
 
             if ((users?.Count ?? 0) > 0)
                 foreach (var u in users)
@@ -866,7 +866,7 @@ namespace ThePalace.Client.Desktop.Entities.Core
         {
             var helper = new GraphicsHelper(g);
 
-            var drawCmds = this.RoomInfo?.DrawCmds
+            var drawCmds = RoomInfo?.DrawCmds
                 ?.Where(d => d.Layer == layer)
                 ?.Where(d => (d.Points?.Count ?? 0) > 0)
                 ?.ToList() ?? [];

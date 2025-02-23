@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Client.Desktop.Entities.Gfx;
+using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;

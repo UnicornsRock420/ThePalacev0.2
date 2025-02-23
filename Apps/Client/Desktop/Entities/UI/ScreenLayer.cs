@@ -2,7 +2,7 @@
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Common.Desktop.Interfaces;
 
-namespace ThePalace.Client.Desktop.Entities.Gfx
+namespace ThePalace.Client.Desktop.Entities.UI
 {
     public partial class ScreenLayer : Disposable
     {

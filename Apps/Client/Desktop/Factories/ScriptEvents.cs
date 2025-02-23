@@ -12,9 +12,6 @@ namespace ThePalace.Client.Desktop.Factories
     {
         private static readonly IReadOnlyList<IptEventTypes> _eventTypes = Enum.GetValues<IptEventTypes>().ToList();
 
-        private static readonly Lazy<ScriptEvents> _current = new();
-        public static ScriptEvents Current => _current.Value;
-
         private ConcurrentDictionary<IptEventTypes, List<EventHandler>> _events = new();
 
         public ScriptEvents()
