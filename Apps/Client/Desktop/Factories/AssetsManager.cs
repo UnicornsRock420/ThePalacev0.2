@@ -1,12 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
+using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Constants;
-using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Factories.Core;
 
@@ -185,7 +185,7 @@ namespace ThePalace.Client.Desktop.Factories
             }
         }
 
-        public AssetRec GetAsset(IDesktopSessionState sessionState, AssetSpec assetSpec, bool downloadAsset = false)
+        public AssetDesc GetAsset(IDesktopSessionState sessionState, AssetSpec assetSpec, bool downloadAsset = false)
         {
             var assetID = assetSpec.Id;
 
