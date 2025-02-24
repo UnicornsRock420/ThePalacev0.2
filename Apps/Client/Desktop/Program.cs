@@ -46,7 +46,7 @@ namespace ThePalace.Client.Desktop
                     // TODO: GUI
 
                     if (q.Count > 0 &&
-                        q.TryDequeue(out Cmd cmd))
+                        q.TryDequeue(out var cmd))
                     {
                         if (cmd.Values != null)
                             cmd.CmdFnc(cmd.Values);
@@ -60,21 +60,12 @@ namespace ThePalace.Client.Desktop
             {
                 _jobs[ThreadQueues.GUI] = job;
 
-                job.Queue.Enqueue(new Cmd()
+                job.Enqueue(a =>
                 {
-                    CmdFnc = a =>
-                    {
-                        var sessionState = SessionManager.Current.CreateSession<DesktopSessionState>();
-                        var app = new Program();
+                    var app = new Program();
+                    app.Initialize();
 
-                        app.Initialize(sessionState);
-
-                        Application.Run(FormsManager.Current);
-
-                        TaskManager.Current.Shutdown();
-
-                        return null;
-                    }
+                    return null;
                 });
             }
 
@@ -111,36 +102,35 @@ namespace ThePalace.Client.Desktop
                 _jobs[ThreadQueues.Media] = job;
             }
 
-            //job = TaskManager.Current.CreateTask(q =>
-            //    {
-            //        // TODO: Core
+            job = TaskManager.Current.CreateTask(q =>
+                {
+                    // TODO: Core
 
-            //        TaskManager.Current.Run();
+                    Application.Run(FormsManager.Current);
+                    TaskManager.Current.Shutdown();
+                },
+                null,
+                RunOptions.UseSleepInterval);
+            if (job != null)
+            {
+                _jobs[ThreadQueues.Core] = job;
+            }
 
-            //        FormsManager.Current.Dispose();
-            //    },
-            //    null,
-            //    RunOptions.UseSleepInterval | RunOptions.RunNow);
-            //if (job != null)
-            //{
-            //    _jobs[ThreadQueues.Core] = job;
-            //}
-
-            TaskManager.Current.Run();
-
-            FormsManager.Current.Dispose();
+            TaskManager.Current.Run(resources: FormsManager.Current);
         }
 
         private ContextMenuStrip _contextMenu = new();
-        private IDesktopSessionState _sessionState = null;
+        private IDesktopSessionState _sessionState = SessionManager.Current.CreateSession<DesktopSessionState>();
 
-        private static readonly IptEventTypes[] CONST_eventTypes = Enum.GetValues<IptEventTypes>()
+        private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
             .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
-            .ToArray();
+            .ToList()
+            .AsReadOnly();
 
-        private static readonly IptEventTypes[] CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
+        private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
             .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
-            .ToArray();
+            .ToList()
+            .AsReadOnly();
 
         private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings = new Dictionary<IptEventTypes[], ScreenLayers[]>
         {
@@ -182,12 +172,9 @@ namespace ThePalace.Client.Desktop
             //}
         }
 
-        public void Initialize(IDesktopSessionState sessionState)
+        public void Initialize()
         {
-            if (this.IsDisposed ||
-                sessionState == null) return;
-
-            this._sessionState = sessionState;
+            if (this.IsDisposed) return;
 
             foreach (var type in CONST_eventTypes)
             {
@@ -218,35 +205,32 @@ namespace ThePalace.Client.Desktop
             //});
 #endif
 
-            //TaskManager.Current.CreateTask(() =>
-            //{
-            //    var sessionState = this._sessionState as IUISessionState;
-            //    if (sessionState == null) return;
+            _jobs[ThreadQueues.GUI].Enqueue(a =>
+            {
+                var sessionState = a[0] as IDesktopSessionState;
+                if (sessionState == null) return null;
 
-            //    ShowAppForm();
+                ShowAppForm();
 
-            //    if (SysTrayIcon.Current.Value)
-            //    {
-            //        var form = sessionState.GetForm(nameof(Program2));
-            //        if (form == null) return;
+                var form = sessionState.GetForm(nameof(Program));
+                if (form == null) return null;
 
-            //        var trayIcon = sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
-            //        if (trayIcon == null)
-            //        {
-            //            trayIcon = new NotifyIcon
-            //            {
-            //                ContextMenuStrip = new ContextMenuStrip(),
-            //                Icon = form.Icon,
-            //                Visible = true,
-            //            };
-            //            sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+                var trayIcon = sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
+                if (trayIcon == null)
+                {
+                    trayIcon = new NotifyIcon
+                    {
+                        ContextMenuStrip = new ContextMenuStrip(),
+                        Icon = form.Icon,
+                        Visible = true,
+                    };
+                    sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
 
-            //            trayIcon.ContextMenuStrip.Items.Add("Exit", null, new EventHandler((sender, e) => TaskManager.Current.Dispose()));
-            //        }
-            //    }
+                    trayIcon.ContextMenuStrip.Items.Add("Exit", null, new EventHandler((sender, e) => TaskManager.Current.Dispose()));
+                }
 
-            //    return;
-            //}, null);
+                return null;
+            }, this._sessionState);
 
             return;
         }
@@ -324,7 +308,7 @@ namespace ThePalace.Client.Desktop
 
             var form = FormsManager.Current.CreateForm<FormDialog>(new FormCfg
             {
-                //Load = new EventHandler((sender, e) => TaskManager.Current.Run(ThreadQueues.GUI)),
+                Load = new EventHandler((sender, e) => TaskManager.Current.Run()),
                 WindowState = FormWindowState.Minimized,
                 AutoScaleMode = AutoScaleMode.Font,
                 AutoScaleDimensions = new SizeF(7F, 15F),
@@ -343,37 +327,37 @@ namespace ThePalace.Client.Desktop
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.MouseUp += new MouseEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.MouseDown += new MouseEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.DragEnter += new DragEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.DragLeave += new EventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.DragOver += new DragEventHandler((sender, e) =>
             {
                 this._sessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.State);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
             });
             form.Resize += new EventHandler((sender, e) =>
             {
@@ -822,7 +806,7 @@ namespace ThePalace.Client.Desktop
                             return;
                         }
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this._sessionState, null, this._sessionState.State);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this._sessionState, null, this._sessionState.ScriptState);
 
                         if (e.KeyCode == Keys.Enter)
                         {
@@ -873,7 +857,7 @@ namespace ThePalace.Client.Desktop
                                     //ScriptEvents.Current.Invoke(IptEventTypes.Chat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
                                     //ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
 
-                                    var iptTracking = this._sessionState.State as IptTracking;
+                                    var iptTracking = this._sessionState.ScriptState as IptTracking;
                                     if (iptTracking != null)
                                     {
                                         if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
@@ -899,7 +883,7 @@ namespace ThePalace.Client.Desktop
 
                         if (!AsyncTcpSocket.IsConnected(this._sessionState?.ConnectionState)) return;
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this._sessionState, null, this._sessionState.State);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this._sessionState, null, this._sessionState.ScriptState);
                     });
 
                     this._sessionState.RegisterControl(nameof(txtInput), txtInput);

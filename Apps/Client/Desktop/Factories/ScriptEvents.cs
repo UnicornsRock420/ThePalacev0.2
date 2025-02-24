@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Client.Desktop.Entities.Core;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 
@@ -35,7 +35,7 @@ namespace ThePalace.Client.Desktop.Factories
             GC.SuppressFinalize(this);
         }
 
-        public void Invoke(IptEventTypes eventType, ISessionState sessionState, IProtocol packet, object scriptState = null)
+        public void Invoke(IptEventTypes eventType, IDesktopSessionState sessionState, IProtocol packet, object scriptState = null)
         {
             var scriptEvent = new ScriptEvent
             {
@@ -55,7 +55,7 @@ namespace ThePalace.Client.Desktop.Factories
                     LoggerHub.Current.Error(ex);
 
                     if (eventType != IptEventTypes.UnhandledError)
-                        this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.State);
+                        this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptState);
                 }
             }
         }

@@ -5,7 +5,7 @@ using static ThePalace.Common.Threading.Job;
 
 namespace ThePalace.Common.Threading
 {
-    public partial class TaskManager : Singleton<TaskManager>, IDisposable
+    public partial class TaskManager : SingletonDisposable<TaskManager>
     {
         static TaskManager() => _globalToken = CancellationTokenFactory.NewToken();
 
@@ -13,7 +13,7 @@ namespace ThePalace.Common.Threading
 
         ~TaskManager() => Dispose();
 
-        public void Dispose()
+        public override void Dispose()
         {
             if (!_globalToken.IsCancellationRequested)
             {
@@ -38,6 +38,8 @@ namespace ThePalace.Common.Threading
 
                 _globalToken.Dispose();
             }
+
+            base.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -127,8 +129,13 @@ namespace ThePalace.Common.Threading
             }
         }
 
-        public void Run(TimeSpan? sleepInterval = null, CancellationToken? token = null)
+        public void Run(TimeSpan? sleepInterval = null, CancellationToken? token = null, params IDisposable[] resources)
         {
+            if ((resources?.Length ?? 0) > 0)
+            {
+                _managedResources.AddRange(resources);
+            }
+
             sleepInterval ??= TimeSpan.FromMilliseconds(750);
 
             while (!GlobalToken.IsCancellationRequested &&

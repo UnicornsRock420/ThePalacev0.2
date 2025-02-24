@@ -252,5 +252,17 @@ namespace ThePalace.Common.Threading
 
             return Failures > 0 ? -1 : 0;
         }
+
+        public void Enqueue(CmdFnc fnc, params object[] values)
+        {
+            var cmd = new Cmd
+            {
+                CmdFnc = fnc,
+            };
+            if (values.Length > 0)
+                cmd.Values = values;
+
+            Queue.Enqueue(cmd);
+        }
     }
 }
