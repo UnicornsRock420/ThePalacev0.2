@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories;
 using ThePalace.Network.Entities;
@@ -108,14 +109,17 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public static ConnectionState CreateConnection(Socket handler, ConnectionManager? instance = null)
+        public static ConnectionState CreateConnection(Socket? handler = null, ConnectionManager? instance = null)
         {
+            ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+            //ArgumentNullException.ThrowIfNull(instance, nameof(instance));
+
             // TODO: Check banlist record(s)
 
             var result = new ConnectionState
             {
                 Socket = handler,
-                IPAddress = handler.GetIPAddress(),
+                RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0),
             };
 
             instance?.Register(result);

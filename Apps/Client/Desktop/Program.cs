@@ -39,13 +39,14 @@ namespace ThePalace.Client.Desktop
             //// see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
+            var app = new Program();
             var job = (Job?)null;
 
             job = TaskManager.Current.CreateTask(q =>
                 {
                     // TODO: GUI
 
-                    if (q.Count > 0 &&
+                    if (!q.IsEmpty &&
                         q.TryDequeue(out var cmd))
                     {
                         if (cmd.Values != null)
@@ -62,7 +63,6 @@ namespace ThePalace.Client.Desktop
 
                 job.Enqueue(a =>
                 {
-                    var app = new Program();
                     app.Initialize();
 
                     return null;
@@ -71,24 +71,17 @@ namespace ThePalace.Client.Desktop
 
             job = TaskManager.Current.CreateTask(q =>
                 {
-                    // TODO: Network_Receive
-                },
-                null,
-                RunOptions.UseManualResetEvent);
-            if (job != null)
-            {
-                _jobs[ThreadQueues.Network_Receive] = job;
-            }
+                    // TODO: Network
 
-            job = TaskManager.Current.CreateTask(q =>
-                {
-                    // TODO: Network_Send
+                    while (app.SessionState.ConnectionState.BytesReceived.Length > 0)
+                    {
+                    }
                 },
                 null,
                 RunOptions.UseManualResetEvent);
             if (job != null)
             {
-                _jobs[ThreadQueues.Network_Send] = job;
+                _jobs[ThreadQueues.Network] = job;
             }
 
             job = TaskManager.Current.CreateTask(q =>
@@ -100,6 +93,17 @@ namespace ThePalace.Client.Desktop
             if (job != null)
             {
                 _jobs[ThreadQueues.Media] = job;
+            }
+
+            job = TaskManager.Current.CreateTask(q =>
+                {
+                    // TODO: Assets
+                },
+                null,
+                RunOptions.UseManualResetEvent);
+            if (job != null)
+            {
+                _jobs[ThreadQueues.Assets] = job;
             }
 
             job = TaskManager.Current.CreateTask(q =>
@@ -120,7 +124,7 @@ namespace ThePalace.Client.Desktop
         }
 
         private ContextMenuStrip _contextMenu = new();
-        private IDesktopSessionState _sessionState = SessionManager.Current.CreateSession<DesktopSessionState>();
+        public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
 
         private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
             .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
@@ -230,7 +234,7 @@ namespace ThePalace.Client.Desktop
                 }
 
                 return null;
-            }, this._sessionState);
+            }, this.SessionState);
 
             return;
         }
@@ -317,51 +321,51 @@ namespace ThePalace.Client.Desktop
             });
             if (form == null) return;
 
-            this._sessionState.RegisterForm(nameof(Program), form);
+            this.SessionState.RegisterForm(nameof(Program), form);
 
-            form.SessionState = this._sessionState;
+            form.SessionState = this.SessionState;
             form.FormClosed += new FormClosedEventHandler((sender, e) =>
-                this._sessionState.UnregisterForm(nameof(Program), sender as FormBase));
+                this.SessionState.UnregisterForm(nameof(Program), sender as FormBase));
 
             form.MouseMove += new MouseEventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.MouseUp += new MouseEventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.MouseDown += new MouseEventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.DragEnter += new DragEventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.DragLeave += new EventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.DragOver += new DragEventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
-                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this._sessionState, null, this._sessionState.ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
             });
             form.Resize += new EventHandler((sender, e) =>
             {
-                this._sessionState.LastActivity = DateTime.UtcNow;
+                this.SessionState.LastActivity = DateTime.UtcNow;
 
                 var form = sender as FormBase;
                 if (form == null ||
@@ -383,7 +387,7 @@ namespace ThePalace.Client.Desktop
                     (screenWidth / 2) - (form.Width / 2),
                     (screenHeight / 2) - (form.Height / 2));
 
-                var toolStrip = this._sessionState.GetControl("toolStrip") as ToolStrip;
+                var toolStrip = this.SessionState.GetControl("toolStrip") as ToolStrip;
                 if (toolStrip != null)
                 {
                     toolStrip.Size = new Size(form.Width, form.Height);
@@ -402,7 +406,7 @@ namespace ThePalace.Client.Desktop
 
             var tabIndex = 0;
 
-            var toolStrip = this._sessionState.GetControl("toolStrip") as ToolStrip;
+            var toolStrip = this.SessionState.GetControl("toolStrip") as ToolStrip;
             if (toolStrip == null)
             {
                 toolStrip = FormsManager.Current.CreateControl<FormBase, ToolStrip>(form, true, new ControlCfg
@@ -416,7 +420,7 @@ namespace ThePalace.Client.Desktop
 
                 if (toolStrip != null)
                 {
-                    this._sessionState.RegisterControl(nameof(toolStrip), toolStrip);
+                    this.SessionState.RegisterControl(nameof(toolStrip), toolStrip);
 
                     toolStrip.Stretch = true;
                     toolStrip.GripMargin = new Padding(0);
@@ -428,7 +432,7 @@ namespace ThePalace.Client.Desktop
                 }
             }
 
-            var imgScreen = this._sessionState.GetControl("imgScreen") as PictureBox;
+            var imgScreen = this.SessionState.GetControl("imgScreen") as PictureBox;
             if (imgScreen == null)
             {
                 imgScreen = FormsManager.Current.CreateControl<FormBase, PictureBox>(form, true, new ControlCfg
@@ -443,7 +447,7 @@ namespace ThePalace.Client.Desktop
                 {
                     imgScreen.MouseClick += new MouseEventHandler((sender, e) =>
                     {
-                        if (!AsyncTcpSocket.IsConnected(this._sessionState.ConnectionState))
+                        if (!AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState))
                             ShowConnectionForm();
                         else
                         {
@@ -452,10 +456,10 @@ namespace ThePalace.Client.Desktop
                             switch (e.Button)
                             {
                                 case MouseButtons.Left:
-                                    this._sessionState.UserDesc.UserInfo.RoomPos = point;
+                                    this.SessionState.UserDesc.UserInfo.RoomPos = point;
 
                                     var user = null as UserDesc;
-                                    user = this._sessionState.RoomUsers.GetValueLocked(this._sessionState.UserId);
+                                    user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
                                     if (user != null)
                                     {
                                         user.UserInfo.RoomPos = point;
@@ -464,7 +468,7 @@ namespace ThePalace.Client.Desktop
                                         var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
                                         if (queue != null) queue.Clear();
 
-                                        this._sessionState.RefreshScreen(
+                                        this.SessionState.RefreshScreen(
                                             ScreenLayers.UserProp,
                                             ScreenLayers.UserNametag,
                                             ScreenLayers.Messages);
@@ -494,11 +498,11 @@ namespace ThePalace.Client.Desktop
                                         toolStripItem.Click += contextMenuItem_Click;
                                     }
 
-                                    if ((this._sessionState.RoomUsers?.Count ?? 0) > 0)
-                                        foreach (var roomUser in this._sessionState.RoomUsers.Values)
+                                    if ((this.SessionState.RoomUsers?.Count ?? 0) > 0)
+                                        foreach (var roomUser in this.SessionState.RoomUsers.Values)
                                             if (roomUser.UserInfo.UserId == 0 ||
                                                 roomUser.UserInfo.RoomPos == null) continue;
-                                            else if (roomUser.UserInfo.UserId != this._sessionState.UserId &&
+                                            else if (roomUser.UserInfo.UserId != this.SessionState.UserId &&
                                                 BinaryOpsExts.IsPointInPolygon(
                                                     point,
                                                     roomUser.UserInfo.RoomPos.GetBoundingBox(
@@ -518,8 +522,8 @@ namespace ThePalace.Client.Desktop
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                if (this._sessionState.UserDesc.IsModerator ||
-                                                    this._sessionState.UserDesc.IsAdministrator)
+                                                if (this.SessionState.UserDesc.IsModerator ||
+                                                    this.SessionState.UserDesc.IsAdministrator)
                                                 {
                                                     toolStripItem = _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
                                                     if (toolStripItem != null)
@@ -600,7 +604,7 @@ namespace ThePalace.Client.Desktop
                                                 }
                                             }
 
-                                    if ((this._sessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
+                                    if ((this.SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
                                     {
                                         toolStripItem = _contextMenu.Items.Add("Delete All Props");
                                         if (toolStripItem != null)
@@ -614,7 +618,7 @@ namespace ThePalace.Client.Desktop
                                         }
 
                                         var j = 0;
-                                        foreach (var looseProp in this._sessionState.RoomInfo.LooseProps)
+                                        foreach (var looseProp in this.SessionState.RoomInfo.LooseProps)
                                         {
                                             if (looseProp.Loc == null) continue;
 
@@ -655,8 +659,8 @@ namespace ThePalace.Client.Desktop
                                         }
                                     }
 
-                                    if ((this._sessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                                        foreach (var hotSpot in this._sessionState.RoomInfo.HotSpots)
+                                    if ((this.SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
+                                        foreach (var hotSpot in this.SessionState.RoomInfo.HotSpots)
                                             if (point.IsPointInPolygon(hotSpot.Vortexes.ToArray()))
                                             {
                                                 toolStripItem = _contextMenu.Items.Add($"Select Spot: {hotSpot.SpotInfo.HotspotID}");
@@ -670,8 +674,8 @@ namespace ThePalace.Client.Desktop
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                if (this._sessionState.UserDesc.IsModerator ||
-                                                    this._sessionState.UserDesc.IsAdministrator)
+                                                if (this.SessionState.UserDesc.IsModerator ||
+                                                    this.SessionState.UserDesc.IsAdministrator)
                                                 {
                                                     toolStripItem = _contextMenu.Items.Add($"Delete Spot: {hotSpot.SpotInfo.HotspotID}");
                                                     if (toolStripItem != null)
@@ -696,12 +700,12 @@ namespace ThePalace.Client.Desktop
                     {
                         imgScreen.Cursor = Cursors.Default;
 
-                        if (AsyncTcpSocket.IsConnected(this._sessionState.ConnectionState))
+                        if (AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState))
                         {
                             var point = new ThePalace.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
-                            if ((this._sessionState.RoomUsers?.Count ?? 0) > 0)
-                                foreach (var roomUser in this._sessionState.RoomUsers.Values)
+                            if ((this.SessionState.RoomUsers?.Count ?? 0) > 0)
+                                foreach (var roomUser in this.SessionState.RoomUsers.Values)
                                     if (roomUser.UserInfo.UserId == 0 ||
                                         roomUser.UserInfo.RoomPos == null) continue;
                                     else if (point.IsPointInPolygon(
@@ -715,8 +719,8 @@ namespace ThePalace.Client.Desktop
                                         break;
                                     }
 
-                            if ((this._sessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
-                                foreach (var looseProp in this._sessionState.RoomInfo.LooseProps)
+                            if ((this.SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
+                                foreach (var looseProp in this.SessionState.RoomInfo.LooseProps)
                                 {
                                     if (looseProp.Loc == null) continue;
 
@@ -735,8 +739,8 @@ namespace ThePalace.Client.Desktop
                                     }
                                 }
 
-                            if ((this._sessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                                foreach (var hotSpot in this._sessionState.RoomInfo.HotSpots)
+                            if ((this.SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
+                                foreach (var hotSpot in this.SessionState.RoomInfo.HotSpots)
                                     if (point.IsPointInPolygon(hotSpot.Vortexes.ToArray()))
                                     {
                                         imgScreen.Cursor = Cursors.Hand;
@@ -745,11 +749,11 @@ namespace ThePalace.Client.Desktop
                         }
                     });
 
-                    this._sessionState.RegisterControl(nameof(imgScreen), imgScreen);
+                    this.SessionState.RegisterControl(nameof(imgScreen), imgScreen);
                 }
             }
 
-            var labelInfo = this._sessionState.GetControl("labelInfo") as Label;
+            var labelInfo = this.SessionState.GetControl("labelInfo") as Label;
             if (labelInfo == null)
             {
                 labelInfo = FormsManager.Current.CreateControl<FormBase, Label>(form, true, new ControlCfg
@@ -761,10 +765,10 @@ namespace ThePalace.Client.Desktop
                 })?.FirstOrDefault();
 
                 if (labelInfo != null)
-                    this._sessionState.RegisterControl(nameof(labelInfo), labelInfo);
+                    this.SessionState.RegisterControl(nameof(labelInfo), labelInfo);
             }
 
-            var txtInput = this._sessionState.GetControl("txtInput") as TextBox;
+            var txtInput = this.SessionState.GetControl("txtInput") as TextBox;
             if (txtInput == null)
             {
                 txtInput = FormsManager.Current.CreateControl<FormBase, TextBox>(form, true, new ControlCfg
@@ -790,7 +794,7 @@ namespace ThePalace.Client.Desktop
                     });
                     txtInput.KeyUp += new KeyEventHandler((sender, e) =>
                     {
-                        this._sessionState.LastActivity = DateTime.UtcNow;
+                        this.SessionState.LastActivity = DateTime.UtcNow;
 
                         if (e.KeyCode == Keys.Tab)
                         {
@@ -799,14 +803,14 @@ namespace ThePalace.Client.Desktop
                             txtInput.Text = string.Empty;
                         }
 
-                        if (!AsyncTcpSocket.IsConnected(this._sessionState?.ConnectionState))
+                        if (!AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState))
                         {
                             this.ShowConnectionForm();
 
                             return;
                         }
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this._sessionState, null, this._sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this.SessionState, null, this.SessionState.ScriptState);
 
                         if (e.KeyCode == Keys.Enter)
                         {
@@ -857,7 +861,7 @@ namespace ThePalace.Client.Desktop
                                     //ScriptEvents.Current.Invoke(IptEventTypes.Chat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
                                     //ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
 
-                                    var iptTracking = this._sessionState.ScriptState as IptTracking;
+                                    var iptTracking = this.SessionState.ScriptState as IptTracking;
                                     if (iptTracking != null)
                                     {
                                         if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
@@ -872,7 +876,7 @@ namespace ThePalace.Client.Desktop
                     });
                     txtInput.KeyDown += new KeyEventHandler((sender, e) =>
                     {
-                        this._sessionState.LastActivity = DateTime.UtcNow;
+                        this.SessionState.LastActivity = DateTime.UtcNow;
 
                         if (e.KeyCode == Keys.Tab)
                         {
@@ -881,16 +885,16 @@ namespace ThePalace.Client.Desktop
                             txtInput.Text = string.Empty;
                         }
 
-                        if (!AsyncTcpSocket.IsConnected(this._sessionState?.ConnectionState)) return;
+                        if (!AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState)) return;
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this._sessionState, null, this._sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this.SessionState, null, this.SessionState.ScriptState);
                     });
 
-                    this._sessionState.RegisterControl(nameof(txtInput), txtInput);
+                    this.SessionState.RegisterControl(nameof(txtInput), txtInput);
                 }
             }
 
-            this._sessionState.RefreshScreen(ScreenLayers.Base);
+            this.SessionState.RefreshScreen(ScreenLayers.Base);
 
             ShowConnectionForm();
         }
@@ -898,7 +902,7 @@ namespace ThePalace.Client.Desktop
         {
             if (this.IsDisposed) return;
 
-            var connectionForm = this._sessionState.GetForm<Forms.Connection>(nameof(Forms.Connection));
+            var connectionForm = this.SessionState.GetForm<Forms.Connection>(nameof(Forms.Connection));
             if (connectionForm == null)
             {
                 connectionForm = FormsManager.Current.CreateForm<Forms.Connection>(
@@ -914,15 +918,15 @@ namespace ThePalace.Client.Desktop
                     });
                 if (connectionForm == null) return;
 
-                connectionForm.SessionState = this._sessionState;
+                connectionForm.SessionState = this.SessionState;
                 connectionForm.FormClosed += new FormClosedEventHandler((sender, e) =>
                 {
-                    this._sessionState.UnregisterForm(nameof(Forms.Connection), sender as FormBase);
+                    this.SessionState.UnregisterForm(nameof(Forms.Connection), sender as FormBase);
                 });
 
                 if (connectionForm != null)
                 {
-                    this._sessionState.RegisterForm(nameof(Forms.Connection), connectionForm);
+                    this.SessionState.RegisterForm(nameof(Forms.Connection), connectionForm);
 
                     var buttonDisconnect = connectionForm.Controls
                         .Cast<Control>()
@@ -935,10 +939,10 @@ namespace ThePalace.Client.Desktop
                             //if ((this._sessionState.ConnectionState?.IsConnected ?? false) == true)
                             //    ConnectionManager.Current.Disconnect(this._sessionState);
 
-                            var connectionForm = this._sessionState.GetForm(nameof(Forms.Connection));
+                            var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
                             connectionForm?.Close();
                         });
-                        buttonDisconnect.Visible = AsyncTcpSocket.IsConnected(this._sessionState?.ConnectionState);
+                        buttonDisconnect.Visible = AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState);
                     }
 
                     var buttonConnect = connectionForm.Controls
@@ -949,7 +953,7 @@ namespace ThePalace.Client.Desktop
                     {
                         buttonConnect.Click += new EventHandler((sender, e) =>
                         {
-                            var connectionForm = this._sessionState.GetForm(nameof(Forms.Connection));
+                            var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
                             if (connectionForm != null)
                             {
                                 //var checkBoxNewTab = connectionForm.Controls
@@ -966,7 +970,7 @@ namespace ThePalace.Client.Desktop
                                     .FirstOrDefault() as ComboBox;
                                 if (comboBoxUsernames != null)
                                 {
-                                    this._sessionState.RegInfo.UserName = this._sessionState.RegInfo.UserName = comboBoxUsernames.Text;
+                                    this.SessionState.RegInfo.UserName = this.SessionState.RegInfo.UserName = comboBoxUsernames.Text;
                                 }
 
                                 var textBoxRoomID = connectionForm.Controls
@@ -980,7 +984,7 @@ namespace ThePalace.Client.Desktop
                                     if (!string.IsNullOrEmpty(textBoxRoomID.Text))
                                         roomID = Convert.ToInt16(textBoxRoomID.Text);
 
-                                    this._sessionState.RegInfo.DesiredRoom = roomID;
+                                    this.SessionState.RegInfo.DesiredRoom = roomID;
                                 }
 
                                 var comboBoxAddresses = connectionForm.Controls
@@ -1004,7 +1008,7 @@ namespace ThePalace.Client.Desktop
                     {
                         buttonCancel.Click += new EventHandler((sender, e) =>
                         {
-                            var connectionForm = this._sessionState.GetForm(nameof(Forms.Connection));
+                            var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
                             connectionForm?.Close();
                         });
                     }
@@ -1076,22 +1080,22 @@ namespace ThePalace.Client.Desktop
                 {
                     case nameof(GoBack):
                     case nameof(GoForward):
-                        if (AsyncTcpSocket.IsConnected(this._sessionState.ConnectionState) &&
-                            (this._sessionState.History.History.Count > 0))
+                        if (AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState) &&
+                            (this.SessionState.History.History.Count > 0))
                         {
                             var url = null as string;
 
                             switch (name)
                             {
                                 case nameof(GoBack):
-                                    if ((!this._sessionState.History.Position.HasValue ||
-                                        this._sessionState.History.History.Keys.Min() != this._sessionState.History.Position.Value))
-                                        url = this._sessionState.History.Back();
+                                    if ((!this.SessionState.History.Position.HasValue ||
+                                        this.SessionState.History.History.Keys.Min() != this.SessionState.History.Position.Value))
+                                        url = this.SessionState.History.Back();
                                     break;
                                 case nameof(GoForward):
-                                    if (this._sessionState.History.Position.HasValue &&
-                                        this._sessionState.History.History.Keys.Max() != this._sessionState.History.Position.Value)
-                                        url = this._sessionState.History.Forward();
+                                    if (this.SessionState.History.Position.HasValue &&
+                                        this.SessionState.History.History.Keys.Max() != this.SessionState.History.Position.Value)
+                                        url = this.SessionState.History.Forward();
                                     break;
                             }
 
@@ -1127,16 +1131,16 @@ namespace ThePalace.Client.Desktop
 
                         break;
                     case nameof(Connection):
-                        ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(this._sessionState, null);
+                        ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(this.SessionState, null);
                         break;
                     case nameof(Chatlog):
-                        ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(this._sessionState, null);
+                        ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(this.SessionState, null);
                         break;
                     case nameof(UsersList):
-                        ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(this._sessionState, null);
+                        ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(this.SessionState, null);
                         break;
                     case nameof(RoomsList):
-                        ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(this._sessionState, null);
+                        ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(this.SessionState, null);
                         break;
                     case nameof(Bookmarks):
                         break;
@@ -1174,8 +1178,8 @@ namespace ThePalace.Client.Desktop
 
             var cmd = (ContextMenuCommandTypes)values[0];
 
-            if (this._sessionState.UserDesc.IsModerator ||
-                this._sessionState.UserDesc.IsAdministrator)
+            if (this.SessionState.UserDesc.IsModerator ||
+                this.SessionState.UserDesc.IsAdministrator)
                 switch (cmd)
                 {
                     case ContextMenuCommandTypes.CMD_PIN:
@@ -1237,7 +1241,7 @@ namespace ThePalace.Client.Desktop
                     {
                         var value = (Int32)values[1];
 
-                        this._sessionState.SelectedHotSpot = this._sessionState.RoomInfo?.HotSpots
+                        this.SessionState.SelectedHotSpot = this.SessionState.RoomInfo?.HotSpots
                             ?.Where(s => s.SpotInfo.HotspotID == value)
                             ?.FirstOrDefault();
                     }
@@ -1247,7 +1251,7 @@ namespace ThePalace.Client.Desktop
                     {
                         var value = (Int32)values[1];
 
-                        this._sessionState.SelectedProp = this._sessionState.RoomInfo?.LooseProps
+                        this.SessionState.SelectedProp = this.SessionState.RoomInfo?.LooseProps
                             ?.Where(s => s.AssetSpec.Id == value)
                             ?.Select(s => s.AssetSpec)
                             ?.FirstOrDefault();
@@ -1258,7 +1262,7 @@ namespace ThePalace.Client.Desktop
                     {
                         var value = (UInt32)values[1];
 
-                        this._sessionState.SelectedUser = this._sessionState.RoomUsers.GetValueLocked(value);
+                        this.SessionState.SelectedUser = this.SessionState.RoomUsers.GetValueLocked(value);
                     }
 
                     break;
@@ -1281,10 +1285,10 @@ namespace ThePalace.Client.Desktop
                     {
                         var value = values[1] as ThePalace.Core.Entities.Shared.Types.Point;
 
-                        this._sessionState.UserDesc.UserInfo.RoomPos = value;
+                        this.SessionState.UserDesc.UserInfo.RoomPos = value;
 
                         var user = null as UserDesc;
-                        user = this._sessionState.RoomUsers.GetValueLocked(this._sessionState.UserId);
+                        user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
                         if (user != null)
                         {
                             user.UserInfo.RoomPos = value;
@@ -1293,7 +1297,7 @@ namespace ThePalace.Client.Desktop
                             var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
                             if (queue != null) queue.Clear();
 
-                            this._sessionState.RefreshScreen(
+                            this.SessionState.RefreshScreen(
                                 ScreenLayers.UserProp,
                                 ScreenLayers.UserNametag,
                                 ScreenLayers.Messages);

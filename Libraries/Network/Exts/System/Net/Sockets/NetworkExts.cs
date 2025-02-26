@@ -45,7 +45,10 @@ namespace System.Net.Sockets
             }
         }
 
-        public static string? GetIPAddress(this Socket handler) =>
-            ((IPEndPoint)handler?.RemoteEndPoint)?.Address?.ToString();
+        public static IPAddress? GetIPAddress(this Socket handler) =>
+            ((IPEndPoint)handler?.RemoteEndPoint)?.Address;
+
+        public static int? GetPort(this Socket handler) =>
+            ((IPEndPoint)handler?.RemoteEndPoint)?.Port;
     }
 }

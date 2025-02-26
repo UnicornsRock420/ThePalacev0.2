@@ -1,4 +1,6 @@
-﻿namespace ThePalace.Common.Factories
+﻿using System.Collections.Concurrent;
+
+namespace ThePalace.Common.Factories
 {
     /// <summary>
     /// This stream maintains data only until the data is read, then it is purged from the stream.
@@ -28,13 +30,13 @@
 
         //Maintains the streams data.The Queue object provides an easy and efficient way to add and remove data
         //Each item in the queue represents each write to the stream.Every call to write translates to an item in the queue
-        private Queue<Chunk> _chunks;
+        private ConcurrentQueue<Chunk> _chunks;
 
         public byte[] Dequeue()
         {
             if ((this._chunks?.Count ?? 0) < 1) return [];
 
-            var chunk = this._chunks.Dequeue();
+            this._chunks.TryDequeue(out var chunk);
             if (chunk?.Position == 0) return chunk.Data;
 
             var count = chunk.Length - chunk.Position;
@@ -55,13 +57,17 @@
         {
             var iRemainingBytesToRead = count;
             var iTotalBytesRead = 0;
+            var chunk = (Chunk?)null;
 
             //Read until we hit the requested count, or until we hav nothing left to read
             while (iTotalBytesRead <= count &&
                 this._chunks.Count > 0)
             {
                 //Get first chunk from the queue
-                var chunk = this._chunks.Peek();
+                using (var @lock = LockContext.GetLock(this._chunks))
+                {
+                    this._chunks.TryPeek(out chunk);
+                }
 
                 //Determine how much of the chunk there is left to read
                 var iUnreadChunkLength = chunk.Length - chunk.Position;
@@ -83,7 +89,10 @@
                     //If the entire chunk has been read,  remove it
                     if (chunk.Position + iBytesToRead >= chunk.Data.Length)
                     {
-                        this._chunks.Dequeue();
+                        using (var @lock = LockContext.GetLock(this._chunks))
+                        {
+                            this._chunks.TryDequeue(out var _);
+                        }
                     }
                     else
                     {
@@ -133,7 +142,10 @@
             Buffer.BlockCopy(buffer, offset, bufSave, 0, count);
 
             //Add the data to the queue
-            this._chunks.Enqueue(new Chunk(bufSave));
+            using (var @lock = LockContext.GetLock(this._chunks))
+            {
+                this._chunks.Enqueue(new Chunk(bufSave));
+            }
         }
 
         public override bool CanSeek => CanSeekOveride;
@@ -165,8 +177,16 @@
 
         public long Count => (this._chunks?.Count ?? 0);
 
-        public override long Length =>
-            (this._chunks?.Count ?? 0) < 1 ? 0 : this._chunks.Sum(b => b.Length - b.Position);
+        public override long Length
+        {
+            get
+            {
+                using (var @lock = LockContext.GetLock(this._chunks))
+                {
+                    return (this._chunks?.Count ?? 0) < 1 ? 0 : this._chunks.Sum(b => b.Length - b.Position);
+                }
+            }
+        }
 
         public override void Flush() { }
     }

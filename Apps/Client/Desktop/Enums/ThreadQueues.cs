@@ -7,9 +7,8 @@
         Core,
         //Devices,
         Media,
-        //Assets,
-        Network_Receive,
-        Network_Send,
+        Assets,
+        Network,
         ScriptEngine,
 #if WINDOWS10_0_17763_0_OR_GREATER
         Toast,

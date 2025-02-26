@@ -54,8 +54,8 @@
 
         public bool Lock()
         {
-            if (_lockObj == null) return false;
-            if (_hasLock) return true;
+            if (_lockObj == null ||
+                _hasLock) return false;
 
             Monitor.Enter(_lockObj, ref _hasLock);
 
@@ -64,8 +64,8 @@
 
         public bool TryLock(int millisecondsTimeout = 0)
         {
-            if (_lockObj == null) return false;
-            if (_hasLock) return true;
+            if (_lockObj == null ||
+                _hasLock) return false;
 
             if (millisecondsTimeout > 0)
             {
