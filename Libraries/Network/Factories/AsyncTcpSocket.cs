@@ -44,26 +44,16 @@ namespace ThePalace.Network.Factories
         public event EventHandler DataReceived;
         public event EventHandler StateChanged;
 
-        public void Listen(string hostname, int port, int listenBacklog = 0)
+        public void Listen(IPEndPoint? hostAddr = null, int listenBacklog = 0)
         {
-            ArgumentNullException.ThrowIfNull(hostname, nameof(hostname));
+            ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
 
             var ipAddress = (IPAddress?)null;
-
-            if (string.IsNullOrWhiteSpace(hostname) || !IPAddress.TryParse(hostname, out ipAddress))
-            {
-                var ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-                ipAddress = ipHostInfo.AddressList[0];
-            }
-
-            if (ipAddress == null) throw new Exception($"Cannot bind to {hostname}:{port} (address:port)!");
 
             try
             {
                 var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                var localEndPoint = new IPEndPoint(IPAddress.Any, port);
-                listener.Bind(localEndPoint);
-
+                listener.Bind(hostAddr);
                 listener.Listen(listenBacklog);
 
                 LoggerHub.Current.Info("Listener Operational. Waiting for connections...");
@@ -98,21 +88,19 @@ namespace ThePalace.Network.Factories
             }
         }
 
-        public bool Connect(IConnectionState connectionState, string? hostname, ushort port = 9998)
+        public bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
         {
             ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
-            ArgumentNullException.ThrowIfNull(hostname, nameof(hostname));
+            ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
 
             DropConnection(connectionState);
 
-            connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
             try
             {
-                connectionState.Socket.Connect(hostname, port);
+                connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                connectionState.Socket.Connect(hostAddr);
 
-                connectionState.Hostname = hostname;
-                connectionState.Port = port;
+                connectionState.HostAddr = hostAddr;
             }
             catch (Exception ex)
             {
@@ -176,7 +164,7 @@ namespace ThePalace.Network.Factories
 
             handler.SetKeepAlive();
 
-            Console.WriteLine($"{connectionState.IPAddress}");
+            Console.WriteLine($"{connectionState.RemoteAddr}");
 
             try
             {

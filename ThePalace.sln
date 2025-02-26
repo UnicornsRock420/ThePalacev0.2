@@ -84,6 +84,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Media.SoundPlayer
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Common", "Libraries\Common\ThePalace.Common\ThePalace.Common.csproj", "{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution Files", "{45B7EAC9-8A2A-4A87-BC23-BCA587A1C12B}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
