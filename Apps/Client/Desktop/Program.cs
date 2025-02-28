@@ -114,7 +114,7 @@ namespace ThePalace.Client.Desktop
                     TaskManager.Current.Shutdown();
                 },
                 null,
-                RunOptions.UseSleepInterval);
+                RunOptions.UseSleepInterval | RunOptions.RunNow);
             if (job != null)
             {
                 _jobs[ThreadQueues.Core] = job;
