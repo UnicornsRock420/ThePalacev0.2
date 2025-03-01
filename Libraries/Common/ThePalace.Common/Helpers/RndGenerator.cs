@@ -1,102 +1,101 @@
-﻿namespace ThePalace.Common.Helpers
+﻿namespace ThePalace.Common.Helpers;
+
+public static class RndGenerator
 {
-    public static class RndGenerator
+    private const uint _KvTtl = 3;
+    private static Random _RndGenerator;
+    private static DateTime _UpdateDate;
+
+    private static void CheckTTL()
     {
-        private const uint _KvTtl = 3;
-        private static Random _RndGenerator;
-        private static DateTime _UpdateDate;
-
-        private static void CheckTTL()
+        if (_RndGenerator == null || DateTime.UtcNow.Subtract(_UpdateDate).Minutes > _KvTtl)
         {
-            if (_RndGenerator == null || DateTime.UtcNow.Subtract(_UpdateDate).Minutes > _KvTtl)
+            try
             {
-                try
-                {
-                    _RndGenerator = new Random();
-                    _UpdateDate = DateTime.UtcNow;
-                }
-                catch
-                {
-                }
+                _RndGenerator = new Random();
+                _UpdateDate = DateTime.UtcNow;
+            }
+            catch
+            {
             }
         }
+    }
 
-        public static int Next(int minValue, int maxValue)
+    public static int Next(int minValue, int maxValue)
+    {
+        if (maxValue < 1)
         {
-            if (maxValue < 1)
-            {
-                return 0;
-            }
-
-            CheckTTL();
-
-            return _RndGenerator.Next(minValue, maxValue);
+            return 0;
         }
 
-        public static int Next(int maxValue)
+        CheckTTL();
+
+        return _RndGenerator.Next(minValue, maxValue);
+    }
+
+    public static int Next(int maxValue)
+    {
+        if (maxValue < 1)
         {
-            if (maxValue < 1)
-            {
-                return 0;
-            }
-
-            CheckTTL();
-
-            return _RndGenerator.Next(maxValue);
+            return 0;
         }
 
-        public static int Next()
-        {
-            CheckTTL();
+        CheckTTL();
 
-            return _RndGenerator.Next();
+        return _RndGenerator.Next(maxValue);
+    }
+
+    public static int Next()
+    {
+        CheckTTL();
+
+        return _RndGenerator.Next();
+    }
+
+    public static uint Next(uint minValue, uint maxValue)
+    {
+        if (maxValue < 1)
+        {
+            return 0;
         }
 
-        public static uint Next(uint minValue, uint maxValue)
+        CheckTTL();
+
+        return (uint)_RndGenerator.Next((int)minValue, (int)maxValue);
+    }
+
+    public static uint Next(uint maxValue)
+    {
+        if (maxValue < 1)
         {
-            if (maxValue < 1)
-            {
-                return 0;
-            }
-
-            CheckTTL();
-
-            return (uint)_RndGenerator.Next((int)minValue, (int)maxValue);
+            return 0;
         }
 
-        public static uint Next(uint maxValue)
+        CheckTTL();
+
+        return (uint)_RndGenerator.Next((int)maxValue);
+    }
+
+    public static byte[] NextBytes(int size)
+    {
+        if (size < 1)
         {
-            if (maxValue < 1)
-            {
-                return 0;
-            }
-
-            CheckTTL();
-
-            return (uint)_RndGenerator.Next((int)maxValue);
+            size = 1;
         }
 
-        public static byte[] NextBytes(int size)
-        {
-            if (size < 1)
-            {
-                size = 1;
-            }
+        CheckTTL();
 
-            CheckTTL();
+        var result = new byte[size];
 
-            var result = new byte[size];
+        _RndGenerator.NextBytes(result);
 
-            _RndGenerator.NextBytes(result);
+        return result;
+    }
 
-            return result;
-        }
+    public static double NextDouble()
+    {
+        CheckTTL();
 
-        public static double NextDouble()
-        {
-            CheckTTL();
-
-            return _RndGenerator.NextDouble();
-        }
+        return _RndGenerator.NextDouble();
     }
 }

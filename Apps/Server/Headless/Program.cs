@@ -1,9 +1,8 @@
-namespace ThePalace.Server.Desktop
+namespace ThePalace.Server.Desktop;
+
+public partial class Program
 {
-    public partial class Program
+    public static void Main()
     {
-        public static void Main()
-        {
-        }
     }
 }

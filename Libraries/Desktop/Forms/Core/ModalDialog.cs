@@ -1,11 +1,10 @@
 ﻿using ThePalace.Common.Desktop.Interfaces;
 
-namespace ThePalace.Common.Desktop.Forms.Core
-{
-    public class ModalDialog<T> : FormBase, IFormResult<T>
-    {
-        public ModalDialog() { }
+namespace ThePalace.Common.Desktop.Forms.Core;
 
-        public T Result { get; }
-    }
+public class ModalDialog<T> : FormBase, IFormResult<T>
+{
+    public ModalDialog() { }
+
+    public T Result { get; }
 }

@@ -3,12 +3,11 @@ using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Communications
+namespace ThePalace.Core.Entities.Network.Client.Communications;
+
+[Mnemonic("gmsg")]
+public partial class MSG_GMSG : EventParams, IProtocolC2S, ICommunications
 {
-    [Mnemonic("gmsg")]
-    public partial class MSG_GMSG : EventParams, IProtocolC2S, ICommunications
-    {
-        [CString(255)]
-        public string? Text { get; set; }
-    }
+    [CString(255)]
+    public string? Text { get; set; }
 }

@@ -3,40 +3,39 @@ using System.Runtime.Serialization;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared
+namespace ThePalace.Core.Entities.Shared;
+
+public partial class UserDesc : IDisposable, IStruct
 {
-    public partial class UserDesc : IDisposable, IStruct
+    public UserDesc()
     {
-        public UserDesc()
-        {
-            this.UserInfo = new();
-            this.Extended = new();
-        }
-
-        ~UserDesc() => this.Dispose();
-
-        public void Dispose()
-        {
-            UserInfo = null;
-
-            Extended
-                ?.Values
-                ?.Where(_ => _ is IDisposable)
-                ?.Cast<IDisposable>()
-                ?.ToList()
-                ?.ForEach(_ => TCF
-                    .Options(false)
-                    .Try(() => _.Dispose())
-                    .Execute());
-            Extended?.Clear();
-            Extended = null;
-
-            GC.SuppressFinalize(this);
-        }
-
-        public UserRec UserInfo;
-
-        [IgnoreDataMember]
-        public ConcurrentDictionary<string, object> Extended;
+        this.UserInfo = new();
+        this.Extended = new();
     }
+
+    ~UserDesc() => this.Dispose();
+
+    public void Dispose()
+    {
+        UserInfo = null;
+
+        Extended
+            ?.Values
+            ?.Where(_ => _ is IDisposable)
+            ?.Cast<IDisposable>()
+            ?.ToList()
+            ?.ForEach(_ => TCF
+                .Options(false)
+                .Try(() => _.Dispose())
+                .Execute());
+        Extended?.Clear();
+        Extended = null;
+
+        GC.SuppressFinalize(this);
+    }
+
+    public UserRec UserInfo;
+
+    [IgnoreDataMember]
+    public ConcurrentDictionary<string, object> Extended;
 }

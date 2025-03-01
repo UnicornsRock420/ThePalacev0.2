@@ -2,48 +2,47 @@
 using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Core;
 
-namespace ThePalace.Core.Factories.Core
+namespace ThePalace.Core.Factories.Core;
+
+public partial class SessionManager : SingletonDisposable<SessionManager>
 {
-    public partial class SessionManager : SingletonDisposable<SessionManager>
+    private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
+    public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
+
+    public SessionManager() { }
+    ~SessionManager() => this.Dispose(false);
+
+    public override void Dispose()
     {
-        private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
-        public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
+        if (this.IsDisposed) return;
 
-        public SessionManager() { }
-        ~SessionManager() => this.Dispose(false);
+        _sessions?.Clear();
 
-        public override void Dispose()
-        {
-            if (this.IsDisposed) return;
+        base.Dispose();
 
-            _sessions?.Clear();
+        GC.SuppressFinalize(this);
+    }
 
-            base.Dispose();
+    public T CreateSession<T>()
+        where T : ISessionState =>
+        (T)CreateSession(typeof(T));
 
-            GC.SuppressFinalize(this);
-        }
+    public object CreateSession(Type type)
+    {
+        if (this.IsDisposed) return null;
 
-        public T CreateSession<T>()
-            where T : ISessionState =>
-            (T)CreateSession(typeof(T));
+        var sessionState = type.GetInstance() as ISessionState;
+        if (sessionState == null)
+            throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", type.Name));
 
-        public object CreateSession(Type type)
-        {
-            if (this.IsDisposed) return null;
+        _sessions.TryAdd(sessionState.Id, sessionState);
+        return sessionState;
+    }
 
-            var sessionState = type.GetInstance() as ISessionState;
-            if (sessionState == null)
-                throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", type.Name));
+    public void RemoveSession(ISessionState sessionState)
+    {
+        if (this.IsDisposed) return;
 
-            _sessions.TryAdd(sessionState.Id, sessionState);
-            return sessionState;
-        }
-
-        public void RemoveSession(ISessionState sessionState)
-        {
-            if (this.IsDisposed) return;
-
-            _sessions.TryRemove(sessionState.Id, out var _);
-        }
+        _sessions.TryRemove(sessionState.Id, out var _);
     }
 }

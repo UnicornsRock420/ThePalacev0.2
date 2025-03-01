@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Users
+namespace ThePalace.Common.Client.Entities.Business.Shared.Users;
+
+[Mnemonic("uLoc")]
+public partial class BO_USERMOVE : IEventHandler<MSG_USERMOVE>
 {
-    [Mnemonic("uLoc")]
-    public partial class BO_USERMOVE : IEventHandler<MSG_USERMOVE>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

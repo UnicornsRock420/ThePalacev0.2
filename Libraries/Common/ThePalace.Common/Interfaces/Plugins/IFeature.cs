@@ -1,17 +1,16 @@
 ﻿using ThePalace.Common.Enums.App;
 
-namespace ThePalace.Common.Interfaces.Plugins
+namespace ThePalace.Common.Interfaces.Plugins;
+
+public interface IFeature : IDisposable
 {
-    public interface IFeature : IDisposable
-    {
-        string Name { get; }
-        string Description { get; }
+    string Name { get; }
+    string Description { get; }
 
-        DeviceTypes[] Devices { get; }
-        FeatureTypes[] Features { get; }
-        SubFeatureTypes[] SubFeatures { get; }
-        PurposeTypes Purpose { get; }
+    DeviceTypes[] Devices { get; }
+    FeatureTypes[] Features { get; }
+    SubFeatureTypes[] SubFeatures { get; }
+    PurposeTypes Purpose { get; }
 
-        void Initialize(params object[] args);
-    }
+    void Initialize(params object[] args);
 }

@@ -1,9 +1,8 @@
-﻿namespace ThePalace.Core.Attributes.Strings
+﻿namespace ThePalace.Core.Attributes.Strings;
+
+public class Str31Attribute : PStringAttribute
 {
-    public class Str31Attribute : PStringAttribute
+    public Str31Attribute() : base(1, 31, 32)
     {
-        public Str31Attribute() : base(1, 31, 32)
-        {
-        }
     }
 }

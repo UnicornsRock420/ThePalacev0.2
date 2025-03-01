@@ -2,10 +2,9 @@
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Rooms
+namespace ThePalace.Core.Entities.Network.Client.Rooms;
+
+[Mnemonic("nRom")]
+public partial class MSG_ROOMNEW : EventParams, IProtocolC2S
 {
-    [Mnemonic("nRom")]
-    public partial class MSG_ROOMNEW : EventParams, IProtocolC2S
-    {
-    }
 }

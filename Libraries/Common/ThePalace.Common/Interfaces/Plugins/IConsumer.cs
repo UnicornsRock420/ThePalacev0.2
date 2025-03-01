@@ -1,7 +1,6 @@
-﻿namespace ThePalace.Common.Interfaces.Plugins
+﻿namespace ThePalace.Common.Interfaces.Plugins;
+
+public interface IConsumer : IFeature
 {
-    public interface IConsumer : IFeature
-    {
-        void Consume(params object[] args);
-    }
+    void Consume(params object[] args);
 }

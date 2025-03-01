@@ -3,11 +3,10 @@ using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Assets
+namespace ThePalace.Core.Entities.Network.Client.Assets;
+
+[Mnemonic("rAst")]
+public partial class MSG_ASSETREGI : EventParams, IProtocolC2S
 {
-    [Mnemonic("rAst")]
-    public partial class MSG_ASSETREGI : EventParams, IProtocolC2S
-    {
-        public AssetRec? AssetInfo;
-    }
+    public AssetRec? AssetInfo;
 }

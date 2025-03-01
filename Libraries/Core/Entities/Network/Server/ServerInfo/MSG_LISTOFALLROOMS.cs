@@ -9,43 +9,42 @@ using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Network.Server.ServerInfo
+namespace ThePalace.Core.Entities.Network.Server.ServerInfo;
+
+[DynamicSize]
+[Mnemonic("rLst")]
+public partial class MSG_LISTOFALLROOMS : EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
 {
-    [DynamicSize]
-    [Mnemonic("rLst")]
-    public partial class MSG_LISTOFALLROOMS : EventParams, IStructRefNum, IStructSerializer, IProtocolS2C
+    [IgnoreDataMember]
+    public sint32 RefNum
     {
-        [IgnoreDataMember]
-        public sint32 RefNum
+        get => this.Rooms?.Count ?? 0;
+        set
         {
-            get => this.Rooms?.Count ?? 0;
-            set
-            {
-                if (value > 0) return;
+            if (value > 0) return;
 
-                this.Rooms = [];
-            }
-        }
-
-        public List<ListRec>? Rooms;
-
-        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
-        {
             this.Rooms = [];
-
-            while ((reader.Length - reader.Position) >= 12)
-            {
-                var room = new ListRec();
-                reader.PalaceDeserialize(room, typeof(ListRec), opts);
-                this.Rooms.Add(room);
-            }
         }
+    }
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+    public List<ListRec>? Rooms;
+
+    public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
+    {
+        this.Rooms = [];
+
+        while ((reader.Length - reader.Position) >= 12)
         {
-            if ((this.Rooms?.Count ?? 0) > 0)
-                foreach (var room in this.Rooms)
-                    writer.PalaceSerialize(room, typeof(ListRec), opts);
+            var room = new ListRec();
+            reader.PalaceDeserialize(room, typeof(ListRec), opts);
+            this.Rooms.Add(room);
         }
+    }
+
+    public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+    {
+        if ((this.Rooms?.Count ?? 0) > 0)
+            foreach (var room in this.Rooms)
+                writer.PalaceSerialize(room, typeof(ListRec), opts);
     }
 }

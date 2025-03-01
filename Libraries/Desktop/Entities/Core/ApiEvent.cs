@@ -1,10 +1,9 @@
-﻿namespace ThePalace.Common.Desktop.Entities.Core
+﻿namespace ThePalace.Common.Desktop.Entities.Core;
+
+public partial class ApiEvent : EventArgs
 {
-    public partial class ApiEvent : EventArgs
-    {
-        public Keys Keys { get; set; }
-        public object Sender { get; set; }
-        public object[] HotKeyState { get; set; }
-        public object[] EventState { get; set; }
-    }
+    public Keys Keys { get; set; }
+    public object Sender { get; set; }
+    public object[] HotKeyState { get; set; }
+    public object[] EventState { get; set; }
 }

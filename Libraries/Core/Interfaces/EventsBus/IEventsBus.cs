@@ -1,17 +1,16 @@
-﻿namespace ThePalace.Core.Interfaces.EventsBus
+﻿namespace ThePalace.Core.Interfaces.EventsBus;
+
+public interface IEventsBus : IDisposable
 {
-    public interface IEventsBus : IDisposable
-    {
-        Task Publish(object? sender, IEventParams @event);
+    Task Publish(object? sender, IEventParams @event);
 
-        void Subscribe(IEventHandler handler);
-    }
+    void Subscribe(IEventHandler handler);
+}
 
-    public interface IEventsBus<T> : IDisposable
-        where T : IEventParams
-    {
-        Task Publish(object? sender, T @event);
+public interface IEventsBus<T> : IDisposable
+    where T : IEventParams
+{
+    Task Publish(object? sender, T @event);
 
-        void Subscribe(IEventHandler<T> handler);
-    }
+    void Subscribe(IEventHandler<T> handler);
 }

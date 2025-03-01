@@ -1,9 +1,8 @@
-﻿namespace ThePalace.Common.Server
+﻿namespace ThePalace.Common.Server;
+
+public partial class ServerBase
 {
-    public partial class ServerBase
+    public void Run()
     {
-        public void Run()
-        {
-        }
     }
 }

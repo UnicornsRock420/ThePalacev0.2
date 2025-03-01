@@ -1,47 +1,46 @@
-﻿namespace System.Collections
+﻿namespace System.Collections;
+
+public class Disposable : IDisposable
 {
-    public class Disposable : IDisposable
+    // https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1063
+
+    protected bool IsDisposed { get; private set; } = false;
+    protected List<IDisposable> _managedResources { get; private set; } = [];
+
+    // NOTE: Leave out the finalizer altogether if this class doesn't
+    // own unmanaged resources, but leave the other methods
+    // exactly as they are.
+    ~Disposable()
     {
-        // https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1063
+        // Finalizer calls Dispose(false)
+        Dispose(false);
+    }
 
-        protected bool IsDisposed { get; private set; } = false;
-        protected List<IDisposable> _managedResources { get; private set; } = [];
+    // Dispose() calls Dispose(true)
+    public virtual void Dispose()
+    {
+        Dispose(true);
 
-        // NOTE: Leave out the finalizer altogether if this class doesn't
-        // own unmanaged resources, but leave the other methods
-        // exactly as they are.
-        ~Disposable()
+        GC.SuppressFinalize(this);
+    }
+
+    // The bulk of the clean-up code is implemented in Dispose(bool)
+    protected virtual void Dispose(bool disposing)
+    {
+        if (IsDisposed) return;
+
+        if (disposing)
         {
-            // Finalizer calls Dispose(false)
-            Dispose(false);
-        }
-
-        // Dispose() calls Dispose(true)
-        public virtual void Dispose()
-        {
-            Dispose(true);
-
-            GC.SuppressFinalize(this);
-        }
-
-        // The bulk of the clean-up code is implemented in Dispose(bool)
-        protected virtual void Dispose(bool disposing)
-        {
-            if (IsDisposed) return;
-
-            if (disposing)
+            // free managed resources
+            if ((_managedResources?.Count ?? 0) > 0)
             {
-                // free managed resources
-                if ((_managedResources?.Count ?? 0) > 0)
-                {
-                    _managedResources
-                        ?.ForEach(r => { try { r?.Dispose(); } catch { } });
-                    _managedResources?.Clear();
-                }
-                _managedResources = null;
+                _managedResources
+                    ?.ForEach(r => { try { r?.Dispose(); } catch { } });
+                _managedResources?.Clear();
             }
-
-            IsDisposed = true;
+            _managedResources = null;
         }
+
+        IsDisposed = true;
     }
 }

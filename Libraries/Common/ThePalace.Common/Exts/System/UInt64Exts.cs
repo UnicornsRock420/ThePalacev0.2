@@ -1,18 +1,17 @@
-﻿namespace System
+﻿namespace System;
+
+public static class UInt64Exts
 {
-    public static class UInt64Exts
+    public static class Types
     {
-        public static class Types
-        {
-            public static readonly Type UInt64 = typeof(UInt64);
-            public static readonly Type UInt64Array = typeof(UInt64[]);
-            public static readonly Type UInt64List = typeof(List<UInt64>);
-        }
-
-        //static UInt64Exts() { }
-
-        public static byte[] GetBytes(this UInt64 value) =>
-            BitConverter.GetBytes(value);
-
+        public static readonly Type UInt64 = typeof(UInt64);
+        public static readonly Type UInt64Array = typeof(UInt64[]);
+        public static readonly Type UInt64List = typeof(List<UInt64>);
     }
+
+    //static UInt64Exts() { }
+
+    public static byte[] GetBytes(this UInt64 value) =>
+        BitConverter.GetBytes(value);
+
 }

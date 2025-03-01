@@ -3,15 +3,14 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Shared.Users
+namespace ThePalace.Common.Server.Entities.Business.Shared.Users;
+
+[DynamicSize(32, 1)]
+[Mnemonic("usrN")]
+public partial class BO_USERNAME : IEventHandler<MSG_USERNAME>
 {
-    [DynamicSize(32, 1)]
-    [Mnemonic("usrN")]
-    public partial class BO_USERNAME : IEventHandler<MSG_USERNAME>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

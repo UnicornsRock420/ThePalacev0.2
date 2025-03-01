@@ -1,11 +1,10 @@
-﻿namespace ThePalace.Common.Enums.App
+﻿namespace ThePalace.Common.Enums.App;
+
+public enum NetworkCommandTypes : int
 {
-    public enum NetworkCommandTypes : int
-    {
-        DISCONNECT,
-        LISTEN,
-        CONNECT,
-        RECEIVE,
-        SEND,
-    }
+    DISCONNECT,
+    LISTEN,
+    CONNECT,
+    RECEIVE,
+    SEND,
 }

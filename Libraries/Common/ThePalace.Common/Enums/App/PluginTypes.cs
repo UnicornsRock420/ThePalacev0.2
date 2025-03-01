@@ -1,45 +1,44 @@
-﻿namespace ThePalace.Common.Enums.App
+﻿namespace ThePalace.Common.Enums.App;
+
+public enum FeatureTypes : short
 {
-    public enum FeatureTypes : short
-    {
-        CORE,
-        GUI,
-        MEDIA,
-        NETWORK,
-    }
+    CORE,
+    GUI,
+    MEDIA,
+    NETWORK,
+}
 
-    public enum SubFeatureTypes : short
-    {
-        NONE,
-        AUDIO,
-        BUSINESS,
-        CODEC,
-        COMMUNICATION,
-        LIBRARY,
-        LOGGING,
-        LOGIC,
-        MANAGER,
-        PROTOCOL,
-        SCRIPTING,
-        SYSTRAYICON,
-        VIDEO,
-    }
+public enum SubFeatureTypes : short
+{
+    NONE,
+    AUDIO,
+    BUSINESS,
+    CODEC,
+    COMMUNICATION,
+    LIBRARY,
+    LOGGING,
+    LOGIC,
+    MANAGER,
+    PROTOCOL,
+    SCRIPTING,
+    SYSTRAYICON,
+    VIDEO,
+}
 
-    public enum PurposeTypes : short
-    {
-        VOID,
-        PROVIDER,
-        CONSUMER,
-    }
+public enum PurposeTypes : short
+{
+    VOID,
+    PROVIDER,
+    CONSUMER,
+}
 
-    public enum DeviceTypes : short
-    {
-        NONE,
-        KEYBOARD,
-        MOUSE,
-        USB,
-        BLUETOOTH,
-        STORAGE,
-        VIRTUAL,
-    }
+public enum DeviceTypes : short
+{
+    NONE,
+    KEYBOARD,
+    MOUSE,
+    USB,
+    BLUETOOTH,
+    STORAGE,
+    VIRTUAL,
 }

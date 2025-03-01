@@ -1,10 +1,9 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
 
-namespace ThePalace.Core.Entities.Core
+namespace ThePalace.Core.Entities.Core;
+
+public partial class PluginState : AssemblyLoadContext
 {
-    public partial class PluginState : AssemblyLoadContext
-    {
-        protected override Assembly Load(AssemblyName assemblyName) => null;
-    }
+    protected override Assembly Load(AssemblyName assemblyName) => null;
 }

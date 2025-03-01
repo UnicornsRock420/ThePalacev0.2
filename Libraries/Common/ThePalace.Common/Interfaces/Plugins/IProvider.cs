@@ -1,7 +1,6 @@
-﻿namespace ThePalace.Common.Interfaces.Plugins
+﻿namespace ThePalace.Common.Interfaces.Plugins;
+
+public interface IProvider : IFeature
 {
-    public interface IProvider : IFeature
-    {
-        object Provide(params object[] args);
-    }
+    object Provide(params object[] args);
 }

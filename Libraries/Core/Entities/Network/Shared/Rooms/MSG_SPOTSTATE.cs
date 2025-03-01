@@ -5,13 +5,12 @@ using HotSpotID = System.Int16;
 using RoomID = System.Int16;
 using StateID = System.Int16;
 
-namespace ThePalace.Core.Entities.Network.Shared.Rooms
+namespace ThePalace.Core.Entities.Network.Shared.Rooms;
+
+[Mnemonic("sSta")]
+public partial class MSG_SPOTSTATE : EventParams, IProtocolC2S, IProtocolS2C
 {
-    [Mnemonic("sSta")]
-    public partial class MSG_SPOTSTATE : EventParams, IProtocolC2S, IProtocolS2C
-    {
-        public RoomID RoomID;
-        public HotSpotID SpotID;
-        public StateID StateID;
-    }
+    public RoomID RoomID;
+    public HotSpotID SpotID;
+    public StateID StateID;
 }

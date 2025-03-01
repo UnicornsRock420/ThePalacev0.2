@@ -1,13 +1,12 @@
 ﻿using System.Data;
 
-namespace ThePalace.Database.Core.Interfaces
+namespace ThePalace.Database.Core.Interfaces;
+
+public interface ISqlConnectionFactory : IDisposable
 {
-    public interface ISqlConnectionFactory : IDisposable
-    {
-        string ConnectionString { get; }
+    string ConnectionString { get; }
 
-        IDbConnection GetOpenConnection();
+    IDbConnection GetOpenConnection();
 
-        IDbConnection CreateNewConnection();
-    }
+    IDbConnection CreateNewConnection();
 }

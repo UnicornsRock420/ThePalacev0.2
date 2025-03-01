@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Server.Auth;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Server.Auth
+namespace ThePalace.Common.Server.Entities.Business.Server.Auth;
+
+[Mnemonic("autr")]
+public partial class BO_AUTHRESPONSE : IEventHandler<MSG_AUTHRESPONSE>
 {
-    [Mnemonic("autr")]
-    public partial class BO_AUTHRESPONSE : IEventHandler<MSG_AUTHRESPONSE>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

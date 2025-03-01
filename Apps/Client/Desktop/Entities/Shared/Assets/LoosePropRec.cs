@@ -1,20 +1,19 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Entities.Shared.Rooms;
 
-namespace ThePalace.Client.Desktop.Entities.Shared.Assets
+namespace ThePalace.Client.Desktop.Entities.Shared.Assets;
+
+public partial class LoosePropDesc : LoosePropRec
 {
-    public partial class LoosePropDesc : LoosePropRec
+    ~LoosePropDesc() => Dispose();
+
+    public void Dispose()
     {
-        ~LoosePropDesc() => Dispose();
+        try { Image?.Dispose(); Image = null; } catch { }
 
-        public void Dispose()
-        {
-            try { Image?.Dispose(); Image = null; } catch { }
-
-            GC.SuppressFinalize(this);
-        }
-
-        [IgnoreDataMember]
-        public Bitmap Image;
+        GC.SuppressFinalize(this);
     }
+
+    [IgnoreDataMember]
+    public Bitmap Image;
 }

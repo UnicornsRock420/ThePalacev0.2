@@ -1,11 +1,10 @@
-﻿namespace ThePalace.Core.Enums.Palace
+﻿namespace ThePalace.Core.Enums.Palace;
+
+[Flags]
+public enum SerializerOptions : byte
 {
-    [Flags]
-    public enum SerializerOptions : byte
-    {
-        None = 0,
-        SwapByteOrder = 0x01,
-        IncludeHeader = 0x02,
-        RefNumOnly = 0x04,
-    }
+    None = 0,
+    SwapByteOrder = 0x01,
+    IncludeHeader = 0x02,
+    RefNumOnly = 0x04,
 }

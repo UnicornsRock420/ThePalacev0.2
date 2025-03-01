@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Attributes.Core
+﻿namespace ThePalace.Core.Attributes.Core;
+
+public class ScreenRefreshAttribute : Attribute
 {
-    public class ScreenRefreshAttribute : Attribute
-    {
-    }
 }

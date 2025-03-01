@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Server.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Server.Users
+namespace ThePalace.Common.Server.Entities.Business.Server.Users;
+
+[Mnemonic("rprs")]
+public partial class BO_USERLIST : IEventHandler<MSG_USERLIST>
 {
-    [Mnemonic("rprs")]
-    public partial class BO_USERLIST : IEventHandler<MSG_USERLIST>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

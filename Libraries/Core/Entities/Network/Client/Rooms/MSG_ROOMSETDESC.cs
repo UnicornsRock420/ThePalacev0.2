@@ -5,17 +5,16 @@ using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Rooms
+namespace ThePalace.Core.Entities.Network.Client.Rooms;
+
+[Mnemonic("sRom")]
+public partial class MSG_ROOMSETDESC : EventParams, IStructSerializer, IProtocolC2S
 {
-    [Mnemonic("sRom")]
-    public partial class MSG_ROOMSETDESC : EventParams, IStructSerializer, IProtocolC2S
-    {
-        public RoomDesc? RoomInfo;
+    public RoomDesc? RoomInfo;
 
-        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None) =>
-            RoomInfo.Deserialize(reader, opts);
+    public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None) =>
+        RoomInfo.Deserialize(reader, opts);
 
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None) =>
-            RoomInfo.Serialize(writer, opts);
-    }
+    public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None) =>
+        RoomInfo.Serialize(writer, opts);
 }

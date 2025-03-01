@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Shared.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Rooms
+namespace ThePalace.Common.Client.Entities.Business.Shared.Rooms;
+
+[Mnemonic("sSta")]
+public partial class BO_SPOTSTATE : IEventHandler<MSG_SPOTSTATE>
 {
-    [Mnemonic("sSta")]
-    public partial class BO_SPOTSTATE : IEventHandler<MSG_SPOTSTATE>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

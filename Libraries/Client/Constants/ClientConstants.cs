@@ -1,8 +1,7 @@
-﻿namespace ThePalace.Common.Client.Constants
+﻿namespace ThePalace.Common.Client.Constants;
+
+public static class ClientConstants
 {
-    public static class ClientConstants
-    {
-        public const string RegCodeSeed = @"CANADA";
-        public const string ClientAgent = @"PC4237";
-    }
+    public const string RegCodeSeed = @"CANADA";
+    public const string ClientAgent = @"PC4237";
 }

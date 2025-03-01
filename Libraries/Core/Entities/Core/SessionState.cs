@@ -3,18 +3,17 @@ using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Core.Entities.Network.Shared.Core
+namespace ThePalace.Core.Entities.Network.Shared.Core;
+
+public partial class SessionState : ISessionState
 {
-    public partial class SessionState : ISessionState
-    {
-        public Guid Id { get; } = Guid.NewGuid();
-        public uint UserId { get; set; }
-        public DateTime? LastActivity {  get; set; }
+    public Guid Id { get; } = Guid.NewGuid();
+    public uint UserId { get; set; }
+    public DateTime? LastActivity {  get; set; }
 
-        public IConnectionState? ConnectionState { get; set; } = null;
-        public UserDesc? UserDesc { get; set; } = null;
-        public RegistrationRec? RegInfo { get; set; } = null;
+    public IConnectionState? ConnectionState { get; set; } = null;
+    public UserDesc? UserDesc { get; set; } = null;
+    public RegistrationRec? RegInfo { get; set; } = null;
 
-        public object? State { get; set; } = null;
-    }
+    public object? State { get; set; } = null;
 }

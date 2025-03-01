@@ -1,12 +1,11 @@
-﻿namespace ThePalace.Core.Interfaces.EventsBus
-{
-    public interface IEventHandler
-    {
-        Task<object?> Handle(object? sender, IEventParams @event);
-    }
+﻿namespace ThePalace.Core.Interfaces.EventsBus;
 
-    public interface IEventHandler<in TEventArgs> : IEventHandler
-        where TEventArgs : IEventParams
-    {
-    }
+public interface IEventHandler
+{
+    Task<object?> Handle(object? sender, IEventParams @event);
+}
+
+public interface IEventHandler<in TEventArgs> : IEventHandler
+    where TEventArgs : IEventParams
+{
 }

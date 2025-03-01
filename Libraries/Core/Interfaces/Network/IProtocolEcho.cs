@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Interfaces.Network
+﻿namespace ThePalace.Core.Interfaces.Network;
+
+public interface IProtocolEcho : IProtocol
 {
-    public interface IProtocolEcho : IProtocol
-    {
-    }
 }

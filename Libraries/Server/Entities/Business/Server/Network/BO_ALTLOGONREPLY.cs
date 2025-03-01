@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Server.Network;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Server.Network
+namespace ThePalace.Common.Server.Entities.Business.Server.Network;
+
+[Mnemonic("rep2")]
+public partial class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
 {
-    [Mnemonic("rep2")]
-    public partial class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

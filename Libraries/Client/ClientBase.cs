@@ -1,9 +1,8 @@
-﻿namespace ThePalace.Common.Client
+﻿namespace ThePalace.Common.Client;
+
+public partial class ClientBase
 {
-    public partial class ClientBase
+    public void Run()
     {
-        public void Run()
-        {
-        }
     }
 }

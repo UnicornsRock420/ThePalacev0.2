@@ -1,14 +1,13 @@
 ﻿using System.Collections;
 
-namespace ThePalace.Common.Factories
+namespace ThePalace.Common.Factories;
+
+public abstract partial class SingletonDisposable<T> : Disposable
+    where T : class, new()
 {
-    public abstract partial class SingletonDisposable<T> : Disposable
-        where T : class, new()
-    {
-        protected SingletonDisposable() { }
+    protected SingletonDisposable() { }
 
-        private static Lazy<T> _current = new Lazy<T>();
+    private static Lazy<T> _current = new Lazy<T>();
 
-        public static T Current => _current.Value;
-    }
+    public static T Current => _current.Value;
 }

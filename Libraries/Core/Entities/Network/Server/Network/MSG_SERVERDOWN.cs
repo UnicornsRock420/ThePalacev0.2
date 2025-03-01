@@ -8,23 +8,22 @@ using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Network.Server.Network
+namespace ThePalace.Core.Entities.Network.Server.Network;
+
+[ByteSize(4)]
+[Mnemonic("down")]
+public partial class MSG_SERVERDOWN : EventParams, IStructRefNum, IProtocolS2C
 {
-    [ByteSize(4)]
-    [Mnemonic("down")]
-    public partial class MSG_SERVERDOWN : EventParams, IStructRefNum, IProtocolS2C
+    [IgnoreDataMember]
+    public sint32 RefNum
     {
-        [IgnoreDataMember]
-        public sint32 RefNum
-        {
-            get => (sint32)ServerDownFlags;
-            set => ServerDownFlags = (ServerDownFlags)value;
-        }
-
-        [IgnoreDataMember]
-        public ServerDownFlags ServerDownFlags;
-
-        [CString]
-        public string? WhyMessage;
+        get => (sint32)ServerDownFlags;
+        set => ServerDownFlags = (ServerDownFlags)value;
     }
+
+    [IgnoreDataMember]
+    public ServerDownFlags ServerDownFlags;
+
+    [CString]
+    public string? WhyMessage;
 }

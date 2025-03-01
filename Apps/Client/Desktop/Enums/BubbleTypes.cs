@@ -1,10 +1,9 @@
-﻿namespace ThePalace.Client.Desktop.Enums
+﻿namespace ThePalace.Client.Desktop.Enums;
+
+public enum BubbleTypes
 {
-    public enum BubbleTypes
-    {
-        Normal,
-        Shout,
-        Sticky,
-        Thought,
-    }
+    Normal,
+    Shout,
+    Sticky,
+    Thought,
 }

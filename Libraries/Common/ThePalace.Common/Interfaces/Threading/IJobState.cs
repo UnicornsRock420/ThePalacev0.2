@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Common.Interfaces.Threading
+﻿namespace ThePalace.Common.Interfaces.Threading;
+
+public interface IJobState
 {
-    public interface IJobState
-    {
-    }
 }

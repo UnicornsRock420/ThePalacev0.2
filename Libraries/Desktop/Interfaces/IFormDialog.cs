@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Common.Desktop.Interfaces
+﻿namespace ThePalace.Common.Desktop.Interfaces;
+
+public interface IFormDialog
 {
-    public interface IFormDialog
-    {
-    }
 }

@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Interfaces.Network
+﻿namespace ThePalace.Core.Interfaces.Network;
+
+public interface IProtocolS2C : IProtocol
 {
-    public interface IProtocolS2C : IProtocol
-    {
-    }
 }

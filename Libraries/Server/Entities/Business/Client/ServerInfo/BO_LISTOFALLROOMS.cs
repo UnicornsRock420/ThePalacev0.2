@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Client.ServerInfo;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Client.ServerInfo
+namespace ThePalace.Common.Server.Entities.Business.Client.ServerInfo;
+
+[Mnemonic("rLst")]
+public partial class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>
 {
-    [Mnemonic("rLst")]
-    public partial class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

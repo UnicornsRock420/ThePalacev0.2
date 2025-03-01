@@ -7,23 +7,22 @@ using ThePalace.Core.Interfaces.Network;
 using uint32 = System.UInt32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities.Network.Server.Network
+namespace ThePalace.Core.Entities.Network.Server.Network;
+
+[DynamicSize]
+[Mnemonic("blow")]
+public partial class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolS2C
 {
-    [DynamicSize]
-    [Mnemonic("blow")]
-    public partial class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolS2C
+    public uint32 PluginTag;
+    public uint8[] Embedded;
+
+    public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
-        public uint32 PluginTag;
-        public uint8[] Embedded;
+        throw new NotImplementedException();
+    }
 
-        public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
-        {
-            throw new NotImplementedException();
-        }
+    public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+    {
+        throw new NotImplementedException();
     }
 }

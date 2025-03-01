@@ -3,69 +3,68 @@ using System.Reflection;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Entities.Core;
 
-namespace ThePalace.Core
+namespace ThePalace.Core;
+
+public partial class PluginManager : SingletonDisposable<PluginManager>
 {
-    public partial class PluginManager : SingletonDisposable<PluginManager>
+    private ConcurrentDictionary<Guid, Assembly> _plugins = new();
+    public IReadOnlyDictionary<Guid, Assembly> Plugins => _plugins.AsReadOnly();
+
+    private readonly PluginState _pluginContext = new();
+
+    public PluginManager() { }
+    ~PluginManager() => this.Dispose(false);
+
+    public override void Dispose()
     {
-        private ConcurrentDictionary<Guid, Assembly> _plugins = new();
-        public IReadOnlyDictionary<Guid, Assembly> Plugins => _plugins.AsReadOnly();
+        if (this.IsDisposed) return;
 
-        private readonly PluginState _pluginContext = new();
+        base.Dispose();
 
-        public PluginManager() { }
-        ~PluginManager() => this.Dispose(false);
+        try { _plugins?.Clear(); _plugins = null; } catch { }
+        try { _pluginContext?.Unload(); } catch { }
+    }
 
-        public override void Dispose()
-        {
-            if (this.IsDisposed) return;
+    public void LoadPlugins()
+    {
+        if (this.IsDisposed) return;
 
-            base.Dispose();
+        var path = Path.Combine(Environment.CurrentDirectory, "Plugins");
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
 
-            try { _plugins?.Clear(); _plugins = null; } catch { }
-            try { _pluginContext?.Unload(); } catch { }
-        }
+        var files = Directory.GetFiles(path, "*PLUGIN*.DLL", SearchOption.TopDirectoryOnly);
+        foreach (var file in files)
+            _plugins.TryAdd(Guid.NewGuid(), _pluginContext.LoadFromAssemblyPath(file));
+    }
 
-        public void LoadPlugins()
-        {
-            if (this.IsDisposed) return;
+    public Type GetType(string typeName)
+    {
+        if (this.IsDisposed) return null;
 
-            var path = Path.Combine(Environment.CurrentDirectory, "Plugins");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+        foreach (var plugin in _plugins.Values)
+            try
+            {
+                return plugin?.GetType(typeName);
+            }
+            catch { }
 
-            var files = Directory.GetFiles(path, "*PLUGIN*.DLL", SearchOption.TopDirectoryOnly);
-            foreach (var file in files)
-                _plugins.TryAdd(Guid.NewGuid(), _pluginContext.LoadFromAssemblyPath(file));
-        }
+        return null;
+    }
 
-        public Type GetType(string typeName)
-        {
-            if (this.IsDisposed) return null;
+    public List<Type> GetTypes()
+    {
+        if (this.IsDisposed) return null;
 
-            foreach (var plugin in _plugins.Values)
-                try
-                {
-                    return plugin?.GetType(typeName);
-                }
-                catch { }
+        var result = new List<Type>();
 
-            return null;
-        }
+        foreach (var plugin in _plugins.Values)
+            try
+            {
+                result.AddRange(plugin?.GetTypes());
+            }
+            catch { }
 
-        public List<Type> GetTypes()
-        {
-            if (this.IsDisposed) return null;
-
-            var result = new List<Type>();
-
-            foreach (var plugin in _plugins.Values)
-                try
-                {
-                    result.AddRange(plugin?.GetTypes());
-                }
-                catch { }
-
-            return result;
-        }
+        return result;
     }
 }

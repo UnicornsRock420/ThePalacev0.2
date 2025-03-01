@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Interfaces.Data
+﻿namespace ThePalace.Core.Interfaces.Data;
+
+public interface IStruct
 {
-    public interface IStruct
-    {
-    }
 }

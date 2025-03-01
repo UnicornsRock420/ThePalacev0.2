@@ -2,11 +2,10 @@
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared.Assets
+namespace ThePalace.Core.Entities.Shared.Assets;
+
+[ByteSize(40)]
+public partial class AssetDesc : RawStream, IStruct
 {
-    [ByteSize(40)]
-    public partial class AssetDesc : RawStream, IStruct
-    {
-        public AssetRec AssetInfo { get; set; }
-    }
+    public AssetRec AssetInfo { get; set; }
 }

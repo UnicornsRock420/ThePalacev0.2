@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Server.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.Rooms
+namespace ThePalace.Common.Client.Entities.Business.Server.Rooms;
+
+[Mnemonic("endr")]
+public partial class BO_ROOMDESCEND : IEventHandler<MSG_ROOMDESCEND>
 {
-    [Mnemonic("endr")]
-    public partial class BO_ROOMDESCEND : IEventHandler<MSG_ROOMDESCEND>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Client.Media;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Client.Media
+namespace ThePalace.Common.Client.Entities.Business.Client.Media;
+
+[Mnemonic("qFil")]
+public partial class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>
 {
-    [Mnemonic("qFil")]
-    public partial class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

@@ -4,28 +4,27 @@ using ThePalace.Common.Factories;
 using ThePalace.Network.Constants;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Network.Entities
+namespace ThePalace.Network.Entities;
+
+public partial class ConnectionState : EventArgs, IConnectionState
 {
-    public partial class ConnectionState : EventArgs, IConnectionState
-    {
-        public IPEndPoint? HostAddr { get; set; }
-        public IPEndPoint? RemoteAddr { get; set; }
+    public IPEndPoint? HostAddr { get; set; }
+    public IPEndPoint? RemoteAddr { get; set; }
 
-        public DateTime? LastReceived { get; set; } = null;
-        public DateTime? LastSent { get; set; } = null;
+    public DateTime? LastReceived { get; set; } = null;
+    public DateTime? LastSent { get; set; } = null;
 
-        public BufferStream BytesSent { get; set; } = new();
-        public BufferStream BytesReceived { get; set; } = new();
-        public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
+    public BufferStream BytesSent { get; set; } = new();
+    public BufferStream BytesReceived { get; set; } = new();
+    public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 
-        public Socket? Socket { get; set; } = null;
+    public Socket? Socket { get; set; } = null;
 
-        public object? State { get; set; } = null;
-    }
+    public object? State { get; set; } = null;
+}
 
-    public partial class ConnectionState<TState> : ConnectionState
-        where TState : class
-    {
-        public new TState? State { get; set; }
-    }
+public partial class ConnectionState<TState> : ConnectionState
+    where TState : class
+{
+    public new TState? State { get; set; }
 }

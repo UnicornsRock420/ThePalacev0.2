@@ -2,51 +2,50 @@
 using System.Collections.Concurrent;
 using ThePalace.Common.Interfaces.Plugins;
 
-namespace ThePalace.Common.Threading
+namespace ThePalace.Common.Threading;
+
+public partial class CmdTask : Disposable
 {
-    public partial class CmdTask : Disposable
+    public Task Task;
+    public List<IProvider> Providers = new();
+    public List<IConsumer> Consumers = new();
+    public ConcurrentQueue<Cmd> Queue = new();
+    public ManualResetEvent SignalEvent = new(false);
+
+    public CmdTask() { }
+    ~CmdTask() =>
+        Dispose(false);
+
+    public override void Dispose()
     {
-        public Task Task;
-        public List<IProvider> Providers = new();
-        public List<IConsumer> Consumers = new();
-        public ConcurrentQueue<Cmd> Queue = new();
-        public ManualResetEvent SignalEvent = new(false);
+        if (IsDisposed) return;
 
-        public CmdTask() { }
-        ~CmdTask() =>
-            Dispose(false);
+        base.Dispose();
 
-        public override void Dispose()
+        if ((Queue?.Count ?? 0) > 0)
         {
-            if (IsDisposed) return;
-
-            base.Dispose();
-
-            if ((Queue?.Count ?? 0) > 0)
-            {
-                Queue
-                    .ToList()
-                    .ForEach(c => { try { c.Dispose(); } catch { } });
-                Queue.Clear();
-            }
-            Queue = null;
-
-            if ((Providers?.Count ?? 0) > 0)
-            {
-                Providers.ForEach(p => { try { p.Dispose(); } catch { } });
-                Providers.Clear();
-            }
-            Providers = null;
-
-            if ((Consumers?.Count ?? 0) > 0)
-            {
-                Consumers.ForEach(c => { try { c.Dispose(); } catch { } });
-                Consumers.Clear();
-            }
-            Consumers = null;
-
-            SignalEvent?.Set();
-            SignalEvent = null;
+            Queue
+                .ToList()
+                .ForEach(c => { try { c.Dispose(); } catch { } });
+            Queue.Clear();
         }
+        Queue = null;
+
+        if ((Providers?.Count ?? 0) > 0)
+        {
+            Providers.ForEach(p => { try { p.Dispose(); } catch { } });
+            Providers.Clear();
+        }
+        Providers = null;
+
+        if ((Consumers?.Count ?? 0) > 0)
+        {
+            Consumers.ForEach(c => { try { c.Dispose(); } catch { } });
+            Consumers.Clear();
+        }
+        Consumers = null;
+
+        SignalEvent?.Set();
+        SignalEvent = null;
     }
 }

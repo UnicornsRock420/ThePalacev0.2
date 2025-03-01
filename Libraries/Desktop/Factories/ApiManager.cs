@@ -2,40 +2,39 @@
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Factories;
 
-namespace ThePalace.Common.Desktop.Factories
+namespace ThePalace.Common.Desktop.Factories;
+
+public partial class ApiManager : SingletonDisposable<ApiManager>
 {
-    public partial class ApiManager : SingletonDisposable<ApiManager>
+    private ConcurrentDictionary<string, ApiBinding> _apiBindings = new();
+    public IReadOnlyDictionary<string, ApiBinding> ApiBindings => _apiBindings;
+
+    public ApiManager() { }
+    ~ApiManager() => Dispose(false);
+
+    public override void Dispose()
     {
-        private ConcurrentDictionary<string, ApiBinding> _apiBindings = new();
-        public IReadOnlyDictionary<string, ApiBinding> ApiBindings => _apiBindings;
+        if (this.IsDisposed) return;
 
-        public ApiManager() { }
-        ~ApiManager() => Dispose(false);
+        base.Dispose();
 
-        public override void Dispose()
-        {
-            if (this.IsDisposed) return;
+        _apiBindings.Clear();
+        _apiBindings = null;
+    }
 
-            base.Dispose();
+    public void RegisterApi(string friendlyName, EventHandler binding)
+    {
+        if (!_apiBindings.ContainsKey(friendlyName) &&
+            binding != null)
+            _apiBindings.TryAdd(friendlyName, new ApiBinding
+            {
+                Binding = binding,
+            });
+    }
 
-            _apiBindings.Clear();
-            _apiBindings = null;
-        }
-
-        public void RegisterApi(string friendlyName, EventHandler binding)
-        {
-            if (!_apiBindings.ContainsKey(friendlyName) &&
-                binding != null)
-                _apiBindings.TryAdd(friendlyName, new ApiBinding
-                {
-                    Binding = binding,
-                });
-        }
-
-        public void UnregisterApi(string friendlyName)
-        {
-            if (!_apiBindings.ContainsKey(friendlyName))
-                _apiBindings.TryRemove(friendlyName, out var _);
-        }
+    public void UnregisterApi(string friendlyName)
+    {
+        if (!_apiBindings.ContainsKey(friendlyName))
+            _apiBindings.TryRemove(friendlyName, out var _);
     }
 }

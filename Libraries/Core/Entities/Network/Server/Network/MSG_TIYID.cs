@@ -3,12 +3,11 @@ using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Server.Network
+namespace ThePalace.Core.Entities.Network.Server.Network;
+
+[Mnemonic("tiyr")]
+public partial class MSG_TIYID : EventParams, IProtocolS2C
 {
-    [Mnemonic("tiyr")]
-    public partial class MSG_TIYID : EventParams, IProtocolS2C
-    {
-        [IgnoreDataMember]
-        public string? IpAddress;
-    }
+    [IgnoreDataMember]
+    public string? IpAddress;
 }

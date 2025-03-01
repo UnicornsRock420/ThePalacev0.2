@@ -6,23 +6,22 @@ using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint32 = System.Int32;
 
-namespace ThePalace.Core.Entities.Network.Server.Users
+namespace ThePalace.Core.Entities.Network.Server.Users;
+
+[Mnemonic("rprs")]
+public partial class MSG_USERLIST : EventParams, IStructRefNum, IProtocolS2C
 {
-    [Mnemonic("rprs")]
-    public partial class MSG_USERLIST : EventParams, IStructRefNum, IProtocolS2C
+    [IgnoreDataMember]
+    public sint32 RefNum
     {
-        [IgnoreDataMember]
-        public sint32 RefNum
+        get => this.Users?.Count ?? 0;
+        set
         {
-            get => this.Users?.Count ?? 0;
-            set
-            {
-                if (value > 0) return;
+            if (value > 0) return;
 
-                this.Users = [];
-            }
+            this.Users = [];
         }
-
-        public List<UserRec>? Users;
     }
+
+    public List<UserRec>? Users;
 }

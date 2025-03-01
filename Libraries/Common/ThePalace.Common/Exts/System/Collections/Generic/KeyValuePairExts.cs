@@ -1,12 +1,11 @@
-﻿namespace System.Collections.Generic
-{
-    public static class KeyValuePairExts
-    {
-        public static class Types
-        {
-            public static readonly Type KeyValuePairGeneric = typeof(KeyValuePair<,>);
-        }
+﻿namespace System.Collections.Generic;
 
-        //static KeyValuePairExts() { }
+public static class KeyValuePairExts
+{
+    public static class Types
+    {
+        public static readonly Type KeyValuePairGeneric = typeof(KeyValuePair<,>);
     }
+
+    //static KeyValuePairExts() { }
 }

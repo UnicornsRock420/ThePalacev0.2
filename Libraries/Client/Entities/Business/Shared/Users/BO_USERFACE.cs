@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Users
+namespace ThePalace.Common.Client.Entities.Business.Shared.Users;
+
+[Mnemonic("usrF")]
+public partial class BO_USERFACE : IEventHandler<MSG_USERFACE>
 {
-    [Mnemonic("usrF")]
-    public partial class BO_USERFACE : IEventHandler<MSG_USERFACE>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

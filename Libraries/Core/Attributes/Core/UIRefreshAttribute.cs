@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Attributes.Core
+﻿namespace ThePalace.Core.Attributes.Core;
+
+public class UIRefreshAttribute : Attribute
 {
-    public class UIRefreshAttribute : Attribute
-    {
-    }
 }

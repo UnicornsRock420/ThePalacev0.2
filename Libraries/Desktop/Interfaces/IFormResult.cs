@@ -1,7 +1,6 @@
-﻿namespace ThePalace.Common.Desktop.Interfaces
+﻿namespace ThePalace.Common.Desktop.Interfaces;
+
+public interface IFormResult<T>
 {
-    public interface IFormResult<T>
-    {
-        T Result { get; }
-    }
+    T Result { get; }
 }

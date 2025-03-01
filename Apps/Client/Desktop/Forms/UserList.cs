@@ -1,12 +1,9 @@
 ﻿using ThePalace.Common.Desktop.Forms.Core;
 
-namespace ThePalace.Client.Desktop.Forms
+namespace ThePalace.Client.Desktop.Forms;
+
+public partial class UserList : FormBase
 {
-    public partial class UserList : FormBase
-    {
-        public UserList() =>
-            InitializeComponent();
-        ~UserList() =>
-            this.Dispose(false);
-    }
+    public UserList() => InitializeComponent();
+    ~UserList() => this.Dispose(false);
 }

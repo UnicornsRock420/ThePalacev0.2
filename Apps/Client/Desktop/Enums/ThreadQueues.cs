@@ -1,17 +1,16 @@
-﻿namespace ThePalace.Client.Desktop.Enums
+﻿namespace ThePalace.Client.Desktop.Enums;
+
+public enum ThreadQueues : short
 {
-    public enum ThreadQueues : short
-    {
-        GUI,
-        Audio,
-        Core,
-        //Devices,
-        Media,
-        Assets,
-        Network,
-        ScriptEngine,
+    GUI,
+    Audio,
+    Core,
+    //Devices,
+    Media,
+    Assets,
+    Network,
+    ScriptEngine,
 #if WINDOWS10_0_17763_0_OR_GREATER
-        Toast,
+    Toast,
 #endif
-    }
 }

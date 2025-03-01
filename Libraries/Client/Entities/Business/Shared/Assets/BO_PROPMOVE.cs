@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Assets
+namespace ThePalace.Common.Client.Entities.Business.Shared.Assets;
+
+[Mnemonic("mPrp")]
+public partial class BO_PROPMOVE : IEventHandler<MSG_PROPMOVE>
 {
-    [Mnemonic("mPrp")]
-    public partial class BO_PROPMOVE : IEventHandler<MSG_PROPMOVE>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

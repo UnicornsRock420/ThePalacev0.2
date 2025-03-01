@@ -1,9 +1,8 @@
-﻿namespace ThePalace.Common.Client.Interfaces
+﻿namespace ThePalace.Common.Client.Interfaces;
+
+public interface IScriptEngine : IDisposable
 {
-    public interface IScriptEngine : IDisposable
-    {
-        //void Initialize(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
-        //void PreInvoke(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
-        //void Invoke(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
-    }
+    //void Initialize(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
+    //void PreInvoke(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
+    //void Invoke(IClientSessionState sessionState, ScriptEvent @event, params object[] args);
 }

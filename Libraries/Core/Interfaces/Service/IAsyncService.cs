@@ -1,6 +1,5 @@
-﻿namespace ThePalace.Core.Interfaces.Service
+﻿namespace ThePalace.Core.Interfaces.Service;
+
+public interface IAsyncService<TRequest, TWhere>
 {
-    public interface IAsyncService<TRequest, TWhere>
-    {
-    }
 }

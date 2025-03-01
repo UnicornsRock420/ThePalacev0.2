@@ -1,9 +1,8 @@
-﻿namespace ThePalace.Core.Attributes.Strings
+﻿namespace ThePalace.Core.Attributes.Strings;
+
+public class Str255Attribute : PStringAttribute
 {
-    public class Str255Attribute : PStringAttribute
+    public Str255Attribute() : base(1, 255, 256)
     {
-        public Str255Attribute() : base(1, 255, 256)
-        {
-        }
     }
 }

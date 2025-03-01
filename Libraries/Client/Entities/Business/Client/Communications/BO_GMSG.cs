@@ -2,14 +2,13 @@
 using ThePalace.Core.Entities.Network.Client.Communications;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Client.Communications
+namespace ThePalace.Common.Client.Entities.Business.Client.Communications;
+
+[Mnemonic("gmsg")]
+public partial class BO_GMSG : IEventHandler<MSG_GMSG>
 {
-    [Mnemonic("gmsg")]
-    public partial class BO_GMSG : IEventHandler<MSG_GMSG>
+    public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        public async Task<object?> Handle(object? sender, IEventParams @event)
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }
