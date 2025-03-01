@@ -3,6 +3,7 @@ using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Network.Shared.Users;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Network;
@@ -13,6 +14,7 @@ namespace ThePalace.Testing
     public partial class TestSerialization
     {
         private static readonly Type CONST_TYPE_IProtocolS2C = typeof(IProtocolS2C);
+        private static readonly Type CONST_TYPE_AssetSpec = typeof(AssetSpec);
         private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
 
         [TestInitialize]
@@ -193,7 +195,7 @@ namespace ThePalace.Testing
 
             if (dstMsg is MSG_USERDESC _msg)
             {
-                Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + 8 + (8 * _msg.NbrProps)));
+                Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + 8 + (CONST_TYPE_AssetSpec.GetByteSize() * _msg.NbrProps)));
 
                 Assert.IsTrue(_msg.ColorNbr == srcMsg.ColorNbr);
                 Assert.IsTrue(_msg.FaceNbr == srcMsg.FaceNbr);
