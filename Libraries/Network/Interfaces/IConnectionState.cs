@@ -16,6 +16,7 @@ public interface IConnectionState
     byte[] Buffer { get; set; }
 
     Socket? Socket { get; set; }
+    NetworkStream? NetworkStream { get; set; }
 
     object State { get; set; }
 }

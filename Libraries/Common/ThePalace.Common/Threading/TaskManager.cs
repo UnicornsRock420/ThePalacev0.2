@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Common.Factories;
 using ThePalace.Common.Interfaces.Threading;
-using static ThePalace.Common.Threading.Job;
 
 namespace ThePalace.Common.Threading;
 
@@ -9,7 +8,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 {
     static TaskManager() => _globalToken = CancellationTokenFactory.NewToken();
 
-    public TaskManager() => _jobs = new();
+    public TaskManager() => Jobs = new();
 
     ~TaskManager() => Dispose();
 
@@ -21,9 +20,9 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
             Thread.Sleep(450);
 
-            _jobs.Values
-                .Union(_jobs.Values
-                    .SelectMany(j => j._subJobs ?? []))
+            Jobs.Values
+                .Union(Jobs.Values
+                    .SelectMany(j => j.SubJobs ?? []))
                 .ToList()
                 .ForEach(j =>
                 {
@@ -32,7 +31,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
                     j.JobState = null;
                 });
-            _jobs.Clear();
+            Jobs.Clear();
 
             Thread.Sleep(450);
 
@@ -46,20 +45,19 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
     private static readonly CancellationTokenSource _globalToken;
 
-    private readonly Dictionary<Guid, Job> _jobs;
-    public IReadOnlyDictionary<Guid, Job> Jobs => _jobs.AsReadOnly();
+    public Dictionary<Guid, IJob> Jobs { get; protected set; }
 
     public static CancellationToken GlobalToken => _globalToken.Token;
 
-    public Job CreateTask(Action<ConcurrentQueue<Cmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
     {
         if (_globalToken.IsCancellationRequested) return null;
 
         sleepInterval ??= TimeSpan.FromMilliseconds(750);
 
-        var job = new Job(cmd, jobState, opts, sleepInterval);
+        var job = new Job<ICmd>(cmd, jobState, opts, sleepInterval);
 
-        _jobs.Add(job.Id, job);
+        Jobs.Add(job.Id, job);
 
         if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
         {
@@ -69,16 +67,35 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         return job;
     }
 
-    public async Task Fork(Job parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
+    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+        where TCmd : ICmd
+    {
+        if (_globalToken.IsCancellationRequested) return null;
+
+        sleepInterval ??= TimeSpan.FromMilliseconds(750);
+
+        var job = new Job<TCmd>(cmd, jobState, opts, sleepInterval);
+
+        Jobs.Add(job.Id, job);
+
+        if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
+        {
+            job.Task.Start();
+        }
+
+        return job;
+    }
+
+    public async Task Fork(IJob<ICmd> parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
     {
         if (_globalToken.IsCancellationRequested ||
             threadCount < 1 ||
-            !_jobs.ContainsKey(parent.Id)) return;
+            !Jobs.ContainsKey(parent.Id)) return;
 
         for (var j = threadCount; j > 0; j--)
         {
-            var job = new Job(parent);
-            parent._subJobs.Add(job);
+            var job = new Job<ICmd>(parent);
+            parent.SubJobs.Add(job);
 
             if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
             {
@@ -89,9 +106,9 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
     public bool Cancel(Guid jobId, CancelOptions opts = CancelOptions.Cascade)
     {
-        if (!_jobs.ContainsKey(jobId)) return false;
+        if (!Jobs.ContainsKey(jobId)) return false;
 
-        _jobs[jobId].Cancel(opts);
+        Jobs[jobId].Cancel(opts);
 
         return true;
     }
@@ -104,8 +121,8 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
     ];
     private void Cleanup()
     {
-        var jobs = _jobs.Values
-            .SelectMany(j => j._subJobs)
+        var jobs = Jobs.Values
+            .SelectMany(j => j.SubJobs)
             .ToList();
 
         foreach (var job in jobs)
@@ -115,15 +132,15 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
                 try { job.Cancel(); } catch { }
                 try { job.Dispose(); } catch { }
 
-                if (_jobs.ContainsKey(job.Id))
+                if (Jobs.ContainsKey(job.Id))
                 {
-                    _jobs.Remove(job.Id);
+                    Jobs.Remove(job.Id);
                 }
                 else if (
                     job.ParentId.HasValue &&
-                    _jobs.ContainsKey(job.ParentId.Value))
+                    Jobs.ContainsKey(job.ParentId.Value))
                 {
-                    _jobs[job.ParentId.Value]._subJobs.Remove(job);
+                    Jobs[job.ParentId.Value].SubJobs.Remove(job);
                 }
             }
         }
@@ -143,9 +160,9 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         {
             Cleanup();
 
-            var jobs = _jobs.Values
-                .Union(_jobs.Values
-                    .SelectMany(j => j._subJobs))
+            var jobs = Jobs.Values
+                .Union(Jobs.Values
+                    .SelectMany(j => j.SubJobs))
                 .ToList();
             foreach (var job in jobs)
             {

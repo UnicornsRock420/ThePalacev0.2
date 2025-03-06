@@ -44,6 +44,56 @@ public partial class AsyncTcpSocket : IDisposable
     public event EventHandler DataReceived;
     public event EventHandler StateChanged;
 
+    private static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
+    {
+        try
+        {
+            cb();
+
+            return true;
+        }
+        catch (SocketException ex)
+        {
+            LoggerHub.Current.Error(ex);
+
+            connectionState?.Socket?.DropConnection();
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            LoggerHub.Current.Error(ex);
+
+            if (disconnectOnError)
+                connectionState?.Socket?.DropConnection();
+
+            return false;
+        }
+    }
+
+    public bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
+    {
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
+        ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
+
+        connectionState?.Socket?.DropConnection();
+
+        Do(connectionState, () =>
+        {
+            connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            connectionState.Socket.Connect(hostAddr);
+
+            connectionState.HostAddr = hostAddr;
+        });
+
+        return Do(connectionState, () =>
+        {
+            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+
+            this.ConnectionEstablished?.Invoke(connectionState, null);
+        });
+    }
+
     public void Listen(IPEndPoint? hostAddr = null, int listenBacklog = 0)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
@@ -88,51 +138,6 @@ public partial class AsyncTcpSocket : IDisposable
         }
     }
 
-    public bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
-        ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
-
-        DropConnection(connectionState);
-
-        try
-        {
-            connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            connectionState.Socket.Connect(hostAddr);
-
-            connectionState.HostAddr = hostAddr;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            DropConnection(connectionState);
-        }
-
-        try
-        {
-            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
-
-            this.ConnectionEstablished?.Invoke(connectionState, null);
-
-            return true;
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            DropConnection(connectionState);
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            DropConnection(connectionState);
-        }
-
-        return false;
-    }
-
     private void AcceptCallback(IAsyncResult ar)
     {
         _signalEvent.Set();
@@ -159,29 +164,13 @@ public partial class AsyncTcpSocket : IDisposable
 
         if (handler == null) throw new SocketException();
 
-        var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
+        var connectionState = (ConnectionState)ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
         if (connectionState == null) throw new SocketException();
 
-        handler.SetKeepAlive();
-
-        Console.WriteLine($"{connectionState.RemoteAddr}");
-
-        try
+        Do(connectionState, () =>
         {
             handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            DropConnection(connectionState);
-
-            return;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-        }
+        });
 
         ConnectionReceived.Invoke(this, connectionState);
     }
@@ -191,62 +180,42 @@ public partial class AsyncTcpSocket : IDisposable
         var connectionState = (ConnectionState?)ar.AsyncState;
         if (connectionState?.Socket == null) throw new SocketException();
 
-        var bytesReceived = 0;
-
-        try
+        if (connectionState.NetworkStream.DataAvailable)
         {
-            bytesReceived = connectionState.Socket.EndReceive(ar);
-            if (bytesReceived < 1)
+            var bytesReceived = 0;
+
+            Do(connectionState, () =>
             {
-                DropConnection(connectionState);
+                bytesReceived = connectionState.Socket.EndReceive(ar);
+                if (bytesReceived < 1)
+                {
+                    connectionState?.Socket?.DropConnection();
+                }
+            });
+
+            if (!IsConnected(connectionState))
+            {
+                connectionState?.Socket?.DropConnection();
 
                 return;
             }
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
 
-            DropConnection(connectionState);
+            using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
+            {
+                connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
 
-            return;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
+                connectionState.LastReceived = DateTime.UtcNow;
+            }
         }
 
-        if (!IsConnected(connectionState))
-        {
-            DropConnection(connectionState);
-
-            return;
-        }
-
-        using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
-        {
-            connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
-
-            connectionState.LastReceived = DateTime.UtcNow;
-        }
-
-        try
+        Do(connectionState, () =>
         {
             connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+        });
 
+        if (connectionState.NetworkStream.DataAvailable)
+        {
             DataReceived.Invoke(this, connectionState);
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            DropConnection(connectionState);
-
-            return;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
         }
     }
 
@@ -254,7 +223,7 @@ public partial class AsyncTcpSocket : IDisposable
     {
         if (connectionState?.Socket == null)
         {
-            DropConnection(connectionState);
+            connectionState?.Socket?.DropConnection();
 
             return;
         }
@@ -263,24 +232,10 @@ public partial class AsyncTcpSocket : IDisposable
         {
             using (var @lock = LockContext.GetLock(connectionState.Socket))
             {
-                try
+                Do(connectionState, () =>
                 {
                     connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState);
-
-                    connectionState.LastSent = DateTime.UtcNow;
-                }
-                catch (SocketException ex)
-                {
-                    LoggerHub.Current.Error(ex);
-
-                    DropConnection(connectionState);
-
-                    return;
-                }
-                catch (Exception ex)
-                {
-                    LoggerHub.Current.Error(ex);
-                }
+                });
             }
         }
     }
@@ -292,22 +247,12 @@ public partial class AsyncTcpSocket : IDisposable
 
         var bytesSent = (uint)0;
 
-        try
+        Do(connectionState, () =>
         {
             bytesSent = (uint)connectionState.Socket.EndSend(ar);
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
 
-            DropConnection(connectionState);
-
-            return;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-        }
+            connectionState.LastSent = DateTime.UtcNow;
+        });
     }
 
     public static bool IsConnected(IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
@@ -327,7 +272,7 @@ public partial class AsyncTcpSocket : IDisposable
         {
             LoggerHub.Current.Error(ex);
 
-            DropConnection(connectionState);
+            connectionState?.Socket?.DropConnection();
 
             return false;
         }
@@ -338,7 +283,4 @@ public partial class AsyncTcpSocket : IDisposable
             return false;
         }
     }
-
-    public static void DropConnection(IConnectionState connectionState) =>
-        connectionState?.Socket?.DropConnection();
 }

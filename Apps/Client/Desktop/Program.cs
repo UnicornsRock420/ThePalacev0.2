@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Data;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -12,6 +11,7 @@ using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
@@ -19,11 +19,12 @@ using ThePalace.Core.Entities.Network.Shared.Communications;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
+using ThePalace.Core.Interfaces.Network;
 using ThePalace.Network.Factories;
-using static ThePalace.Common.Threading.Job;
 
 namespace ThePalace.Client.Desktop;
 
@@ -39,10 +40,11 @@ public partial class Program : Disposable
         //// see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
 
-        var app = new Program();
-        var job = (Job?)null;
+        var app = (Program?)null;
+        var job = (IJob?)null;
 
-        job = TaskManager.Current.CreateTask(q =>
+        #region Jobs
+        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
             {
                 // TODO: GUI
 
@@ -61,19 +63,22 @@ public partial class Program : Disposable
         {
             _jobs[ThreadQueues.GUI] = job;
 
-            job.Enqueue(a =>
+            ((Job<ActionCmd>)job).Enqueue(new ActionCmd
             {
-                app.Initialize();
+                CmdFnc = q =>
+                {
+                    app = new Program();
 
-                return null;
+                    return null;
+                },
             });
         }
 
-        job = TaskManager.Current.CreateTask(q =>
+        job = TaskManager.Current.CreateTask<IProtocol>(q =>
             {
                 // TODO: Network
 
-                while (app.SessionState.ConnectionState.BytesReceived.Length > 0)
+                while ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                 {
                 }
             },
@@ -84,7 +89,7 @@ public partial class Program : Disposable
             _jobs[ThreadQueues.Network] = job;
         }
 
-        job = TaskManager.Current.CreateTask(q =>
+        job = TaskManager.Current.CreateTask<MediaCmd>(q =>
             {
                 // TODO: Media
             },
@@ -95,7 +100,7 @@ public partial class Program : Disposable
             _jobs[ThreadQueues.Media] = job;
         }
 
-        job = TaskManager.Current.CreateTask(q =>
+        job = TaskManager.Current.CreateTask<AssetCmd>(q =>
             {
                 // TODO: Assets
             },
@@ -106,7 +111,7 @@ public partial class Program : Disposable
             _jobs[ThreadQueues.Assets] = job;
         }
 
-        job = TaskManager.Current.CreateTask(q =>
+        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
             {
                 // TODO: Core
 
@@ -119,6 +124,7 @@ public partial class Program : Disposable
         {
             _jobs[ThreadQueues.Core] = job;
         }
+        #endregion
 
         TaskManager.Current.Run(resources: FormsManager.Current);
     }
@@ -138,24 +144,26 @@ public partial class Program : Disposable
 
     private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings = new Dictionary<IptEventTypes[], ScreenLayers[]>
     {
-        { new IptEventTypes[] { IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad }, new ScreenLayers[] { ScreenLayers.Base } },
-        { new IptEventTypes[] { IptEventTypes.InChat }, new ScreenLayers[] { ScreenLayers.Messages } },
-        { new IptEventTypes[] { IptEventTypes.NameChange }, new ScreenLayers[] { ScreenLayers.UserNametag } },
-        { new IptEventTypes[] { IptEventTypes.FaceChange, IptEventTypes.MsgUserProp }, new ScreenLayers[] { ScreenLayers.UserProp } },
-        { new IptEventTypes[] { IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved }, new ScreenLayers[] { ScreenLayers.LooseProp } },
-        { new IptEventTypes[] { IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock }, new ScreenLayers[] { ScreenLayers.SpotImage } },
-        { new IptEventTypes[] { IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList, IptEventTypes.MsgUserLog, IptEventTypes.UserEnter }, new ScreenLayers[] { ScreenLayers.UserProp, ScreenLayers.UserNametag } },
-        { new IptEventTypes[] { IptEventTypes.MsgAssetSend }, new ScreenLayers[] { ScreenLayers.UserProp, ScreenLayers.LooseProp } },
-        { new IptEventTypes[] { IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove }, new ScreenLayers[] { ScreenLayers.UserProp, ScreenLayers.UserNametag, ScreenLayers.Messages } },
-        { new IptEventTypes[] { IptEventTypes.MsgDraw }, new ScreenLayers[] { ScreenLayers.BottomPaint, ScreenLayers.TopPaint } },
-        { new IptEventTypes[] { IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew }, new ScreenLayers[] { ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage } },
+        { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayers.Base] },
+        { [IptEventTypes.InChat], [ScreenLayers.Messages] },
+        { [IptEventTypes.NameChange], [ScreenLayers.UserNametag] },
+        { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayers.UserProp] },
+        { [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved], [ScreenLayers.LooseProp] },
+        { [IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock], [ScreenLayers.SpotImage] },
+        { [IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList, IptEventTypes.MsgUserLog, IptEventTypes.UserEnter], [ScreenLayers.UserProp, ScreenLayers.UserNametag] },
+        { [IptEventTypes.MsgAssetSend], [ScreenLayers.UserProp, ScreenLayers.LooseProp] },
+        { [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove], [ScreenLayers.UserProp, ScreenLayers.UserNametag, ScreenLayers.Messages] },
+        { [IptEventTypes.MsgDraw], [ScreenLayers.BottomPaint, ScreenLayers.TopPaint] },
+        { [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew], [ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage] },
     }.AsReadOnly();
 
-    private static readonly ConcurrentDictionary<ThreadQueues, Job> _jobs = new();
+    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
     public Program()
     {
         this._managedResources.Add(_contextMenu);
+
+        this.Initialize();
     }
     ~Program() => this.Dispose(false);
 
@@ -209,32 +217,37 @@ public partial class Program : Disposable
         //});
 #endif
 
-        _jobs[ThreadQueues.GUI].Enqueue(a =>
-        {
-            var sessionState = a[0] as IDesktopSessionState;
-            if (sessionState == null) return null;
-
-            ShowAppForm();
-
-            var form = sessionState.GetForm(nameof(Program));
-            if (form == null) return null;
-
-            var trayIcon = sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
-            if (trayIcon == null)
+        ((Job<ActionCmd>)_jobs[ThreadQueues.GUI])?.Enqueue(
+            new ActionCmd
             {
-                trayIcon = new NotifyIcon
+                CmdFnc = a =>
                 {
-                    ContextMenuStrip = new ContextMenuStrip(),
-                    Icon = form.Icon,
-                    Visible = true,
-                };
-                sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+                    var sessionState = a[0] as IDesktopSessionState;
+                    if (sessionState == null) return null;
 
-                trayIcon.ContextMenuStrip.Items.Add("Exit", null, new EventHandler((sender, e) => TaskManager.Current.Dispose()));
-            }
+                    ShowAppForm();
 
-            return null;
-        }, this.SessionState);
+                    var form = sessionState.GetForm(nameof(Program));
+                    if (form == null) return null;
+
+                    var trayIcon = sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
+                    if (trayIcon == null)
+                    {
+                        trayIcon = new NotifyIcon
+                        {
+                            ContextMenuStrip = new ContextMenuStrip(),
+                            Icon = form.Icon,
+                            Visible = true,
+                        };
+                        sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+
+                        trayIcon.ContextMenuStrip.Items.Add("Exit", null, new EventHandler((sender, e) => TaskManager.Current.Dispose()));
+                    }
+
+                    return null;
+                },
+                Values = [this.SessionState],
+            });
 
         return;
     }
@@ -1188,49 +1201,49 @@ public partial class Program : Disposable
                 case ContextMenuCommandTypes.CMD_UNGAG:
                 case ContextMenuCommandTypes.CMD_PROPGAG:
                 case ContextMenuCommandTypes.CMD_UNPROPGAG:
-                {
-                    var value = (UInt32)values[1];
+                    {
+                        var value = (UInt32)values[1];
 
-                    //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                    //{
-                    //    EventType = EventTypes.MSG_WHISPER,
-                    //    protocolSend = new MSG_WHISPER
-                    //    {
-                    //        TargetID = value,
-                    //        Text = $"`{cmd.GetDescription()}",
-                    //    },
-                    //});
-                }
+                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                        //{
+                        //    EventType = EventTypes.MSG_WHISPER,
+                        //    protocolSend = new MSG_WHISPER
+                        //    {
+                        //        TargetID = value,
+                        //        Text = $"`{cmd.GetDescription()}",
+                        //    },
+                        //});
+                    }
 
                     break;
                 case ContextMenuCommandTypes.MSG_KILLUSER:
-                {
-                    var value = (UInt32)values[1];
+                    {
+                        var value = (UInt32)values[1];
 
-                    //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                    //{
-                    //    EventType = EventTypes.MSG_KILLUSER,
-                    //    protocolSend = new MSG_KILLUSER
-                    //    {
-                    //        TargetID = value,
-                    //    },
-                    //});
-                }
+                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                        //{
+                        //    EventType = EventTypes.MSG_KILLUSER,
+                        //    protocolSend = new MSG_KILLUSER
+                        //    {
+                        //        TargetID = value,
+                        //    },
+                        //});
+                    }
 
                     break;
                 case ContextMenuCommandTypes.MSG_SPOTDEL:
-                {
-                    var value = (short)values[1];
+                    {
+                        var value = (short)values[1];
 
-                    //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                    //{
-                    //    EventType = EventTypes.MSG_SPOTDEL,
-                    //    protocolSend = new MSG_SPOTDEL
-                    //    {
-                    //        SpotID = value,
-                    //    },
-                    //});
-                }
+                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                        //{
+                        //    EventType = EventTypes.MSG_SPOTDEL,
+                        //    protocolSend = new MSG_SPOTDEL
+                        //    {
+                        //        SpotID = value,
+                        //    },
+                        //});
+                    }
 
                     break;
             }
@@ -1238,80 +1251,80 @@ public partial class Program : Disposable
         switch (cmd)
         {
             case ContextMenuCommandTypes.UI_SPOTSELECT:
-            {
-                var value = (Int32)values[1];
+                {
+                    var value = (Int32)values[1];
 
-                this.SessionState.SelectedHotSpot = this.SessionState.RoomInfo?.HotSpots
-                    ?.Where(s => s.SpotInfo.HotspotID == value)
-                    ?.FirstOrDefault();
-            }
+                    this.SessionState.SelectedHotSpot = this.SessionState.RoomInfo?.HotSpots
+                        ?.Where(s => s.SpotInfo.HotspotID == value)
+                        ?.FirstOrDefault();
+                }
 
                 break;
             case ContextMenuCommandTypes.UI_PROPSELECT:
-            {
-                var value = (Int32)values[1];
+                {
+                    var value = (Int32)values[1];
 
-                this.SessionState.SelectedProp = this.SessionState.RoomInfo?.LooseProps
-                    ?.Where(s => s.AssetSpec.Id == value)
-                    ?.Select(s => s.AssetSpec)
-                    ?.FirstOrDefault();
-            }
+                    this.SessionState.SelectedProp = this.SessionState.RoomInfo?.LooseProps
+                        ?.Where(s => s.AssetSpec.Id == value)
+                        ?.Select(s => s.AssetSpec)
+                        ?.FirstOrDefault();
+                }
 
                 break;
             case ContextMenuCommandTypes.UI_USERSELECT:
-            {
-                var value = (UInt32)values[1];
+                {
+                    var value = (UInt32)values[1];
 
-                this.SessionState.SelectedUser = this.SessionState.RoomUsers.GetValueLocked(value);
-            }
+                    this.SessionState.SelectedUser = this.SessionState.RoomUsers.GetValueLocked(value);
+                }
 
                 break;
             case ContextMenuCommandTypes.MSG_PROPDEL:
-            {
-                var value = (Int32)values[1];
-
-                //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                //{
-                //    EventType = EventTypes.MSG_PROPDEL,
-                //    protocolSend = new MSG_PROPDEL
-                //    {
-                //        propNum = value,
-                //    },
-                //});
-            }
-
-                break;
-            case ContextMenuCommandTypes.MSG_USERMOVE:
-            {
-                var value = values[1] as ThePalace.Core.Entities.Shared.Types.Point;
-
-                this.SessionState.UserDesc.UserInfo.RoomPos = value;
-
-                var user = null as UserDesc;
-                user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
-                if (user != null)
                 {
-                    user.UserInfo.RoomPos = value;
-                    user.Extended["CurrentMessage"] = null;
-
-                    var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
-                    if (queue != null) queue.Clear();
-
-                    this.SessionState.RefreshScreen(
-                        ScreenLayers.UserProp,
-                        ScreenLayers.UserNametag,
-                        ScreenLayers.Messages);
+                    var value = (Int32)values[1];
 
                     //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
-                    //    EventType = EventTypes.MSG_USERMOVE,
-                    //    protocolSend = new MSG_USERMOVE
+                    //    EventType = EventTypes.MSG_PROPDEL,
+                    //    protocolSend = new MSG_PROPDEL
                     //    {
-                    //        Pos = value,
+                    //        propNum = value,
                     //    },
                     //});
                 }
-            }
+
+                break;
+            case ContextMenuCommandTypes.MSG_USERMOVE:
+                {
+                    var value = values[1] as ThePalace.Core.Entities.Shared.Types.Point;
+
+                    this.SessionState.UserDesc.UserInfo.RoomPos = value;
+
+                    var user = null as UserDesc;
+                    user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
+                    if (user != null)
+                    {
+                        user.UserInfo.RoomPos = value;
+                        user.Extended["CurrentMessage"] = null;
+
+                        var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
+                        if (queue != null) queue.Clear();
+
+                        this.SessionState.RefreshScreen(
+                            ScreenLayers.UserProp,
+                            ScreenLayers.UserNametag,
+                            ScreenLayers.Messages);
+
+                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                        //{
+                        //    EventType = EventTypes.MSG_USERMOVE,
+                        //    protocolSend = new MSG_USERMOVE
+                        //    {
+                        //        Pos = value,
+                        //    },
+                        //});
+                    }
+                }
 
                 break;
         }

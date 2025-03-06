@@ -9,7 +9,7 @@ public partial class CmdTask : Disposable
     public Task Task;
     public List<IProvider> Providers = new();
     public List<IConsumer> Consumers = new();
-    public ConcurrentQueue<Cmd> Queue = new();
+    public ConcurrentQueue<ActionCmd> Queue = new();
     public ManualResetEvent SignalEvent = new(false);
 
     public CmdTask() { }

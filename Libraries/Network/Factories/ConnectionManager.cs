@@ -2,7 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories;
-using ThePalace.Network.Entities;
+using ThePalace.Network.Interfaces;
+using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories;
 
@@ -18,7 +19,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         {
             using (var @lock = LockContext.GetLock(_connectionStates))
             {
-                _connectionStates.Values.ToList().ForEach(state => AsyncTcpSocket.DropConnection(state));
+                _connectionStates.Values.ToList().ForEach(s => s?.Socket?.DropConnection());
                 _connectionStates.Clear();
             }
             _connectionStates = null;
@@ -31,8 +32,8 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
     private uint _userIDCounter = 0;
     private bool _isDisposed = false;
 
-    private volatile ConcurrentDictionary<uint, ConnectionState> _connectionStates = new();
-    public IReadOnlyDictionary<uint, ConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
+    private volatile ConcurrentDictionary<uint, IConnectionState> _connectionStates = new();
+    public IReadOnlyDictionary<uint, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
 
     public uint UserID
     {
@@ -45,7 +46,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         }
     }
 
-    public uint Register(ConnectionState connectionState)
+    public uint Register(IConnectionState connectionState)
     {
         if (_isDisposed) return 0;
 
@@ -59,7 +60,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         return result;
     }
 
-    public uint Register(uint id, ConnectionState connectionState)
+    public uint Register(uint id, IConnectionState connectionState)
     {
         if (_isDisposed) return 0;
 
@@ -81,7 +82,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         }
     }
 
-    public void Unregister(ConnectionState connectionState)
+    public void Unregister(IConnectionState connectionState)
     {
         if (_isDisposed) return;
 
@@ -109,7 +110,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         }
     }
 
-    public static ConnectionState CreateConnection(Socket? handler = null, ConnectionManager? instance = null)
+    public static IConnectionState CreateConnection(Socket? handler = null, ConnectionManager? instance = null)
     {
         ArgumentNullException.ThrowIfNull(handler, nameof(handler));
         //ArgumentNullException.ThrowIfNull(instance, nameof(instance));
@@ -119,6 +120,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         var result = new ConnectionState
         {
             Socket = handler,
+            NetworkStream = new NetworkStream(handler),
             RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0),
         };
 
@@ -126,4 +128,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
         return result;
     }
+
+    public static void DropConnection(IConnectionState connectionState) =>
+        connectionState?.Socket?.DropConnection();
 }

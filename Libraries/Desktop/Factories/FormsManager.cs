@@ -194,7 +194,7 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
         if (cfg.Focus) form.Focus();
     }
 
-    public void RegisterControl(FormBase parent, Control control) =>
+    public static void RegisterControl(FormBase parent, Control control) =>
         parent.Controls.Add(control);
     public TControl[] CreateControl<TForm, TControl>(TForm parent, bool visible = true, params ControlCfg[] cfgs)
         where TForm : FormBase

@@ -1,6 +1,8 @@
-﻿namespace ThePalace.Common.Threading;
+﻿using ThePalace.Common.Interfaces.Threading;
 
-public partial class Cmd : IDisposable
+namespace ThePalace.Common.Threading;
+
+public partial class ActionCmd : ICmd, IDisposable
 {
     public CmdFnc CmdFnc;
     public object[] Values;

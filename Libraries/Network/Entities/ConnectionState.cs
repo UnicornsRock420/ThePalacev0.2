@@ -19,6 +19,7 @@ public partial class ConnectionState : EventArgs, IConnectionState
     public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 
     public Socket? Socket { get; set; } = null;
+    public NetworkStream? NetworkStream { get; set; } = null;
 
     public object? State { get; set; } = null;
 }

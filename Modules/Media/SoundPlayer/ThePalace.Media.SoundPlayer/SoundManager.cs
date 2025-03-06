@@ -1,6 +1,6 @@
-﻿using LibVLCSharp.Shared;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using LibVLCSharp.Shared;
 using ThePalace.Common.Factories;
 
 namespace ThePalace.Media.SoundPlayer;
