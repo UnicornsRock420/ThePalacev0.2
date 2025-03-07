@@ -281,7 +281,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
         toolStrip.Items.Clear();
 
-        foreach (var ribbonItem in SettingsManager.UserSettings.Ribbon)
+        foreach (var ribbonItem in new ItemBase[0]) //SettingsManager.UserSettings.Ribbon
         {
             var nodeType = ribbonItem.GetType().Name;
             switch (nodeType)

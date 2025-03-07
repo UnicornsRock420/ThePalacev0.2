@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography;
+﻿using ICSharpCode.SharpZipLib.GZip;
+using System.Security.Cryptography;
 using System.Text;
-using ICSharpCode.SharpZipLib.GZip;
 
 namespace System;
 
@@ -53,7 +53,7 @@ public static class ByteExts
         {
             zipInput.CopyTo(memOutput);
 
-            return memOutput.ToArray().GetString();
+            return memOutput.GetBuffer().GetString();
         }
     }
 

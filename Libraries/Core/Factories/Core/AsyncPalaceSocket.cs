@@ -21,7 +21,7 @@ namespace ThePalace.Core.Factories.Core
                     ms.PalaceSerialize((int)sessionState.UserId, obj, SerializerOptions.IncludeHeader);
 
                     if (ms.Length > 0)
-                        sessionState.ConnectionState.Send(ms.ToArray());
+                        sessionState.ConnectionState.Send(ms.GetBuffer());
                 }
         }
     }

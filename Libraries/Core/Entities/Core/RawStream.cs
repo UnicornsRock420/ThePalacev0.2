@@ -51,7 +51,7 @@ public partial class RawStream : EventArgs, IDisposable, IData, IStruct
     protected MemoryStream? _stream;
     public virtual uint8[]? Data
     {
-        get => this._stream?.ToArray() ?? [];
+        get => this._stream?.GetBuffer() ?? [];
         set => this._stream = new(value ?? []);
     }
     public virtual MemoryStream? Stream

@@ -1024,7 +1024,7 @@ public static class BinaryOpsExts
                 ms.PalaceSerialize(obj, objType, opts);
             }
 
-            msgBytes = ms.ToArray();
+            msgBytes = ms.GetBuffer();
         }
         if ((msgBytes?.Length ?? 0) < 1) msgBytes = null;
 
@@ -1050,7 +1050,7 @@ public static class BinaryOpsExts
             {
                 ms.PalaceSerialize(hdr, typeof(MSG_Header), opts);
 
-                hdrBytes = ms.ToArray();
+                hdrBytes = ms.GetBuffer();
             }
             if ((hdrBytes?.Length ?? 0) < 1) throw new Exception("Unable to serialize " + nameof(MSG_Header));
 

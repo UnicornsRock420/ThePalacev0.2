@@ -1,7 +1,7 @@
-﻿using System.Runtime.Serialization;
-using ICSharpCode.SharpZipLib.GZip;
+﻿using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using System.Runtime.Serialization;
 using ThePalace.Core.Constants;
 using ThePalace.Logging.Entities;
 using sint16 = System.Int16;
@@ -312,7 +312,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
                     using (var zipInput = type.GetInstance(memInput) as InflaterInputStream)
                         zipInput.CopyTo(memOutput);
 
-                    return memOutput.ToArray();
+                    return memOutput.GetBuffer();
                 }
             }
             catch (Exception ex)

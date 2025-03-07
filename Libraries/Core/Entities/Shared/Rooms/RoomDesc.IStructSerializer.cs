@@ -319,7 +319,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                                     //_blobData.WriteBytes(MessagePackSerializer.Serialize(state.PicLoc));
                                 }
 
-                                _blobData.WriteBytes(ms.ToArray());
+                                _blobData.WriteBytes(ms.GetBuffer());
                             }
                         }
                         else
@@ -381,7 +381,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                 hotspotOfst = (short)(this.HotSpots.Count > 0 ? _blobData.Count : 0);
 
-                _blobData.WriteBytes(tmp.ToArray());
+                _blobData.WriteBytes(tmp.GetBuffer());
             }
 
             //Start Pictures
@@ -406,7 +406,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                 pictureOfst = (short)(this.Pictures.Count > 0 ? _blobData.Count : 0);
 
-                _blobData.WriteBytes(tmp.ToArray());
+                _blobData.WriteBytes(tmp.GetBuffer());
             }
 
 
@@ -435,10 +435,10 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                         tmp2.Write(this.DrawCmds[i].Data);
                     }
 
-                    tmp1.Write(tmp2.ToArray());
+                    tmp1.Write(tmp2.GetBuffer());
                 }
 
-                _blobData.WriteBytes(tmp1.ToArray());
+                _blobData.WriteBytes(tmp1.GetBuffer());
             }
 
             // Start Loose Props
@@ -452,7 +452,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                 {
                     this.LooseProps[i].Serialize(ms, opts);
 
-                    _blobData.WriteBytes(ms.ToArray());
+                    _blobData.WriteBytes(ms.GetBuffer());
                 }
             }
 
@@ -480,9 +480,9 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                 this.WriteInt16(lenVars);                  // Length of Data Blob
             }
 
-            this._stream.Write(_blobData.Stream.ToArray());
+            this._stream.Write(_blobData.Stream.GetBuffer());
 
-            writer.Write(this.Stream.ToArray());
+            writer.Write(this.Stream.GetBuffer());
         }
     }
 }

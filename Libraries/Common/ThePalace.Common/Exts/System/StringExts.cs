@@ -160,7 +160,7 @@ public static class StringExts
 
             memOutput.Position = 0;
 
-            return memOutput.ToArray();
+            return memOutput.GetBuffer();
         }
     }
 
