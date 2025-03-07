@@ -1,11 +1,14 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories;
+using ThePalace.Network.Enums;
 
 namespace ThePalace.Network.Interfaces;
 
 public interface IConnectionState
 {
+    SocketDirection Direction { get; set; }
+
     IPEndPoint? HostAddr { get; set; }
     IPEndPoint? RemoteAddr { get; set; }
 

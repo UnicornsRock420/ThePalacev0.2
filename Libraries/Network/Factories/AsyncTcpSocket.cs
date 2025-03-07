@@ -32,21 +32,30 @@ public static partial class AsyncTcpSocket
     private static AsyncCallback _receiveCallback;
     private static AsyncCallback _sendCallback;
 
-    private static volatile ManualResetEvent _acceptResetEvent = new ManualResetEvent(false);
-    public static CancellationToken CancellationToken { get; private set; } = new();
+    private static volatile ManualResetEvent _acceptResetEvent = new(false);
+    public static CancellationTokenSource CancellationTokenSource { get; } = new();
+    public static CancellationToken CancellationToken => CancellationTokenSource.Token;
 
     public static event EventHandler ConnectionEstablished;
     public static event EventHandler ConnectionReceived;
     public static event EventHandler DataReceived;
     public static event EventHandler StateChanged;
 
-    private static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
+    private static bool Do(this IConnectionState connectionState, Action cb, bool disconnectOnError = false)
     {
         try
         {
             cb();
 
             return true;
+        }
+        catch (TaskCanceledException ex)
+        {
+            //LoggerHub.Current.Error(ex);
+
+            connectionState?.Socket?.DropConnection();
+
+            return false;
         }
         catch (SocketException ex)
         {
@@ -67,38 +76,28 @@ public static partial class AsyncTcpSocket
         }
     }
 
-    public static bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
+    public static async Task<bool> Connect(this IConnectionState connectionState, IPEndPoint? hostAddr = null)
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
 
-        connectionState?.Socket?.DropConnection();
-
-        Do(connectionState, () =>
+        return connectionState.Do(() =>
         {
-            connectionState.Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            connectionState.Socket.Connect(hostAddr);
+            ConnectionManager.Connect(connectionState, hostAddr);
 
-            connectionState.HostAddr = hostAddr;
-        });
-
-        return Do(connectionState, () =>
-        {
             connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
 
             ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
     }
 
-    public static void Listen(IPEndPoint? hostAddr = null, int listenBacklog = 0)
+    public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
 
-        var ipAddress = (IPAddress?)null;
-
         try
         {
-            var listener = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            var listener = ConnectionManager.CreateSocket(hostAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             listener.Bind(hostAddr);
             listener.Listen(listenBacklog);
 
@@ -112,6 +111,10 @@ public static partial class AsyncTcpSocket
                 {
                     listener.BeginAccept(_acceptCallback, listener);
                 }
+                catch (TaskCanceledException ex)
+                {
+                    return;
+                }
                 catch (SocketException ex)
                 {
                     LoggerHub.Current.Error(ex);
@@ -123,6 +126,10 @@ public static partial class AsyncTcpSocket
 
                 _acceptResetEvent.WaitOne();
             }
+        }
+        catch (TaskCanceledException ex)
+        {
+            return;
         }
         catch (SocketException ex)
         {
@@ -145,6 +152,12 @@ public static partial class AsyncTcpSocket
         {
             handler = listener?.EndAccept(ar);
         }
+        catch (TaskCanceledException ex)
+        {
+            handler = null;
+
+            return;
+        }
         catch (SocketException ex)
         {
             LoggerHub.Current.Error(ex);
@@ -160,10 +173,10 @@ public static partial class AsyncTcpSocket
 
         if (handler == null) throw new SocketException();
 
-        var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
+        var connectionState = ConnectionManager.CreateConnectionState(handler, ConnectionManager.Current);
         if (connectionState == null) throw new SocketException();
 
-        Do(connectionState, () =>
+        connectionState.Do(() =>
         {
             handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
         });
@@ -180,7 +193,7 @@ public static partial class AsyncTcpSocket
         {
             var bytesReceived = 0;
 
-            Do(connectionState, () =>
+            connectionState.Do(() =>
             {
                 bytesReceived = connectionState.Socket.EndReceive(ar);
                 if (bytesReceived < 1)
@@ -189,7 +202,7 @@ public static partial class AsyncTcpSocket
                 }
             });
 
-            if (!IsConnected(connectionState))
+            if (!connectionState.IsConnected())
             {
                 connectionState?.Socket?.DropConnection();
 
@@ -204,7 +217,7 @@ public static partial class AsyncTcpSocket
             }
         }
 
-        Do(connectionState, () =>
+        connectionState.Do(() =>
         {
             connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
         });
@@ -215,24 +228,17 @@ public static partial class AsyncTcpSocket
         }
     }
 
-    public static void Send(IConnectionState connectionState, byte[]? data)
+    public static void Send(this IConnectionState connectionState, byte[]? data)
     {
-        if (connectionState?.Socket == null)
-        {
-            connectionState?.Socket?.DropConnection();
+        if (connectionState?.Socket == null ||
+            (data?.Length ?? 0) < 1) return;
 
-            return;
-        }
-
-        if ((data?.Length ?? 0) > 0)
+        using (var @lock = LockContext.GetLock(connectionState.Socket))
         {
-            using (var @lock = LockContext.GetLock(connectionState.Socket))
+            connectionState.Do(() =>
             {
-                Do(connectionState, () =>
-                {
-                    connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState);
-                });
-            }
+                connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState);
+            });
         }
     }
 
@@ -243,26 +249,34 @@ public static partial class AsyncTcpSocket
 
         var bytesSent = (uint)0;
 
-        Do(connectionState, () =>
+        connectionState.Do(() =>
         {
-            bytesSent = (uint)connectionState.Socket.EndSend(ar);
+            bytesSent += (uint)connectionState.Socket.EndSend(ar);
 
-            connectionState.LastSent = DateTime.UtcNow;
+            if (bytesSent > 0)
+                connectionState.LastSent = DateTime.UtcNow;
         });
     }
 
-    public static bool IsConnected(IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
+    public static bool IsConnected(this IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
     {
-        var passiveIdleTimeout_Timespan = new TimeSpan(0, 0, passiveIdleTimeoutInSeconds);
+        var passiveIdleTimeout_Timespan = TimeSpan.FromSeconds(passiveIdleTimeoutInSeconds);
 
         try
         {
-            if (connectionState.LastReceived.HasValue && DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
+            if (connectionState.LastReceived.HasValue &&
+                DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
             {
                 return (!connectionState.Socket?.Poll(1, SelectMode.SelectRead)) ?? false;
             }
 
             return connectionState.Socket?.Connected ?? false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            connectionState?.Socket?.DropConnection();
+
+            return false;
         }
         catch (SocketException ex)
         {

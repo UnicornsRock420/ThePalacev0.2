@@ -65,7 +65,7 @@ public partial class Program : Disposable
             opts: RunOptions.UseTimer,
             timer: new UITimer
             {
-                Enabled = false,
+                Enabled = true,
             });
         if (job != null)
         {
@@ -338,7 +338,7 @@ public partial class Program : Disposable
 
         var form = FormsManager.Current.CreateForm<FormDialog>(new FormCfg
         {
-            Load = new EventHandler((sender, e) => TaskManager.Current.Run()),
+            Load = new EventHandler((sender, e) => _jobs[ThreadQueues.GUI].Run()),
             WindowState = FormWindowState.Minimized,
             AutoScaleMode = AutoScaleMode.Font,
             AutoScaleDimensions = new SizeF(7F, 15F),
@@ -473,7 +473,7 @@ public partial class Program : Disposable
             {
                 imgScreen.MouseClick += new MouseEventHandler((sender, e) =>
                 {
-                    if (!AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState))
+                    if (!this.SessionState.ConnectionState.IsConnected())
                         ShowConnectionForm();
                     else
                     {
@@ -726,7 +726,7 @@ public partial class Program : Disposable
                 {
                     imgScreen.Cursor = Cursors.Default;
 
-                    if (AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState))
+                    if (this.SessionState.ConnectionState.IsConnected())
                     {
                         var point = new ThePalace.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
@@ -829,7 +829,7 @@ public partial class Program : Disposable
                         txtInput.Text = string.Empty;
                     }
 
-                    if (!AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState))
+                    if (!this.SessionState?.ConnectionState?.IsConnected() ?? false)
                     {
                         this.ShowConnectionForm();
 
@@ -911,7 +911,7 @@ public partial class Program : Disposable
                         txtInput.Text = string.Empty;
                     }
 
-                    if (!AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState)) return;
+                    if (!this.SessionState?.ConnectionState?.IsConnected() ?? false) return;
 
                     ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this.SessionState, null, this.SessionState.ScriptState);
                 });
@@ -968,7 +968,7 @@ public partial class Program : Disposable
                         var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
                         connectionForm?.Close();
                     });
-                    buttonDisconnect.Visible = AsyncTcpSocket.IsConnected(this.SessionState?.ConnectionState);
+                    buttonDisconnect.Visible = this.SessionState?.ConnectionState?.IsConnected() ?? false;
                 }
 
                 var buttonConnect = connectionForm.Controls
@@ -1106,7 +1106,7 @@ public partial class Program : Disposable
             {
                 case nameof(GoBack):
                 case nameof(GoForward):
-                    if (AsyncTcpSocket.IsConnected(this.SessionState.ConnectionState) &&
+                    if (this.SessionState.ConnectionState.IsConnected() &&
                         (this.SessionState.History.History.Count > 0))
                     {
                         var url = null as string;

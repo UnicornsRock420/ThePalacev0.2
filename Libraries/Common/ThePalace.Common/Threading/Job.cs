@@ -35,6 +35,8 @@ public partial class RunLog
 public partial class Job<TCmd> : IJob<TCmd>, IDisposable
     where TCmd : ICmd
 {
+    private const int CONST_defaultSleepInterval = 1500;
+
     public Job()
     {
         TokenSource = CancellationTokenFactory.NewToken();
@@ -47,7 +49,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         Completions = 0;
         Failures = 0;
 
-        SleepInterval = TimeSpan.FromMilliseconds(1500);
+        SleepInterval = TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
         Queue = new ConcurrentQueue<TCmd>();
         JobState = null;
     }
@@ -55,7 +57,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
     {
         if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
-        sleepInterval ??= TimeSpan.FromMilliseconds(750);
+        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
         JobState = jobState;
         Options = opts;
@@ -70,7 +72,10 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         {
             Timer = timer;
             Timer.Interval = (int)sleepInterval.Value.TotalMilliseconds;
-            Timer.Tick += new EventHandler((s, a) => this.TimerRun());
+            Timer.Tick += new EventHandler((s, a) =>
+            {
+                this.TimerRun();
+            });
         }
 
         if ((opts & RunOptions.UseResetEvent) == RunOptions.UseResetEvent)
@@ -130,7 +135,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
     public CancellationToken Token => TokenSource.Token;
 
     DisposableList<IJob> IJob.SubJobs => new(SubJobs.Cast<IJob>());
-    public new DisposableList<IJob<TCmd>> SubJobs { get; protected set; }
+    public DisposableList<IJob<TCmd>> SubJobs { get; protected set; }
 
     public RunOptions Options { get; set; }
     public Guid Id { get; } = Guid.NewGuid();
@@ -141,7 +146,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
     public ManualResetEvent ResetEvent { get; protected set; }
     public TimeSpan SleepInterval { get; set; }
     public Interfaces.Threading.ITimer Timer { get; set; }
-    public virtual ConcurrentQueue<TCmd> Queue { get; protected set; }
+    public ConcurrentQueue<TCmd> Queue { get; protected set; }
     public virtual IJobState? JobState { get; set; }
 
     public void Cancel(CancelOptions opts = CancelOptions.Cascade)
@@ -156,11 +161,11 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
 
         if (doCascade || (opts & CancelOptions.OnlyChildren) == CancelOptions.OnlyChildren)
         {
-            jobs.AddRange(this.SubJobs
-                .SelectMany(j => j.SubJobs));
+            jobs.AddRange(this?.SubJobs
+                ?.SelectMany(j => j?.SubJobs ?? []) ?? []);
         }
 
-        jobs.ForEach(t => t.Cancel());
+        jobs.ForEach(t => t?.Dispose());
     }
 
 
@@ -178,7 +183,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         }, token ?? TokenSource.Token);
     }
 
-    protected async Task<int> TimerRun()
+    protected int TimerRun()
     {
         var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
         if (!doUseTimer) return -1;
@@ -213,8 +218,6 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
                 !Timer.Enabled)
             {
                 Timer.Start();
-
-                return await this.TimerRun();
             }
 
             return 0;

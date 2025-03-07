@@ -2,12 +2,15 @@
 using System.Net.Sockets;
 using ThePalace.Common.Factories;
 using ThePalace.Network.Constants;
+using ThePalace.Network.Enums;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Network.Entities;
 
 public partial class ConnectionState : EventArgs, IConnectionState
 {
+    public SocketDirection Direction { get; set; }
+
     public IPEndPoint? HostAddr { get; set; }
     public IPEndPoint? RemoteAddr { get; set; }
 

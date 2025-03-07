@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories;
+using ThePalace.Network.Enums;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
@@ -110,23 +111,74 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         }
     }
 
-    public static IConnectionState CreateConnection(Socket? handler = null, ConnectionManager? instance = null)
+    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp)
+    {
+        return new Socket(addressFamily, socketType, protocolType);
+    }
+
+    public static NetworkStream CreateNetworkStream(Socket handler)
     {
         ArgumentNullException.ThrowIfNull(handler, nameof(handler));
-        //ArgumentNullException.ThrowIfNull(instance, nameof(instance));
+
+        return new NetworkStream(handler);
+    }
+
+    public static IConnectionState CreateConnectionState(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, IPEndPoint? hostAddr = null, ConnectionManager? instance = null)
+    {
+        // TODO: Check banlist record(s)
+
+        var handler = CreateSocket(addressFamily, socketType);
+
+        var result = new ConnectionState
+        {
+            Direction = SocketDirection.Outbound,
+            Socket = handler,
+            NetworkStream = CreateNetworkStream(handler),
+        };
+
+        if (hostAddr != null)
+        {
+            result.Socket.Connect(result.HostAddr = hostAddr);
+        }
+
+        instance ??= ConnectionManager.Current;
+        instance?.Register(result);
+
+        return result;
+    }
+
+    public static IConnectionState CreateConnectionState(Socket? handler = null, ConnectionManager? instance = null)
+    {
+        ArgumentNullException.ThrowIfNull(handler, nameof(handler));
 
         // TODO: Check banlist record(s)
 
         var result = new ConnectionState
         {
+            Direction = SocketDirection.Inbound,
             Socket = handler,
-            NetworkStream = new NetworkStream(handler),
+            NetworkStream = CreateNetworkStream(handler),
             RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0),
         };
 
+        instance ??= ConnectionManager.Current;
         instance?.Register(result);
 
         return result;
+    }
+
+    internal static void Connect(IConnectionState connectionState, IPEndPoint hostAddr)
+    {
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
+
+        connectionState.Socket?.DropConnection();
+
+        connectionState.Direction = SocketDirection.Outbound;
+
+        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        connectionState.Socket.Connect(hostAddr);
+
+        connectionState.HostAddr = hostAddr;
     }
 
     public static void DropConnection(IConnectionState connectionState) =>

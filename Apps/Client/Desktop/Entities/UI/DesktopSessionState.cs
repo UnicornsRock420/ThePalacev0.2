@@ -68,7 +68,7 @@ public partial class DesktopSessionState : IDesktopSessionState
 
     public void RefreshUI()
     {
-        var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
+        var isConnected = ConnectionState.IsConnected();
 
         var form = GetForm("SessionStateManager");
         if (form == null) return;
@@ -121,7 +121,7 @@ public partial class DesktopSessionState : IDesktopSessionState
     }
     public void RefreshRibbon()
     {
-        var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
+        var isConnected = ConnectionState.IsConnected();
 
         var toolStrip = GetControl("toolStrip") as ToolStrip;
         if (toolStrip == null) return;
@@ -279,7 +279,7 @@ public partial class DesktopSessionState : IDesktopSessionState
 
         try
         {
-            var isConnected = AsyncTcpSocket.IsConnected(ConnectionState);
+            var isConnected = ConnectionState.IsConnected();
             if (!isConnected)
             {
                 foreach (var layer in _layerTypes)

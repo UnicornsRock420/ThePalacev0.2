@@ -6,6 +6,8 @@ namespace ThePalace.Common.Threading;
 
 public partial class TaskManager : SingletonDisposable<TaskManager>
 {
+    private const int CONST_defaultSleepInterval = 1500;
+
     static TaskManager() => _globalToken = CancellationTokenFactory.NewToken();
 
     public TaskManager() => Jobs = new();
@@ -53,7 +55,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
     {
         if (_globalToken.IsCancellationRequested) return null;
 
-        sleepInterval ??= TimeSpan.FromMilliseconds(750);
+        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
         var job = new Job<ICmd>(cmd, jobState, opts, sleepInterval, timer);
 
@@ -80,7 +82,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
     {
         if (_globalToken.IsCancellationRequested) return null;
 
-        sleepInterval ??= TimeSpan.FromMilliseconds(750);
+        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
         var job = new Job<TCmd>(cmd, jobState, opts, sleepInterval, timer);
 
@@ -179,7 +181,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
             _managedResources.AddRange(resources);
         }
 
-        sleepInterval ??= TimeSpan.FromMilliseconds(750);
+        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
         while (!GlobalToken.IsCancellationRequested &&
                (!token.HasValue || !token.Value.IsCancellationRequested))
