@@ -5,7 +5,7 @@ using ThePalace.Network.Enums;
 
 namespace ThePalace.Network.Interfaces;
 
-public interface IConnectionState
+public interface IConnectionState : IDisposable
 {
     SocketDirection Direction { get; set; }
 

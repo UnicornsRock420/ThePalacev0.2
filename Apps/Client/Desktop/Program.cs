@@ -435,6 +435,8 @@ public partial class Program : Disposable
             {
                 toolStrip.Size = new Size(form.Width, form.Height);
             }
+
+            this.SessionState.RefreshUI();
         });
 
         FormsManager.UpdateForm(form, new FormCfg
@@ -966,6 +968,7 @@ public partial class Program : Disposable
         }
 
         this.SessionState.RefreshScreen(ScreenLayers.Base);
+        this.SessionState.RefreshUI();
 
         ShowConnectionForm();
     }

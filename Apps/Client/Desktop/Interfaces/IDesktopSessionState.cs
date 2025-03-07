@@ -5,6 +5,7 @@ using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Rooms;
+using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 
 namespace ThePalace.Common.Desktop.Interfaces;
@@ -28,6 +29,8 @@ public interface IDesktopSessionState : IUISessionState
     string? MediaUrl { get; set; }
     string? ServerName { get; set; }
     int ServerPopulation { get; set; }
+    List<ListRec> ServerRooms { get; set; }
+    List<ListRec> ServerUsers { get; set; }
 
     AssetSpec SelectedProp { get; set; }
     UserDesc SelectedUser { get; set; }

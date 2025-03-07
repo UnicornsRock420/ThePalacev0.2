@@ -9,6 +9,33 @@ namespace ThePalace.Network.Entities;
 
 public partial class ConnectionState : EventArgs, IConnectionState
 {
+    public ConnectionState() { }
+    ~ConnectionState() => this.Dispose();
+
+    public void Dispose()
+    {
+        try { BytesSent?.Dispose(); } catch { }
+        BytesSent = null;
+        try { BytesReceived?.Dispose(); } catch { }
+        BytesReceived = null;
+
+        try { NetworkStream?.Dispose(); } catch { }
+        NetworkStream = null;
+        try { Socket?.DropConnection(); } catch { }
+        try { Socket?.Dispose(); } catch { }
+        Socket = null;
+
+        HostAddr = null;
+        RemoteAddr = null;
+        Buffer = null;
+        State = null;
+
+        LastReceived = null;
+        LastSent = null;
+
+        GC.SuppressFinalize(this);
+    }
+
     public SocketDirection Direction { get; set; }
 
     public IPEndPoint? HostAddr { get; set; }

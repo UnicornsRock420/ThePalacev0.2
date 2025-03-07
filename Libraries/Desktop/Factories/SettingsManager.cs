@@ -121,8 +121,7 @@ public partial class SettingsManager : Disposable
     public ConcurrentDictionary<string, ISettingBase> Settings { get; private set; } = new();
 
     public SettingsManager() { }
-    ~SettingsManager() =>
-        Dispose(false);
+    ~SettingsManager() => Dispose(false);
 
     public new void Dispose()
     {

@@ -14,11 +14,13 @@ using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Common.Factories;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Rooms;
+using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
@@ -34,7 +36,12 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 {
     public DesktopSessionState()
     {
-        //this._managedResources.AddRange();
+        this._managedResources.AddRange(
+            [
+                this._refreshTimer,
+                this._uiControls,
+                this._uiLayers,
+            ]);
 
         FormsManager.Current.FormClosed += _FormClosed;
         AsyncTcpSocket.ConnectionEstablished += _ConnectionEstablished;
@@ -94,8 +101,14 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
         this.RegInfo.Ul2DEngineCaps = (Upload2DEngineCaps)0x01;
         this.RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
     }
-    ~DesktopSessionState() =>
-        this.Dispose(false);
+    ~DesktopSessionState() => this.Dispose(false);
+
+    public void Dispose()
+    {
+        LastActivity = null;
+
+        base.Dispose();
+    }
 
     private void _FormClosed(object sender, EventArgs e)
     {
@@ -203,12 +216,14 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
     public string? MediaUrl { get; set; } = string.Empty;
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
+    public List<ListRec> ServerRooms { get; set; } = new();
+    public List<ListRec> ServerUsers { get; set; } = new();
 
     public void RefreshUI()
     {
         var isConnected = ConnectionState.IsConnected();
 
-        var form = GetForm("SessionStateManager");
+        var form = GetForm("Program");
         if (form == null) return;
 
         var toolStrip = GetControl("toolStrip") as ToolStrip;
@@ -488,7 +503,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                             _uiLayers[layer].Opacity == 0F ||
                             _uiLayers[layer].Image == null) continue;
 
-                        lock (_uiLayers[layer])
+                        using (var @lock = LockContext.GetLock(_uiLayers[layer]))
                         {
                             var imgAttributes = null as ImageAttributes;
 
@@ -1013,117 +1028,117 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                 switch (dc.Type)
                 {
                     case DrawCmdTypes.DC_Path:
-                    {
-                        var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
-                        using (var penColour = new Pen(colour, dc.PenSize))
-                        using (var brushColour = new SolidBrush(colour))
                         {
-                            penColour.StartCap = LineCap.Round;
-                            penColour.EndCap = LineCap.Round;
-
-                            helper.SetBrush(brushColour);
-                            helper.SetPen(penColour);
-
-                            if (dc.Filled)
-                                helper.BeginPath();
-
-                            var x = dc.Pos.HAxis;
-                            var y = dc.Pos.VAxis;
-
-                            helper.MoveTo(x, y);
-
-                            foreach (var p in dc.Points)
+                            var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
+                            using (var penColour = new Pen(colour, dc.PenSize))
+                            using (var brushColour = new SolidBrush(colour))
                             {
-                                x += p.HAxis;
-                                y += p.VAxis;
+                                penColour.StartCap = LineCap.Round;
+                                penColour.EndCap = LineCap.Round;
 
-                                helper.LineTo(x, y);
+                                helper.SetBrush(brushColour);
+                                helper.SetPen(penColour);
+
+                                if (dc.Filled)
+                                    helper.BeginPath();
+
+                                var x = dc.Pos.HAxis;
+                                var y = dc.Pos.VAxis;
+
+                                helper.MoveTo(x, y);
+
+                                foreach (var p in dc.Points)
+                                {
+                                    x += p.HAxis;
+                                    y += p.VAxis;
+
+                                    helper.LineTo(x, y);
+                                }
+
+                                if (dc.Filled)
+                                    helper.Fill();
+
+                                helper.Stroke();
                             }
-
-                            if (dc.Filled)
-                                helper.Fill();
-
-                            helper.Stroke();
                         }
-                    }
 
                         break;
                     case DrawCmdTypes.DC_Ellipse:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    helper.DrawEllipse(dc.Rect);
+                            //    helper.DrawEllipse(dc.Rect);
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
+                        }
 
                         break;
                     case DrawCmdTypes.DC_Text:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
+                            //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
+                        }
 
                         break;
                     case DrawCmdTypes.DC_Shape:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    // TODO:
+                            //    // TODO:
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
+                        }
 
                         break;
                 }

@@ -88,7 +88,7 @@ public static partial class AsyncTcpSocket
         {
             ConnectionManager.Connect(connectionState, hostAddr);
 
-            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
 
             ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
@@ -188,7 +188,7 @@ public static partial class AsyncTcpSocket
 
         connectionState.Do(() =>
         {
-            handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
         });
 
         ConnectionReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
@@ -247,7 +247,7 @@ public static partial class AsyncTcpSocket
         {
             connectionState.Do(() =>
             {
-                connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState);
+                connectionState.NetworkStream.BeginWrite(data, 0, data.Length, _sendCallback, connectionState);
             });
         }
     }
@@ -268,7 +268,7 @@ public static partial class AsyncTcpSocket
         });
     }
 
-    public static bool IsConnected(this IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 600)
+    public static bool IsConnected(this IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 750)
     {
         var passiveIdleTimeout_Timespan = TimeSpan.FromSeconds(passiveIdleTimeoutInSeconds);
 
@@ -277,10 +277,12 @@ public static partial class AsyncTcpSocket
             if (connectionState.LastReceived.HasValue &&
                 DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
             {
-                return (!connectionState.Socket?.Poll(1, SelectMode.SelectRead)) ?? false;
-            }
+                var result = (!connectionState.Socket?.Poll(1, SelectMode.SelectRead)) ?? false;
 
-            return connectionState.Socket?.Connected ?? false;
+                connectionState.LastReceived = DateTime.UtcNow;
+
+                return result;
+            }
         }
         catch (TaskCanceledException ex)
         {
@@ -302,5 +304,7 @@ public static partial class AsyncTcpSocket
 
             return false;
         }
+
+        return connectionState.Socket?.Connected ?? false;
     }
 }

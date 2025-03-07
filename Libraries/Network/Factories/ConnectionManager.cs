@@ -8,30 +8,30 @@ using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories;
 
-public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
+public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
 {
-    public void Dispose()
-    {
-        if (_isDisposed) return;
+    public ConnectionManager() { }
+    ~ConnectionManager() => this.Dispose();
 
-        _isDisposed = true;
+    public override void Dispose()
+    {
+        if (IsDisposed) return;
 
         if (_connectionStates != null)
         {
             using (var @lock = LockContext.GetLock(_connectionStates))
             {
-                _connectionStates.Values.ToList().ForEach(s => s?.Socket?.DropConnection());
+                _connectionStates.Values.ToList().ForEach(s => s?.Disconnect());
                 _connectionStates.Clear();
             }
             _connectionStates = null;
         }
 
-        GC.SuppressFinalize(this);
+        base.Dispose();
     }
 
     private const uint CONST_INT_UserIDCounterMax = 9999;
     private uint _userIDCounter = 0;
-    private bool _isDisposed = false;
 
     private volatile ConcurrentDictionary<uint, IConnectionState> _connectionStates = new();
     public IReadOnlyDictionary<uint, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
@@ -49,7 +49,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public uint Register(IConnectionState connectionState)
     {
-        if (_isDisposed) return 0;
+        if (IsDisposed) return 0;
 
         var result = UserID;
 
@@ -63,7 +63,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public uint Register(uint id, IConnectionState connectionState)
     {
-        if (_isDisposed) return 0;
+        if (IsDisposed) return 0;
 
         using (var @lock = LockContext.GetLock(_connectionStates))
         {
@@ -75,7 +75,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public void Unregister(uint id)
     {
-        if (_isDisposed) return;
+        if (IsDisposed) return;
 
         using (var @lock = LockContext.GetLock(_connectionStates))
         {
@@ -85,7 +85,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public void Unregister(IConnectionState connectionState)
     {
-        if (_isDisposed) return;
+        if (IsDisposed) return;
 
         var id = (uint)0;
 
@@ -111,10 +111,8 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         }
     }
 
-    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp)
-    {
-        return new Socket(addressFamily, socketType, protocolType);
-    }
+    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp) =>
+        new Socket(addressFamily, socketType, protocolType);
 
     public static NetworkStream CreateNetworkStream(Socket handler)
     {
