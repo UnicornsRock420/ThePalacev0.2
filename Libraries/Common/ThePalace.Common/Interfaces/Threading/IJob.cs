@@ -24,6 +24,7 @@ public interface IJob : IDisposable
     int Failures { get; }
     ManualResetEvent ResetEvent { get; }
     TimeSpan SleepInterval { get; set; }
+    ITimer Timer { get; set; }
 
     abstract IJobState? JobState { get; set; }
 

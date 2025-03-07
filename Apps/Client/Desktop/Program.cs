@@ -41,6 +41,10 @@ public partial class Program : Disposable
         ApplicationConfiguration.Initialize();
 
         var app = (Program?)null;
+        var uiTimer = new System.Windows.Forms.Timer
+        {
+
+        };
         var job = (IJob?)null;
 
         #region Jobs
@@ -57,8 +61,12 @@ public partial class Program : Disposable
                         cmd.CmdFnc();
                 }
             },
-            null,
-            RunOptions.UseSleepInterval);
+            jobState: null,
+            opts: RunOptions.UseTimer,
+            timer: new UITimer
+            {
+                Enabled = false,
+            });
         if (job != null)
         {
             _jobs[ThreadQueues.GUI] = job;
@@ -83,10 +91,15 @@ public partial class Program : Disposable
                 }
             },
             null,
-            RunOptions.UseManualResetEvent);
+            RunOptions.UseResetEvent);
         if (job != null)
         {
             _jobs[ThreadQueues.Network] = job;
+
+            AsyncTcpSocket.DataReceived += (o, a) =>
+            {
+                _jobs[ThreadQueues.Network].ResetEvent.Set();
+            };
         }
 
         job = TaskManager.Current.CreateTask<MediaCmd>(q =>
@@ -94,7 +107,7 @@ public partial class Program : Disposable
                 // TODO: Media
             },
             null,
-            RunOptions.UseManualResetEvent);
+            RunOptions.UseResetEvent);
         if (job != null)
         {
             _jobs[ThreadQueues.Media] = job;
@@ -105,7 +118,7 @@ public partial class Program : Disposable
                 // TODO: Assets
             },
             null,
-            RunOptions.UseManualResetEvent);
+            RunOptions.UseResetEvent);
         if (job != null)
         {
             _jobs[ThreadQueues.Assets] = job;
@@ -115,8 +128,7 @@ public partial class Program : Disposable
             {
                 // TODO: Core
 
-                Application.Run(FormsManager.Current);
-                TaskManager.Current.Shutdown();
+                TaskManager.Current.Run(resources: FormsManager.Current);
             },
             null,
             RunOptions.UseSleepInterval | RunOptions.RunNow);
@@ -126,7 +138,8 @@ public partial class Program : Disposable
         }
         #endregion
 
-        TaskManager.Current.Run(resources: FormsManager.Current);
+        Application.Run(FormsManager.Current);
+        TaskManager.Current.Shutdown();
     }
 
     private ContextMenuStrip _contextMenu = new();
@@ -176,12 +189,12 @@ public partial class Program : Disposable
         foreach (var type in CONST_eventTypes)
             ScriptEvents.Current.UnregisterEvent(type, this.RefreshScreen);
 
-        //var trayIcon = this._sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
-        //if (trayIcon != null)
-        //{
-        //    trayIcon.Visible = false;
-        //    try { trayIcon.Dispose(); } catch { }
-        //}
+        var trayIcon = this.SessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
+        if (trayIcon != null)
+        {
+            trayIcon.Visible = false;
+            try { trayIcon.Dispose(); } catch { }
+        }
     }
 
     public void Initialize()

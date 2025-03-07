@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
 using ThePalace.Common.Interfaces.Threading;
 
 namespace ThePalace.Common.Threading;
@@ -12,7 +11,8 @@ public enum RunOptions : int
     RunNow = 0x02,
     RunOnce = 0x04,
     UseSleepInterval = 0x08,
-    UseManualResetEvent = 0x10,
+    UseTimer = 0x10,
+    UseResetEvent = 0x20,
 }
 
 [Flags]
@@ -51,7 +51,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         Queue = new ConcurrentQueue<TCmd>();
         JobState = null;
     }
-    public Job(Action<ConcurrentQueue<TCmd>>? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null) : this()
+    public Job(Action<ConcurrentQueue<TCmd>>? cmd = null, IJobState? jobState = null, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, Interfaces.Threading.ITimer? timer = null) : this()
     {
         if (cmd == null) throw new ArgumentNullException(nameof(cmd));
 
@@ -65,15 +65,23 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
             SleepInterval = sleepInterval.Value;
         }
 
-        if ((opts & RunOptions.UseManualResetEvent) == RunOptions.UseManualResetEvent)
+        if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
+            timer != null)
+        {
+            Timer = timer;
+            Timer.Interval = (int)sleepInterval.Value.TotalMilliseconds;
+            Timer.Tick += new EventHandler((s, a) => this.TimerRun());
+        }
+
+        if ((opts & RunOptions.UseResetEvent) == RunOptions.UseResetEvent)
         {
             ResetEvent = new(false);
         }
 
         Build(Cmd = cmd);
     }
-    
-    internal Job(IJob<TCmd> parent) : this(parent.Cmd, parent.JobState, parent.Options, parent.SleepInterval)
+
+    internal Job(IJob<TCmd> parent) : this(parent.Cmd, parent.JobState, parent.Options, parent.SleepInterval, parent.Timer)
     {
         ParentId = parent.Id;
         Cmd = parent.Cmd;
@@ -85,9 +93,9 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
 
     public void Dispose()
     {
-        try { ResetEvent?.Dispose(); } catch { }
-        try { TokenSource?.Dispose(); } catch { }
-        try { Task?.Dispose(); } catch { }
+        try { ResetEvent?.Dispose(); } catch { } finally { ResetEvent = null; }
+        try { TokenSource?.Dispose(); } catch { } finally { TokenSource = null; }
+        try { Task?.Dispose(); } catch { } finally { Task = null; }
 
         SubJobs?.ToList()?.ForEach(j => { try { j?.Dispose(); } catch { } });
         SubJobs?.Clear();
@@ -103,6 +111,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         Queue?.Clear();
         Queue = null;
 
+        Timer = null;
         JobState = null;
 
         GC.SuppressFinalize(this);
@@ -131,6 +140,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
     public int Failures { get; protected set; }
     public ManualResetEvent ResetEvent { get; protected set; }
     public TimeSpan SleepInterval { get; set; }
+    public Interfaces.Threading.ITimer Timer { get; set; }
     public virtual ConcurrentQueue<TCmd> Queue { get; protected set; }
     public virtual IJobState? JobState { get; set; }
 
@@ -153,7 +163,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
         jobs.ForEach(t => t.Cancel());
     }
 
-    
+
     public void Build(Action<ConcurrentQueue<TCmd>>? cmd = null, CancellationToken? token = null)
     {
         if (Task != null)
@@ -167,13 +177,53 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
             (cmd ?? Cmd)(Queue);
         }, token ?? TokenSource.Token);
     }
-    
+
+    protected async Task<int> TimerRun()
+    {
+        var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
+        if (!doUseTimer) return -1;
+
+        IsRunning = true;
+
+        if (Task.Status != TaskStatus.Running)
+            try
+            {
+                Cmd(Queue);
+
+                IsRunning = false;
+                Completions++;
+            }
+            catch (Exception ex)
+            {
+                IsRunning = false;
+                Failures++;
+
+                return -1;
+            }
+
+        return Failures > 0 ? -1 : 0;
+    }
+
     public async Task<int> Run()
     {
+        var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
+        if (doUseTimer)
+        {
+            if (Timer != null &&
+                !Timer.Enabled)
+            {
+                Timer.Start();
+
+                return await this.TimerRun();
+            }
+
+            return 0;
+        }
+
         var doBreakOnError = (Options & RunOptions.BreakOnError) == RunOptions.BreakOnError;
         var doRunRunOnce = (Options & RunOptions.RunOnce) == RunOptions.RunOnce;
         var doUseSleepInterval = (Options & RunOptions.UseSleepInterval) == RunOptions.UseSleepInterval;
-        var doUseManualResetEvent = (Options & RunOptions.UseManualResetEvent) == RunOptions.UseManualResetEvent;
+        var doUseManualResetEvent = (Options & RunOptions.UseResetEvent) == RunOptions.UseResetEvent;
 
         if (doUseManualResetEvent)
         {
@@ -242,7 +292,7 @@ public partial class Job<TCmd> : IJob<TCmd>, IDisposable
             doBreakOnError = (Options & RunOptions.BreakOnError) == RunOptions.BreakOnError;
             doRunRunOnce = (Options & RunOptions.RunOnce) == RunOptions.RunOnce;
             doUseSleepInterval = (Options & RunOptions.UseSleepInterval) == RunOptions.UseSleepInterval;
-            doUseManualResetEvent = (Options & RunOptions.UseManualResetEvent) == RunOptions.UseManualResetEvent;
+            doUseManualResetEvent = (Options & RunOptions.UseResetEvent) == RunOptions.UseResetEvent;
         }
 
         return Failures > 0 ? -1 : 0;

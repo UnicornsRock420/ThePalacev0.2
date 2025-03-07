@@ -7,42 +7,38 @@ using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories;
 
-public partial class AsyncTcpSocket : IDisposable
+public static partial class AsyncTcpSocket
 {
-    public AsyncTcpSocket()
+    static AsyncTcpSocket()
     {
         _acceptCallback = new AsyncCallback(AcceptCallback);
         _receiveCallback = new AsyncCallback(ReceiveCallback);
         _sendCallback = new AsyncCallback(SendCallback);
     }
 
-    ~AsyncTcpSocket() => this.Dispose();
-
-    public void Dispose()
+    public static void Dispose()
     {
-        _signalEvent.Set();
-
-        GC.SuppressFinalize(this);
+        _acceptResetEvent.Set();
     }
 
-    public void Shutdown()
+    public static void Shutdown()
     {
-        _signalEvent.Set();
+        _acceptResetEvent.Set();
 
-        this.Dispose();
+        Dispose();
     }
 
-    private AsyncCallback _acceptCallback;
-    private AsyncCallback _receiveCallback;
-    private AsyncCallback _sendCallback;
+    private static AsyncCallback _acceptCallback;
+    private static AsyncCallback _receiveCallback;
+    private static AsyncCallback _sendCallback;
 
-    private volatile ManualResetEvent _signalEvent = new ManualResetEvent(false);
-    public CancellationToken CancellationToken { get; private set; } = new();
+    private static volatile ManualResetEvent _acceptResetEvent = new ManualResetEvent(false);
+    public static CancellationToken CancellationToken { get; private set; } = new();
 
-    public event EventHandler ConnectionEstablished;
-    public event EventHandler ConnectionReceived;
-    public event EventHandler DataReceived;
-    public event EventHandler StateChanged;
+    public static event EventHandler ConnectionEstablished;
+    public static event EventHandler ConnectionReceived;
+    public static event EventHandler DataReceived;
+    public static event EventHandler StateChanged;
 
     private static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
     {
@@ -71,7 +67,7 @@ public partial class AsyncTcpSocket : IDisposable
         }
     }
 
-    public bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
+    public static bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
@@ -90,11 +86,11 @@ public partial class AsyncTcpSocket : IDisposable
         {
             connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
 
-            this.ConnectionEstablished?.Invoke(connectionState, null);
+            ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
     }
 
-    public void Listen(IPEndPoint? hostAddr = null, int listenBacklog = 0)
+    public static void Listen(IPEndPoint? hostAddr = null, int listenBacklog = 0)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
 
@@ -110,7 +106,7 @@ public partial class AsyncTcpSocket : IDisposable
 
             while (!CancellationToken.IsCancellationRequested)
             {
-                _signalEvent.Reset();
+                _acceptResetEvent.Reset();
 
                 try
                 {
@@ -125,7 +121,7 @@ public partial class AsyncTcpSocket : IDisposable
                     LoggerHub.Current.Error(ex);
                 }
 
-                _signalEvent.WaitOne();
+                _acceptResetEvent.WaitOne();
             }
         }
         catch (SocketException ex)
@@ -138,9 +134,9 @@ public partial class AsyncTcpSocket : IDisposable
         }
     }
 
-    private void AcceptCallback(IAsyncResult ar)
+    private static void AcceptCallback(IAsyncResult ar)
     {
-        _signalEvent.Set();
+        _acceptResetEvent.Set();
 
         var listener = (Socket?)ar.AsyncState;
         var handler = (Socket?)null;
@@ -164,7 +160,7 @@ public partial class AsyncTcpSocket : IDisposable
 
         if (handler == null) throw new SocketException();
 
-        var connectionState = (ConnectionState)ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
+        var connectionState = ConnectionManager.CreateConnection(handler, ConnectionManager.Current);
         if (connectionState == null) throw new SocketException();
 
         Do(connectionState, () =>
@@ -172,12 +168,12 @@ public partial class AsyncTcpSocket : IDisposable
             handler.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
         });
 
-        ConnectionReceived.Invoke(this, connectionState);
+        ConnectionReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
     }
 
-    private void ReceiveCallback(IAsyncResult ar)
+    private static void ReceiveCallback(IAsyncResult ar)
     {
-        var connectionState = (ConnectionState?)ar.AsyncState;
+        var connectionState = (IConnectionState?)ar.AsyncState;
         if (connectionState?.Socket == null) throw new SocketException();
 
         if (connectionState.NetworkStream.DataAvailable)
@@ -215,11 +211,11 @@ public partial class AsyncTcpSocket : IDisposable
 
         if (connectionState.NetworkStream.DataAvailable)
         {
-            DataReceived.Invoke(this, connectionState);
+            DataReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         }
     }
 
-    public void Send(IConnectionState connectionState, byte[]? data)
+    public static void Send(IConnectionState connectionState, byte[]? data)
     {
         if (connectionState?.Socket == null)
         {

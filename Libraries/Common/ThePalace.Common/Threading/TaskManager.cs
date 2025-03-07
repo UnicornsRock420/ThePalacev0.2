@@ -49,38 +49,54 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
     public static CancellationToken GlobalToken => _globalToken.Token;
 
-    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, Interfaces.Threading.ITimer? timer = null)
     {
         if (_globalToken.IsCancellationRequested) return null;
 
         sleepInterval ??= TimeSpan.FromMilliseconds(750);
 
-        var job = new Job<ICmd>(cmd, jobState, opts, sleepInterval);
+        var job = new Job<ICmd>(cmd, jobState, opts, sleepInterval, timer);
 
         Jobs.Add(job.Id, job);
 
         if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
         {
-            job.Task.Start();
+            if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
+                job.Timer != null)
+            {
+                job.Timer.Start();
+            }
+            else
+            {
+                job.Task.Start();
+            }
         }
 
         return job;
     }
 
-    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null)
+    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, Interfaces.Threading.ITimer? timer = null)
         where TCmd : ICmd
     {
         if (_globalToken.IsCancellationRequested) return null;
 
         sleepInterval ??= TimeSpan.FromMilliseconds(750);
 
-        var job = new Job<TCmd>(cmd, jobState, opts, sleepInterval);
+        var job = new Job<TCmd>(cmd, jobState, opts, sleepInterval, timer);
 
         Jobs.Add(job.Id, job);
 
         if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
         {
-            job.Task.Start();
+            if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
+                job.Timer != null)
+            {
+                job.Timer.Start();
+            }
+            else
+            {
+                job.Task.Start();
+            }
         }
 
         return job;
@@ -99,7 +115,15 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
 
             if ((opts & RunOptions.RunNow) == RunOptions.RunNow)
             {
-                job.Run();
+                if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
+                    job.Timer != null)
+                {
+                    job.Timer.Start();
+                }
+                else
+                {
+                    job.Run();
+                }
             }
         }
     }
@@ -129,6 +153,8 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         {
             if (_expiredStates.Contains(job.Task.Status))
             {
+                if ((job.Options & RunOptions.UseTimer) == RunOptions.UseTimer) continue;
+
                 try { job.Cancel(); } catch { }
                 try { job.Dispose(); } catch { }
 
