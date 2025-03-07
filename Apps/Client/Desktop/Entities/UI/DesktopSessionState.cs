@@ -1,22 +1,28 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Timers;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
+using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Common.Threading;
 using ThePalace.Core.Constants;
+using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Helpers;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
@@ -24,8 +30,138 @@ using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public partial class DesktopSessionState : IDesktopSessionState
+public partial class DesktopSessionState : Disposable, IDesktopSessionState
 {
+    public DesktopSessionState()
+    {
+        //this._managedResources.AddRange();
+
+        FormsManager.Current.FormClosed += _FormClosed;
+        AsyncTcpSocket.ConnectionEstablished += _ConnectionEstablished;
+        AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
+
+        this._refreshTimer.Elapsed += new ElapsedEventHandler((s, e) =>
+        {
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
+            {
+                CmdFnc = a =>
+                {
+                    var sessionState = a[0] as IDesktopSessionState;
+                    if (sessionState == null) return null;
+
+                    sessionState.RefreshScreen(ScreenLayers.Messages);
+
+                    return null;
+                },
+                Values = [s],
+            });
+        });
+        this._refreshTimer.AutoReset = true;
+
+        foreach (var layer in _layerTypes)
+            this._uiLayers.TryAdd(layer, new ScreenLayer(layer)
+            {
+                ResourceType = typeof(FormsManager),
+            });
+
+        var iptTracking = new IptTracking();
+        this.ScriptState = iptTracking;
+        var iptVar = new IptMetaVariable
+        {
+            IsSpecial = true,
+            IsGlobal = true,
+            Value = new IptVariable
+            {
+                Type = IptVariableTypes.Shadow,
+                Value = this,
+            },
+        };
+        iptVar.IsReadOnly = true;
+        iptTracking.Variables.TryAdd("SESSIONSTATE", iptVar);
+
+        this.UserDesc.Extended.TryAdd(@"MessageQueue", new DisposableQueue<MsgBubble>());
+        this.UserDesc.Extended.TryAdd(@"CurrentMessage", null);
+
+        var seed = (uint)Cipher.WizKeytoSeed(ClientConstants.RegCodeSeed);
+        this.RegInfo.Crc = Cipher.ComputeLicenseCrc(seed);
+        this.RegInfo.Counter = (uint)Cipher.GetSeedFromReg(seed, this.RegInfo.Crc);
+        this.RegInfo.PuidCRC = this.RegInfo.Crc;
+        this.RegInfo.PuidCtr = this.RegInfo.Counter;
+
+        this.RegInfo.Reserved = ClientConstants.ClientAgent;
+        this.RegInfo.UlUploadCaps = (UploadCapabilities)0x41;
+        this.RegInfo.UlDownloadCaps = (DownloadCapabilities)0x0151;
+        this.RegInfo.Ul2DEngineCaps = (Upload2DEngineCaps)0x01;
+        this.RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
+    }
+    ~DesktopSessionState() =>
+        this.Dispose(false);
+
+    private void _FormClosed(object sender, EventArgs e)
+    {
+        if (this.IsDisposed) return;
+
+        var form = sender as Form;
+        if (form == null) return;
+
+        var key = this._uiControls
+            .Where(c => c.Value == form)
+            .Select(c => c.Key)
+            .FirstOrDefault();
+        if (key != null)
+            this._uiControls.TryRemove(key, out var _);
+    }
+
+    private void _ConnectionEstablished(object sender, EventArgs e)
+    {
+        if (this.IsDisposed) return;
+
+        this._refreshTimer?.Start();
+
+        if (this == sender)
+        {
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
+            {
+                CmdFnc = a =>
+                {
+                    var sessionState = a[0] as IDesktopSessionState;
+                    if (sessionState == null) return null;
+
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender],
+            });
+        }
+    }
+
+    private void _ConnectionDisconnected(object sender, EventArgs e)
+    {
+        if (this.IsDisposed) return;
+
+        this._refreshTimer?.Stop();
+
+        if (this == sender)
+        {
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
+            {
+                CmdFnc = a =>
+                {
+                    var sessionState = a[0] as IDesktopSessionState;
+                    if (sessionState == null) return null;
+
+                    sessionState.RefreshScreen();
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender],
+            });
+        }
+    }
+
     private static readonly IReadOnlyList<ScreenLayers> _layerTypes = Enum.GetValues<ScreenLayers>().AsReadOnly();
 
     private DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
@@ -33,6 +169,8 @@ public partial class DesktopSessionState : IDesktopSessionState
 
     private DisposableDictionary<string, IDisposable> _uiControls = new();
     public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+
+    public System.Timers.Timer _refreshTimer = new(350);
 
     // UI Info
     public bool Visible { get; set; } = true;

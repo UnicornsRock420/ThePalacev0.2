@@ -1,11 +1,12 @@
-﻿using ThePalace.Core.Entities.Shared;
+﻿using System.Collections;
+using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Core.Entities.Network.Shared.Core;
 
-public partial class SessionState : ISessionState
+public partial class SessionState : Disposable, ISessionState
 {
     public Guid Id { get; } = Guid.NewGuid();
     public uint UserId { get; set; }

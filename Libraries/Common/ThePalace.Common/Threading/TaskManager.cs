@@ -174,7 +174,7 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         }
     }
 
-    public void Run(TimeSpan? sleepInterval = null, CancellationToken? token = null, params IDisposable[] resources)
+    public async Task Run(TimeSpan? sleepInterval = null, CancellationToken? token = null, params IDisposable[] resources)
     {
         if ((resources?.Length ?? 0) > 0)
         {

@@ -118,7 +118,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public static NetworkStream CreateNetworkStream(Socket handler)
     {
-        ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler, nameof(ConnectionManager) + "." + nameof(handler));
 
         return new NetworkStream(handler);
     }
@@ -149,7 +149,7 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 
     public static IConnectionState CreateConnectionState(Socket? handler = null, ConnectionManager? instance = null)
     {
-        ArgumentNullException.ThrowIfNull(handler, nameof(handler));
+        ArgumentNullException.ThrowIfNull(handler, nameof(ConnectionManager) + "." + nameof(handler));
 
         // TODO: Check banlist record(s)
 
@@ -167,9 +167,9 @@ public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
         return result;
     }
 
-    internal static void Connect(IConnectionState connectionState, IPEndPoint hostAddr)
+    public static void Connect(IConnectionState connectionState, IPEndPoint hostAddr)
     {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
 
         connectionState.Socket?.DropConnection();
 

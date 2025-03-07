@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -15,15 +18,21 @@ using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
+using ThePalace.Core.Entities.Network.Client.Assets;
+using ThePalace.Core.Entities.Network.Client.Network;
+using ThePalace.Core.Entities.Network.Client.Rooms;
+using ThePalace.Core.Entities.Network.Client.Users;
 using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Entities.Network.Shared.Network;
+using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Interfaces.Network;
+using ThePalace.Core.Factories.Scripting;
+using ThePalace.Core.Interfaces.Core;
+using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 
 namespace ThePalace.Client.Desktop;
@@ -41,10 +50,6 @@ public partial class Program : Disposable
         ApplicationConfiguration.Initialize();
 
         var app = (Program?)null;
-        var uiTimer = new System.Windows.Forms.Timer
-        {
-
-        };
         var job = (IJob?)null;
 
         #region Jobs
@@ -73,7 +78,7 @@ public partial class Program : Disposable
 
             ((Job<ActionCmd>)job).Enqueue(new ActionCmd
             {
-                CmdFnc = q =>
+                CmdFnc = a =>
                 {
                     app = new Program();
 
@@ -82,12 +87,21 @@ public partial class Program : Disposable
             });
         }
 
-        job = TaskManager.Current.CreateTask<IProtocol>(q =>
+        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
             {
-                // TODO: Network
+                if (!q.IsEmpty &&
+                    q.TryDequeue(out var cmd))
+                {
+                    if (cmd.Values != null)
+                        cmd.CmdFnc(cmd.Values);
+                    else
+                        cmd.CmdFnc();
+                }
 
                 while ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                 {
+                    // TODO: Network
+
                 }
             },
             null,
@@ -96,15 +110,17 @@ public partial class Program : Disposable
         {
             _jobs[ThreadQueues.Network] = job;
 
-            AsyncTcpSocket.DataReceived += (o, a) =>
-            {
-                _jobs[ThreadQueues.Network].ResetEvent.Set();
-            };
+            AsyncTcpSocket.DataReceived += (o, a) => _jobs[ThreadQueues.Network].ResetEvent.Set();
         }
 
         job = TaskManager.Current.CreateTask<MediaCmd>(q =>
             {
-                // TODO: Media
+                if (!q.IsEmpty &&
+                    q.TryDequeue(out var mediaCmd))
+                {
+                    // TODO: Media
+
+                }
             },
             null,
             RunOptions.UseResetEvent);
@@ -114,9 +130,17 @@ public partial class Program : Disposable
         }
 
         job = TaskManager.Current.CreateTask<AssetCmd>(q =>
+        {
+            if (!q.IsEmpty &&
+                q.TryDequeue(out var assetCmd))
             {
-                // TODO: Assets
-            },
+                if (!AssetsManager.Current.Assets.ContainsKey(assetCmd.AssetInfo.AssetInfo.AssetSpec.Id))
+                {
+                    // TODO: Assets
+
+                }
+            }
+        },
             null,
             RunOptions.UseResetEvent);
         if (job != null)
@@ -124,12 +148,7 @@ public partial class Program : Disposable
             _jobs[ThreadQueues.Assets] = job;
         }
 
-        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
-            {
-                // TODO: Core
-
-                TaskManager.Current.Run(resources: FormsManager.Current);
-            },
+        job = TaskManager.Current.CreateTask(q => TaskManager.Current.Run(resources: FormsManager.Current),
             null,
             RunOptions.UseSleepInterval | RunOptions.RunNow);
         if (job != null)
@@ -144,6 +163,10 @@ public partial class Program : Disposable
 
     private ContextMenuStrip _contextMenu = new();
     public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
+
+    private static readonly ScreenLayers[] CONST_allLayers = Enum.GetValues<ScreenLayers>()
+        .Where(v => !new[] { ScreenLayers.Base, ScreenLayers.DimRoom }.Contains(v))
+        .ToArray();
 
     private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
         .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
@@ -171,6 +194,7 @@ public partial class Program : Disposable
     }.AsReadOnly();
 
     private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
 
     public Program()
     {
@@ -206,28 +230,29 @@ public partial class Program : Disposable
             ScriptEvents.Current.RegisterEvent(type, this.RefreshScreen);
         }
 
-        //ApiManager.Current.RegisterApi(nameof(this.ShowConnectionForm), this.ShowConnectionForm);
-        //ApiManager.Current.RegisterApi(nameof(this.toolStripDropdownlist_Click), this.toolStripDropdownlist_Click);
-        //ApiManager.Current.RegisterApi(nameof(this.toolStripMenuItem_Click), this.toolStripMenuItem_Click);
-        //ApiManager.Current.RegisterApi(nameof(this.contextMenuItem_Click), this.contextMenuItem_Click);
+        ApiManager.Current.RegisterApi(nameof(this.ShowConnectionForm), this.ShowConnectionForm);
+        ApiManager.Current.RegisterApi(nameof(this.toolStripDropdownlist_Click), this.toolStripDropdownlist_Click);
+        ApiManager.Current.RegisterApi(nameof(this.toolStripMenuItem_Click), this.toolStripMenuItem_Click);
+        ApiManager.Current.RegisterApi(nameof(this.contextMenuItem_Click), this.contextMenuItem_Click);
 
         ShowAppForm();
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-        //TaskManager.Current.DispatchToast(new ToastCfg
+        //var toast = new ToastCfg
         //{
         //    ExpirationTime = DateTime.Now.AddMinutes(1),
-        //    Args = (IReadOnlyDictionary<string, object>)new Dictionary<string, object>
+        //    Args = new Dictionary<string, object>
         //    {
         //        { "action", "whisperMsg" },
         //        { "connectionId", 123 },
         //        { "conversationId", 456 },
-        //    },
-        //    Text = (IReadOnlyList<string>)new List<string>
+        //    }.AsReadOnly(),
+        //    Text = new List<string>
         //    {
         //        "Beat it like it owes you money!",
-        //    },
-        //});
+        //    }.AsReadOnly(),
+        //};
+        //TaskManager.Current.DispatchToast(toast);
 #endif
 
         ((Job<ActionCmd>)_jobs[ThreadQueues.GUI])?.Enqueue(
@@ -286,50 +311,42 @@ public partial class Program : Disposable
             }
         }
 
-        //TaskManager.Current.CreateTask(() =>
-        //{
-        //    if (screenLayers.Contains(ScreenLayers.Base))
-        //        sessionState.RefreshScreen(ScreenLayers.Base);
+        ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+        {
+            CmdFnc = a =>
+            {
+                if (screenLayers.Contains(ScreenLayers.Base))
+                    sessionState.RefreshScreen(ScreenLayers.Base);
 
-        //    if (uiRefresh)
-        //    {
-        //        sessionState.RefreshUI();
-        //        sessionState.RefreshRibbon();
-        //    }
+                if (uiRefresh)
+                {
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+                }
 
-        //    if (!screenLayers.Contains(ScreenLayers.Base))
-        //        sessionState.RefreshScreen(screenLayers);
-        //    else
-        //        sessionState.RefreshScreen(new[] {
-        //            ScreenLayers.LooseProp,
-        //            ScreenLayers.SpotImage,
-        //            ScreenLayers.BottomPaint,
-        //            ScreenLayers.SpotNametag,
-        //            ScreenLayers.UserProp,
-        //            ScreenLayers.UserNametag,
-        //            ScreenLayers.ScriptedImage,
-        //            ScreenLayers.ScriptedText,
-        //            ScreenLayers.SpotBorder,
-        //            ScreenLayers.TopPaint,
-        //            ScreenLayers.Messages, });
+                if (!screenLayers.Contains(ScreenLayers.Base))
+                    sessionState.RefreshScreen(screenLayers);
+                else
+                    sessionState.RefreshScreen(CONST_allLayers);
 
-        //    switch (scriptEvent.EventType)
-        //    {
-        //        case IptEventTypes.RoomLoad:
-        //            sessionState.History.RegisterHistory(
-        //                $"{sessionState.ServerName} - {sessionState.RoomInfo.roomName}",
-        //                $"palace://{sessionState.ConnectionState.Host}:{sessionState.ConnectionState.Port}/{sessionState.RoomInfo.roomID}");
+                switch (scriptEvent.EventType)
+                {
+                    case IptEventTypes.RoomLoad:
+                        sessionState.History.RegisterHistory(
+                            $"{sessionState.ServerName} - {sessionState.RoomInfo.Name}",
+                            $"palace://{sessionState.ConnectionState.HostAddr.Address}:{sessionState.ConnectionState.HostAddr.Port}/{sessionState.RoomInfo.RoomInfo.RoomID}");
 
-        //            sessionState.RefreshRibbon();
+                        sessionState.RefreshRibbon();
 
-        //            ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, sessionState, null, sessionState.ScriptState);
-        //            ScriptEvents.Current.Invoke(IptEventTypes.Enter, sessionState, null, sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, sessionState, null, sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.Enter, sessionState, null, sessionState.ScriptState);
 
-        //            break;
-        //    }
+                        break;
+                }
 
-        //    return;
-        //}, null);
+                return null;
+            },
+        });
     }
 
     private void ShowAppForm()
@@ -499,14 +516,25 @@ public partial class Program : Disposable
                                         ScreenLayers.UserNametag,
                                         ScreenLayers.Messages);
 
-                                    //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                                    //{
-                                    //    EventType = EventTypes.MSG_USERMOVE,
-                                    //    protocolSend = new MSG_USERMOVE
-                                    //    {
-                                    //        Pos = point,
-                                    //    },
-                                    //});
+                                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                    {
+                                        CmdFnc = a =>
+                                        {
+                                            var sessionState = a[0] as IDesktopSessionState;
+                                            if (sessionState == null) return null;
+
+                                            var point = a[1] as ThePalace.Core.Entities.Shared.Types.Point;
+                                            if (point == null) return null;
+
+                                            sessionState.Send(new MSG_USERMOVE
+                                            {
+                                                Pos = point,
+                                            });
+
+                                            return null;
+                                        },
+                                        Values = [this.SessionState, point],
+                                    });
                                 }
 
                                 break;
@@ -849,29 +877,33 @@ public partial class Program : Disposable
                         {
                             if (text[0] == '/')
                             {
-                                //TaskManager.Current.CreateTask(ThreadQueues.ScriptEngine, args =>
-                                //{
-                                //    var sessionState = args[0] as SessionState;
-                                //    if (sessionState == null) return null;
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.ScriptEngine]).Enqueue(new ActionCmd
+                                {
+                                    CmdFnc = a =>
+                                    {
+                                        var sessionState = a[0] as IDesktopSessionState;
+                                        if (sessionState == null) return null;
 
-                                //    var text = args[1] as string;
-                                //    if (text == null) return null;
+                                        var text = a[1] as string;
+                                        if (text == null) return null;
 
-                                //    try
-                                //    {
-                                //        var atomlist = IptscraeEngine.Parser(
-                                //            sessionState.ScriptState as IptTracking,
-                                //            text,
-                                //            false);
-                                //        IptscraeEngine.Executor(atomlist, sessionState.ScriptState as IptTracking);
-                                //    }
-                                //    catch (Exception ex)
-                                //    {
-                                //        LoggerHub.Current.Error(ex);
-                                //    }
+                                        try
+                                        {
+                                            var atomlist = IptscraeEngine.Parser(
+                                                sessionState.ScriptState as IptTracking,
+                                                text,
+                                                false);
+                                            IptscraeEngine.Executor(atomlist, sessionState.ScriptState as IptTracking);
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            LoggerHub.Current.Error(ex);
+                                        }
 
-                                //    return null;
-                                //}, this._sessionState, string.Concat(text.Skip(1)));
+                                        return null;
+                                    },
+                                    Values = [this.SessionState, string.Concat(text.Skip(1))],
+                                });
                             }
                             else
                             {
@@ -879,13 +911,9 @@ public partial class Program : Disposable
                                 {
                                     Text = text,
                                 };
-                                var outboundPacket = new MSG_Header
-                                {
-                                    EventType = EventTypes.MSG_XTALK,
-                                };
 
-                                //ScriptEvents.Current.Invoke(IptEventTypes.Chat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
-                                //ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this._sessionState, outboundPacket, this._sessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, this.SessionState, xTalk, this.SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this.SessionState, xTalk, this.SessionState.ScriptState);
 
                                 var iptTracking = this.SessionState.ScriptState as IptTracking;
                                 if (iptTracking != null)
@@ -893,8 +921,25 @@ public partial class Program : Disposable
                                     if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
                                         xTalk.Text = iptTracking.Variables["CHATSTR"].Value.Value.ToString();
 
-                                    //if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    //    TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, outboundPacket);
+                                    if (!string.IsNullOrWhiteSpace(xTalk.Text))
+                                    {
+                                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
+                                        {
+                                            CmdFnc = a =>
+                                            {
+                                                var sessionState = a[0] as IDesktopSessionState;
+                                                if (sessionState == null) return null;
+
+                                                var xTalk = a[1] as MSG_XTALK;
+                                                if (xTalk == null) return null;
+
+                                                sessionState?.Send(xTalk);
+
+                                                return null;
+                                            },
+                                            Values = [this.SessionState, xTalk],
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -962,8 +1007,8 @@ public partial class Program : Disposable
                 {
                     buttonDisconnect.Click += new EventHandler((sender, e) =>
                     {
-                        //if ((this._sessionState.ConnectionState?.IsConnected ?? false) == true)
-                        //    ConnectionManager.Current.Disconnect(this._sessionState);
+                        if ((this.SessionState.ConnectionState?.IsConnected() ?? false) == true)
+                            this.SessionState.ConnectionState.Socket?.DropConnection();
 
                         var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
                         connectionForm?.Close();
@@ -1017,9 +1062,27 @@ public partial class Program : Disposable
                                 .Cast<Control>()
                                 .Where(c => c.Name == "comboBoxAddresses")
                                 .FirstOrDefault() as ComboBox;
-                            //if (comboBoxAddresses != null &&
-                            //    !string.IsNullOrWhiteSpace(comboBoxAddresses.Text))
-                            //    TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.CONNECT, $"palace://{comboBoxAddresses.Text}");
+                            if (comboBoxAddresses != null &&
+                                !string.IsNullOrWhiteSpace(comboBoxAddresses.Text))
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                {
+                                    CmdFnc = a =>
+                                    {
+                                        var sessionState = a[0] as IDesktopSessionState;
+                                        if (sessionState == null) return null;
+
+                                        var url = a[1] as string;
+                                        if (url == null) return null;
+
+                                        if (IPEndPoint.TryParse(url, out var result))
+                                        {
+                                            sessionState.ConnectionState.Connect(result);
+                                        }
+
+                                        return null;
+                                    },
+                                    Values = [this.SessionState, $"palace://{comboBoxAddresses.Text}"],
+                                });
 
                             connectionForm.Close();
                         }
@@ -1045,19 +1108,19 @@ public partial class Program : Disposable
                     .FirstOrDefault() as ComboBox;
                 if (comboBoxUsernames != null)
                 {
-                    //var usernamesList = SettingsManager.Current.Settings[@"\GUI\Connection\Usernames"] as ISettingList;
-                    //if (usernamesList != null)
-                    //{
-                    //    comboBoxUsernames.Items.AddRange(usernamesList.Text
-                    //        .Select(v => new ComboboxItem
-                    //        {
-                    //            Text = v,
-                    //            Value = v,
-                    //        })
-                    //        .ToArray());
+                    var usernamesList = SettingsManager.Current.Settings[@"\GUI\Connection\Usernames"] as ISettingList;
+                    if (usernamesList != null)
+                    {
+                        comboBoxUsernames.Items.AddRange(usernamesList.Text
+                            .Select(v => new ComboboxItem
+                            {
+                                Text = v,
+                                Value = v,
+                            })
+                            .ToArray());
 
-                    //    comboBoxUsernames.Text = usernamesList.Text?.FirstOrDefault();
-                    //}
+                        comboBoxUsernames.Text = usernamesList.Text?.FirstOrDefault();
+                    }
                 }
 
                 var comboBoxAddresses = connectionForm.Controls
@@ -1066,19 +1129,19 @@ public partial class Program : Disposable
                     .FirstOrDefault() as ComboBox;
                 if (comboBoxAddresses != null)
                 {
-                    //var addressesList = SettingsManager.Current.Settings[@"\GUI\Connection\Addresses"] as ISettingList;
-                    //if (addressesList != null)
-                    //{
-                    //    comboBoxAddresses.Items.AddRange(addressesList.Text
-                    //        .Select(v => new ComboboxItem
-                    //        {
-                    //            Text = v,
-                    //            Value = v,
-                    //        })
-                    //        .ToArray());
+                    var addressesList = SettingsManager.Current.Settings[@"\GUI\Connection\Addresses"] as ISettingList;
+                    if (addressesList != null)
+                    {
+                        comboBoxAddresses.Items.AddRange(addressesList.Text
+                            .Select(v => new ComboboxItem
+                            {
+                                Text = v,
+                                Value = v,
+                            })
+                            .ToArray());
 
-                    //    comboBoxAddresses.Text = addressesList.Text?.FirstOrDefault();
-                    //}
+                        comboBoxAddresses.Text = addressesList.Text?.FirstOrDefault();
+                    }
                 }
             }
         }
@@ -1090,10 +1153,10 @@ public partial class Program : Disposable
             connectionForm.Show();
             connectionForm.Focus();
 
-            //this._sessionState.RefreshScreen(ScreenLayers.Base);
-            //this._sessionState.RefreshUI();
-            //this._sessionState.RefreshScreen();
-            //this._sessionState.RefreshRibbon();
+            this.SessionState.RefreshScreen(ScreenLayers.Base);
+            this.SessionState.RefreshUI();
+            this.SessionState.RefreshScreen();
+            this.SessionState.RefreshRibbon();
         }
     }
 
@@ -1139,19 +1202,49 @@ public partial class Program : Disposable
                                          !string.IsNullOrWhiteSpace(match.Groups[3].Value)
                                 ? Convert.ToInt16(match.Groups[3].Value) : (short)0;
 
-                            //if (AsyncTcpSocket.IsConnected(this._sessionState.ConnectionState) &&
-                            //    this._sessionState.ConnectionState.Hostname == host &&
-                            //    this._sessionState.ConnectionState.Port == port &&
-                            //    roomID != 0)
-                            //    TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                            //    {
-                            //        EventType = EventTypes.MSG_ROOMGOTO,
-                            //        protocolSend = new MSG_ROOMGOTO
-                            //        {
-                            //            dest = roomID,
-                            //        },
-                            //    });
-                            //else TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.CONNECT, url);
+                            if ((this.SessionState.ConnectionState?.IsConnected() ?? false) &&
+                                this.SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
+                                this.SessionState.ConnectionState.HostAddr.Port == port &&
+                                roomID != 0)
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                {
+                                    CmdFnc = a =>
+                                    {
+                                        var sessionState = a[0] as IDesktopSessionState;
+                                        if (sessionState == null) return null;
+
+                                        var roomID = a[1] as short?;
+                                        if (roomID == null) return null;
+
+                                        sessionState?.Send(new MSG_ROOMGOTO
+                                        {
+                                            Dest = roomID.Value,
+                                        });
+
+                                        return null;
+                                    },
+                                    Values = [this.SessionState, roomID],
+                                });
+                            else
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                {
+                                    CmdFnc = a =>
+                                    {
+                                        var sessionState = a[0] as IDesktopSessionState;
+                                        if (sessionState == null) return null;
+
+                                        var url = a[1] as string;
+                                        if (url == null) return null;
+
+                                        if (IPEndPoint.TryParse(url, out var result))
+                                        {
+                                            ConnectionManager.Connect(sessionState.ConnectionState, result);
+                                        }
+
+                                        return null;
+                                    },
+                                    Values = [this.SessionState, url],
+                                });
                         }
                     }
 
@@ -1169,21 +1262,13 @@ public partial class Program : Disposable
                     ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(this.SessionState, null);
                     break;
                 case nameof(Bookmarks):
-                    break;
                 case nameof(LiveDirectory):
-                    break;
                 case nameof(DoorOutlines):
-                    break;
                 case nameof(UserNametags):
-                    break;
                 case nameof(Tabs):
-                    break;
                 case nameof(Terminal):
-                    break;
                 case nameof(SuperUser):
-                    break;
                 case nameof(Draw):
-                    break;
                 case nameof(Sounds):
                     break;
             }
@@ -1215,17 +1300,31 @@ public partial class Program : Disposable
                 case ContextMenuCommandTypes.CMD_PROPGAG:
                 case ContextMenuCommandTypes.CMD_UNPROPGAG:
                     {
-                        var value = (UInt32)values[1];
+                        var value = (Int32)values[1];
 
-                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_WHISPER,
-                        //    protocolSend = new MSG_WHISPER
-                        //    {
-                        //        TargetID = value,
-                        //        Text = $"`{cmd.GetDescription()}",
-                        //    },
-                        //});
+                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        {
+                            CmdFnc = a =>
+                            {
+                                var sessionState = a[0] as IDesktopSessionState;
+                                if (sessionState == null) return null;
+
+                                var value = a[1] as Int32?;
+                                if (value == null) return null;
+
+                                var cmd = a[2] as ContextMenuCommandTypes?;
+                                if (cmd == null) return null;
+
+                                sessionState.Send(new MSG_WHISPER
+                                {
+                                    TargetID = value.Value,
+                                    Text = $"`{cmd.Value.GetDescription()}",
+                                });
+
+                                return null;
+                            },
+                            Values = [this.SessionState, value, cmd],
+                        });
                     }
 
                     break;
@@ -1233,14 +1332,25 @@ public partial class Program : Disposable
                     {
                         var value = (UInt32)values[1];
 
-                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_KILLUSER,
-                        //    protocolSend = new MSG_KILLUSER
-                        //    {
-                        //        TargetID = value,
-                        //    },
-                        //});
+                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        {
+                            CmdFnc = a =>
+                            {
+                                var sessionState = a[0] as IDesktopSessionState;
+                                if (sessionState == null) return null;
+
+                                var value = a[1] as UInt32?;
+                                if (value == null) return null;
+
+                                sessionState.Send(new MSG_KILLUSER
+                                {
+                                    TargetID = value.Value,
+                                });
+
+                                return null;
+                            },
+                            Values = [this.SessionState, value],
+                        });
                     }
 
                     break;
@@ -1248,14 +1358,25 @@ public partial class Program : Disposable
                     {
                         var value = (short)values[1];
 
-                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_SPOTDEL,
-                        //    protocolSend = new MSG_SPOTDEL
-                        //    {
-                        //        SpotID = value,
-                        //    },
-                        //});
+                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        {
+                            CmdFnc = a =>
+                            {
+                                var sessionState = a[0] as IDesktopSessionState;
+                                if (sessionState == null) return null;
+
+                                var value = a[1] as short?;
+                                if (value == null) return null;
+
+                                sessionState.Send(new MSG_SPOTDEL
+                                {
+                                    SpotID = value.Value,
+                                });
+
+                                return null;
+                            },
+                            Values = [this.SessionState, value],
+                        });
                     }
 
                     break;
@@ -1296,14 +1417,25 @@ public partial class Program : Disposable
                 {
                     var value = (Int32)values[1];
 
-                    //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                    //{
-                    //    EventType = EventTypes.MSG_PROPDEL,
-                    //    protocolSend = new MSG_PROPDEL
-                    //    {
-                    //        propNum = value,
-                    //    },
-                    //});
+                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                    {
+                        CmdFnc = a =>
+                        {
+                            var sessionState = a[0] as IDesktopSessionState;
+                            if (sessionState == null) return null;
+
+                            var value = a[1] as Int32?;
+                            if (value == null) return null;
+
+                            sessionState.Send(new MSG_PROPDEL
+                            {
+                                PropNum = value.Value,
+                            });
+
+                            return null;
+                        },
+                        Values = [this.SessionState, value],
+                    });
                 }
 
                 break;
@@ -1328,14 +1460,25 @@ public partial class Program : Disposable
                             ScreenLayers.UserNametag,
                             ScreenLayers.Messages);
 
-                        //TaskManager.Current.CreateTask(ThreadQueues.Network, null, this._sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_USERMOVE,
-                        //    protocolSend = new MSG_USERMOVE
-                        //    {
-                        //        Pos = value,
-                        //    },
-                        //});
+                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        {
+                            CmdFnc = a =>
+                            {
+                                var sessionState = a[0] as IDesktopSessionState;
+                                if (sessionState == null) return null;
+
+                                var value = a[1] as ThePalace.Core.Entities.Shared.Types.Point;
+                                if (value == null) return null;
+
+                                sessionState.Send(new MSG_USERMOVE
+                                {
+                                    Pos = value,
+                                });
+
+                                return null;
+                            },
+                            Values = [this.SessionState, value],
+                        });
                     }
                 }
 

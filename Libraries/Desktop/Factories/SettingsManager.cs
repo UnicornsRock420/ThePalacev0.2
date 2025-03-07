@@ -13,7 +13,7 @@ using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Common.Desktop.Factories;
 
-public sealed class SettingsManager : Disposable
+public partial class SettingsManager : Disposable
 {
     public static class UserSettings
     {

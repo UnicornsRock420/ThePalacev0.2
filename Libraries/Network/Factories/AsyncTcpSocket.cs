@@ -37,6 +37,7 @@ public static partial class AsyncTcpSocket
     public static CancellationToken CancellationToken => CancellationTokenSource.Token;
 
     public static event EventHandler ConnectionEstablished;
+    public static event EventHandler ConnectionDisconnected;
     public static event EventHandler ConnectionReceived;
     public static event EventHandler DataReceived;
     public static event EventHandler StateChanged;
@@ -53,7 +54,7 @@ public static partial class AsyncTcpSocket
         {
             //LoggerHub.Current.Error(ex);
 
-            connectionState?.Socket?.DropConnection();
+            connectionState?.Disconnect();
 
             return false;
         }
@@ -61,7 +62,7 @@ public static partial class AsyncTcpSocket
         {
             LoggerHub.Current.Error(ex);
 
-            connectionState?.Socket?.DropConnection();
+            connectionState?.Disconnect();
 
             return false;
         }
@@ -70,7 +71,9 @@ public static partial class AsyncTcpSocket
             LoggerHub.Current.Error(ex);
 
             if (disconnectOnError)
-                connectionState?.Socket?.DropConnection();
+            {
+                connectionState?.Disconnect();
+            }
 
             return false;
         }
@@ -78,8 +81,8 @@ public static partial class AsyncTcpSocket
 
     public static async Task<bool> Connect(this IConnectionState connectionState, IPEndPoint? hostAddr = null)
     {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(connectionState));
-        ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
+        ArgumentNullException.ThrowIfNull(hostAddr, nameof(AsyncTcpSocket) + "." + nameof(hostAddr));
 
         return connectionState.Do(() =>
         {
@@ -91,9 +94,16 @@ public static partial class AsyncTcpSocket
         });
     }
 
+    public static async Task Disconnect(this IConnectionState connectionState)
+    {
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
+
+        connectionState?.Disconnect();
+    }
+
     public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)
     {
-        ArgumentNullException.ThrowIfNull(hostAddr, nameof(hostAddr));
+        ArgumentNullException.ThrowIfNull(hostAddr, nameof(AsyncTcpSocket) + "." + nameof(hostAddr));
 
         try
         {
@@ -198,13 +208,13 @@ public static partial class AsyncTcpSocket
                 bytesReceived = connectionState.Socket.EndReceive(ar);
                 if (bytesReceived < 1)
                 {
-                    connectionState?.Socket?.DropConnection();
+                    connectionState?.Disconnect();
                 }
             });
 
             if (!connectionState.IsConnected())
             {
-                connectionState?.Socket?.DropConnection();
+                connectionState?.Disconnect();
 
                 return;
             }
@@ -274,7 +284,7 @@ public static partial class AsyncTcpSocket
         }
         catch (TaskCanceledException ex)
         {
-            connectionState?.Socket?.DropConnection();
+            connectionState?.Disconnect();
 
             return false;
         }
@@ -282,7 +292,7 @@ public static partial class AsyncTcpSocket
         {
             LoggerHub.Current.Error(ex);
 
-            connectionState?.Socket?.DropConnection();
+            connectionState?.Disconnect();
 
             return false;
         }
