@@ -1,4 +1,4 @@
-﻿namespace System.Windows.Forms;
+﻿namespace ThePalace.Common.Desktop.Factories.System.Windows.Forms;
 
 public abstract class SingletonApplicationContext<T> : ApplicationContext
     where T : class, new()

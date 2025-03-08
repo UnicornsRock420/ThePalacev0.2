@@ -1,4 +1,4 @@
-﻿namespace System;
+﻿namespace ThePalace.Common.Enums.System;
 
 /// <summary>
 ///     <see cref="TypeCode" />

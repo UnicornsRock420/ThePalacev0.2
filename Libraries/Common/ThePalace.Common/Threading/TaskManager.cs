@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Common.Factories;
 using ThePalace.Common.Interfaces.Threading;
 using ITimer = ThePalace.Common.Interfaces.Threading.ITimer;
 

@@ -1,10 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
 using System.Xml;
 using ThePalace.Common.Desktop.Entities.Ribbon;
+using ThePalace.Common.Exts.System;
+using ThePalace.Common.Exts.System.Collections.Concurrent;
+using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Interfaces.Core;
 

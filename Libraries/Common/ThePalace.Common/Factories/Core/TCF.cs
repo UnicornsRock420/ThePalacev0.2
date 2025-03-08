@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Factories;
+﻿namespace ThePalace.Common.Factories.Core;
 
 public sealed class TCF : IDisposable
 {

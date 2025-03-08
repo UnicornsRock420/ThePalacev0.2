@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Factories;
+﻿namespace ThePalace.Common.Helpers;
 
 public static class RndGenerator
 {

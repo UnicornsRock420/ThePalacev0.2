@@ -1,11 +1,13 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
 using ThePalace.Common.Constants;
+using ThePalace.Common.Enums.System;
+using ThePalace.Common.Exts.System.Collections.Generic;
+using ThePalace.Common.Exts.System.ComponentModel;
 
-namespace System;
+namespace ThePalace.Common.Exts.System;
 
 #region Aliases
 

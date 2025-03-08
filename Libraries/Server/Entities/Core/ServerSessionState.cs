@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Server.Interfaces;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Interfaces;

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Factories.Core;
 using ThePalace.Network.Enums;
-using ThePalace.Network.Helpers;
+using ThePalace.Network.Exts.System.Net.Sockets;
+using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 

@@ -1,8 +1,6 @@
-﻿using System.Collections;
+﻿namespace System;
 
-namespace ThePalace.Common.Factories;
-
-public abstract class SingletonDisposable<T> : Disposable
+public abstract class Singleton<T>
     where T : class, new()
 {
     private static readonly Lazy<T> _current = new();

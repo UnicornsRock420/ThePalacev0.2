@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using ThePalace.Common.Factories.System.Collections;
 
 namespace ThePalace.Core.Factories.Filesystem;
 

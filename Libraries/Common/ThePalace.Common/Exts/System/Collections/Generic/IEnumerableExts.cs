@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Generic;
+﻿using System.Collections;
+
+namespace ThePalace.Common.Exts.System.Collections.Generic;
 
 public static class IEnumerableExts
 {

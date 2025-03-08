@@ -1,6 +1,7 @@
-﻿using ThePalace.Common.Factories;
+﻿using ThePalace.Common.Factories.Core;
+using ThePalace.Common.Factories.System.Collections.Concurrent;
 
-namespace System.Collections.Concurrent;
+namespace ThePalace.Common.Exts.System.Collections.Concurrent;
 
 public static class DisposableDictionaryExts
 {

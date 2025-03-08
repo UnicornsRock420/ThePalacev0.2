@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
-using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Common.Desktop.Factories;

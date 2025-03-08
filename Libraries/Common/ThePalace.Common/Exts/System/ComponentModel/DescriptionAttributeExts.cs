@@ -1,4 +1,6 @@
-﻿namespace System.ComponentModel;
+﻿using System.ComponentModel;
+
+namespace ThePalace.Common.Exts.System.ComponentModel;
 
 public static class DescriptionAttributeExts
 {

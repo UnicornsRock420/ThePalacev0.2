@@ -1,7 +1,8 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using ThePalace.Common.Enums.System;
 
-namespace System;
+namespace ThePalace.Common.Exts.System;
 
 public static class TypeExts
 {

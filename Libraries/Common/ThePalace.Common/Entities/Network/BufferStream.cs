@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using ThePalace.Common.Factories.Core;
 
-namespace ThePalace.Common.Factories;
+namespace ThePalace.Common.Entities.Network;
 
 /// <summary>
 ///     This stream maintains data only until the data is read, then it is purged from the stream.

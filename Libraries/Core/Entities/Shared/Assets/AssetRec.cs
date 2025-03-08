@@ -1,7 +1,8 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Common.Exts.System;
+using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Helpers;
+using ThePalace.Core.Helpers.Core;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = int;
 using uint16 = ushort;

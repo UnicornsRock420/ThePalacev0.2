@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Factories.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
-namespace ThePalace.Network.Helpers;
+namespace ThePalace.Network.Helpers.Network;
 
 public static class AsyncTcpSocket
 {

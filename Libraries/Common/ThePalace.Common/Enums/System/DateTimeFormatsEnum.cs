@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace System;
+namespace ThePalace.Common.Enums.System;
 
 public enum DateTimeFormatsEnum
 {

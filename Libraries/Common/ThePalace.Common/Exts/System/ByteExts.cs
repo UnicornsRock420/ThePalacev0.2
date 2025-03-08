@@ -2,7 +2,7 @@
 using System.Text;
 using ICSharpCode.SharpZipLib.GZip;
 
-namespace System;
+namespace ThePalace.Common.Exts.System;
 
 public static class ByteExts
 {

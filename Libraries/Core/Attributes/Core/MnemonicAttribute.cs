@@ -1,4 +1,5 @@
-﻿using uint32 = uint;
+﻿using ThePalace.Common.Exts.System;
+using uint32 = uint;
 
 namespace ThePalace.Core.Attributes.Core;
 

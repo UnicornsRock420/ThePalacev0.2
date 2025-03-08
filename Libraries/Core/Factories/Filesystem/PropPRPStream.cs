@@ -9,6 +9,7 @@ using ThePalace.Core.Helpers;
 using ThePalace.Core.Models.Palace;
 using ThePalace.Core.Models.Protocols;
 using ThePalace.Core.Entities.Shared.Types;
+using ThePalace.Core.Helpers.Core;
 using ThePalace.Core.Utility;
 
 namespace ThePalace.Core.Factories.Filesystem

@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
-using System.Globalization;
+﻿using System.Globalization;
+using ThePalace.Common.Enums.System;
+using ThePalace.Common.Exts.System.ComponentModel;
 
-namespace System;
+namespace ThePalace.Common.Exts.System;
 
 public static class DateTimeExts
 {

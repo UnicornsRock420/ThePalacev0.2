@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -13,7 +11,12 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
-using System.ComponentModel;
+using ThePalace.Common.Exts.System;
+using ThePalace.Common.Exts.System.Collections.Concurrent;
+using ThePalace.Common.Exts.System.Collections.Generic;
+using ThePalace.Common.Exts.System.ComponentModel;
+using ThePalace.Common.Factories.System.Collections;
+using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
@@ -30,15 +33,15 @@ using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Factories.Scripting;
+using ThePalace.Core.Helpers.Network;
+using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
+using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Factories;
+using ThePalace.Network.Helpers.Network;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
-using ThePalace.Core.Helpers;
-using ThePalace.Network.Helpers;
-
 
 
 #if WINDOWS10_0_17763_0_OR_GREATER

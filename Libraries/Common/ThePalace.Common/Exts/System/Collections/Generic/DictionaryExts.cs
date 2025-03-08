@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Factories.Core;
 
-namespace System.Collections.Generic;
+namespace ThePalace.Common.Exts.System.Collections.Generic;
 
 public static class DictionaryExts
 {

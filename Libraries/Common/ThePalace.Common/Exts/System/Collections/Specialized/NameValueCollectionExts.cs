@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Specialized;
+﻿using System.Collections.Specialized;
+
+namespace ThePalace.Common.Exts.System.Collections.Specialized;
 
 public static class NameValueCollectionExts
 {

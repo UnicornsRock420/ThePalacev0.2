@@ -1,6 +1,7 @@
-﻿using ThePalace.Common.Factories;
+﻿using System.Collections.Concurrent;
+using ThePalace.Common.Factories.Core;
 
-namespace System.Collections.Concurrent;
+namespace ThePalace.Common.Exts.System.Collections.Concurrent;
 
 public static class ConcurrentDictionaryExts
 {

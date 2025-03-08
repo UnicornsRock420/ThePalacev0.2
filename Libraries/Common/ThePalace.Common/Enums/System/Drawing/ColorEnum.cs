@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
+using System.Drawing;
 
-namespace System.Drawing;
+namespace ThePalace.Common.Enums.System.Drawing;
 
 /// <summary>Enum representing the available chat name color presets.</summary>
 /// <see cref="CheerColorEnum"

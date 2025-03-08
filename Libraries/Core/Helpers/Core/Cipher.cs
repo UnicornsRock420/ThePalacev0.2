@@ -1,10 +1,11 @@
 ﻿using System.Text;
+using ThePalace.Common.Exts.System;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Exts;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
 
-namespace ThePalace.Core.Helpers;
+namespace ThePalace.Core.Helpers.Core;
 
 public static class Cipher
 {

@@ -6,7 +6,7 @@ using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Helpers;
+using ThePalace.Core.Helpers.Core;
 using sint16 = short;
 
 namespace ThePalace.Testing;

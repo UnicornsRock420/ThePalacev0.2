@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.Caching;
+using ThePalace.Common.Factories.Core;
 
-namespace ThePalace.Common.Factories;
+namespace ThePalace.Common.Helpers;
 
 public static class Cache
 {

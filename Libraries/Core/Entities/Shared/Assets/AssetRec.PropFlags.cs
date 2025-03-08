@@ -1,4 +1,5 @@
-﻿using ThePalace.Core.Enums;
+﻿using ThePalace.Common.Exts.System;
+using ThePalace.Core.Enums;
 using sint32 = int;
 using uint16 = ushort;
 

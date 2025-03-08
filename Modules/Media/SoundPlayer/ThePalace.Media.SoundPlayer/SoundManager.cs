@@ -1,7 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using LibVLCSharp.Shared;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Exts.System.Collections.Concurrent;
+using ThePalace.Common.Factories.Core;
 
 namespace ThePalace.Media.SoundPlayer;
 

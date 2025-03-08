@@ -1,7 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Exts.System;
+using ThePalace.Common.Exts.System.Collections.Concurrent;
+using ThePalace.Common.Exts.System.Collections.Generic;
+using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
@@ -9,7 +12,7 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 
-namespace ThePalace.Core.Factories.Scripting;
+namespace ThePalace.Core.Helpers.Scripting;
 
 using IptAtomList = List<IptVariable>;
 

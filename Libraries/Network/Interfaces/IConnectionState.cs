@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Factories;
+using ThePalace.Common.Entities.Network;
 using ThePalace.Network.Enums;
 
 namespace ThePalace.Network.Interfaces;

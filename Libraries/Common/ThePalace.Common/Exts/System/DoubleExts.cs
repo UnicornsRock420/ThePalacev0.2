@@ -1,4 +1,4 @@
-﻿namespace System;
+﻿namespace ThePalace.Common.Exts.System;
 
 public static class DoubleExts
 {
