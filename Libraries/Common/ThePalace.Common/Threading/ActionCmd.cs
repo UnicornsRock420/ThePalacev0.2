@@ -11,5 +11,7 @@ public class ActionCmd : ICmd, IDisposable
     {
         CmdFnc = null;
         Values = null;
+
+        GC.SuppressFinalize(this);
     }
 }

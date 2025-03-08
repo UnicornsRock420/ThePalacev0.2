@@ -38,8 +38,6 @@ public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
         }
 
         base.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 
     public static Bitmap Render(AssetDesc asset)

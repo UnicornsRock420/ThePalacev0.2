@@ -17,6 +17,8 @@ public class EventBus : IEventsBus
     public void Dispose()
     {
         _handlersDictionary?.Clear();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Subscribe(IEventHandler handler)
@@ -175,6 +177,8 @@ public class EventBus<TEventParams> : IEventsBus<TEventParams>
     public void Dispose()
     {
         _handlersDictionary?.Clear();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Subscribe(IEventHandler<TEventParams> handler)

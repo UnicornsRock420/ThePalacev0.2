@@ -18,6 +18,8 @@ public abstract class ItemBase : IDisposable
     public void Dispose()
     {
         Unload();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Unload()

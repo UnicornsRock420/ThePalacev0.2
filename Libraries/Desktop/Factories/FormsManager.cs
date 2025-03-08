@@ -52,8 +52,6 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
 
         base.Dispose();
 
-        GC.SuppressFinalize(this);
-
         ExitThread();
     }
 

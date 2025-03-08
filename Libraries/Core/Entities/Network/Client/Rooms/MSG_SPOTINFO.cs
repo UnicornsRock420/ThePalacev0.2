@@ -16,5 +16,7 @@ public class MSG_SPOTINFO : EventParams, IProtocolC2S, IDisposable
     public void Dispose()
     {
         SpotInfo = null;
+
+        GC.SuppressFinalize(this);
     }
 }

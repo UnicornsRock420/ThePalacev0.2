@@ -64,6 +64,8 @@ public sealed class TCF : IDisposable
         CatchBlock = null;
         FinallyBlock = null;
         Results = null;
+
+        GC.SuppressFinalize(this);
     }
 
     ~TCF()
