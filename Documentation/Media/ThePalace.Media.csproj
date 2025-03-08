@@ -7,160 +7,169 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Remove="Resources\backgrounds\aephixcorelogo.png"/>
-        <None Remove="Resources\backgrounds\clouds.gif"/>
-        <None Remove="Resources\backgrounds\clouds.jpg"/>
-        <None Remove="Resources\cursors\normal-drag.png"/>
-        <None Remove="Resources\cursors\normal-hover.png"/>
-        <None Remove="Resources\icons\aephixcorelogo.ico"/>
-        <None Remove="Resources\icons\backbutton-enabled.png"/>
-        <None Remove="Resources\icons\bookmark-off-enabled.png"/>
-        <None Remove="Resources\icons\bookmark-on-enabled.png"/>
-        <None Remove="Resources\icons\chatlog-enabled.png"/>
-        <None Remove="Resources\icons\connection-enabled.png"/>
-        <None Remove="Resources\icons\dooroutlines-off-enabled.png"/>
-        <None Remove="Resources\icons\dooroutlines-on-enabled.png"/>
-        <None Remove="Resources\icons\drawing-enabled.png"/>
-        <None Remove="Resources\icons\forwardbutton-enabled.png"/>
-        <None Remove="Resources\icons\livedirectory-enabled.png"/>
-        <None Remove="Resources\icons\nametags-off-enabled.png"/>
-        <None Remove="Resources\icons\nametags-on-enabled.png"/>
-        <None Remove="Resources\icons\playsounds-enabled.png"/>
-        <None Remove="Resources\icons\roomlist-enabled.png"/>
-        <None Remove="Resources\icons\roomlist-locked.png"/>
-        <None Remove="Resources\icons\roomlist-unlocked.png"/>
-        <None Remove="Resources\icons\superuser-enabled.png"/>
-        <None Remove="Resources\icons\tabs-off-enabled.png"/>
-        <None Remove="Resources\icons\tabs-on-enabled.png"/>
-        <None Remove="Resources\icons\terminal-enabled.png"/>
-        <None Remove="Resources\icons\terminal-hover-frame1.png"/>
-        <None Remove="Resources\icons\terminal-hover-frame2.png"/>
-        <None Remove="Resources\icons\terminal-hover.png"/>
-        <None Remove="Resources\icons\userlist-administrator.png"/>
-        <None Remove="Resources\icons\userlist-enabled.png"/>
-        <None Remove="Resources\icons\userlist-moderator.png"/>
-        <None Remove="Resources\smilies\4leafclovers.png"/>
-        <None Remove="Resources\smilies\akwatoo.png"/>
-        <None Remove="Resources\smilies\anberlins.png"/>
-        <None Remove="Resources\smilies\aqua-smileys.png"/>
-        <None Remove="Resources\smilies\asdrains.png"/>
-        <None Remove="Resources\smilies\asylum.png"/>
-        <None Remove="Resources\smilies\asylumbrites.png"/>
-        <None Remove="Resources\smilies\blotters.png"/>
-        <None Remove="Resources\smilies\chewy-face.png"/>
-        <None Remove="Resources\smilies\classic-smileys.png"/>
-        <None Remove="Resources\smilies\cuties.png"/>
-        <None Remove="Resources\smilies\defaultsmileys.png"/>
-        <None Remove="Resources\smilies\dinks.png"/>
-        <None Remove="Resources\smilies\dinks2.png"/>
-        <None Remove="Resources\smilies\Droplets.png"/>
-        <None Remove="Resources\smilies\emos.png"/>
-        <None Remove="Resources\smilies\emosv2.png"/>
-        <None Remove="Resources\smilies\falanxesV2.png"/>
-        <None Remove="Resources\smilies\imaginations.png"/>
-        <None Remove="Resources\smilies\imaginationsV2.png"/>
-        <None Remove="Resources\smilies\imaginationsV2_transparent.png"/>
-        <None Remove="Resources\smilies\loversv2.png"/>
-        <None Remove="Resources\smilies\mattahan.png"/>
-        <None Remove="Resources\smilies\palaceposers.png"/>
-        <None Remove="Resources\smilies\palaceV2.png"/>
-        <None Remove="Resources\smilies\palaceV4.png"/>
-        <None Remove="Resources\smilies\palclassics.png"/>
-        <None Remove="Resources\smilies\pandis.png"/>
-        <None Remove="Resources\smilies\sillies.png"/>
-        <None Remove="Resources\smilies\snazzies.png"/>
-        <None Remove="Resources\smilies\snoots.png"/>
-        <None Remove="Resources\smilies\starrykidds.png"/>
-        <None Remove="Resources\smilies\stinkie-hearts.png"/>
-        <None Remove="Resources\smilies\stinkies.png"/>
-        <None Remove="Resources\smilies\syncs.png"/>
-        <None Remove="Resources\smilies\techies.png"/>
-        <None Remove="Resources\smilies\transparent_imaginations.png"/>
+        <None Remove="Resources\backgrounds\aephixcorelogo.png" />
+        <None Remove="Resources\backgrounds\clouds.gif" />
+        <None Remove="Resources\backgrounds\clouds.jpg" />
+        <None Remove="Resources\cursors\normal-drag.png" />
+        <None Remove="Resources\cursors\normal-hover.png" />
+        <None Remove="Resources\icons\aephixcorelogo.ico" />
+        <None Remove="Resources\icons\backbutton-enabled.png" />
+        <None Remove="Resources\icons\bookmark-off-enabled.png" />
+        <None Remove="Resources\icons\bookmark-on-enabled.png" />
+        <None Remove="Resources\icons\chatlog-enabled.png" />
+        <None Remove="Resources\icons\connection-enabled.png" />
+        <None Remove="Resources\icons\dooroutlines-off-enabled.png" />
+        <None Remove="Resources\icons\dooroutlines-on-enabled.png" />
+        <None Remove="Resources\icons\drawing-enabled.png" />
+        <None Remove="Resources\icons\forwardbutton-enabled.png" />
+        <None Remove="Resources\icons\livedirectory-enabled.png" />
+        <None Remove="Resources\icons\nametags-off-enabled.png" />
+        <None Remove="Resources\icons\nametags-on-enabled.png" />
+        <None Remove="Resources\icons\playsounds-enabled.png" />
+        <None Remove="Resources\icons\roomlist-enabled.png" />
+        <None Remove="Resources\icons\roomlist-locked.png" />
+        <None Remove="Resources\icons\roomlist-unlocked.png" />
+        <None Remove="Resources\icons\superuser-enabled.png" />
+        <None Remove="Resources\icons\tabs-off-enabled.png" />
+        <None Remove="Resources\icons\tabs-on-enabled.png" />
+        <None Remove="Resources\icons\terminal-enabled.png" />
+        <None Remove="Resources\icons\terminal-hover-frame1.png" />
+        <None Remove="Resources\icons\terminal-hover-frame2.png" />
+        <None Remove="Resources\icons\terminal-hover.png" />
+        <None Remove="Resources\icons\userlist-administrator.png" />
+        <None Remove="Resources\icons\userlist-enabled.png" />
+        <None Remove="Resources\icons\userlist-moderator.png" />
+        <None Remove="Resources\smilies\4leafclovers.png" />
+        <None Remove="Resources\smilies\akwatoo.png" />
+        <None Remove="Resources\smilies\anberlins.png" />
+        <None Remove="Resources\smilies\aqua-smileys.png" />
+        <None Remove="Resources\smilies\asdrains.png" />
+        <None Remove="Resources\smilies\asylum.png" />
+        <None Remove="Resources\smilies\asylumbrites.png" />
+        <None Remove="Resources\smilies\blotters.png" />
+        <None Remove="Resources\smilies\chewy-face.png" />
+        <None Remove="Resources\smilies\classic-smileys.png" />
+        <None Remove="Resources\smilies\cuties.png" />
+        <None Remove="Resources\smilies\defaultsmileys.png" />
+        <None Remove="Resources\smilies\dinks.png" />
+        <None Remove="Resources\smilies\dinks2.png" />
+        <None Remove="Resources\smilies\Droplets.png" />
+        <None Remove="Resources\smilies\emos.png" />
+        <None Remove="Resources\smilies\emosv2.png" />
+        <None Remove="Resources\smilies\falanxesV2.png" />
+        <None Remove="Resources\smilies\imaginations.png" />
+        <None Remove="Resources\smilies\imaginationsV2.png" />
+        <None Remove="Resources\smilies\imaginationsV2_transparent.png" />
+        <None Remove="Resources\smilies\loversv2.png" />
+        <None Remove="Resources\smilies\mattahan.png" />
+        <None Remove="Resources\smilies\palaceposers.png" />
+        <None Remove="Resources\smilies\palaceV2.png" />
+        <None Remove="Resources\smilies\palaceV4.png" />
+        <None Remove="Resources\smilies\palclassics.png" />
+        <None Remove="Resources\smilies\pandis.png" />
+        <None Remove="Resources\smilies\sillies.png" />
+        <None Remove="Resources\smilies\snazzies.png" />
+        <None Remove="Resources\smilies\snoots.png" />
+        <None Remove="Resources\smilies\starrykidds.png" />
+        <None Remove="Resources\smilies\stinkie-hearts.png" />
+        <None Remove="Resources\smilies\stinkies.png" />
+        <None Remove="Resources\smilies\syncs.png" />
+        <None Remove="Resources\smilies\techies.png" />
+        <None Remove="Resources\smilies\transparent_imaginations.png" />
     </ItemGroup>
 
     <ItemGroup>
-        <Resource Include="Resources\backgrounds\aephixcorelogo.png"/>
-        <Resource Include="Resources\backgrounds\clouds.gif"/>
-        <Resource Include="Resources\backgrounds\clouds.jpg"/>
-        <Resource Include="Resources\cursors\normal-drag.png"/>
-        <Resource Include="Resources\cursors\normal-hover.png"/>
-        <Resource Include="Resources\icons\aephixcorelogo.ico"/>
-        <Resource Include="Resources\icons\backbutton-enabled.png"/>
-        <Resource Include="Resources\icons\bookmark-off-enabled.png"/>
-        <Resource Include="Resources\icons\bookmark-on-enabled.png"/>
-        <Resource Include="Resources\icons\chatlog-enabled.png"/>
-        <Resource Include="Resources\icons\connection-enabled.png"/>
-        <Resource Include="Resources\icons\dooroutlines-off-enabled.png"/>
-        <Resource Include="Resources\icons\dooroutlines-on-enabled.png"/>
-        <Resource Include="Resources\icons\drawing-enabled.png"/>
-        <Resource Include="Resources\icons\forwardbutton-enabled.png"/>
-        <Resource Include="Resources\icons\livedirectory-enabled.png"/>
-        <Resource Include="Resources\icons\nametags-off-enabled.png"/>
-        <Resource Include="Resources\icons\nametags-on-enabled.png"/>
-        <Resource Include="Resources\icons\playsounds-enabled.png"/>
-        <Resource Include="Resources\icons\roomlist-enabled.png"/>
-        <Resource Include="Resources\icons\roomlist-locked.png"/>
-        <Resource Include="Resources\icons\roomlist-unlocked.png"/>
-        <Resource Include="Resources\icons\superuser-enabled.png"/>
-        <Resource Include="Resources\icons\tabs-off-enabled.png"/>
-        <Resource Include="Resources\icons\tabs-on-enabled.png"/>
-        <Resource Include="Resources\icons\terminal-enabled.png"/>
-        <Resource Include="Resources\icons\terminal-hover-frame1.png"/>
-        <Resource Include="Resources\icons\terminal-hover-frame2.png"/>
-        <Resource Include="Resources\icons\terminal-hover.png"/>
-        <Resource Include="Resources\icons\userlist-administrator.png"/>
-        <Resource Include="Resources\icons\userlist-enabled.png"/>
-        <Resource Include="Resources\icons\userlist-moderator.png"/>
-        <Resource Include="Resources\smilies\4leafclovers.png"/>
-        <Resource Include="Resources\smilies\akwatoo.png"/>
-        <Resource Include="Resources\smilies\anberlins.png"/>
-        <Resource Include="Resources\smilies\aqua-smileys.png"/>
-        <Resource Include="Resources\smilies\asdrains.png"/>
-        <Resource Include="Resources\smilies\asylum.png"/>
-        <Resource Include="Resources\smilies\asylumbrites.png"/>
-        <Resource Include="Resources\smilies\blotters.png"/>
-        <Resource Include="Resources\smilies\chewy-face.png"/>
-        <Resource Include="Resources\smilies\classic-smileys.png"/>
-        <Resource Include="Resources\smilies\cuties.png"/>
-        <Resource Include="Resources\smilies\defaultsmileys.png"/>
-        <Resource Include="Resources\smilies\dinks.png"/>
-        <Resource Include="Resources\smilies\dinks2.png"/>
-        <Resource Include="Resources\smilies\Droplets.png"/>
-        <Resource Include="Resources\smilies\emos.png"/>
-        <Resource Include="Resources\smilies\emosv2.png"/>
-        <Resource Include="Resources\smilies\falanxesV2.png"/>
-        <Resource Include="Resources\smilies\imaginations.png"/>
-        <Resource Include="Resources\smilies\imaginationsV2.png"/>
-        <Resource Include="Resources\smilies\imaginationsV2_transparent.png"/>
-        <Resource Include="Resources\smilies\loversv2.png"/>
-        <Resource Include="Resources\smilies\mattahan.png"/>
-        <Resource Include="Resources\smilies\palaceposers.png"/>
-        <Resource Include="Resources\smilies\palaceV2.png"/>
-        <Resource Include="Resources\smilies\palaceV4.png"/>
-        <Resource Include="Resources\smilies\palclassics.png"/>
-        <Resource Include="Resources\smilies\pandis.png"/>
-        <Resource Include="Resources\smilies\sillies.png"/>
-        <Resource Include="Resources\smilies\snazzies.png"/>
-        <Resource Include="Resources\smilies\snoots.png"/>
-        <Resource Include="Resources\smilies\starrykidds.png"/>
-        <Resource Include="Resources\smilies\stinkie-hearts.png"/>
-        <Resource Include="Resources\smilies\stinkies.png"/>
-        <Resource Include="Resources\smilies\syncs.png"/>
-        <Resource Include="Resources\smilies\techies.png"/>
-        <Resource Include="Resources\smilies\transparent_imaginations.png"/>
+        <Resource Include="Resources\backgrounds\aephixcorelogo.png" />
+        <Resource Include="Resources\backgrounds\clouds.gif" />
+        <Resource Include="Resources\backgrounds\clouds.jpg" />
+        <Resource Include="Resources\cursors\normal-drag.png" />
+        <Resource Include="Resources\cursors\normal-hover.png" />
+        <Resource Include="Resources\icons\aephixcorelogo.ico" />
+        <Resource Include="Resources\icons\backbutton-enabled.png" />
+        <Resource Include="Resources\icons\bookmark-off-enabled.png" />
+        <Resource Include="Resources\icons\bookmark-on-enabled.png" />
+        <Resource Include="Resources\icons\chatlog-enabled.png" />
+        <Resource Include="Resources\icons\connection-enabled.png" />
+        <Resource Include="Resources\icons\dooroutlines-off-enabled.png" />
+        <Resource Include="Resources\icons\dooroutlines-on-enabled.png" />
+        <Resource Include="Resources\icons\drawing-enabled.png" />
+        <Resource Include="Resources\icons\forwardbutton-enabled.png" />
+        <Resource Include="Resources\icons\livedirectory-enabled.png" />
+        <Resource Include="Resources\icons\nametags-off-enabled.png" />
+        <Resource Include="Resources\icons\nametags-on-enabled.png" />
+        <Resource Include="Resources\icons\playsounds-enabled.png" />
+        <Resource Include="Resources\icons\roomlist-enabled.png" />
+        <Resource Include="Resources\icons\roomlist-locked.png" />
+        <Resource Include="Resources\icons\roomlist-unlocked.png" />
+        <Resource Include="Resources\icons\superuser-enabled.png" />
+        <Resource Include="Resources\icons\tabs-off-enabled.png" />
+        <Resource Include="Resources\icons\tabs-on-enabled.png" />
+        <Resource Include="Resources\icons\terminal-enabled.png" />
+        <Resource Include="Resources\icons\terminal-hover-frame1.png" />
+        <Resource Include="Resources\icons\terminal-hover-frame2.png" />
+        <Resource Include="Resources\icons\terminal-hover.png" />
+        <Resource Include="Resources\icons\userlist-administrator.png" />
+        <Resource Include="Resources\icons\userlist-enabled.png" />
+        <Resource Include="Resources\icons\userlist-moderator.png" />
+        <Resource Include="Resources\smilies\4leafclovers.png" />
+        <Resource Include="Resources\smilies\akwatoo.png" />
+        <Resource Include="Resources\smilies\anberlins.png" />
+        <Resource Include="Resources\smilies\aqua-smileys.png" />
+        <Resource Include="Resources\smilies\asdrains.png" />
+        <Resource Include="Resources\smilies\asylum.png" />
+        <Resource Include="Resources\smilies\asylumbrites.png" />
+        <Resource Include="Resources\smilies\blotters.png" />
+        <Resource Include="Resources\smilies\chewy-face.png" />
+        <Resource Include="Resources\smilies\classic-smileys.png" />
+        <Resource Include="Resources\smilies\cuties.png" />
+        <Resource Include="Resources\smilies\defaultsmileys.png" />
+        <Resource Include="Resources\smilies\dinks.png" />
+        <Resource Include="Resources\smilies\dinks2.png" />
+        <Resource Include="Resources\smilies\Droplets.png" />
+        <Resource Include="Resources\smilies\emos.png" />
+        <Resource Include="Resources\smilies\emosv2.png" />
+        <Resource Include="Resources\smilies\falanxesV2.png" />
+        <Resource Include="Resources\smilies\imaginations.png" />
+        <Resource Include="Resources\smilies\imaginationsV2.png" />
+        <Resource Include="Resources\smilies\imaginationsV2_transparent.png" />
+        <Resource Include="Resources\smilies\loversv2.png" />
+        <Resource Include="Resources\smilies\mattahan.png" />
+        <Resource Include="Resources\smilies\palaceposers.png" />
+        <Resource Include="Resources\smilies\palaceV2.png" />
+        <Resource Include="Resources\smilies\palaceV4.png" />
+        <Resource Include="Resources\smilies\palclassics.png" />
+        <Resource Include="Resources\smilies\pandis.png" />
+        <Resource Include="Resources\smilies\sillies.png" />
+        <Resource Include="Resources\smilies\snazzies.png" />
+        <Resource Include="Resources\smilies\snoots.png" />
+        <Resource Include="Resources\smilies\starrykidds.png" />
+        <Resource Include="Resources\smilies\stinkie-hearts.png" />
+        <Resource Include="Resources\smilies\stinkies.png" />
+        <Resource Include="Resources\smilies\syncs.png" />
+        <Resource Include="Resources\smilies\techies.png" />
+        <Resource Include="Resources\smilies\transparent_imaginations.png" />
     </ItemGroup>
 
     <ItemGroup>
         <None Update="Data\MSG_ROOMDESC.data">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Media\amen.mp3">
+        <None Update="Media\Amen.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\Applause.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Media\belch.mp3">
+        <None Update="Media\Avicii.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Badumtss.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\BarrelRoll.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Belch.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\binarydna.png">
@@ -172,7 +181,7 @@
         <None Update="Media\Boing.wav">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Media\boom.mp3">
+        <None Update="Media\Boom.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\Bored.mp3">
@@ -202,6 +211,12 @@
         <None Update="Media\Cough.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Media\CrackFox.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Crickets.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="Media\Crunch.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -217,16 +232,31 @@
         <None Update="Media\DoorOpen.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Media\EmotionalDamage.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="Media\endoftime.gif">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Exclamation.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\Fader.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Media\fazein.mp3">
+        <None Update="Media\Fatality.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Fazein.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Media\guffaw.mp3">
+        <None Update="Media\Finishhim.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\GetInMyBelly.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\Guffaw.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\Hello.mp3">
@@ -235,14 +265,29 @@
         <None Update="Media\Hi.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Media\ItsATrap.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="Media\Kiss.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\LetMeShowYaSomethin.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\lobby.gif">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Media\MartianTalking.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\MattDamon.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="Media\No.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\OhNo.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\patient.gif">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -252,6 +297,12 @@
         </None>
         <None Update="Media\Pop.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\ReadingRainbow.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\RenegadeForLife.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
         <None Update="Media\Scream.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -277,6 +328,9 @@
         <None Update="Media\teehee.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="Media\WassUp.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
         <None Update="Media\Whispers.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
@@ -288,6 +342,9 @@
         </None>
         <None Update="Media\Yes.mp3">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Media\YouCanDoIt.mp3">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
