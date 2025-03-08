@@ -25,7 +25,7 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
-using ThePalace.Network.Factories;
+using ThePalace.Network.Helpers;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
@@ -73,18 +73,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         var iptTracking = new IptTracking();
         ScriptState = iptTracking;
-        var iptVar = new IptMetaVariable
+        iptTracking.Variables.TryAdd("SESSIONSTATE", new IptMetaVariable
         {
-            IsSpecial = true,
-            IsGlobal = true,
-            Value = new IptVariable
-            {
-                Type = IptVariableTypes.Shadow,
-                Value = this
-            }
-        };
-        iptVar.IsReadOnly = true;
-        iptTracking.Variables.TryAdd("SESSIONSTATE", iptVar);
+            Flags = IptMetaVariableFlags.All,
+            Variable = new IptVariable(IptVariableTypes.Shadow, this),
+        });
 
         UserDesc.Extended.TryAdd(@"MessageQueue", new DisposableQueue<MsgBubble>());
         UserDesc.Extended.TryAdd(@"CurrentMessage", null);
@@ -109,15 +102,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         base.Dispose();
     }
 
-    private static readonly IReadOnlyList<ScreenLayerTypes> _layerTypes = Enum.GetValues<ScreenLayerTypes>().AsReadOnly();
-    private readonly DisposableDictionary<ScreenLayerTypes, IScreenLayer> _uiLayers = new();
-    public IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers => _uiLayers.AsReadOnly();
-    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
-    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+    #region Object Info
+    public Guid Id { get; } = Guid.NewGuid();
+    #endregion
 
-    private readonly Timer _refreshTimer = new(350);
-
-    // UI Info
+    #region GUI Info
     public bool Visible { get; set; } = true;
     public DateTime? LastActivity { get; set; }
     public HistoryManager History { get; } = new();
@@ -130,26 +119,40 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public UserDesc SelectedUser { get; set; } = null;
     public HotspotDesc SelectedHotSpot { get; set; } = null;
 
-    public RoomDesc RoomInfo { get; set; } = null;
-    public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
+    private static readonly IReadOnlyList<ScreenLayerTypes> _layerTypes = Enum.GetValues<ScreenLayerTypes>().AsReadOnly();
+    private readonly DisposableDictionary<ScreenLayerTypes, IScreenLayer> _uiLayers = new();
+    public IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers => _uiLayers.AsReadOnly();
+    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
+    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+    private readonly Timer _refreshTimer = new(350);
+    #endregion
 
-    public ConcurrentDictionary<string, object> Extended { get; set; } = new();
-
-    public object? ScriptState { get; set; }
-
-    public Guid Id { get; } = Guid.NewGuid();
-
+    #region User Info
     public uint UserId { get; set; }
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
-    public object? State { get; set; }
 
+    public ConcurrentDictionary<string, object> Extended { get; set; } = new();
+    #endregion
+
+    #region Room Info
+    public RoomDesc RoomInfo { get; set; } = null;
+
+    public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
+    #endregion
+
+    #region Server Info
     public string? MediaUrl { get; set; } = string.Empty;
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
+
     public List<ListRec> ServerRooms { get; set; } = new();
     public List<ListRec> ServerUsers { get; set; } = new();
+
+    public object? ScriptState { get; set; }
+    public object? State { get; set; }
+    #endregion
 
     public void RefreshUI()
     {
@@ -235,8 +238,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                             item.Checked = ribbonItem2.Checked;
                     }
 
-                    var condition = true;
-                    switch (nodeType)
+                    var condition = nodeType switch
                     {
                         //case nameof(Bookmarks):
                         //case nameof(Connection):
@@ -245,28 +247,15 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         //case nameof(Tabs):
                         //    condition = true;
                         //    break;
-                        case nameof(DoorOutlines):
-                        case nameof(UserNametags):
-                        case nameof(Terminal):
-                        case nameof(SuperUser):
-                        case nameof(Draw):
-                        case nameof(UsersList):
-                        case nameof(RoomsList):
-                        case nameof(Sounds):
-                            condition = isConnected;
-                            break;
-                        case nameof(GoBack):
-                            condition =
-                                History.History.Count > 0 &&
-                                (!History.Position.HasValue || History.History.Keys.Min() != History.Position.Value);
-                            break;
-                        case nameof(GoForward):
-                            condition =
-                                History.History.Count > 0 &&
-                                History.Position.HasValue &&
-                                History.History.Keys.Max() != History.Position.Value;
-                            break;
-                    }
+                        nameof(DoorOutlines) or nameof(UserNametags) or nameof(Terminal) or nameof(SuperUser)
+                            or nameof(Draw) or nameof(UsersList) or nameof(RoomsList) or nameof(Sounds) => isConnected,
+                        nameof(GoBack) => History.History.Count > 0 && (!History.Position.HasValue ||
+                                                                        History.History.Keys.Min() !=
+                                                                        History.Position.Value),
+                        nameof(GoForward) => History.History.Count > 0 && History.Position.HasValue &&
+                                             History.History.Keys.Max() != History.Position.Value,
+                        _ => true
+                    };
 
                     if (ribbonItem is StandardItem _standardItem)
                         item.Image = _standardItem.Image;
@@ -1063,117 +1052,117 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 switch (dc.Type)
                 {
                     case DrawCmdTypes.DC_Path:
-                    {
-                        var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
-                        using (var penColour = new Pen(colour, dc.PenSize))
-                        using (var brushColour = new SolidBrush(colour))
                         {
-                            penColour.StartCap = LineCap.Round;
-                            penColour.EndCap = LineCap.Round;
-
-                            helper.SetBrush(brushColour);
-                            helper.SetPen(penColour);
-
-                            if (dc.Filled)
-                                helper.BeginPath();
-
-                            var x = dc.Pos.HAxis;
-                            var y = dc.Pos.VAxis;
-
-                            helper.MoveTo(x, y);
-
-                            foreach (var p in dc.Points)
+                            var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
+                            using (var penColour = new Pen(colour, dc.PenSize))
+                            using (var brushColour = new SolidBrush(colour))
                             {
-                                x += p.HAxis;
-                                y += p.VAxis;
+                                penColour.StartCap = LineCap.Round;
+                                penColour.EndCap = LineCap.Round;
 
-                                helper.LineTo(x, y);
+                                helper.SetBrush(brushColour);
+                                helper.SetPen(penColour);
+
+                                if (dc.Filled)
+                                    helper.BeginPath();
+
+                                var x = dc.Pos.HAxis;
+                                var y = dc.Pos.VAxis;
+
+                                helper.MoveTo(x, y);
+
+                                foreach (var p in dc.Points)
+                                {
+                                    x += p.HAxis;
+                                    y += p.VAxis;
+
+                                    helper.LineTo(x, y);
+                                }
+
+                                if (dc.Filled)
+                                    helper.Fill();
+
+                                helper.Stroke();
                             }
-
-                            if (dc.Filled)
-                                helper.Fill();
-
-                            helper.Stroke();
                         }
-                    }
 
                         break;
                     case DrawCmdTypes.DC_Ellipse:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    helper.DrawEllipse(dc.Rect);
+                            //    helper.DrawEllipse(dc.Rect);
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
+                        }
 
                         break;
                     case DrawCmdTypes.DC_Text:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
+                            //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
+                        }
 
                         break;
                     case DrawCmdTypes.DC_Shape:
-                    {
-                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                        //using (var penColour = new Pen(colour, dc.penSize))
-                        //using (var brushColour = new SolidBrush(colour))
-                        //{
-                        //    penColour.StartCap = LineCap.Round;
-                        //    penColour.EndCap = LineCap.Round;
+                        {
+                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                            //using (var penColour = new Pen(colour, dc.penSize))
+                            //using (var brushColour = new SolidBrush(colour))
+                            //{
+                            //    penColour.StartCap = LineCap.Round;
+                            //    penColour.EndCap = LineCap.Round;
 
-                        //    helper.SetBrush(brushColour);
-                        //    helper.SetPen(penColour);
+                            //    helper.SetBrush(brushColour);
+                            //    helper.SetPen(penColour);
 
-                        //    helper.BeginPath();
+                            //    helper.BeginPath();
 
-                        //    // TODO:
+                            //    // TODO:
 
-                        //    if (dc.filled)
-                        //        helper.Fill();
+                            //    if (dc.filled)
+                            //        helper.Fill();
 
-                        //    helper.Stroke();
-                        //}
+                            //    helper.Stroke();
+                            //}
 
-                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
-                    }
+                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
+                        }
 
                         break;
                 }

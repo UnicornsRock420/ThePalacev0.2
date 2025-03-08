@@ -573,18 +573,17 @@ public static class BinaryOpsExts
                             .Select(a => a as PStringAttribute)
                             .LastOrDefault();
 
-                        switch (pString.LengthByteSize)
+                        byteSize = pString.LengthByteSize switch
                         {
-                            case 1: byteSize = reader.ReadByte(); break;
-                            case 2:
-                                byteSize = doSwap
-                                    ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16()
-                                    : reader.ReadInt16(); break;
-                            case 4:
-                                byteSize = doSwap
-                                    ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32()
-                                    : reader.ReadInt32(); break;
-                        }
+                            1 => reader.ReadByte(),
+                            2 => doSwap
+                                ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16()
+                                : reader.ReadInt16(),
+                            4 => doSwap
+                                ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32()
+                                : reader.ReadInt32(),
+                            _ => byteSize
+                        };
 
                         if (byteSize > pString.MaxStringLength) byteSize = pString.MaxStringLength;
 
@@ -932,22 +931,20 @@ public static class BinaryOpsExts
                     return;
             }
 
-            switch (byteSize)
+            buffer = byteSize switch
             {
-                case 1: buffer = [(byte)_value]; break;
-                case 2:
-                    buffer = doSwap
-                        ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray()
-                        : Convert.ToUInt16(_value).GetBytes(); break;
-                case 4:
-                    buffer = doSwap
-                        ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray()
-                        : Convert.ToUInt32(_value).GetBytes(); break;
-                case 8:
-                    buffer = doSwap
-                        ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray()
-                        : Convert.ToUInt64(_value).GetBytes(); break;
-            }
+                1 => [(byte)_value],
+                2 => doSwap
+                    ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray()
+                    : Convert.ToUInt16(_value).GetBytes(),
+                4 => doSwap
+                    ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray()
+                    : Convert.ToUInt32(_value).GetBytes(),
+                8 => doSwap
+                    ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray()
+                    : Convert.ToUInt64(_value).GetBytes(),
+                _ => buffer
+            };
 
             if ((buffer?.Length ?? 0) > 0)
                 writer.Write(buffer, 0, buffer.Length);

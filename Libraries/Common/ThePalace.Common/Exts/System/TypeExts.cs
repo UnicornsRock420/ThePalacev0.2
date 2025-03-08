@@ -80,12 +80,12 @@ public static class TypeExts
 
     public static int TypeID(this Type type)
     {
-        switch (type)
+        return type switch
         {
-            case Type _t when _t == Int128Exts.Types.Int128: return (int)TypeCodeEnum.Int128;
-            case Type _t when _t == UInt128Exts.Types.UInt128: return (int)TypeCodeEnum.UInt128;
-            default: return (int)TypeCode(type);
-        }
+            Type _t when _t == Int128Exts.Types.Int128 => (int)TypeCodeEnum.Int128,
+            Type _t when _t == UInt128Exts.Types.UInt128 => (int)TypeCodeEnum.UInt128,
+            _ => (int)TypeCode(type)
+        };
     }
 
     public static TypeCodeEnum TypeCode<T>()

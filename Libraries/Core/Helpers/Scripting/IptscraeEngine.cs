@@ -7,6 +7,7 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Core;
+using ThePalace.Logging.Entities;
 
 namespace ThePalace.Core.Factories.Scripting;
 
@@ -46,144 +47,92 @@ public static class IptscraeEngine
         {
             "LINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
-                var register4 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register4 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer || register3.Type != IptVariableTypes.Integer ||
-                            register4.Type != IptVariableTypes.Integer)
-                            throw new Exception(
-                                $"Wrong datatype {register1.Type}, {register2.Type}, {register3.Type}, {register4.Type}...");
+                //$scope.model.Screen.paintPenPos = {
+                //    v: register3.Value,
+                //    h: register4.Value,
+                //};
 
-                        //$scope.model.Screen.paintPenPos = {
-                        //    v: register3.Value,
-                        //    h: register4.Value,
-                        //};
-
-                        //$scope.encodeDrawCmd({
-                        //    v: register3.Value,
-                        //    h: register4.Value,
-                        //}, [{
-                        //    v: register1.Value - register3.Value,
-                        //    h: register2.Value - register4.Value,
-                        //}]);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.encodeDrawCmd({
+                //    v: register3.Value,
+                //    h: register4.Value,
+                //}, [{
+                //    v: register1.Value - register3.Value,
+                //    h: register2.Value - register4.Value,
+                //}]);
             })
         },
         {
             "LINETO", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
+                //$scope.encodeDrawCmd({
+                //    v: $scope.model.Screen.paintPenPos.v,
+                //    h: $scope.model.Screen.paintPenPos.h,
+                //}, [{
+                //    v: register1.Value - $scope.model.Screen.paintPenPos.v,
+                //    h: register2.Value - $scope.model.Screen.paintPenPos.h,
+                //}]);
 
-                        //$scope.encodeDrawCmd({
-                        //    v: $scope.model.Screen.paintPenPos.v,
-                        //    h: $scope.model.Screen.paintPenPos.h,
-                        //}, [{
-                        //    v: register1.Value - $scope.model.Screen.paintPenPos.v,
-                        //    h: register2.Value - $scope.model.Screen.paintPenPos.h,
-                        //}]);
-
-                        //$scope.model.Screen.paintPenPos = {
-                        //    v: register1.Value,
-                        //    h: register2.Value,
-                        //};
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.model.Screen.paintPenPos = {
+                //    v: register1.Value,
+                //    h: register2.Value,
+                //};
             })
         },
         // Start Paint Commands
         {
             "PENPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //$scope.model.Screen.paintPenPos = {
-                        //    v: register1.Value,
-                        //    h: register2.Value,
-                        //};
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.model.Screen.paintPenPos = {
+                //    v: register1.Value,
+                //    h: register2.Value,
+                //};
             })
         },
         {
             "PENTO", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
+                //if (!$scope.model.Screen.paintPenPos) {
+                //    $scope.model.Screen.paintPenPos = {
+                //        v: 0,
+                //        h: 0,
+                //    };
+                //}
 
-                        //if (!$scope.model.Screen.paintPenPos) {
-                        //    $scope.model.Screen.paintPenPos = {
-                        //        v: 0,
-                        //        h: 0,
-                        //    };
-                        //}
+                //var xCoord = $scope.model.Screen.paintPenPos.h + register2.Value;
+                //var yCoord = $scope.model.Screen.paintPenPos.v + register1.Value;
 
-                        //var xCoord = $scope.model.Screen.paintPenPos.h + register2.Value;
-                        //var yCoord = $scope.model.Screen.paintPenPos.v + register1.Value;
-
-                        //$scope.model.Screen.paintPenPos = {
-                        //    v: yCoord,
-                        //    h: xCoord,
-                        //};
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.model.Screen.paintPenPos = {
+                //    v: yCoord,
+                //    h: xCoord,
+                //};
             })
         },
         {
             "PENCOLOR", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer || register3.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}, {register3.Type}...");
-
-                        //$scope.model.Screen.paintPenColor = {
-                        //    r: register3.Value % 256,
-                        //    g: register2.Value % 256,
-                        //    b: register1.Value % 256,
-                        //};
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.model.Screen.paintPenColor = {
+                //    r: register3.Value % 256,
+                //    g: register2.Value % 256,
+                //    b: register1.Value % 256,
+                //};
             })
         },
         {
@@ -225,20 +174,11 @@ public static class IptscraeEngine
         {
             "PENSIZE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        register.Value = (int)register.Value % gMaxPaintPenSize;
+                if ((int)register.Value < 1) register.Value = 1;
 
-                        if ((int)register.Value < 1) register.Value = 1;
-
-                        //$scope.model.Screen.paintPenSize = register.Value;
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.model.Screen.paintPenSize = register.Value;
             })
         },
         // End Paint Commands
@@ -246,28 +186,21 @@ public static class IptscraeEngine
         {
             "SOUND", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //if ($scope.model.Interface.soundsEnabled) {
-                        //    var audioUrl = $scope.model.ServerInfo.mediaUrl + ($scope.model.ServerInfo.mediaUrl.substring($scope.model.ServerInfo.mediaUrl.length - 1, 1) == '/' ? '' : '/') + register.Value;
-                        //
-                        //    $scope.model.Application.soundPlayer.preload({
-                        //        sourceUrl: audioUrl,
-                        //        resolve: function (response) {
-                        //            this.play();
-                        //        },
-                        //        reject: function (errors) {
-                        //        },
-                        //    });
-                        //    $scope.model.Application.soundPlayer.load();
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //if ($scope.model.Interface.soundsEnabled) {
+                //    var audioUrl = $scope.model.ServerInfo.mediaUrl + ($scope.model.ServerInfo.mediaUrl.substring($scope.model.ServerInfo.mediaUrl.length - 1, 1) == '/' ? '' : '/') + register.Value;
+                //
+                //    $scope.model.Application.soundPlayer.preload({
+                //        sourceUrl: audioUrl,
+                //        resolve: function (response) {
+                //            this.play();
+                //        },
+                //        reject: function (errors) {
+                //        },
+                //    });
+                //    $scope.model.Application.soundPlayer.load();
+                //}
             })
         },
         {
@@ -279,20 +212,13 @@ public static class IptscraeEngine
         {
             "MIDIPLAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //if ($scope.model.Interface.soundsEnabled) {
-                        //    var audioUrl = $scope.model.ServerInfo.mediaUrl + ($scope.model.ServerInfo.mediaUrl.substring($scope.model.ServerInfo.mediaUrl.length - 1, 1) == '/' ? '' : '/') + register.Value;
-                        //
-                        //    $scope.model.Application.midiPlayer.play(audioUrl);
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //if ($scope.model.Interface.soundsEnabled) {
+                //    var audioUrl = $scope.model.ServerInfo.mediaUrl + ($scope.model.ServerInfo.mediaUrl.substring($scope.model.ServerInfo.mediaUrl.length - 1, 1) == '/' ? '' : '/') + register.Value;
+                //
+                //    $scope.model.Application.midiPlayer.play(audioUrl);
+                //}
             })
         },
         {
@@ -306,99 +232,61 @@ public static class IptscraeEngine
         {
             "SINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)Math.Sin((int)register.Value) * 1000
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)Math.Sin((int)register.Value) * 1000
+                });
             })
         },
         {
             "COSINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)Math.Cos((int)register.Value) * 1000
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)Math.Cos((int)register.Value) * 1000
+                });
             })
         },
         {
             "TANGENT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)Math.Tan((int)register.Value) * 1000
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)Math.Tan((int)register.Value) * 1000
+                });
             })
         },
         {
             "SQUAREROOT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)Math.Sqrt((int)register.Value) * 1000
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)Math.Sqrt((int)register.Value) * 1000
+                });
             })
         },
         {
             "RANDOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        var value = (int)register.Value;
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = RndGenerator.Next(value)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = RndGenerator.Next((int)register.Value)
+                });
             })
         },
         { "MOD", (IptCommandFnc)((iptTracking, recursionDepth) => { Operator(iptTracking, "%", recursionDepth); }) },
@@ -437,19 +325,12 @@ public static class IptscraeEngine
         {
             "PICK", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (iptTracking.Stack.Count <= (int)register.Value)
-                            throw new Exception("Not enough items on the stack...");
+                if (iptTracking.Stack.Count <= (int)register.Value)
+                    throw new Exception("Not enough items on the stack...");
 
-                        iptTracking.Stack.Push(iptTracking.Stack[iptTracking.Stack.Count - (int)register.Value - 1]);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                iptTracking.Stack.Push(iptTracking.Stack[iptTracking.Stack.Count - (int)register.Value - 1]);
             })
         },
         {
@@ -459,12 +340,12 @@ public static class IptscraeEngine
                 iptTracking.Stack.Push(register);
             })
         },
-        { "POP", (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Stack.Pop(); }) },
+        { "POP", (IptCommandFnc)((iptTracking, recursionDepth) => { popStack(iptTracking); }) },
         {
             "SWAP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = iptTracking.Stack.Pop();
-                var register2 = iptTracking.Stack.Pop();
+                var register1 = popStack(iptTracking);
+                var register2 = popStack(iptTracking);
 
                 iptTracking.Stack.Push(register1);
                 iptTracking.Stack.Push(register2);
@@ -485,187 +366,119 @@ public static class IptscraeEngine
         {
             "ROOMMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$scope.serverSend(
-                        //    'MSG_RMSG',
-                        //    {
-                        //        text: register.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_RMSG',
+                //    {
+                //        text: register.Value,
+                //    });
             })
         },
         {
             "SUSRMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$scope.serverSend(
-                        //    'MSG_SMSG',
-                        //    {
-                        //        text: register.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_SMSG',
+                //    {
+                //        text: register.Value,
+                //    });
             })
         },
         {
             "GLOBALMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$scope.serverSend(
-                        //    'MSG_GMSG',
-                        //    {
-                        //        text: register.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_GMSG',
+                //    {
+                //        text: register.Value,
+                //    });
             })
         },
         {
             "LOCALMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$.connection.proxyHub.client.receive(
-                        //    'MSG_TALK',
-                        //    $scope.model.UserInfo.userId,
-                        //    {
-                        //        text: register.Value,
-                        //        localmsg: true,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$.connection.proxyHub.client.receive(
+                //    'MSG_TALK',
+                //    $scope.model.UserInfo.userId,
+                //    {
+                //        text: register.Value,
+                //        localmsg: true,
+                //    });
             })
         },
         {
             "STATUSMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$scope.setStatusMsg(register.Value);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.setStatusMsg(register.Value);
             })
         },
         {
             "PRIVATEMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.String)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //$scope.serverSend(
-                        //    'MSG_XWHISPER',
-                        //    {
-                        //        target: register1.Value,
-                        //        text: register2.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_XWHISPER',
+                //    {
+                //        target: register1.Value,
+                //        text: register2.Value,
+                //    });
             })
         },
         {
             "LOGMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$scope.model.Interface.LogList.push({
-                        //    userName: this.iptEngineUsername,
-                        //    text: register.Value,
-                        //    isWhisper: true,
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.model.Interface.LogList.push({
+                //    userName: this.iptEngineUsername,
+                //    text: register.Value,
+                //    isWhisper: true,
+                //});
             })
         },
         {
             "SAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_XTALK,
-                        //    protocolSend = new MSG_XTALK
-                        //    {
-                        //        Text = register.Value.ToString(),
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    EventType = EventTypes.MSG_XTALK,
+                //    protocolSend = new MSG_XTALK
+                //    {
+                //        Text = register.Value.ToString(),
+                //    },
+                //});
             })
         },
         {
             "SAYAT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.String:
-                        if (register2.Type != register3.Type && register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //$scope.serverSend(
-                        //    'MSG_XTALK',
-                        //    {
-                        //        text: ''.concat('@', register2.Value, ',', register1.Value, ' ', register3.Value),
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_XTALK',
+                //    {
+                //        text: ''.concat('@', register2.Value, ',', register1.Value, ' ', register3.Value),
+                //    });
             })
         },
         // End Message Commands
@@ -673,97 +486,73 @@ public static class IptscraeEngine
         {
             "MACRO", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        // TODO:
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                // TODO:
             })
         },
         {
             "USERPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                        //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                        //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                        //            if (register.Value < $scope.model.RoomInfo.UserList[j].propSpec.length) {
-                        //                var propID = $scope.model.RoomInfo.UserList[j].propSpec[register.Value].id;
-                        //
-                        //                iptTracking.Stack.Push(new IptValue {
-                        //                    Type = IptTypes.Integer,
-                        //                    Value = propID,
-                        //                });
-                        //            }
-                        //        }
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
+                //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
+                //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
+                //            if (register.Value < $scope.model.RoomInfo.UserList[j].propSpec.length) {
+                //                var propID = $scope.model.RoomInfo.UserList[j].propSpec[register.Value].id;
+                //
+                //                iptTracking.Stack.Push(new IptValue {
+                //                    Type = IptTypes.Integer,
+                //                    Value = propID,
+                //                });
+                //            }
+                //        }
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "DROPPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                        //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                        //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                        //            var lastIndex = $scope.model.RoomInfo.UserList[j].propSpec.length - 1;
-                        //            var propID = $scope.model.RoomInfo.UserList[j].propSpec[lastIndex].id;
-                        //
-                        //            $scope.serverSend(
-                        //                'MSG_PROPNEW',
-                        //
-                        //                {
-                        //                    propSpec: {
-                        //                        id: propID,
-                        //			            crc: 0,
-                        //		            },
-                        //		            loc: {
-                        //                        h: register2.Value,
-                        //			            v: register1.Value,
-                        //		            },
-                        //	            });
-                        //
-                        //            if (lastIndex == 0) {
-                        //	            $scope.setProps(null);
-                        //            }
-                        //            else {
-                        //	            $scope.model.RoomInfo.UserList[j].propSpec.splice(lastIndex, 1);
-                        //
-                        //	            $scope.setProps($scope.model.RoomInfo.UserList[j].propSpec);
-                        //            }
-                        //        }
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
+                //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
+                //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
+                //            var lastIndex = $scope.model.RoomInfo.UserList[j].propSpec.length - 1;
+                //            var propID = $scope.model.RoomInfo.UserList[j].propSpec[lastIndex].id;
+                //
+                //            $scope.serverSend(
+                //                'MSG_PROPNEW',
+                //
+                //                {
+                //                    propSpec: {
+                //                        id: propID,
+                //			            crc: 0,
+                //		            },
+                //		            loc: {
+                //                        h: register2.Value,
+                //			            v: register1.Value,
+                //		            },
+                //	            });
+                //
+                //            if (lastIndex == 0) {
+                //	            $scope.setProps(null);
+                //            }
+                //            else {
+                //	            $scope.model.RoomInfo.UserList[j].propSpec.splice(lastIndex, 1);
+                //
+                //	            $scope.setProps($scope.model.RoomInfo.UserList[j].propSpec);
+                //            }
+                //        }
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
@@ -806,7 +595,7 @@ public static class IptscraeEngine
         {
             "HASPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
 
                 //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
                 //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
@@ -826,9 +615,6 @@ public static class IptscraeEngine
                 //                    break;
                 //                case IptTypes.Integer:
                 //                    propID = register.Value;
-                //
-                //                    break;
-                //                default: throw new Exception($"Wrong datatype {register2.Type}...");
                 //
                 //                    break;
                 //            }
@@ -857,9 +643,9 @@ public static class IptscraeEngine
         {
             "ADDLOOSEPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.String);
 
                 if (register1.Type != register2.Type && register1.Type != IptVariableTypes.Integer)
                     throw new Exception($"Wrong datatype {register1.Type}...");
@@ -904,14 +690,13 @@ public static class IptscraeEngine
                         //    });
 
                         break;
-                    default: throw new Exception($"Wrong datatype {register3.Type}...");
                 }
             })
         },
         {
             "REMOVEPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
 
                 //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
                 //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
@@ -960,7 +745,7 @@ public static class IptscraeEngine
         {
             "DONPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
                 var propSpec = new List<AssetSpec>();
 
                 //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
@@ -1005,44 +790,37 @@ public static class IptscraeEngine
         {
             "SETPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Array:
-                        var propSpec = new List<AssetSpec>();
+                var propSpec = new List<AssetSpec>();
 
-                        //for (var j = 0; j < register.Value.length; j++) {
-                        //    switch (register.Value[j].Type) {
-                        //        case IptTypes.String:
-                        //            for (var k in $scope.model.Screen.assetCache) {
-                        //                if ($scope.model.Screen.assetCache[k].name == register.Value[j].Value) {
-                        //                    propSpec.push({
-                        //                        id: k,
-                        //			            crc: 0,
-                        //		            });
-                        //
-                        //                    break;
-                        //                }
-                        //            }
-                        //
-                        //            break;
-                        //        case IptTypes.Integer:
-                        //            propSpec.push({
-                        //                id: register.Value[j].Value,
-                        //	            crc: 0,
-                        //            });
-                        //
-                        //            break;
-                        //        default: throw new Exception($"Wrong datatype {register.Type}...");
-                        //    }
-                        //}
+                //for (var j = 0; j < register.Value.length; j++) {
+                //    switch (register.Value[j].Type) {
+                //        case IptTypes.String:
+                //            for (var k in $scope.model.Screen.assetCache) {
+                //                if ($scope.model.Screen.assetCache[k].name == register.Value[j].Value) {
+                //                    propSpec.push({
+                //                        id: k,
+                //			            crc: 0,
+                //		            });
+                //
+                //                    break;
+                //                }
+                //            }
+                //
+                //            break;
+                //        case IptTypes.Integer:
+                //            propSpec.push({
+                //                id: register.Value[j].Value,
+                //	            crc: 0,
+                //            });
+                //
+                //            break;
+                //        default: throw new Exception($"Wrong datatype {register.Type}...");
+                //    }
+                //}
 
-                        //$scope.setProps(propSpec.length ? propSpec : null);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.setProps(propSpec.length ? propSpec : null);
             })
         },
         {
@@ -1064,12 +842,13 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
-                    Type = IptVariableTypes.Integer
-                    //Value = sessionState.UserInfo.assetSpec.Count,
+                    Type = IptVariableTypes.Integer,
+                    Value = sessionState.UserDesc?.UserInfo?.PropSpec?.Length ?? 0,
                 });
             })
         },
@@ -1078,208 +857,133 @@ public static class IptscraeEngine
         {
             "LOWERCASE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
+                var value = register.Value.ToString().ToLowerInvariant();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        var value = register.Value.ToString().ToLowerInvariant();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = value
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.String,
+                    Value = value
+                });
             })
         },
         {
             "UPPERCASE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
                 register = getVariable(iptTracking, register);
 
-                switch (register.Type)
+                var value = register.Value.ToString().ToUpperInvariant();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        var value = register.Value.ToString().ToUpperInvariant();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = value
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.String,
+                    Value = value
+                });
             })
         },
         {
             "STRINDEX", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.String);
+                var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register2.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        if (register1.Type != IptVariableTypes.String)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = register2.Value.ToString().IndexOf(register1.Value.ToString())
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = register2.Value.ToString().IndexOf(register1.Value.ToString())
+                });
             })
         },
         {
             "STRLEN", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = register.Value.ToString().Length
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = register.Value.ToString().Length
+                });
             })
         },
         {
             "SUBSTR", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.String);
+                var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register2.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        if (register1.Type != IptVariableTypes.String)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = register2.Value.ToString().IndexOf(register1.Value.ToString()) != -1 ? 1 : 0
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                    Type = IptVariableTypes.Bool,
+                    Value = register2.Value.ToString().IndexOf(register1.Value.ToString()) != -1 ? 1 : 0
+                });
             })
         },
         {
             "SUBSTRING", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register3.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        if (register1.Type != IptVariableTypes.Integer && register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register1.Type}, {register2.Type}...");
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = register3.Value.ToString().Substring((int)register2.Value, (int)register1.Value)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register3.Type}...");
-                }
+                    Type = IptVariableTypes.String,
+                    Value = register3.Value.ToString().Substring((int)register2.Value, (int)register1.Value)
+                });
             })
         },
         {
             "GREPSTR", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.String);
+                var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register2.Type)
+                var regExp = new Regex(register1.Value.ToString());
+
+                iptTracking.Grep = regExp.Matches(register2.Value.ToString())
+                    .ToArray();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        if (register1.Type != IptVariableTypes.String)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
-
-                        var regExp = new Regex(register1.Value.ToString());
-
-                        iptTracking.Grep = regExp.Matches(register2.Value.ToString())
-                            .ToArray();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = iptTracking.Grep != null ? 1 : 0
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                    Type = IptVariableTypes.Bool,
+                    Value = iptTracking.Grep != null ? 1 : 0
+                });
             })
         },
         {
             "GREPSUB", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
+                if (iptTracking.Grep != null)
                 {
-                    case IptVariableTypes.String:
-                        if (iptTracking.Grep != null)
-                        {
-                            register.Value = (register.Value?.ToString() ?? string.Empty).Trim();
+                    register.Value = (register.Value?.ToString() ?? string.Empty).Trim();
 
-                            for (var j = 1; j < 10; j++)
-                                register.Value = register.Value?.ToString()
-                                    ?.Replace($"${j}", iptTracking.Grep[j].Value);
+                    for (var j = 1; j < 10; j++)
+                        register.Value = register.Value?.ToString()
+                            ?.Replace($"${j}", iptTracking.Grep[j].Value);
 
-                            iptTracking.Stack.Push(new IptVariable
-                            {
-                                Type = IptVariableTypes.String,
-                                Value = register.Value
-                            });
-                        }
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
+                    iptTracking.Stack.Push(new IptVariable
+                    {
+                        Type = IptVariableTypes.String,
+                        Value = register.Value
+                    });
                 }
             })
         },
         {
             "STRTOATOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Atomlist,
-                            Value = Parser(iptTracking, register.Value.ToString(), false)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Atomlist,
+                    Value = Parse(iptTracking, register.Value.ToString(), false)
+                });
             })
         },
         // End String Commands
@@ -1310,47 +1014,24 @@ public static class IptscraeEngine
         {
             "IF", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                if ((register1.Type != IptVariableTypes.Bool || register1.Type != IptVariableTypes.Integer) &&
-                    register2.Type != IptVariableTypes.Atomlist)
-                    throw new Exception($"Wrong datatype {register1.Type}...");
-
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        if ((int)register1.Value != 0)
-                            Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
-
-                        break;
-                }
+                if ((int)register1.Value != 0)
+                    Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
             })
         },
         {
             "IFELSE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
+                var register3 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                if ((register1.Type != IptVariableTypes.Bool || register1.Type != IptVariableTypes.Integer) &&
-                    register2.Type != IptVariableTypes.Atomlist &&
-                    register3.Type != IptVariableTypes.Atomlist)
-                    throw new Exception($"Wrong datatype {register1.Type}...");
-
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        if ((int)register1.Value != 0)
-                            Executor(register3.Value as IptAtomList, iptTracking, recursionDepth + 1);
-                        else
-                            Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
-
-                        break;
-                }
+                if ((int)register1.Value != 0)
+                    Executor(register3.Value as IptAtomList, iptTracking, recursionDepth + 1);
+                else
+                    Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
             })
         },
         // End Boolean Commands
@@ -1358,31 +1039,20 @@ public static class IptscraeEngine
         {
             "ARRAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Array,
-                            Value = new IptAtomList((int)register.Value)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Array,
+                    Value = new IptAtomList((int)register.Value)
+                });
             })
         },
         {
             "DEF", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = iptTracking.Stack.Pop();
-                var register2 = popStack(iptTracking);
-
-                if (register1.Type != IptVariableTypes.Variable && register2.Type != IptVariableTypes.Atomlist &&
-                    register2.Type != IptVariableTypes.Array)
-                    throw new Exception($"Wrong datatype {register1.Type}, {register2.Type}...");
+                var register1 = popStack(iptTracking, IptVariableTypes.Variable);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist, IptVariableTypes.Array);
 
                 setVariable(iptTracking, register1, register2, recursionDepth);
             })
@@ -1390,70 +1060,42 @@ public static class IptscraeEngine
         {
             "GET", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register2.Type)
-                {
-                    case IptVariableTypes.Array:
-                        var array = register2.Value as IptAtomList;
+                var array = register2.Value as IptAtomList;
 
-                        if (register1.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                if ((int)register1.Value >= array.Count)
+                    throw new Exception($"Index {register1.Value} out of bounds...");
 
-                        if ((int)register1.Value >= array.Count)
-                            throw new Exception($"Index {register1.Value} out of bounds...");
-
-                        iptTracking.Stack.Push(array[(int)register1.Value]);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                iptTracking.Stack.Push(array[(int)register1.Value]);
             })
         },
         {
             "PUT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Array);
+                var register3 = getStack(iptTracking);
 
-                switch (register2.Type)
-                {
-                    case IptVariableTypes.Array:
-                        var array = register2.Value as IptAtomList;
+                var array = register2.Value as IptAtomList;
 
-                        if (register1.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                if ((int)register1.Value >= array.Count)
+                    throw new Exception($"Index {register1.Value} out of bounds...");
 
-                        if ((int)register1.Value >= array.Count)
-                            throw new Exception($"Index {register1.Value} out of bounds...");
-
-                        array[(int)register1.Value] = register3;
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                array[(int)register1.Value] = register3;
             })
         },
         {
             "LENGTH", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Array);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Array:
-                    case IptVariableTypes.String:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (register.Value as IptAtomList).Count
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (register.Value as IptAtomList).Count
+                });
             })
         },
         // End Array Commands
@@ -1461,76 +1103,42 @@ public static class IptscraeEngine
         {
             "ITOA", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        var value = register.Value.ToString();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = value
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.String,
+                    Value = register.Value.ToString()
+                });
             })
         },
         {
             "ATOI", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.String:
-                        var value = int.Parse(register.Value.ToString());
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = value
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = int.Parse(register.Value.ToString())
+                });
             })
         },
         {
             "TOPTYPE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
                 var register = iptTracking.Stack.PeekL();
-                var typeID = 0;
 
-                switch (register.Type)
+                var typeID = register.Type switch
                 {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        typeID = 1;
-
-                        break;
-                    case IptVariableTypes.Variable:
-                        typeID = 2;
-
-                        break;
-                    case IptVariableTypes.Atomlist:
-                        typeID = 3;
-
-                        break;
-                    case IptVariableTypes.String:
-                        typeID = 4;
-
-                        break;
-                    case IptVariableTypes.Array:
-                        typeID = 6;
-
-                        break;
-                }
+                    IptVariableTypes.Bool or
+                        IptVariableTypes.Integer => 1,
+                    IptVariableTypes.Variable => 2,
+                    IptVariableTypes.Atomlist => 3,
+                    IptVariableTypes.String => 4,
+                    IptVariableTypes.Array => 6,
+                    _ => 0
+                };
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -1545,32 +1153,16 @@ public static class IptscraeEngine
                 var register = iptTracking.Stack.PeekL();
                 register = getVariable(iptTracking, register);
 
-                var typeID = 0;
-
-                switch (register.Type)
+                var typeID = register.Type switch
                 {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        typeID = 1;
-
-                        break;
-                    case IptVariableTypes.Variable:
-                        typeID = 2;
-
-                        break;
-                    case IptVariableTypes.Atomlist:
-                        typeID = 3;
-
-                        break;
-                    case IptVariableTypes.String:
-                        typeID = 4;
-
-                        break;
-                    case IptVariableTypes.Array:
-                        typeID = 6;
-
-                        break;
-                }
+                    IptVariableTypes.Bool or
+                        IptVariableTypes.Integer => 1,
+                    IptVariableTypes.Variable => 2,
+                    IptVariableTypes.Atomlist => 3,
+                    IptVariableTypes.String => 4,
+                    IptVariableTypes.Array => 6,
+                    _ => 0
+                };
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -1584,313 +1176,223 @@ public static class IptscraeEngine
         {
             "INSPOT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                        //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                        //        var xCoord = $scope.model.RoomInfo.UserList[j].roomPos.h;
-                        //        var yCoord = $scope.model.RoomInfo.UserList[j].roomPos.v;
-                        //        var inside = false;
-                        //
-                        //        for (var k = 0; k < !inside && $scope.model.RoomInfo.SpotList.length; k++) {
-                        //            var spot = $scope.model.RoomInfo.SpotList[k];
-                        //
-                        //            if (spot.id == register.Value) {
-                        //	            var polygon = [];
-                        //
-                        //	            for (var l = 0; l < spot.Vortexes.length; l++) {
-                        //		            polygon.push({
-                        //			            v: spot.loc.v + spot.Vortexes[l].v,
-                        //			            h: spot.loc.h + spot.Vortexes[l].h,
-                        //		            });
-                        //	            }
-                        //
-                        //	            inside = utilService.pointInPolygon(polygon, {
-                        //		            v: yCoord,
-                        //		            h: xCoord,
-                        //	            });
-                        //
-                        //	            break;
-                        //            }
-                        //        }
-                        //
-                        //        iptTracking.Stack.Push(new IptValue {
-                        //            Type = IptTypes.Bool,
-                        //            Value = inside ? 1 : 0,
-                        //        });
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
+                //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
+                //        var xCoord = $scope.model.RoomInfo.UserList[j].roomPos.h;
+                //        var yCoord = $scope.model.RoomInfo.UserList[j].roomPos.v;
+                //        var inside = false;
+                //
+                //        for (var k = 0; k < !inside && $scope.model.RoomInfo.SpotList.length; k++) {
+                //            var spot = $scope.model.RoomInfo.SpotList[k];
+                //
+                //            if (spot.id == register.Value) {
+                //	            var polygon = [];
+                //
+                //	            for (var l = 0; l < spot.Vortexes.length; l++) {
+                //		            polygon.push({
+                //			            v: spot.loc.v + spot.Vortexes[l].v,
+                //			            h: spot.loc.h + spot.Vortexes[l].h,
+                //		            });
+                //	            }
+                //
+                //	            inside = utilService.pointInPolygon(polygon, {
+                //		            v: yCoord,
+                //		            h: xCoord,
+                //	            });
+                //
+                //	            break;
+                //            }
+                //        }
+                //
+                //        iptTracking.Stack.Push(new IptValue {
+                //            Type = IptTypes.Bool,
+                //            Value = inside ? 1 : 0,
+                //        });
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "LOCK", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //$scope.serverSend(
-                        //    'MSG_DOORLOCK',
-                        //    {
-                        //        roomID: $scope.model.RoomInfo.roomId,
-                        //        spotID: register.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_DOORLOCK',
+                //    {
+                //        roomID: $scope.model.RoomInfo.roomId,
+                //        spotID: register.Value,
+                //    });
             })
         },
         {
             "UNLOCK", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //$scope.serverSend(
-                        //    'MSG_DOORUNLOCK',
-                        //    {
-                        //        roomID: $scope.model.RoomInfo.roomId,
-                        //        spotID: register.Value,
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_DOORUNLOCK',
+                //    {
+                //        roomID: $scope.model.RoomInfo.roomId,
+                //        spotID: register.Value,
+                //    });
             })
         },
         {
             "ISLOCKED", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
-                        //    var spot = $scope.model.RoomInfo.SpotList[j];
-                        //    if (spot.id == register.Value) {
-                        //        iptTracking.Stack.Push(new IptValue {
-                        //            Type = IptTypes.Bool,
-                        //            Value = spot.Type == HotSpotTypes.HT_Door && spot.state != 0 ? 1 : 0,
-                        //        });
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
+                //    var spot = $scope.model.RoomInfo.SpotList[j];
+                //    if (spot.id == register.Value) {
+                //        iptTracking.Stack.Push(new IptValue {
+                //            Type = IptTypes.Bool,
+                //            Value = spot.Type == HotSpotTypes.HT_Door && spot.state != 0 ? 1 : 0,
+                //        });
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "GETSPOTSTATE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
-                        //    if ($scope.model.RoomInfo.SpotList[j].id == register.Value) {
-                        //        iptTracking.Stack.Push(new IptValue {
-                        //            Type = IptTypes.Integer,
-                        //            Value = $scope.model.RoomInfo.SpotList[j].state,
-                        //        });
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
+                //    if ($scope.model.RoomInfo.SpotList[j].id == register.Value) {
+                //        iptTracking.Stack.Push(new IptValue {
+                //            Type = IptTypes.Integer,
+                //            Value = $scope.model.RoomInfo.SpotList[j].state,
+                //        });
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "SETSPOTSTATE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
-                        //    if ($scope.model.RoomInfo.SpotList[j].id == register1.Value) {
-                        //        $scope.serverSend(
-                        //            'MSG_SPOTSTATE',
-                        //            {
-                        //	            roomID: $scope.model.RoomInfo.roomId,
-                        //	            spotID: register1.Value,
-                        //	            state: register2.Value,
-                        //            });
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
+                //    if ($scope.model.RoomInfo.SpotList[j].id == register1.Value) {
+                //        $scope.serverSend(
+                //            'MSG_SPOTSTATE',
+                //            {
+                //	            roomID: $scope.model.RoomInfo.roomId,
+                //	            spotID: register1.Value,
+                //	            state: register2.Value,
+                //            });
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "SETSPOTSTATELOCAL", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
-                        //    if ($scope.model.RoomInfo.SpotList[j].id == register1.Value) {
-                        //        $scope.model.RoomInfo.SpotList[j].state == register2.Value;
-                        //
-                        //        $scope.model.Screen.spotLayerUpdate = true;
-                        //
-                        //        $scope.Screen_OnDraw();
-                        //
-                        //        break;
-                        //    }
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
+                //    if ($scope.model.RoomInfo.SpotList[j].id == register1.Value) {
+                //        $scope.model.RoomInfo.SpotList[j].state == register2.Value;
+                //
+                //        $scope.model.Screen.spotLayerUpdate = true;
+                //
+                //        $scope.Screen_OnDraw();
+                //
+                //        break;
+                //    }
+                //}
             })
         },
         {
             "SETLOC", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != register3.Type || register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //$scope.serverSend(
-                        //    'MSG_SPOTMOVE',
-                        //    {
-                        //        roomID: $scope.model.RoomInfo.roomId,
-                        //        spotID: register1.Value,
-                        //        pos: {
-                        //            h: register3.Value,
-                        //            v: register2.Value,
-                        //        }
-                        //
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_SPOTMOVE',
+                //    {
+                //        roomID: $scope.model.RoomInfo.roomId,
+                //        spotID: register1.Value,
+                //        pos: {
+                //            h: register3.Value,
+                //            v: register2.Value,
+                //        }
+                //
+                //    });
             })
         },
         {
             "SETPICLOC", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-                var register3 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register3 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != register3.Type || register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //$scope.serverSend(
-                        //    'MSG_PICTMOVE',
-                        //    {
-                        //        roomID: $scope.model.RoomInfo.roomId,
-                        //        spotID: register1.Value,
-                        //        pos: {
-                        //            h: register3.Value,
-                        //            v: register2.Value,
-                        //        }
-                        //
-                        //    });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //$scope.serverSend(
+                //    'MSG_PICTMOVE',
+                //    {
+                //        roomID: $scope.model.RoomInfo.roomId,
+                //        spotID: register1.Value,
+                //        pos: {
+                //            h: register3.Value,
+                //            v: register2.Value,
+                //        }
+                //
+                //    });
             })
         },
         {
             "SELECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //$timeout(
-                        //    $scope.Spot_OnEvent,
-                        //    1,
-                        //    false,
-                        //    register.Value,
-                        //    'SELECT'
-                        //);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //$timeout(
+                //    $scope.Spot_OnEvent,
+                //    1,
+                //    false,
+                //    register.Value,
+                //    'SELECT'
+                //);
             })
         },
         {
             "SETALARM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        //var futureTicks = Math.floor((register2.Value / 6) * 100);
-                        //$timeout(
-                        //    $scope.Spot_OnEvent,
-                        //    futureTicks,
-                        //    false,
-                        //    register1.Value,
-                        //    'ALARM'
-                        //);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //var futureTicks = Math.floor((register2.Value / 6) * 100);
+                //$timeout(
+                //    $scope.Spot_OnEvent,
+                //    futureTicks,
+                //    false,
+                //    register1.Value,
+                //    'ALARM'
+                //);
             })
         },
         {
             "ME", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var index = iptTracking.Variables.ContainsKey("ME") ? (int)iptTracking.Variables["ME"].Value.Value : 0;
+                var index = iptTracking.Variables.ContainsKey("ME")
+                    ? (int)iptTracking.Variables["ME"].Variable.Value
+                    : 0;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -1904,9 +1406,12 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                var index = iptTracking.Variables.ContainsKey("ME") ? (int)iptTracking.Variables["ME"].Value.Value : 0;
+                var index = iptTracking.Variables.ContainsKey("ME")
+                    ? (int)iptTracking.Variables["ME"].Variable.Value
+                    : 0;
                 if (index < 0) throw new Exception("Index out of bounds...");
 
                 //var spots = sessionState.RoomInfo.HotSpots.ToArray();
@@ -1922,60 +1427,47 @@ public static class IptscraeEngine
         {
             "DOORIDX", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        //var doorList = [];
+                //var doorList = [];
 
-                        //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
-                        //    if ($scope.model.RoomInfo.SpotList[j].Type == HotSpotTypes.HT_Door) {
-                        //        doorList.push($scope.model.RoomInfo.SpotList[j]);
-                        //    }
-                        //}
+                //for (var j = 0; j < $scope.model.RoomInfo.SpotList.length; j++) {
+                //    if ($scope.model.RoomInfo.SpotList[j].Type == HotSpotTypes.HT_Door) {
+                //        doorList.push($scope.model.RoomInfo.SpotList[j]);
+                //    }
+                //}
 
-                        //if (register.Value < doorList.length) {
-                        //    iptTracking.Stack.Push(new IptValue {
-                        //        Type = IptTypes.Integer,
-                        //        Value = doorList[register.Value].id,
-                        //    });
-                        //
-                        //    break;
-                        //}
-                        //else {
-                        //    throw 'Index out of bounds...';
-                        //}
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //if (register.Value < doorList.length) {
+                //    iptTracking.Stack.Push(new IptValue {
+                //        Type = IptTypes.Integer,
+                //        Value = doorList[register.Value].id,
+                //    });
+                //
+                //    break;
+                //}
+                //else {
+                //    throw 'Index out of bounds...';
+                //}
             })
         },
         {
             "SPOTDEST", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        var index = (int)register.Value;
-                        if (index < 0) throw new Exception("Index out of bounds...");
+                var index = (int)register.Value;
+                if (index < 0) throw new Exception("Index out of bounds...");
 
-                        //var spots = sessionState.RoomInfo.HotSpots.ToArray();
-                        //if (index >= spots.Length) throw new Exception("Index out of bounds...");
+                //var spots = sessionState.RoomInfo.HotSpots.ToArray();
+                //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
-                        iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
-                        //Value = spots[index].Dest,
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
+                //Value = spots[index].Dest,
             })
         },
         {
@@ -1983,7 +1475,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
                 //Value = sessionState.RoomInfo.HotSpots.Count,
@@ -1994,7 +1487,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
                 //Value = sessionState.RoomInfo.HotSpots
@@ -2005,165 +1499,116 @@ public static class IptscraeEngine
         {
             "SPOTNAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        var index = (int)register.Value;
-                        if (index < 0) throw new Exception("Index out of bounds...");
+                var index = (int)register.Value;
+                if (index < 0) throw new Exception("Index out of bounds...");
 
-                        //var spots = sessionState.RoomInfo.HotSpots.ToArray();
-                        //if (index >= spots.Length) throw new Exception("Index out of bounds...");
+                //var spots = sessionState.RoomInfo.HotSpots.ToArray();
+                //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
-                        iptTracking.Stack.Push(new IptVariable(IptVariableTypes.String /*, spots[index].Name */));
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                iptTracking.Stack.Push(new IptVariable(IptVariableTypes.String /*, spots[index].Name */));
             })
         },
         // End Spot Commands
         // Start Functional Commands
-        { "BREAK", (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Break = true; }) },
-        { "RETURN", (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Return = true; }) },
+        { "BREAK", (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Flags |= IptTrackingFlags.Break; }) },
+        {
+            "RETURN",
+            (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Flags |= IptTrackingFlags.Return; })
+        },
         { "EXIT", (IptCommandFnc)((iptTracking, recursionDepth) => { throw new Exception("Exiting Script"); }) },
         {
             "EXEC", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Atomlist:
-                        Executor(register.Value as IptAtomList, iptTracking, recursionDepth + 1);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                Executor(register.Value as IptAtomList, iptTracking, recursionDepth + 1);
             })
         },
         {
             "ALARMEXEC", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                switch (register2.Type)
-                {
-                    case IptVariableTypes.Atomlist:
-                        if (register1.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
-
-                        iptTracking.Alarms.Add(new IptAlarm(register2.Value as IptAtomList, (int)register1.Value));
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                iptTracking.Alarms.Add(new IptAlarm(register2.Value as IptAtomList, (int)register1.Value));
             })
         },
         {
             "WHILE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Atomlist);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                switch (register2.Type)
+                var limit = gWhileMaxIteration;
+
+                iptTracking.Flags &= ~IptTrackingFlags.Break;
+
+                while ((iptTracking.Flags & IptTrackingFlags.Break) == 0 && limit-- > 0)
                 {
-                    case IptVariableTypes.Atomlist:
-                        if (register1.Type != IptVariableTypes.Atomlist)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                    Executor(register1.Value as IptAtomList, iptTracking, recursionDepth + 1);
 
-                        var limit = gWhileMaxIteration;
+                    var register3 = popStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                        iptTracking.Break = false;
+                    if ((int)register3.Value == 0) break;
 
-                        while (!iptTracking.Break && limit-- > 0)
-                        {
-                            Executor(register1.Value as IptAtomList, iptTracking, recursionDepth + 1);
-
-                            var register3 = iptTracking.Stack.Pop();
-
-                            if (register3.Type != IptVariableTypes.Bool && register3.Type != IptVariableTypes.Integer)
-                                throw new Exception($"Wrong datatype {register3.Type}...");
-
-                            if ((int)register3.Value == 0) break;
-
-                            Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
-                        }
-
-                        if (limit < 1) throw new Exception("Endless loop, breaking...");
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
+                    Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
                 }
+
+                if (limit < 1) throw new Exception("Endless loop, breaking...");
             })
         },
         {
             "FOREACH", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Array);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
-                switch (register2.Type)
+                var atom = register1.Value as IptAtomList;
+
+                iptTracking.Flags &= ~IptTrackingFlags.Break;
+
+                for (var j = 0; (iptTracking.Flags & IptTrackingFlags.Break) == 0 && j < atom.Count; j++)
                 {
-                    case IptVariableTypes.Atomlist:
-                        if (register1.Type != IptVariableTypes.Array)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                    iptTracking.Stack.Push(atom[j]);
 
-                        var atom = register1.Value as IptAtomList;
-
-                        iptTracking.Break = false;
-
-                        for (var j = 0; !iptTracking.Break && j < atom.Count; j++)
-                        {
-                            iptTracking.Stack.Push(atom[j]);
-
-                            Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
-                        }
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
+                    Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
                 }
             })
         },
         {
             "GLOBAL", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = iptTracking.Stack.Pop();
+                var register = popStack(iptTracking);
+                if (register.Type != IptVariableTypes.Variable)
+                    throw new Exception($"Wrong datatype {register.Type}...");
 
-                switch (register.Type)
+                var key = register.Value?.ToString();
+
+                if (!iptTracking.Variables.ContainsKey(key))
                 {
-                    case IptVariableTypes.Variable:
-                        var key = register.Value?.ToString();
+                    iptTracking.Variables[key] = new IptMetaVariable
+                    {
+                        Depth = recursionDepth,
+                        Flags = IptMetaVariableFlags.IsGlobal,
+                        Variable = new IptVariable(IptVariableTypes.Integer, 0),
+                    };
+                }
+                else
+                {
+                    var value = iptTracking.Variables[key];
+                    var flags = value.Flags;
 
-                        if (iptTracking.Variables.ContainsKey(key))
-                        {
-                            if (iptTracking.Variables[key].IsReadOnly ||
-                                iptTracking.Variables[key].IsSpecial) break;
+                    if ((flags & IptMetaVariableFlags.IsReadOnly) == IptMetaVariableFlags.IsReadOnly ||
+                        (flags & IptMetaVariableFlags.IsSpecial) == IptMetaVariableFlags.IsSpecial) return;
 
-                            iptTracking.Variables[key].IsGlobal = true;
-                        }
-                        else
-                        {
-                            iptTracking.Variables[key] = new IptMetaVariable
-                            {
-                                Value = new IptVariable
-                                {
-                                    Type = IptVariableTypes.Integer,
-                                    Value = 0
-                                },
-                                Depth = recursionDepth,
-                                IsGlobal = true
-                            };
-                        }
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
+                    value.Flags |= IptMetaVariableFlags.IsGlobal;
                 }
             })
         },
@@ -2174,7 +1619,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2186,71 +1632,51 @@ public static class IptscraeEngine
         {
             "MOVE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Bool && register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
-
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    eventType = EventTypes.MSG_USERMOVE,
-                        //    protocolSend = new MSG_USERMOVE
-                        //    {
-                        //        Pos = new Point
-                        //        {
-                        //            X = (short)((int)register1.Value + sessionState.UserInfo.roomPos.h),
-                        //            Y = (short)((int)register2.Value + sessionState.UserInfo.roomPos.v),
-                        //        },
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    eventType = EventTypes.MSG_USERMOVE,
+                //    protocolSend = new MSG_USERMOVE
+                //    {
+                //        Pos = new Point
+                //        {
+                //            X = (short)((int)register1.Value + sessionState.UserInfo.roomPos.h),
+                //            Y = (short)((int)register2.Value + sessionState.UserInfo.roomPos.v),
+                //        },
+                //    },
+                //});
             })
         },
         {
             "SETPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.Bool:
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Bool && register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
-
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    eventType = Core.Enums.EventTypes.MSG_USERMOVE,
-                        //    protocolSend = new MSG_USERMOVE
-                        //    {
-                        //        pos = new Point
-                        //        {
-                        //            h = (short)(int)register1.Value,
-                        //            v = (short)(int)register2.Value,
-                        //        },
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    eventType = Core.Enums.EventTypes.MSG_USERMOVE,
+                //    protocolSend = new MSG_USERMOVE
+                //    {
+                //        pos = new Point
+                //        {
+                //            h = (short)(int)register1.Value,
+                //            v = (short)(int)register2.Value,
+                //        },
+                //    },
+                //});
             })
         },
         {
@@ -2272,12 +1698,13 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
-                    Type = IptVariableTypes.Integer
-                    //Value = sessionState.UserInfo.roomPos.h,
+                    Type = IptVariableTypes.Integer,
+                    Value = sessionState.UserDesc?.UserInfo?.RoomPos?.HAxis ?? 0,
                 });
             })
         },
@@ -2286,12 +1713,13 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
-                    Type = IptVariableTypes.Integer
-                    //Value = sessionState.UserInfo.roomPos.v,
+                    Type = IptVariableTypes.Integer,
+                    Value = sessionState.UserDesc?.UserInfo?.RoomPos?.VAxis ?? 0,
                 });
             })
         },
@@ -2300,11 +1728,12 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
-                    Type = IptVariableTypes.String
+                    Type = IptVariableTypes.String,
                     //Value = sessionState.ServerName,
                 });
             })
@@ -2314,11 +1743,12 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
-                    Type = IptVariableTypes.String
+                    Type = IptVariableTypes.String,
                     //Value = sessionState.RoomName,
                 });
             })
@@ -2328,7 +1758,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2342,7 +1773,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2356,12 +1788,13 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
                     Type = IptVariableTypes.Integer
-                    //Value = sessionState.RoomUsersInfo.Count,
+                    //Value = sessionState.RoomUsers.Count,
                 });
             })
         },
@@ -2370,7 +1803,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2384,7 +1818,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2398,7 +1833,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 iptTracking.Stack.Push(new IptVariable
                 {
@@ -2412,7 +1848,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 //if (sessionState.UserInfo.assetSpec != null)
                 //    AssetsManager.Current.FreeAssets(
@@ -2435,10 +1872,10 @@ public static class IptscraeEngine
         {
             "WHOTARGET", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                //if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                //var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
-                //if (sessionState == null) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 //iptTracking.Stack.Push(new IptVariable
                 //{
@@ -2452,85 +1889,66 @@ public static class IptscraeEngine
         {
             "SETFACE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    eventType = Core.Enums.EventTypes.MSG_USERFACE,
-                        //    protocolSend = new MSG_USERFACE
-                        //    {
-                        //        faceNbr = (short)(int)register.Value,
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    eventType = Core.Enums.EventTypes.MSG_USERFACE,
+                //    protocolSend = new MSG_USERFACE
+                //    {
+                //        faceNbr = (short)(int)register.Value,
+                //    },
+                //});
             })
         },
         {
             "SETCOLOR", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    EventType = EventTypes.MSG_USERCOLOR,
-                        //    protocolSend = new MSG_USERCOLOR
-                        //    {
-                        //        colorNbr = (short)(int)register.Value,
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    EventType = EventTypes.MSG_USERCOLOR,
+                //    protocolSend = new MSG_USERCOLOR
+                //    {
+                //        colorNbr = (short)(int)register.Value,
+                //    },
+                //});
             })
         },
         {
             "WHONAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                //var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                //switch (register.Type)
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
+
+                //var sourceID = (UInt32)register.Value;
+
+                //var user = null as UserRec;
+                //if (sourceID > 0)
+                //      user = sessionState.RoomUsers.GetValueLocked(sourceID);
+
+                //if (user == null) return;
+
+                //iptTracking.Stack.Push(new IptVariable
                 //{
-                //    case IptVariableTypes.Integer:
-                //        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                //        var sessionState = iptTracking.Variables["SESSIONSTATE"].Value.Value as ISessionState;
-                //        if (sessionState == null) return;
-
-                //        var sourceID = (UInt32)register.Value;
-
-                //        var user = null as UserRec;
-                //        if (sourceID > 0)
-                //              user = sessionState.RoomUsersInfo.GetValueLocked(sourceID);
-
-                //        if (user == null) return;
-
-                //        iptTracking.Stack.Push(new IptVariable
-                //        {
-                //            Type = IptVariableTypes.String,
-                //            Value = user.name,
-                //        });
-
-                //        break;
-                //    default: throw new Exception($"Wrong datatype {register.Type}...");
-                //}
+                //    Type = IptVariableTypes.String,
+                //    Value = user.name,
+                //});
 
                 throw new NotImplementedException("WHONAME");
             })
@@ -2539,18 +1957,19 @@ public static class IptscraeEngine
         {
             "WHOPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking);
 
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 switch (register.Type)
                 {
                     case IptVariableTypes.String:
                     {
                         var key = register.Value.ToString();
-                        //var user = sessionState.RoomUsersInfo.Values
+                        //var user = sessionState.RoomUsers.Values
                         //    .Where(u => u.Name == key)
                         //    .FirstOrDefault();
                         //if (user == null) return;
@@ -2575,7 +1994,7 @@ public static class IptscraeEngine
 
                         var user = null as UserRec;
                         //if (sourceID > 0)
-                        //    user = sessionState.RoomUsersInfo.GetValueLocked(sourceID);
+                        //    user = sessionState.RoomUsers.GetValueLocked(sourceID);
 
                         if (user == null) return;
 
@@ -2600,56 +2019,44 @@ public static class IptscraeEngine
         {
             "ROOMUSER", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
+
+                var index = (int)register.Value;
+                if (index < 0) throw new Exception("Index out of bounds...");
+
+                //var users = sessionState.RoomUsers.Values.ToArray();
+                //if (index >= users.Length) throw new Exception("Index out of bounds...");
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
-
-                        var index = (int)register.Value;
-                        if (index < 0) throw new Exception("Index out of bounds...");
-
-                        //var users = sessionState.RoomUsersInfo.Values.ToArray();
-                        //if (index >= users.Length) throw new Exception("Index out of bounds...");
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer
-                            //Value = users[index].userID,
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer
+                    //Value = users[index].userID,
+                });
             })
         },
         {
             "GOTOROOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    eventType = Core.Enums.EventTypes.MSG_ROOMGOTO,
-                        //    protocolSend = new MSG_ROOMGOTO
-                        //    {
-                        //        dest = (short)(int)register.Value,
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    eventType = Core.Enums.EventTypes.MSG_ROOMGOTO,
+                //    protocolSend = new MSG_ROOMGOTO
+                //    {
+                //        dest = (short)(int)register.Value,
+                //    },
+                //});
             })
         },
         // End User Commands
@@ -2657,7 +2064,7 @@ public static class IptscraeEngine
         {
             "LAUNCHAPP", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = iptTracking.Stack.Pop();
+                var register = popStack(iptTracking);
 
                 // Effectively does nothing, just for legacy support
             })
@@ -2665,41 +2072,28 @@ public static class IptscraeEngine
         {
             "DIMROOM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        var value = 1F - (int)register.Value / 100F;
+                var value = 1F - (int)register.Value / 100F;
 
-                        if (value > 1F) value = 1F;
-                        else if (value < 0) value = 0F;
+                if (value > 1F) value = 1F;
+                else if (value < 0) value = 0F;
 
-                        //sessionState.LayerOpacity(value, ScreenLayers.DimRoom);
-                        //sessionState.RefreshScreen(ScreenLayers.DimRoom);
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //sessionState.LayerOpacity(value, ScreenLayers.DimRoom);
+                //sessionState.RefreshScreen(ScreenLayers.DimRoom);
             })
         },
         {
             "DELAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        Thread.Sleep(IptTracking.TicksToMilliseconds((int)register.Value));
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                Thread.Sleep(IptTracking.TicksToMilliseconds<int>(register.Value));
             })
         },
         {
@@ -2707,7 +2101,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 //ThreadManager.Current.Enqueue(ThreadQueues.Audio, null, sessionState, AudioCommandTypes.BEEP);
             })
@@ -2725,61 +2120,42 @@ public static class IptscraeEngine
         {
             "GOTOURL", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        //$window.open(register.Value, '_blank');
+                //$window.open(register.Value, '_blank');
 
-                        throw new NotImplementedException("GOTOURL");
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                throw new NotImplementedException("GOTOURL");
             })
         },
         {
             "GOTOURLFRAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.String);
+                var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register1.Type)
-                {
-                    case IptVariableTypes.String:
-                        if (register2.Type != IptVariableTypes.String)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
+                //$window.open(register2.Value, register1.Value);
 
-                        //$window.open(register2.Value, register1.Value);
-
-                        throw new NotImplementedException("GOTOURLFRAME");
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                throw new NotImplementedException("GOTOURLFRAME");
             })
         },
         {
             "KILLUSER", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Integer:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                        //{
-                        //    eventType = Core.Enums.EventTypes.MSG_KILLUSER,
-                        //    protocolSend = new MSG_KILLUSER
-                        //    {
-                        //        targetID = (uint)register.Value,
-                        //    },
-                        //});
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
+                //{
+                //    eventType = Core.Enums.EventTypes.MSG_KILLUSER,
+                //    protocolSend = new MSG_KILLUSER
+                //    {
+                //        targetID = (uint)register.Value,
+                //    },
+                //});
             })
         },
         {
@@ -3355,50 +2731,30 @@ public static class IptscraeEngine
         {
             "DEBUGMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        Debug.WriteLine(register.Value.ToString());
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                LoggerHub.Current.Debug(register.Value.ToString());
             })
         },
         {
             "CONSOLEMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        Console.WriteLine(register.Value.ToString());
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                LoggerHub.Current.Console(register.Value.ToString());
             })
         },
         {
             "CONNECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.String);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.String:
-                        if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) break;
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                        if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) break;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
-                        //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.CONNECT, register.Value.ToString());
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.CONNECT, register.Value.ToString());
             })
         },
         {
@@ -3406,7 +2762,8 @@ public static class IptscraeEngine
             {
                 if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
 
-                if (iptTracking.Variables["SESSIONSTATE"].Value.Value is not ISessionState sessionState) return;
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
 
                 //NetworkManager.Current.Disconnect(sessionState);
             })
@@ -3416,11 +2773,8 @@ public static class IptscraeEngine
         {
             "TRYCATCH", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
-
-                if (register1.Type != IptVariableTypes.Atomlist && register2.Type != IptVariableTypes.Atomlist)
-                    throw new Exception($"Wrong datatype {register1.Type}, {register2.Type}...");
+                var register1 = getStack(iptTracking, IptVariableTypes.Atomlist);
+                var register2 = getStack(iptTracking, IptVariableTypes.Atomlist);
 
                 try
                 {
@@ -3434,13 +2788,13 @@ public static class IptscraeEngine
 
                     iptTracking.Variables["ERRORMSG"] = new IptMetaVariable
                     {
-                        Value = new IptVariable
+                        Variable = new IptVariable
                         {
                             Type = IptVariableTypes.String,
                             Value = ex.Message
                         }
                     };
-                    iptTracking.Variables["ERRORMSG"].IsReadOnly = true;
+                    iptTracking.Variables["ERRORMSG"].Flags |= IptMetaVariableFlags.IsReadOnly;
 
                     Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
                 }
@@ -3449,23 +2803,14 @@ public static class IptscraeEngine
         {
             "READONLY", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = iptTracking.Stack.Pop();
+                var register = popStack(iptTracking, IptVariableTypes.Variable);
 
-                switch (register.Type)
-                {
-                    case IptVariableTypes.Variable:
-                        var key = register.Value?.ToString();
+                var key = register.Value?.ToString();
 
-                        if (iptTracking.Variables.ContainsKey(key))
-                        {
-                            if (iptTracking.Variables[key].IsSpecial) break;
+                if (!iptTracking.Variables.ContainsKey(key) ||
+                    iptTracking.Variables[key].IsSpecial) return;
 
-                            iptTracking.Variables[key].IsReadOnly = true;
-                        }
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                iptTracking.Variables["ERRORMSG"].Flags |= IptMetaVariableFlags.IsReadOnly;
             })
         },
         // Start Math Commands
@@ -3482,191 +2827,134 @@ public static class IptscraeEngine
         {
             "ABS", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = Math.Abs((int)register.Value)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = Math.Abs((int)register.Value)
+                });
             })
         },
         {
             "AVG", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register.Type)
+                var values = (register.Value as IptAtomList)
+                    .Select(v =>
+                    {
+                        if (v.Type != IptVariableTypes.Integer)
+                            throw new Exception($"Wrong datatype {v.Type}...");
+
+                        return (decimal)v.Value;
+                    })
+                    .ToList();
+                var avg = values.Sum() / values.Count;
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Array:
-                        var values = (register.Value as IptAtomList)
-                            .Select(v =>
-                            {
-                                if (v.Type != IptVariableTypes.Integer)
-                                    throw new Exception($"Wrong datatype {v.Type}...");
-
-                                return (decimal)v.Value;
-                            })
-                            .ToList();
-                        var avg = values.Sum() / values.Count;
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)avg
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)avg
+                });
             })
         },
         {
             "POW", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.Integer);
+                var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                switch (register1.Type)
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Integer:
-                        if (register2.Type != IptVariableTypes.Integer)
-                            throw new Exception($"Wrong datatype {register2.Type}...");
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = Math.Pow((int)register2.Value, (int)register1.Value)
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register1.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = Math.Pow((int)register2.Value, (int)register1.Value)
+                });
             })
         },
         {
             "SUM", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register.Type)
+                var values = (register.Value as IptAtomList)
+                    .Select(v =>
+                    {
+                        if (v.Type != IptVariableTypes.Integer)
+                            throw new Exception($"Wrong datatype {v.Type}...");
+
+                        return (decimal)v.Value;
+                    })
+                    .ToList();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Array:
-                        var values = (register.Value as IptAtomList)
-                            .Select(v =>
-                            {
-                                if (v.Type != IptVariableTypes.Integer)
-                                    throw new Exception($"Wrong datatype {v.Type}...");
-
-                                return (decimal)v.Value;
-                            })
-                            .ToList();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)values.Sum()
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)values.Sum()
+                });
             })
         },
         {
             "MIN", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register.Type)
+                var values = (register.Value as IptAtomList)
+                    .Select(v =>
+                    {
+                        if (v.Type != IptVariableTypes.Integer)
+                            throw new Exception($"Wrong datatype {v.Type}...");
+
+                        return (decimal)v.Value;
+                    })
+                    .ToList();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Array:
-                        var values = (register.Value as IptAtomList)
-                            .Select(v =>
-                            {
-                                if (v.Type != IptVariableTypes.Integer)
-                                    throw new Exception($"Wrong datatype {v.Type}...");
-
-                                return (decimal)v.Value;
-                            })
-                            .ToList();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)values.Min()
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)values.Min()
+                });
             })
         },
         {
             "MAX", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register = popStack(iptTracking);
+                var register = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register.Type)
+                var values = (register.Value as IptAtomList)
+                    .Select(v =>
+                    {
+                        if (v.Type != IptVariableTypes.Integer)
+                            throw new Exception($"Wrong datatype {v.Type}...");
+
+                        return (decimal)v.Value;
+                    })
+                    .ToList();
+
+                iptTracking.Stack.Push(new IptVariable
                 {
-                    case IptVariableTypes.Array:
-                        var values = (register.Value as IptAtomList)
-                            .Select(v =>
-                            {
-                                if (v.Type != IptVariableTypes.Integer)
-                                    throw new Exception($"Wrong datatype {v.Type}...");
-
-                                return (decimal)v.Value;
-                            })
-                            .ToList();
-
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)values.Max()
-                        });
-
-                        break;
-                    default: throw new Exception($"Wrong datatype {register.Type}...");
-                }
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)values.Max()
+                });
             })
         },
         {
             "COALESCE", (IptCommandFnc)((iptTracking, recursionDepth) =>
             {
-                var register1 = popStack(iptTracking);
-                var register2 = popStack(iptTracking);
+                var register1 = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Bool,
+                    IptVariableTypes.Integer, IptVariableTypes.Decimal);
+                var register2 = getStack(iptTracking, IptVariableTypes.Array);
 
-                switch (register2.Type)
-                {
-                    case IptVariableTypes.Array:
-                        if (register1.Type != IptVariableTypes.String &&
-                            register1.Type != IptVariableTypes.Bool &&
-                            register1.Type != IptVariableTypes.Integer &&
-                            register1.Type != IptVariableTypes.Decimal)
-                            throw new Exception($"Wrong datatype {register1.Type}...");
+                var atom = register2.Value as IptAtomList;
 
-                        var atom = register2.Value as IptAtomList;
-
-                        for (var j = 0; j < atom.Count; j++)
-                            if (atom[j].Type != register1.Type ||
-                                atom[j].Value != register1.Value)
-                            {
-                                iptTracking.Stack.Push(atom[j]);
-
-                                break;
-                            }
+                for (var j = 0; j < atom.Count; j++)
+                    if (atom[j].Type != register1.Type ||
+                        atom[j].Value != register1.Value)
+                    {
+                        iptTracking.Stack.Push(atom[j]);
 
                         break;
-                    default: throw new Exception($"Wrong datatype {register2.Type}...");
-                }
+                    }
             })
         },
         // End Math Commands
@@ -3976,23 +3264,21 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.NotEqualTo,
                     OpFnc = (register1, register2) =>
                     {
-                        switch (register1.Type)
+                        return register1.Type switch
                         {
-                            case IptVariableTypes.String:
-                                return new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
-                                };
-                            case IptVariableTypes.Bool:
-                            case IptVariableTypes.Integer:
-                                return new IptVariable
+                            IptVariableTypes.String => new IptVariable
+                            {
+                                Type = IptVariableTypes.Bool,
+                                Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
+                            },
+                            IptVariableTypes.Bool or
+                                IptVariableTypes.Integer => new IptVariable
                                 {
                                     Type = IptVariableTypes.Bool,
                                     Value = (int)register1.Value != (int)register2.Value ? 1 : 0
-                                };
-                            default: throw new Exception($"Wrong datatype {register1.Type}...");
-                        }
+                                },
+                            _ => throw new Exception($"Wrong datatype {register1.Type}...")
+                        };
                     }
                 }
             },
@@ -4002,23 +3288,21 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.NotEqualTo,
                     OpFnc = (register1, register2) =>
                     {
-                        switch (register1.Type)
+                        return register1.Type switch
                         {
-                            case IptVariableTypes.String:
-                                return new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
-                                };
-                            case IptVariableTypes.Bool:
-                            case IptVariableTypes.Integer:
-                                return new IptVariable
+                            IptVariableTypes.String => new IptVariable
+                            {
+                                Type = IptVariableTypes.Bool,
+                                Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
+                            },
+                            IptVariableTypes.Bool or
+                                IptVariableTypes.Integer => new IptVariable
                                 {
                                     Type = IptVariableTypes.Bool,
                                     Value = (int)register1.Value != (int)register2.Value ? 1 : 0
-                                };
-                            default: throw new Exception($"Wrong datatype {register1.Type}...");
-                        }
+                                },
+                            _ => throw new Exception($"Wrong datatype {register1.Type}...")
+                        };
                     }
                 }
             },
@@ -4028,77 +3312,72 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.EqualTo,
                     OpFnc = (register1, register2) =>
                     {
-                        switch (register1.Type)
+                        return register1.Type switch
                         {
-                            case IptVariableTypes.String:
-                                return new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = register1.Value.ToString() == register2.Value.ToString() ? 1 : 0
-                                };
-                            case IptVariableTypes.Bool:
-                            case IptVariableTypes.Integer:
-                                return new IptVariable
+                            IptVariableTypes.String => new IptVariable
+                            {
+                                Type = IptVariableTypes.Bool,
+                                Value = register1.Value.ToString() == register2.Value.ToString() ? 1 : 0
+                            },
+                            IptVariableTypes.Bool or
+                                IptVariableTypes.Integer => new IptVariable
                                 {
                                     Type = IptVariableTypes.Bool,
                                     Value = (int)register1.Value == (int)register2.Value ? 1 : 0
-                                };
-                            default: throw new Exception($"Wrong datatype {register1.Type}...");
-                        }
+                                },
+                            _ => throw new Exception($"Wrong datatype {register1.Type}...")
+                        };
                     }
                 }
             },
             {
                 "+", new IptOperator
                 {
-                    Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Add |
+                    Flags = IptOperatorFlags.Push |
+                            IptOperatorFlags.Math |
+                            IptOperatorFlags.Add |
                             IptOperatorFlags.Concate,
                     OpFnc = (register1, register2) =>
                     {
-                        switch (register1.Type)
+                        return register1.Type switch
                         {
-                            case IptVariableTypes.String:
-                                return new IptVariable
+                            IptVariableTypes.String => new IptVariable
+                            {
+                                Type = IptVariableTypes.String, Value = $"{register1.Value}{register2.Value}"
+                            },
+                            IptVariableTypes.Bool or
+                                IptVariableTypes.Integer => new IptVariable
                                 {
-                                    Type = IptVariableTypes.String,
-                                    Value = $"{register1.Value}{register2.Value}"
-                                };
-                            case IptVariableTypes.Bool:
-                            case IptVariableTypes.Integer:
-                                return new IptVariable
-                                {
-                                    Type = IptVariableTypes.Integer,
-                                    Value = (int)register1.Value + (int)register2.Value
-                                };
-                            default: throw new Exception($"Wrong datatype {register1.Type}...");
-                        }
+                                    Type = IptVariableTypes.Integer, Value = (int)register1.Value + (int)register2.Value
+                                },
+                            _ => throw new Exception($"Wrong datatype {register1.Type}...")
+                        };
                     }
                 }
             },
             {
                 "&=", new IptOperator
                 {
-                    Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Boolean | IptOperatorFlags.AND |
+                    Flags = IptOperatorFlags.Assigning |
+                            IptOperatorFlags.Boolean |
+                            IptOperatorFlags.AND |
                             IptOperatorFlags.Concate,
                     OpFnc = (register1, register2) =>
                     {
-                        switch (register1.Type)
+                        return register1.Type switch
                         {
-                            case IptVariableTypes.String:
-                                return new IptVariable
-                                {
-                                    Type = IptVariableTypes.String,
-                                    Value = $"{register1.Value}{register2.Value}"
-                                };
-                            case IptVariableTypes.Bool:
-                            case IptVariableTypes.Integer:
-                                return new IptVariable
+                            IptVariableTypes.String => new IptVariable
+                            {
+                                Type = IptVariableTypes.String, Value = $"{register1.Value}{register2.Value}"
+                            },
+                            IptVariableTypes.Bool or
+                                IptVariableTypes.Integer => new IptVariable
                                 {
                                     Type = IptVariableTypes.Bool,
                                     Value = (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0
-                                };
-                            default: throw new Exception($"Wrong datatype {register1.Type}...");
-                        }
+                                },
+                            _ => throw new Exception($"Wrong datatype {register1.Type}...")
+                        };
                     }
                 }
             },
@@ -4108,12 +3387,27 @@ public static class IptscraeEngine
 
     internal static readonly ConcurrentDictionary<string, IptOperator> iptOperators = new(_iptOperators);
 
-    internal static IptVariable popStack(IptTracking iptTracking)
+    internal static IptVariable getStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
+    {
+        if (iptTracking.Stack.Count < 1) throw new Exception("Stack is empty...");
+
+        var register = popStack(iptTracking);
+        register = getVariable(iptTracking, register);
+
+        if (constraintTypes.Length > 0 &&
+            !constraintTypes.Contains(register.Type)) throw new Exception($"Wrong datatype {register.Type}...");
+
+        return register;
+    }
+
+    internal static IptVariable popStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
     {
         if (iptTracking.Stack.Count < 1) throw new Exception("Stack is empty...");
 
         var register = iptTracking.Stack.Pop();
-        register = getVariable(iptTracking, register);
+
+        if (constraintTypes.Length > 0 &&
+            !constraintTypes.Contains(register.Type)) throw new Exception($"Wrong datatype {register.Type}...");
 
         return register;
     }
@@ -4122,12 +3416,13 @@ public static class IptscraeEngine
     {
         if (variable.Type != IptVariableTypes.Variable) return variable;
 
-        var key = variable.Value?.ToString();
+        var key = variable.Value?.ToString()?.Trim();
         if (string.IsNullOrWhiteSpace(key)) throw new NullReferenceException();
 
-        if (iptTracking.Variables.ContainsKey(key) &&
-            iptTracking.Variables[key].Value.Type != IptVariableTypes.Shadow)
-            return iptTracking.Variables[key].Value;
+        if (iptTracking.Variables.TryGetValue(key, out var value) &&
+            value.Variable.Type != IptVariableTypes.Shadow)
+            return value.Variable;
+
         return new IptVariable
         {
             Type = IptVariableTypes.Integer,
@@ -4135,117 +3430,115 @@ public static class IptscraeEngine
         };
     }
 
-    internal static void setVariable(IptTracking iptTracking, IptVariable destination, IptVariable value,
-        int recursionDepth = 0, bool isGlobal = false)
+    internal static void setVariable(IptTracking iptTracking, IptVariable destination, IptVariable variable,
+        int recursionDepth = 0, IptMetaVariableFlags flags = IptMetaVariableFlags.None)
     {
         var key = destination.Value?.ToString();
         if (string.IsNullOrWhiteSpace(key)) throw new NullReferenceException();
 
-        if (iptTracking.Variables.ContainsKey(key))
+        if (iptTracking.Variables.TryGetValue(key, out var value))
         {
-            if (iptTracking.Variables[key].IsReadOnly) throw new Exception($"{key} IsReadOnly...");
+            if (value.IsReadOnly)
+                throw new Exception($"{key} IsReadOnly...");
 
-            if (iptTracking.Variables[key].IsSpecial &&
-                iptTracking.Variables[key].Value.Type != value.Type)
-                throw new Exception($"Wrong datatype {iptTracking.Variables[key].Value.Type}, {value.Type}...");
-
-            iptTracking.Variables[key].Value = value;
+            if (value.IsSpecial &&
+                value.Variable.Type != variable.Type)
+                throw new Exception($"Wrong datatype {value.Variable.Type}, {variable.Type}...");
+            value.Variable = variable;
         }
         else
         {
-            iptTracking.Variables[key] = new IptMetaVariable
-            {
-                Value = value,
-                Depth = recursionDepth,
-                IsGlobal = isGlobal
-            };
+            iptTracking.Variables[key] = new IptMetaVariable(recursionDepth, variable, flags);
         }
     }
 
     internal static void Operator(IptTracking iptTracking, string opKey, int recursionDepth = 0)
     {
-        if (iptOperators.ContainsKey(opKey))
+        if (!iptOperators.TryGetValue(opKey, out var op)) return;
+
+        var flags = op.Flags;
+
+        var register1 = popStack(iptTracking);
+        if ((flags & IptOperatorFlags.Assigning) == IptOperatorFlags.Assigning)
         {
-            var flags = iptOperators[opKey].Flags;
+            if (register1.Type != IptVariableTypes.Variable)
+                throw new Exception($"Wrong datatype {register1.Value}...");
+            if (iptTracking.Variables[register1.Value.ToString()].IsReadOnly)
+                throw new Exception($"{register1.Value} IsReadOnly...");
+        }
 
-            var register1 = iptTracking.Stack.Pop();
-            if ((flags & IptOperatorFlags.Assigning) == IptOperatorFlags.Assigning &&
-                register1.Type != IptVariableTypes.Variable)
-                throw new Exception($"Cannot assign {register1.Value}...");
+        var originalRegister1 = register1;
+        var errorDataType1 = true;
 
-            var originalRegister1 = register1;
-            var errorDataType1 = true;
+        var register2 = (IptVariable?)null;
+        var errorDataType2 = true;
 
-            var register2 = null as IptVariable;
-            var errorDataType2 = true;
+        register1 = getVariable(iptTracking, register1);
 
-            register1 = getVariable(iptTracking, register1);
+        if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math)) != 0 &&
+            (new[] { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register1.Type)))
+            errorDataType1 = false;
+        else if ((flags & IptOperatorFlags.Concate) == IptOperatorFlags.Concate &&
+                 register1.Type == IptVariableTypes.String)
+            errorDataType1 = false;
+
+        // Exclude Unary Operators
+        if ((flags & IptOperatorFlags.Unary) == 0)
+        {
+            register2 = popStack(iptTracking);
+            register2 = getVariable(iptTracking, register2);
 
             if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math)) != 0 &&
-                (register1.Type == IptVariableTypes.Bool ||
-                 register1.Type == IptVariableTypes.Integer))
-                errorDataType1 = false;
+                (new[]
+                    { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register2.Type)))
+                errorDataType2 = false;
             else if ((flags & IptOperatorFlags.Concate) == IptOperatorFlags.Concate &&
-                     register1.Type == IptVariableTypes.String)
-                errorDataType1 = false;
-
-            // Exclude Unary Operators
-            if ((flags & IptOperatorFlags.Unary) == 0)
-            {
-                register2 = iptTracking.Stack.Pop();
-                register2 = getVariable(iptTracking, register2);
-
-                if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math)) != 0 &&
-                    (register2.Type == IptVariableTypes.Bool ||
-                     register2.Type == IptVariableTypes.Integer))
-                    errorDataType2 = false;
-                else if ((flags & IptOperatorFlags.Concate) == IptOperatorFlags.Concate &&
-                         register2.Type == IptVariableTypes.String)
-                    errorDataType2 = false;
-                else if ((flags & IptOperatorFlags.Comparator) == IptOperatorFlags.Comparator &&
-                         register1.Type == register2.Type)
-                    switch (register1.Type)
-                    {
-                        case IptVariableTypes.Bool:
-                        case IptVariableTypes.Integer:
-                        case IptVariableTypes.String:
-                            errorDataType1 = false;
-                            errorDataType2 = false;
-                            break;
-                    }
-            }
-            else
-            {
+                     register2.Type == IptVariableTypes.String)
                 errorDataType2 = false;
-            }
-
-            if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math | IptOperatorFlags.Concate |
-                          IptOperatorFlags.Comparator)) == 0)
+            else if ((flags & IptOperatorFlags.Comparator) == IptOperatorFlags.Comparator &&
+                     register1.Type == register2.Type &&
+                     (new[]
+                             { IptVariableTypes.Bool, IptVariableTypes.Integer, IptVariableTypes.String }
+                         .Contains(register1.Type)))
             {
                 errorDataType1 = false;
                 errorDataType2 = false;
             }
-
-            if (errorDataType1 &&
-                errorDataType2)
-                throw new Exception($"Wrong datatypes {register1.Type} {opKey} {register2.Type}...");
-
-            if (errorDataType1) throw new Exception($"Wrong datatype {register1.Type}...");
-
-            if (errorDataType2) throw new Exception($"Wrong datatype {register2.Type}...");
-
-            var result = null as IptVariable;
-
-            if (iptOperators[opKey].OpFnc != null) result = iptOperators[opKey].OpFnc(register1, register2);
-
-            if (result == null)
-                throw new Exception($"Unexpected result {register1.Value} {opKey} {register2.Value}...");
-
-            if ((flags & IptOperatorFlags.Push) == IptOperatorFlags.Push)
-                iptTracking.Stack.Push(result);
-            else if ((flags & IptOperatorFlags.Assigning) == IptOperatorFlags.Assigning)
-                setVariable(iptTracking, originalRegister1, result, recursionDepth);
         }
+        else
+        {
+            errorDataType2 = false;
+        }
+
+        if ((flags & (IptOperatorFlags.Boolean |
+                      IptOperatorFlags.Math |
+                      IptOperatorFlags.Concate |
+                      IptOperatorFlags.Comparator)) == 0)
+        {
+            errorDataType1 = false;
+            errorDataType2 = false;
+        }
+
+        if (errorDataType1 &&
+            errorDataType2)
+            throw new Exception($"Wrong datatypes {register1.Type} {opKey} {register2.Type}...");
+
+        if (errorDataType1) throw new Exception($"Wrong datatype {register1.Type}...");
+
+        if (errorDataType2) throw new Exception($"Wrong datatype {register2.Type}...");
+
+        var result = (IptVariable?)null;
+
+        if (op.OpFnc != null)
+            result = op.OpFnc(register1, register2);
+
+        if (result == null)
+            throw new Exception($"Unexpected result {register1.Value} {opKey} {register2.Value}...");
+
+        if ((flags & IptOperatorFlags.Push) == IptOperatorFlags.Push)
+            iptTracking.Stack.Push(result);
+        else if ((flags & IptOperatorFlags.Assigning) == IptOperatorFlags.Assigning)
+            setVariable(iptTracking, originalRegister1, result, recursionDepth);
     }
 
     public static void Executor(IptAtomList AtomList, IptTracking iptTracking, int recursionDepth = 0)
@@ -4258,11 +3551,11 @@ public static class IptscraeEngine
             switch (AtomList[j].Type)
             {
                 case IptVariableTypes.Command:
-                    iptTracking.Return = false;
+                    iptTracking.Flags.SetBit<IptTrackingFlags, byte>(IptTrackingFlags.Return, false);
 
                     ((IptCommandFnc)iptCommands[key])(iptTracking, recursionDepth);
 
-                    if (iptTracking.Return) return;
+                    if (IptTrackingFlags.Return.IsSet<IptTrackingFlags, byte>(iptTracking.Flags)) return;
 
                     break;
                 case IptVariableTypes.Operator:
@@ -4277,20 +3570,15 @@ public static class IptscraeEngine
         }
 
         // Garbage Collection:
-        if (recursionDepth == 0)
+        foreach (var key in iptTracking.Variables.Keys)
         {
-            foreach (var key in iptTracking.Variables.Keys)
-                if (!iptTracking.Variables[key].IsGlobal &&
-                    !iptTracking.Variables[key].IsSpecial)
-                    iptTracking.Variables.Remove(key);
-        }
-        else
-        {
-            foreach (var key in iptTracking.Variables.Keys)
-                if (!iptTracking.Variables[key].IsGlobal &&
-                    !iptTracking.Variables[key].IsSpecial &&
-                    iptTracking.Variables[key].Depth >= recursionDepth)
-                    iptTracking.Variables.Remove(key);
+            var value = iptTracking.Variables[key];
+            var flags = value.Flags;
+
+            if (((flags & IptMetaVariableFlags.IsGlobal) == 0) &&
+                ((flags & IptMetaVariableFlags.IsSpecial) == 0) &&
+                (recursionDepth == 0 || value.Depth >= recursionDepth))
+                iptTracking.Variables.Remove(key);
         }
 
         if (iptTracking.Stack.Count > 0)
@@ -4313,7 +3601,7 @@ public static class IptscraeEngine
         }
     }
 
-    public static IptAtomList Parser(IptTracking iptTracking, string str, bool hasEvents = true)
+    public static IptAtomList Parse(IptTracking iptTracking, string str, bool hasEvents = true)
     {
 #if DEBUG
         Debug.WriteLine($"PARSING: {str}");
@@ -4398,7 +3686,7 @@ public static class IptscraeEngine
 
                 var atomlistStr = str.Substr(tokenStart + 1, j - 1);
 
-                iptTracking.Events[eventType] = Parser(iptTracking, atomlistStr, false);
+                iptTracking.Events[eventType] = Parse(iptTracking, atomlistStr, false);
 
                 j++;
             }
@@ -4478,7 +3766,7 @@ public static class IptscraeEngine
                 result.Push(new IptVariable
                 {
                     Type = IptVariableTypes.Atomlist,
-                    Value = Parser(iptTracking, atomlistContents, false)
+                    Value = Parse(iptTracking, atomlistContents, false)
                 });
 
                 j++;
@@ -4538,7 +3826,7 @@ public static class IptscraeEngine
                 result.Push(new IptVariable
                 {
                     Type = IptVariableTypes.Array,
-                    Value = Parser(iptTracking, arrayContents, false)
+                    Value = Parse(iptTracking, arrayContents, false)
                 });
 
                 j++;
