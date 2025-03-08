@@ -130,17 +130,18 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     #endregion
 
     #region User Info
-    public uint UserId { get; set; }
+    public uint UserId { get; set; } = 0;
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
+    public object? State { get; set; } = null;
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
+    public object? ScriptState { get; set; } = null;
     #endregion
 
     #region Room Info
     public RoomDesc RoomInfo { get; set; } = null;
-
     public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
     #endregion
 
@@ -151,9 +152,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     public List<ListRec> ServerRooms { get; set; } = new();
     public List<ListRec> ServerUsers { get; set; } = new();
-
-    public object? ScriptState { get; set; }
-    public object? State { get; set; }
     #endregion
 
     public void RefreshUI()

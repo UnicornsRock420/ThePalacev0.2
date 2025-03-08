@@ -2276,7 +2276,19 @@ public static class IptscraeEngine
         },
         {
             "NBRSERVERUSERS",
-            (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("NBRSERVERUSERS"); })
+            (IptCommandFnc)((iptTracking, recursionDepth) =>
+            {
+                if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+
+                var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
+                if (sessionState == null) return;
+
+                iptTracking.Stack.Push(new IptVariable
+                {
+                    Type = IptVariableTypes.Integer,
+                    Value = (int)sessionState.ServerPopulation,
+                });
+            })
         },
         {
             "NEWHASH",
