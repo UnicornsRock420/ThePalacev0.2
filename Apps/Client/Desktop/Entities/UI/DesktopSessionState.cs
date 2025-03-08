@@ -134,8 +134,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
+    public object? State { get; set; } = null;
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
+    public object? ScriptState { get; set; } = null;
     #endregion
 
     #region Room Info
@@ -151,9 +153,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     public List<ListRec> ServerRooms { get; set; } = new();
     public List<ListRec> ServerUsers { get; set; } = new();
-
-    public object? ScriptState { get; set; }
-    public object? State { get; set; }
     #endregion
 
     public void RefreshUI()

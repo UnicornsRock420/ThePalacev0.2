@@ -20,21 +20,12 @@ public interface IDesktopSessionState : IUISessionState
     int ScreenWidth { get; set; }
     int ScreenHeight { get; set; }
 
-    HistoryManager History { get; }
-    TabPage TabPage { get; set; }
-
-    RoomDesc RoomInfo { get; set; }
-    ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; }
-
-    string? MediaUrl { get; set; }
-    string? ServerName { get; set; }
-    int ServerPopulation { get; set; }
-    List<ListRec> ServerRooms { get; set; }
-    List<ListRec> ServerUsers { get; set; }
-
     AssetSpec SelectedProp { get; set; }
     UserDesc SelectedUser { get; set; }
     HotspotDesc SelectedHotSpot { get; set; }
+
+    HistoryManager History { get; }
+    TabPage TabPage { get; set; }
 
     void RefreshRibbon();
     void RefreshUI();
