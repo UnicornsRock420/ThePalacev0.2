@@ -1,8 +1,8 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using uint16 = ushort;
 
-namespace ThePalace.Core.Entities.Shared;
+namespace ThePalace.Core.Entities.Shared.Users;
 
 public partial class UserDesc
 {

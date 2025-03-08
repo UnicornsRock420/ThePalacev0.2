@@ -1,6 +1,6 @@
-﻿using ThePalace.Common.Helpers;
+﻿using ThePalace.Common.Factories;
 using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
 using sint16 = short;
 

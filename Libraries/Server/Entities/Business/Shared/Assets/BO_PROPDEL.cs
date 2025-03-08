@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Core;
-using ThePalace.Core.Entities.Network.Client.Assets;
+using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Common.Server.Entities.Business.Shared.Assets;

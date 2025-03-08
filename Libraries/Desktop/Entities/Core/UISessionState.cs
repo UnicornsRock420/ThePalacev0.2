@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Entities.Network.Shared.Core;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Interfaces;
 

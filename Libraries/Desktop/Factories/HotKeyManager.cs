@@ -5,7 +5,7 @@ using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Core;
 
-namespace ThePalace.Core.Client.Core;
+namespace ThePalace.Common.Desktop.Factories;
 
 public delegate void HotKeyAction(ISessionState sessionState, Keys keys, object sender = null);
 

@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Shared.Assets;

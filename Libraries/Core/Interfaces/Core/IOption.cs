@@ -1,6 +1,4 @@
-﻿using ThePalace.Core.Interfaces.Core;
-
-namespace ThePalace.Core.Interfaces;
+﻿namespace ThePalace.Core.Interfaces.Core;
 
 public interface IOption : ISettingBase
 {

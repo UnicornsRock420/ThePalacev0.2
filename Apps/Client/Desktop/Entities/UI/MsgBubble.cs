@@ -1,7 +1,7 @@
 ﻿using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Helpers;
+using ThePalace.Common.Factories;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 

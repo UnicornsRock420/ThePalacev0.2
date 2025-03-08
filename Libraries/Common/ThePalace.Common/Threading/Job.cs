@@ -350,10 +350,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         while (!TokenSource.IsCancellationRequested)
         {
             if (doRunLog)
-            {
-                runLog = new RunLog();
-                runLog.Start();
-            }
+                runLog = new RunLog(true);
 
             IsRunning = true;
 

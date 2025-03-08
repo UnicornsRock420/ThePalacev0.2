@@ -2,7 +2,7 @@
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Server.ServerInfo;

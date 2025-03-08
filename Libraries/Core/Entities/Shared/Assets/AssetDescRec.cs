@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
 using uint16 = ushort;

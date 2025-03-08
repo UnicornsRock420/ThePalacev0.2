@@ -1,5 +1,4 @@
-﻿using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Entities.Shared.Users;
+﻿using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Core.Interfaces.Core;

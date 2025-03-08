@@ -1,6 +1,6 @@
 using ThePalace.Client.Desktop.Enums;
 
-namespace ThePalace.Common.Desktop.Interfaces;
+namespace ThePalace.Client.Desktop.Interfaces;
 
 public interface IScreenLayer : IDisposable
 {

@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Enums.Palace;
+﻿using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;

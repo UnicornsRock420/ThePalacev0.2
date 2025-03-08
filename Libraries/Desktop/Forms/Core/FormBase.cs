@@ -1,5 +1,5 @@
-﻿using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Client.Core;
+﻿using ThePalace.Common.Desktop.Factories;
+using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Common.Desktop.Forms.Core;
 

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Client.Desktop.Entities;
+﻿namespace ThePalace.Client.Desktop.Entities.UI;
 
 public class HistoryRecord
 {

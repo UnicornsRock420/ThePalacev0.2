@@ -1,8 +1,6 @@
 ﻿using System.Collections;
 using ThePalace.Common.Server.Interfaces;
-using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Network.Entities;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Common.Server.Entities.Core;
@@ -27,7 +25,7 @@ public class ServerSessionState : Disposable, IServerSessionState
 
     public DateTime? LastActivity { get; set; }
 
-    public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
+    public IConnectionState? ConnectionState { get; set; }
 
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();

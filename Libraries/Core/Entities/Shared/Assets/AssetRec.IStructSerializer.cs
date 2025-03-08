@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
 
 namespace ThePalace.Core.Entities.Shared.Assets;

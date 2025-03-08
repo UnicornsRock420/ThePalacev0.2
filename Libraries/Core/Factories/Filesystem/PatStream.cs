@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Helpers;
 

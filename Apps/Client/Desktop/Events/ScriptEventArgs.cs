@@ -1,7 +1,7 @@
-﻿using ThePalace.Core.Enums.Palace;
+﻿using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.EventParams;
+namespace ThePalace.Client.Desktop.Events;
 
 public class ScriptEventArgs : EventArgs
 {

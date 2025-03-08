@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Factories;
 
 namespace ThePalace.Client.Desktop.Entities.UI;

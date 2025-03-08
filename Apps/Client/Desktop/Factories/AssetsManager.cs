@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
+using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Factories;

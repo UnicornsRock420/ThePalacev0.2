@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
 using sint32 = int;

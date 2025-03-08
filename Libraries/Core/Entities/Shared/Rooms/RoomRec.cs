@@ -1,5 +1,5 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
 using RoomID = short;
 using sint16 = short;

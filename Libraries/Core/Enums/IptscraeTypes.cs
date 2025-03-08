@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Core;
 
-namespace ThePalace.Core.Enums.Palace;
+namespace ThePalace.Core.Enums;
 
 public enum IptEventTypes : short
 {

@@ -5,7 +5,7 @@ using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers;
 using sint16 = short;
 

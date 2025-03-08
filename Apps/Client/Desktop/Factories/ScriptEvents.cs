@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Client.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Factories;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 

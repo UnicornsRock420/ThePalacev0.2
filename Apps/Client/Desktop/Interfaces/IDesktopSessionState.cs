@@ -1,14 +1,14 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
+using ThePalace.Core.Entities.Shared.Users;
 
-namespace ThePalace.Common.Desktop.Interfaces;
+namespace ThePalace.Client.Desktop.Interfaces;
 
 public interface IDesktopSessionState : IUISessionState
 {

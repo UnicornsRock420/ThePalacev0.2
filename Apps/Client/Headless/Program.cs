@@ -1,4 +1,4 @@
-namespace ThePalace.Client.Desktop;
+namespace ThePalace.Client.Headless;
 
 public class Program
 {

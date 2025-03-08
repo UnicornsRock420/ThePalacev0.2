@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using sint32 = int;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;

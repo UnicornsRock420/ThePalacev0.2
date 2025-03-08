@@ -1,10 +1,9 @@
 ﻿using System.Collections;
-using ThePalace.Core.Entities.Shared;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Core.Entities.Network.Shared.Core;
+namespace ThePalace.Core.Entities.Core;
 
 public class SessionState : Disposable, ISessionState
 {

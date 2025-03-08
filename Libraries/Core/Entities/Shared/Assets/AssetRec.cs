@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = int;

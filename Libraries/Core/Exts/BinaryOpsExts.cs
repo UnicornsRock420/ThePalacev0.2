@@ -5,7 +5,6 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Data;
 

@@ -5,8 +5,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Xml;
 using ThePalace.Common.Desktop.Entities.Ribbon;
-using ThePalace.Core;
-using ThePalace.Core.Interfaces;
+using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Common.Desktop.Factories;

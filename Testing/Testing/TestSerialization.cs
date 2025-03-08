@@ -1,10 +1,10 @@
-﻿using ThePalace.Common.Helpers;
+﻿using ThePalace.Common.Factories;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Network;
 

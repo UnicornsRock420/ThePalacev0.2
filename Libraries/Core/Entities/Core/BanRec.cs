@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Database.Core.Model;
+﻿namespace ThePalace.Core.Entities.Core;
 
 public class BanRec
 {

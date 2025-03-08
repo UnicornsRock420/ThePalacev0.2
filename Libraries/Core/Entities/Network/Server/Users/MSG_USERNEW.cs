@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared;
+using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Core.Entities.Network.Server.Users;

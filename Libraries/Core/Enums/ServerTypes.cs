@@ -1,7 +1,7 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using uint32 = uint;
 
-namespace ThePalace.Core.Enums.Palace;
+namespace ThePalace.Core.Enums;
 
 [Flags]
 [ByteSize(2)]

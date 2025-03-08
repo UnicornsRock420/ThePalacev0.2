@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using ThePalace.Common.Factories;
 using ThePalace.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared;
+namespace ThePalace.Core.Entities.Shared.Users;
 
 public partial class UserDesc : IDisposable, IStruct
 {

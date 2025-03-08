@@ -6,7 +6,7 @@ using RoomID = short;
 using sint16 = short;
 using UserID = int;
 
-namespace ThePalace.Core.Entities.Shared;
+namespace ThePalace.Core.Entities.Shared.Users;
 
 public class UserRec : IDisposable, IStruct
 {

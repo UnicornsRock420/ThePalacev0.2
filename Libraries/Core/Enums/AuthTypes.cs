@@ -1,6 +1,6 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 
-namespace ThePalace.Core.Enums.Palace;
+namespace ThePalace.Core.Enums;
 
 [Flags]
 [ByteSize(4)]

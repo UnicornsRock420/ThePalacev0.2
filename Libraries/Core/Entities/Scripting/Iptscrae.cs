@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using ThePalace.Core.Enums.Palace;
+using ThePalace.Core.Enums;
 using Timer = System.Timers.Timer;
 
 namespace ThePalace.Core.Entities.Scripting;
