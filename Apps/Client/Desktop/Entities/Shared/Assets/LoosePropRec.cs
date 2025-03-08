@@ -1,9 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections;
+using System.Runtime.Serialization;
 using ThePalace.Core.Entities.Shared.Rooms;
 
 namespace ThePalace.Client.Desktop.Entities.Shared.Assets;
 
-public class LoosePropDesc
+public class LoosePropDesc : Disposable
 {
     [IgnoreDataMember] public Bitmap Image;
 
@@ -12,7 +13,16 @@ public class LoosePropDesc
         Dispose();
     }
 
-    public void Dispose()
+    public override void Dispose()
+    {
+        Unload();
+
+        base.Dispose();
+    }
+
+    public LoosePropRec PropInfo { get; set; }
+
+    public void Unload()
     {
         try
         {
@@ -22,9 +32,5 @@ public class LoosePropDesc
         catch
         {
         }
-
-        GC.SuppressFinalize(this);
     }
-    
-    public LoosePropRec PropInfo { get; set; }
 }

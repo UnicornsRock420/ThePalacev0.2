@@ -35,14 +35,6 @@ namespace ThePalace.Client.Desktop.Entities.UI;
 
 public class DesktopSessionState : Disposable, IDesktopSessionState
 {
-    private static readonly IReadOnlyList<ScreenLayerTypes> _layerTypes = Enum.GetValues<ScreenLayerTypes>().AsReadOnly();
-
-    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
-
-    private readonly DisposableDictionary<ScreenLayerTypes, IScreenLayer> _uiLayers = new();
-
-    private readonly Timer _refreshTimer = new(350);
-
     public DesktopSessionState()
     {
         _managedResources.AddRange(
@@ -110,15 +102,20 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         LastActivity = null;
 
         base.Dispose();
     }
 
+    private static readonly IReadOnlyList<ScreenLayerTypes> _layerTypes = Enum.GetValues<ScreenLayerTypes>().AsReadOnly();
+    private readonly DisposableDictionary<ScreenLayerTypes, IScreenLayer> _uiLayers = new();
     public IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers => _uiLayers.AsReadOnly();
+    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
     public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+
+    private readonly Timer _refreshTimer = new(350);
 
     // UI Info
     public bool Visible { get; set; } = true;
@@ -1032,19 +1029,22 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                 var loc = msg.Origin;
 
-                //var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
-                //var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
+                var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
+                var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
 
-                //if (x < -halfPropWidth) x = (short)-halfPropWidth;
-                //else if (x > (sessionState.ScreenWidth + halfPropWidth)) x = (short)(sessionState.ScreenWidth + halfPropWidth);
+                var x = UserDesc.UserInfo.RoomPos.HAxis;
+                var y = UserDesc.UserInfo.RoomPos.VAxis;
 
-                //if (y < -halfPropHeight) y = (short)-halfPropHeight;
-                //else if (y > (sessionState.ScreenHeight + halfPropHeight)) y = (short)(sessionState.ScreenHeight + halfPropHeight);
+                if (x < -halfPropWidth) x = (short)-halfPropWidth;
+                else if (x > (this.ScreenWidth + halfPropWidth)) x = (short)(this.ScreenWidth + halfPropWidth);
 
-                //if (x < 0 ||
-                //    y < 0) continue;
+                if (y < -halfPropHeight) y = (short)-halfPropHeight;
+                else if (y > (this.ScreenHeight + halfPropHeight)) y = (short)(this.ScreenHeight + halfPropHeight);
 
-                var image = msg.Render();
+                if (x < 0 ||
+                    y < 0) continue;
+
+                var image = msg.Render(this);
 
                 // TODO:
             }

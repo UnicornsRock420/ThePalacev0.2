@@ -1,17 +1,22 @@
-﻿using ThePalace.Client.Desktop.Enums;
+﻿using System.Collections;
+using System.Text.RegularExpressions;
+using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
+using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Factories;
+using Windows.Foundation.Metadata;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class MsgBubble : IDisposable
+public class MsgBubble : Disposable, IDisposable
 {
-    private const int maxWidth = 150;
-    private const int minWidth = 20;
+    private const double _defaultRatio = 1.3;
+    private const short _defaultOffset = 11;
+    private const int _minWidth = 20;
+    private const int _maxWidth = 150;
+
     private DateTime? _accessed;
-    public Point Location = new(0, 0);
-    public Size TextSize;
 
     public MsgBubble(string text)
     {
@@ -47,21 +52,7 @@ public class MsgBubble : IDisposable
         Parse(text, duration);
     }
 
-    public Bitmap Image { get; private set; }
-
-    public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
-    public DateTime Created { get; } = DateTime.UtcNow;
-    public DateTime Accessed => _accessed ??= DateTime.UtcNow;
-    public bool Visible { get; private set; } = true;
-    public Color Colour { get; } = Color.White;
-    public Point Origin { get; private set; } = new(0, 0);
-
-    public int Duration { get; private set; }
-    public string OriginalText { get; private set; }
-    public string[] Text { get; private set; }
-    public string[] MediaFilenames { get; private set; }
-
-    public void Dispose()
+    public override void Dispose()
     {
         try
         {
@@ -74,89 +65,141 @@ public class MsgBubble : IDisposable
         Text = null;
         MediaFilenames = null;
 
-        GC.SuppressFinalize(this);
+        base.Dispose();
     }
 
+    public Bitmap Image { get; private set; }
+
+    public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
+    public DateTime Created { get; } = DateTime.UtcNow;
+    public DateTime Accessed => _accessed ??= DateTime.UtcNow;
+    public bool Visible { get; private set; } = true;
+    public Color Colour { get; } = Color.White;
+    public Point Origin { get; private set; } = new(0, 0);
+    public Size TextSize { get; set; } = new(0, 0);
+
+    public int Duration { get; private set; }
+    public string OriginalText { get; private set; }
+    public string[] Text { get; private set; }
+    public string[] MediaFilenames { get; private set; }
+
+    #region Regex Matching & Formatting
+
+    private IReadOnlyDictionary<Regex, Func<object[], string?>> _regexPatterns = new Dictionary<Regex, Func<object[], string?>>()
+    {
+        { RegexConstants.REGEX_HIDDEN, a =>
+            {
+                if (a.Length < 1) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[0]");
+                if (a.Length < 2) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[1]");
+
+                var msgBubble = a[0] as MsgBubble;
+                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+
+                var text = a[1] as string;
+                if (text == null) throw new ArgumentNullException(nameof(text));
+
+                msgBubble.Visible = false;
+
+                return text;
+            } },
+        { RegexConstants.REGEX_BUBBLE_TYPE, a =>
+            {
+                if (a.Length < 1) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[0]");
+                if (a.Length < 2) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[1]");
+
+                var msgBubble = a[0] as MsgBubble;
+                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+
+                var text = a[1] as string;
+                if (text == null) throw new ArgumentNullException(nameof(text));
+
+                var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
+
+                if (msgBubble.Type == BubbleTypes.Normal &&
+                    _charBubbleTypeMappings.TryGetValue(match.Groups[1].Value[0], out var bubbleType))
+                {
+                    msgBubble.Type = bubbleType;
+                }
+
+                return match.Groups[2].Value?.Trim();
+            } },
+        { RegexConstants.REGEX_COORDINATES, a =>
+            {
+                if (a.Length < 1) throw new ArgumentNullException("REGEX_COORDINATES[0]");
+                if (a.Length < 2) throw new ArgumentNullException("REGEX_COORDINATES[1]");
+
+                var msgBubble = a[0] as MsgBubble;
+                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+
+                var text = a[1] as string;
+                if (text == null) throw new ArgumentNullException(nameof(text));
+
+                var match = RegexConstants.REGEX_COORDINATES.Match(text);
+
+                var x = Convert.ToInt32(match.Groups[1].Value);
+                var y = Convert.ToInt32(match.Groups[2].Value);
+                msgBubble.Origin = new Point(x, y);
+
+                return match.Groups[3].Value?.Trim();
+            } },
+        { RegexConstants.REGEX_SOUND, a =>
+            {
+                if (a.Length < 1) throw new ArgumentNullException("REGEX_SOUND[0]");
+                if (a.Length < 2) throw new ArgumentNullException("REGEX_SOUND[1]");
+
+                var msgBubble = a[0] as MsgBubble;
+                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+
+                var text = a[1] as string;
+                if (text == null) throw new ArgumentNullException(nameof(text));
+
+                var mediaFilenames = new List<string>();
+                var match = (Match?)null;
+
+                while (RegexConstants.REGEX_SOUND.IsMatch(text))
+                {
+                    match = RegexConstants.REGEX_SOUND.Match(text);
+                    if (match == null) break;
+
+                    var fileName = match.Groups[1].Value?.Trim();
+                    if (!string.IsNullOrWhiteSpace(fileName))
+                        mediaFilenames.Add(fileName);
+
+                    text = match.Groups[2].Value?.Trim();
+                    if (string.IsNullOrWhiteSpace(text)) break;
+                }
+
+                if (mediaFilenames.Count > 0)
+                    msgBubble.MediaFilenames = mediaFilenames.ToArray();
+
+                return text;
+            } },
+    }.AsReadOnly();
+    private static readonly Regex[] CONST_regexSequence =
+    [
+        RegexConstants.REGEX_HIDDEN,
+        RegexConstants.REGEX_BUBBLE_TYPE,
+        RegexConstants.REGEX_COORDINATES,
+        RegexConstants.REGEX_BUBBLE_TYPE,
+        RegexConstants.REGEX_SOUND,
+        RegexConstants.REGEX_BUBBLE_TYPE
+    ];
+
+    #endregion
     private void Parse(string text, int duration = 0)
     {
         OriginalText = text;
 
-        #region Regex Matching & Formatting
-
-        if (RegexConstants.REGEX_VISIBLE.IsMatch(text))
+        foreach (var step in CONST_regexSequence)
         {
-            Visible = false;
-
-            return;
-        }
-
-        if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
-        {
-            var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
-            text = match.Groups[2].Value;
-
-            if (Type == BubbleTypes.Normal)
-                switch (match.Groups[1].Value[0])
-                {
-                    case '!': Type = BubbleTypes.Shout; break;
-                    case ':': Type = BubbleTypes.Thought; break;
-                    case '^': Type = BubbleTypes.Sticky; break;
-                }
-        }
-
-        if (RegexConstants.REGEX_COORDINATES.IsMatch(text))
-        {
-            var match = RegexConstants.REGEX_COORDINATES.Match(text);
-            var x = Convert.ToInt32(match.Groups[1].Value);
-            var y = Convert.ToInt32(match.Groups[2].Value);
-            text = match.Groups[3].Value;
-
-            Origin = new Point(x, y);
-        }
-
-        if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
-        {
-            var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
-            text = match.Groups[2].Value;
-
-            if (Type == BubbleTypes.Normal)
-                switch (match.Groups[1].Value[0])
-                {
-                    case '!': Type = BubbleTypes.Shout; break;
-                    case ':': Type = BubbleTypes.Thought; break;
-                    case '^': Type = BubbleTypes.Sticky; break;
-                }
-        }
-
-        if (RegexConstants.REGEX_SOUND.IsMatch(text))
-        {
-            var mediaFilenames = new List<string>();
-            while (RegexConstants.REGEX_SOUND.IsMatch(text))
+            if (step.IsMatch(text) &&
+                _regexPatterns.TryGetValue(step, out var cb))
             {
-                var match = RegexConstants.REGEX_SOUND.Match(text);
-                text = match.Groups[2].Value;
+                text = cb([this, text]);
 
-                mediaFilenames.Add(match.Groups[1].Value);
+                if (!Visible) break;
             }
-
-            MediaFilenames = mediaFilenames.ToArray();
         }
-
-        if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
-        {
-            var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
-            text = match.Groups[2].Value;
-
-            if (Type == BubbleTypes.Normal)
-                switch (match.Groups[1].Value[0])
-                {
-                    case '!': Type = BubbleTypes.Shout; break;
-                    case ':': Type = BubbleTypes.Thought; break;
-                    case '^': Type = BubbleTypes.Sticky; break;
-                }
-        }
-
-        #endregion
 
         #region Word(s) & Line Formatting
 
@@ -170,10 +213,10 @@ public class MsgBubble : IDisposable
             var newLineSize = TextRenderer.MeasureText(newLine,
                 new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
-            if (newLineSize.Width < maxWidth)
+            if (newLineSize.Width < _maxWidth)
                 line.Enqueue(words.Dequeue());
 
-            if (newLineSize.Width >= maxWidth ||
+            if (newLineSize.Width >= _maxWidth ||
                 words.Count < 1)
             {
                 newLine = line.Join(" ");
@@ -181,7 +224,7 @@ public class MsgBubble : IDisposable
                     new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
                 if (newLineSize.Width > TextSize.Width)
-                    TextSize.Width = newLineSize.Width;
+                    TextSize = new Size(newLineSize.Width, TextSize.Height);
 
                 lines.Add(newLine);
                 line.Clear();
@@ -191,77 +234,32 @@ public class MsgBubble : IDisposable
         Text = lines.ToArray();
         Duration = duration > 0 ? duration : Text.Join(" ").ToCharArray().Length * 500;
 
-        //TextSize.Width += -28; // 16;
-        TextSize.Height = Text.Length * (DesktopConstants.Font.HEIGHT - 5) + 2;
+        TextSize = new Size(
+            TextSize.Width, // Width += -28; // 16;
+            Text.Length * (DesktopConstants.Font.HEIGHT - 5) + 2);
 
         #endregion
     }
 
-    public Bitmap Render()
+    private delegate void RenderMethod(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y);
+    private static readonly IReadOnlyDictionary<BubbleTypes, RenderMethod> _bubbleTypeMethodMappings = new Dictionary<BubbleTypes, RenderMethod>()
     {
-        if (Text.Length < 1) return null;
-
-        //var px = (short)this.Origin;
-        //var py = (short)this.Origin;
-
-        var offsetX = (short)11;
-        var offsetY = (short)11;
-
-        var w = new[] { minWidth, TextSize.Width }.Max();
-        var h = TextSize.Height;
-
-        var x = (short)(Location.X + offsetX);
-        var y = (short)(Location.Y + offsetY);
-
-        //if (sessionState.ScreenWidth < r)
-        //{
-        //    offsetX = -11;
-        //    x -= (short)(w * 1.3);
-        //    r = (short)(x + w);
-        //}
-
-        //if (sessionState.ScreenHeight < b)
-        //{
-        //    offsetY = -11;
-        //    y -= (short)(h * 1.3);
-        //    b = (short)(y + h);
-        //}
-
-        var imagePadding = 50;
-        Image = new Bitmap(TextSize.Width + imagePadding, TextSize.Height + imagePadding);
-
-        using (var g = Graphics.FromImage(Image))
-        using (var colourBrush = new SolidBrush(Colour))
-        using (var colourPen = new Pen(colourBrush, 2))
-        {
-            var helper = new GraphicsHelper(g, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT),
-                colourPen, colourBrush);
-
-            switch (Type)
-            {
-                case BubbleTypes.Normal: Render_Normal(helper, w, h, x, y); break;
-                case BubbleTypes.Shout: Render_Shout(helper, w, h, x, y); break;
-                case BubbleTypes.Sticky: Render_Sticky(helper, w, h, x, y); break;
-                case BubbleTypes.Thought: Render_Thought2(helper, w, h, x, y); break;
-            }
-
-            helper.SetBrush(Brushes.Black);
-            helper.BeginPath();
-
-            for (var k = 0; k < Text.Length; k++)
-                helper.DrawText(Text[k], offsetX + x + 6, Math.Abs(offsetY > 0 ? offsetY : 11) + y - 6 + k * 16); //8, 5
-
-            helper.Fill();
-            helper.Stroke();
-
-            return Image;
-        }
-    }
-
-    private void Render_Normal(GraphicsHelper helper, int w, int h, short x, short y)
+        { BubbleTypes.Normal, Render_Normal },
+        { BubbleTypes.Shout, Render_Shout },
+        { BubbleTypes.Sticky, Render_Sticky },
+        { BubbleTypes.Thought, Render_Thought2 }
+    }.AsReadOnly();
+    private static readonly IReadOnlyDictionary<char, BubbleTypes> _charBubbleTypeMappings = new Dictionary<char, BubbleTypes>()
     {
-        var px = (short)Origin.X;
-        var py = (short)Origin.Y;
+        { '!', BubbleTypes.Shout },
+        { ':', BubbleTypes.Thought },
+        { '^', BubbleTypes.Sticky }
+    }.AsReadOnly();
+
+    private static void Render_Normal(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y)
+    {
+        var px = (short)msgBubble.Origin.X;
+        var py = (short)msgBubble.Origin.Y;
         var r = (short)(x + w);
         var b = (short)(y + h);
         var con1 = (short)0;
@@ -337,7 +335,7 @@ public class MsgBubble : IDisposable
         helper.Stroke();
     }
 
-    private void Render_Shout(GraphicsHelper helper, int w, int h, short x, short y)
+    private static void Render_Shout(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y)
     {
         var SpikeDisplace = (short)20;
         var SpikeHeight = (short)16;
@@ -420,7 +418,7 @@ public class MsgBubble : IDisposable
         helper.Stroke();
     }
 
-    private void Render_Sticky(GraphicsHelper helper, int w, int h, short x, short y)
+    private static void Render_Sticky(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);
         var b = (short)(y + h);
@@ -443,7 +441,8 @@ public class MsgBubble : IDisposable
         helper.Stroke();
     }
 
-    private void Render_Thought(GraphicsHelper helper, int w, int h, short x, short y)
+    [Deprecated(null, DeprecationType.Deprecate, 0)]
+    private static void Render_Thought(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);
         var b = (short)(y + h);
@@ -594,15 +593,15 @@ public class MsgBubble : IDisposable
         helper.Stroke();
     }
 
-    private void Render_Thought2(GraphicsHelper helper, int w, int h, short x, short y)
+    private static void Render_Thought2(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);
         var b = (short)(y + h);
         //var px = (short)0;
         //var py = (short)0;
 
-        var xMax = TextSize.Width / 14;
-        var yMax = TextSize.Height / 13;
+        var xMax = msgBubble.TextSize.Width / 14;
+        var yMax = msgBubble.TextSize.Height / 13;
         var radius = (short)0;
         var rMin = 12;
         var rMax = 15;
@@ -724,4 +723,78 @@ public class MsgBubble : IDisposable
         helper.Fill();
         helper.Stroke();
     }
+
+    public async Task<Bitmap?> Render(IDesktopSessionState sessionState) =>
+        await Task.Factory.StartNew(() =>
+        {
+            if (Text.Length < 1) return null;
+
+            var px = (short)this.Origin.X;
+            var py = (short)this.Origin.Y;
+
+            var offsetX = _defaultOffset;
+            var x = (short)(Origin.X + offsetX);
+            var w = new[] { _minWidth, TextSize.Width }.Max();
+            var r = (short)(x + w);
+
+            var offsetY = _defaultOffset;
+            var y = (short)(Origin.Y + offsetY);
+            var h = TextSize.Height;
+            var b = (short)(y + h);
+
+            if (sessionState.ScreenWidth < r)
+            {
+                offsetX = -_defaultOffset;
+
+                x -= (short)(w * _defaultRatio);
+                r = (short)(x + w);
+            }
+
+            if (sessionState.ScreenHeight < b)
+            {
+                offsetY = -_defaultOffset;
+
+                y -= (short)(h * _defaultRatio);
+                b = (short)(y + h);
+            }
+
+            var imagePadding = 50;
+            Image = new Bitmap(TextSize.Width + imagePadding, TextSize.Height + imagePadding);
+            if (Image == null) throw new OutOfMemoryException(nameof(MsgBubble) + "." + nameof(Render) + "." + nameof(Image));
+
+            using (var g = Graphics.FromImage(Image))
+            using (var colourBrush = new SolidBrush(Colour))
+            using (var colourPen = new Pen(colourBrush, 2))
+            {
+                var helper = new GraphicsHelper(
+                    g,
+                    new Font(
+                        DesktopConstants.Font.NAME,
+                        DesktopConstants.Font.HEIGHT),
+                    colourPen,
+                    colourBrush);
+
+                if (_bubbleTypeMethodMappings.TryGetValue(Type, out var ptr))
+                {
+                    ptr(this, helper, w, h, x, y);
+                }
+
+                helper.SetBrush(Brushes.Black);
+                helper.BeginPath();
+
+                var deltaX = (short)6;
+                var deltaY1 = (short)6;
+                var deltaY2 = (short)16;
+
+                for (var k = 0; k < Text.Length; k++)
+                {
+                    helper.DrawText(Text[k], offsetX + x + deltaX, Math.Abs(offsetY > 0 ? offsetY : _defaultOffset) + y - deltaY1 + k * deltaY2);
+                }
+
+                helper.Fill();
+                helper.Stroke();
+
+                return Image;
+            }
+        });
 }
