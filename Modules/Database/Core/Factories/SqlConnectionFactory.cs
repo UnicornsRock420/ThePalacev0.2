@@ -11,6 +11,8 @@ public class SqlConnectionFactory(string connectionString) : ISqlConnectionFacto
     public void Dispose()
     {
         _connection?.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public string ConnectionString { get; internal set; } = connectionString;

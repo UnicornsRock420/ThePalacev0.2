@@ -21,8 +21,6 @@ public class SessionManager : SingletonDisposable<SessionManager>
         _sessions?.Clear();
 
         base.Dispose();
-
-        GC.SuppressFinalize(this);
     }
 
     public T CreateSession<T>()

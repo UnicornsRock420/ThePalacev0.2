@@ -73,6 +73,8 @@ public class MsgBubble : IDisposable
 
         Text = null;
         MediaFilenames = null;
+
+        GC.SuppressFinalize(this);
     }
 
     private void Parse(string text, int duration = 0)

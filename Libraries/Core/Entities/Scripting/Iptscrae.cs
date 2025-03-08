@@ -102,6 +102,8 @@ public class IptTracking : IDisposable
         Stack?.Clear();
         Stack = null;
         Grep = null;
+
+        GC.SuppressFinalize(this);
     }
 
     public static int TicksToMilliseconds(int ticks)

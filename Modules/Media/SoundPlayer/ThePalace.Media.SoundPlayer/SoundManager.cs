@@ -60,6 +60,8 @@ public class SoundManager : Singleton<SoundManager>, IDisposable
             }
         });
         _libVlcMedia?.Clear();
+
+        GC.SuppressFinalize(this);
     }
 
     ~SoundManager()

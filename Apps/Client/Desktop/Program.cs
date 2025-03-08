@@ -131,14 +131,13 @@ public class Program : Disposable
             {
                 // TODO: GUI
 
-                if (!q.IsEmpty &&
-                    q.TryDequeue(out var cmd))
-                {
-                    if (cmd.Values != null)
-                        cmd.CmdFnc(cmd.Values);
-                    else
-                        cmd.CmdFnc();
-                }
+                if (q.IsEmpty ||
+                    !q.TryDequeue(out var cmd)) return;
+
+                if (cmd.Values != null)
+                    cmd.CmdFnc(cmd.Values);
+                else
+                    cmd.CmdFnc();
             },
             null,
             RunOptions.UseTimer,
