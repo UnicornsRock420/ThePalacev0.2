@@ -7,26 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Constants\RegexConstants.cs"/>
-        <Compile Remove="LockContext.cs"/>
-        <Compile Remove="Singleton.cs"/>
+        <Compile Remove="Constants\RegexConstants.cs" />
+        <Compile Remove="LockContext.cs" />
+        <Compile Remove="Singleton.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Constants\RegexConstants.cs"/>
+        <None Include="Constants\RegexConstants.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1"/>
+        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Common\ThePalace.Common\ThePalace.Common.csproj"/>
-        <ProjectReference Include="..\Logging\ThePalace.Logging.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Helpers\"/>
+        <ProjectReference Include="..\Common\ThePalace.Common\ThePalace.Common.csproj" />
+        <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
     </ItemGroup>
 
 </Project>

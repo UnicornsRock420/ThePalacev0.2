@@ -36,6 +36,10 @@ using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
+using ThePalace.Core.Helpers;
+using ThePalace.Network.Helpers;
+
+
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -939,7 +943,7 @@ public class Program : Disposable
 
                                         try
                                         {
-                                            var atomlist = IptscraeEngine.Parser(
+                                            var atomlist = IptscraeEngine.Parse(
                                                 sessionState.ScriptState as IptTracking,
                                                 text,
                                                 false);
@@ -970,7 +974,7 @@ public class Program : Disposable
                                 if (SessionState.ScriptState is IptTracking iptTracking)
                                 {
                                     if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
-                                        xTalk.Text = iptTracking.Variables["CHATSTR"].Value.Value.ToString();
+                                        xTalk.Text = iptTracking.Variables["CHATSTR"].Variable.Value.ToString();
 
                                     if (!string.IsNullOrWhiteSpace(xTalk.Text))
                                         ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd

@@ -7,126 +7,130 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Entities\Core\RawData.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_NOOP.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_PICTDEL.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_PICTNEW.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_PICTSETDESC.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_PROPSETDESC.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_RESPORT.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_SERVERUP.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_SPOTSETDESC.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs"/>
-        <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs"/>
-        <Compile Remove="Factories\Filesystem\PropPIDSStream.cs"/>
-        <Compile Remove="Factories\Filesystem\PropPROPSStream.cs"/>
-        <Compile Remove="Factories\Filesystem\PropPRPStream.cs"/>
+        <Compile Remove="Entities\Core\RawData.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_ASSETNEW.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_DIYIT.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_NOOP.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_PICTDEL.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_PICTNEW.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_PICTSETDESC.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_PROPSETDESC.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_RESPORT.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_SERVERUP.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_SPOTSETDESC.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_TIMYID.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_USERENTER.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_WMSG.cs" />
+        <Compile Remove="Factories\Filesystem\PropPIDSStream.cs" />
+        <Compile Remove="Factories\Filesystem\PropPROPSStream.cs" />
+        <Compile Remove="Factories\Filesystem\PropPRPStream.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Remove="C:\Users\RubberPinkDildos\.nuget\packages\system.diagnostics.diagnosticsource\9.0.1\contentFiles\any\net9.0\ILLink\ILLink.Descriptors.LibraryBuild.xml"/>
+        <Content Remove="C:\Users\RubberPinkDildos\.nuget\packages\system.diagnostics.diagnosticsource\9.0.1\contentFiles\any\net9.0\ILLink\ILLink.Descriptors.LibraryBuild.xml" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Entities\Core\RawData.cs"/>
-        <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs"/>
-        <None Include="Entities\Network\Unused\MSG_DIYIT.cs"/>
-        <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs"/>
-        <None Include="Entities\Network\Unused\MSG_NOOP.cs"/>
-        <None Include="Entities\Network\Unused\MSG_PICTDEL.cs"/>
-        <None Include="Entities\Network\Unused\MSG_PICTNEW.cs"/>
-        <None Include="Entities\Network\Unused\MSG_PICTSETDESC.cs"/>
-        <None Include="Entities\Network\Unused\MSG_PROPSETDESC.cs"/>
-        <None Include="Entities\Network\Unused\MSG_RESPORT.cs"/>
-        <None Include="Entities\Network\Unused\MSG_SERVERUP.cs"/>
-        <None Include="Entities\Network\Unused\MSG_SPOTSETDESC.cs"/>
-        <None Include="Entities\Network\Unused\MSG_TIMYID.cs"/>
-        <None Include="Entities\Network\Unused\MSG_USERENTER.cs"/>
-        <None Include="Entities\Network\Unused\MSG_WMSG.cs"/>
-        <None Include="Factories\Filesystem\PropPIDSStream.cs"/>
-        <None Include="Factories\Filesystem\PropPROPSStream.cs"/>
-        <None Include="Factories\Filesystem\PropPRPStream.cs"/>
+        <None Include="Entities\Core\RawData.cs" />
+        <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
+        <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
+        <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
+        <None Include="Entities\Network\Unused\MSG_NOOP.cs" />
+        <None Include="Entities\Network\Unused\MSG_PICTDEL.cs" />
+        <None Include="Entities\Network\Unused\MSG_PICTNEW.cs" />
+        <None Include="Entities\Network\Unused\MSG_PICTSETDESC.cs" />
+        <None Include="Entities\Network\Unused\MSG_PROPSETDESC.cs" />
+        <None Include="Entities\Network\Unused\MSG_RESPORT.cs" />
+        <None Include="Entities\Network\Unused\MSG_SERVERUP.cs" />
+        <None Include="Entities\Network\Unused\MSG_SPOTSETDESC.cs" />
+        <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
+        <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
+        <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
+        <None Include="Factories\Filesystem\PropPIDSStream.cs" />
+        <None Include="Factories\Filesystem\PropPROPSStream.cs" />
+        <None Include="Factories\Filesystem\PropPRPStream.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Autofac" Version="8.2.0"/>
-        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0"/>
-        <PackageReference Include="Mapster" Version="7.4.0"/>
-        <PackageReference Include="Mapster.Core" Version="1.2.1"/>
-        <PackageReference Include="MediatR" Version="12.4.1"/>
-        <PackageReference Include="MediatR.Contracts" Version="2.0.1"/>
-        <PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="12.2.0"/>
-        <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.2"/>
-        <PackageReference Include="Serilog" Version="4.2.0"/>
-        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1"/>
-        <PackageReference Include="Serilog.Exceptions" Version="8.4.0"/>
-        <PackageReference Include="Serilog.Expressions" Version="5.0.0"/>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0"/>
-        <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0"/>
-        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0"/>
-        <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
-        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0"/>
-        <PackageReference Include="Serilog.Sinks.Map" Version="2.0.0"/>
-        <PackageReference Include="System.Buffers" Version="4.6.0"/>
-        <PackageReference Include="System.Collections" Version="4.3.0"/>
-        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0"/>
-        <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.2"/>
-        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0"/>
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.2"/>
-        <PackageReference Include="System.Diagnostics.EventLog" Version="9.0.2"/>
-        <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0"/>
-        <PackageReference Include="System.Globalization" Version="4.3.0"/>
-        <PackageReference Include="System.IO" Version="4.3.0"/>
-        <PackageReference Include="System.IO.Pipelines" Version="9.0.2"/>
-        <PackageReference Include="System.Memory" Version="4.6.0"/>
-        <PackageReference Include="System.Reflection" Version="4.3.0"/>
-        <PackageReference Include="System.Reflection.Primitives" Version="4.3.0"/>
-        <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0"/>
-        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0"/>
-        <PackageReference Include="System.Text.Encoding" Version="4.3.0"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.2"/>
-        <PackageReference Include="System.Text.Encodings.Web" Version="9.0.2"/>
-        <PackageReference Include="System.Text.Json" Version="9.0.2"/>
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1"/>
-        <PackageReference Include="System.Threading" Version="4.3.0"/>
-        <PackageReference Include="System.Threading.Extensions" Version="2.0.105"/>
-        <PackageReference Include="System.Threading.Tasks" Version="4.3.0"/>
-        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0"/>
-        <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0"/>
-        <PackageReference Include="System.Threading.Timer" Version="4.3.0"/>
-        <PackageReference Include="System.Windows.Extensions" Version="9.0.2"/>
+        <PackageReference Include="Autofac" Version="8.2.0" />
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+        <PackageReference Include="Mapster" Version="7.4.0" />
+        <PackageReference Include="Mapster.Core" Version="1.2.1" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
+        <PackageReference Include="MediatR.Contracts" Version="2.0.1" />
+        <PackageReference Include="MediatR.Extensions.Autofac.DependencyInjection" Version="12.2.0" />
+        <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2" />
+        <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.2" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+        <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+        <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.0" />
+        <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
+        <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+        <PackageReference Include="Serilog.Sinks.Map" Version="2.0.0" />
+        <PackageReference Include="System.Buffers" Version="4.6.0" />
+        <PackageReference Include="System.Collections" Version="4.3.0" />
+        <PackageReference Include="System.Collections.Concurrent" Version="4.3.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.2" />
+        <PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="9.0.2" />
+        <PackageReference Include="System.Diagnostics.EventLog" Version="9.0.2" />
+        <PackageReference Include="System.Diagnostics.Tracing" Version="4.3.0" />
+        <PackageReference Include="System.Globalization" Version="4.3.0" />
+        <PackageReference Include="System.IO" Version="4.3.0" />
+        <PackageReference Include="System.IO.Pipelines" Version="9.0.2" />
+        <PackageReference Include="System.Memory" Version="4.6.0" />
+        <PackageReference Include="System.Reflection" Version="4.3.0" />
+        <PackageReference Include="System.Reflection.Primitives" Version="4.3.0" />
+        <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
+        <PackageReference Include="System.Resources.ResourceManager" Version="4.3.0" />
+        <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.2" />
+        <PackageReference Include="System.Text.Encodings.Web" Version="9.0.2" />
+        <PackageReference Include="System.Text.Json" Version="9.0.2" />
+        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+        <PackageReference Include="System.Threading" Version="4.3.0" />
+        <PackageReference Include="System.Threading.Extensions" Version="2.0.105" />
+        <PackageReference Include="System.Threading.Tasks" Version="4.3.0" />
+        <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0" />
+        <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
+        <PackageReference Include="System.Threading.Timer" Version="4.3.0" />
+        <PackageReference Include="System.Windows.Extensions" Version="9.0.2" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Logging\ThePalace.Logging.csproj"/>
-        <ProjectReference Include="..\Network\ThePalace.Network.csproj"/>
+        <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
+        <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Factories\Scripting\" />
     </ItemGroup>
 
 </Project>

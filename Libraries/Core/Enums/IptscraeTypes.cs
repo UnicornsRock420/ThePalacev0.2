@@ -133,3 +133,21 @@ public enum IptOperatorFlags
     Concate = 0x00080000,
     Coalesce = 0x00100000
 }
+
+[Flags]
+public enum IptMetaVariableFlags
+{
+    None = 0,
+    IsGlobal = 0x01,
+    IsReadOnly = 0x02,
+    IsSpecial = 0x04,
+    All = IsGlobal | IsReadOnly | IsSpecial,
+}
+
+[Flags]
+public enum IptTrackingFlags
+{
+    None = 0,
+    Break = 0x01,
+    Return = 0x02,
+}

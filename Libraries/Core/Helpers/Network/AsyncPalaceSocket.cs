@@ -1,10 +1,11 @@
 ﻿using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
+using ThePalace.Core.Helpers;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
-using ThePalace.Network.Factories;
+using ThePalace.Network.Helpers;
 
-namespace ThePalace.Core.Factories.Core;
+namespace ThePalace.Core.Helpers;
 
 public static class AsyncPalaceSocket
 {

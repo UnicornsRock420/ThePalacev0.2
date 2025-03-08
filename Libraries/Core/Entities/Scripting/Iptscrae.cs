@@ -11,28 +11,25 @@ using IptEvents = ConcurrentDictionary<IptEventTypes, List<IptVariable>>;
 using IptVariables = ConcurrentDictionary<string, IptMetaVariable>;
 
 public delegate void IptCommandFnc(IptTracking iptTracking, int recursionDepth);
-
 public delegate IptVariable IptOperatorFnc(IptVariable register1, IptVariable register2);
 
 public class IptAlarm
 {
-    public IptAlarm(IptAtomList value, int delay)
+    public IptAlarm(IptAtomList atomList, int delay)
     {
         Created = DateTime.UtcNow;
+        AtomList = atomList;
         Delay = delay;
-        Value = value;
     }
 
     public DateTime Created { get; internal set; }
-    public int Delay { get; internal set; }
-    public IptAtomList Value { get; internal set; }
+
+    public IptAtomList AtomList { get; internal set; }
+    public double Delay { get; internal set; }
 }
 
 public class IptVariable
 {
-    public IptVariableTypes Type;
-    public object Value;
-
     public IptVariable()
     {
     }
@@ -49,24 +46,48 @@ public class IptVariable
         Type = type;
         Value = value;
     }
+
+    public IptVariableTypes Type { get; internal set; }
+    public object Value { get; internal set; }
+
+    public T GetValue<T>()
+    {
+        return (T)Value;
+    }
 }
 
 public class IptMetaVariable
 {
-    private IptVariable _value;
-    public int Depth = 0;
-    public bool IsGlobal = false;
-    public bool IsReadOnly = false;
-    public bool IsSpecial = false;
-
-    public IptVariable Value
+    public IptMetaVariable()
     {
-        get => _value;
+    }
+
+    public IptMetaVariable(int depth, IptVariable variable, IptMetaVariableFlags flags = IptMetaVariableFlags.None)
+    {
+        Depth = depth;
+        Flags = flags;
+        Variable = variable;
+    }
+
+    public IptMetaVariable(IptMetaVariable src) : this(src.Depth, src.Variable, src.Flags)
+    {
+    }
+
+    public int Depth = 0;
+    public IptMetaVariableFlags Flags = IptMetaVariableFlags.None;
+    public bool IsGlobal => (Flags & IptMetaVariableFlags.IsGlobal) == IptMetaVariableFlags.IsGlobal;
+    public bool IsReadOnly => (Flags & IptMetaVariableFlags.IsReadOnly) == IptMetaVariableFlags.IsReadOnly;
+    public bool IsSpecial => (Flags & IptMetaVariableFlags.IsSpecial) == IptMetaVariableFlags.IsSpecial;
+
+    private IptVariable _variable;
+    public IptVariable Variable
+    {
+        get => _variable;
         set
         {
-            if (IsReadOnly) return;
+            if (!IsReadOnly) return;
 
-            _value = value;
+            _variable = value;
         }
     }
 }
@@ -79,35 +100,45 @@ public class IptOperator
 
 public class IptTracking : IDisposable
 {
-    public readonly Timer Timer = new()
-    {
-        Interval = 10 //IptTracking.TicksToMilliseconds(1)
-    };
-
-    public bool Break = false;
-    public Match[] Grep;
-
-    public bool Return = false;
-    public IptAtomList Stack { get; internal set; } = new();
-    public IptAlarms Alarms { get; internal set; } = new();
-    public IptEvents Events { get; internal set; } = new();
-    public IptVariables Variables { get; internal set; } = new();
-
     public void Dispose()
     {
-        Events?.Clear();
-        Events = null;
-        Variables?.Clear();
-        Variables = null;
+        _timer?.Dispose();
+        _timer = null;
+
         Stack?.Clear();
         Stack = null;
+
+        Alarms?.Clear();
+        Alarms = null;
+
+        Events?.Clear();
+        Events = null;
+
+        Variables?.Clear();
+        Variables = null;
+
         Grep = null;
 
         GC.SuppressFinalize(this);
     }
 
-    public static int TicksToMilliseconds(int ticks)
+    private Timer _timer;
+    public Timer Timer => _timer ??= new()
     {
-        return ticks / 6 * 100;
+        Interval = TicksToMilliseconds<double>(1),
+        Enabled = false,
+    };
+
+    public IptTrackingFlags Flags { get; internal set; } = IptTrackingFlags.None;
+    public IptAtomList Stack { get; internal set; } = new();
+    public IptAlarms Alarms { get; internal set; } = new();
+    public IptEvents Events { get; internal set; } = new();
+    public IptVariables Variables { get; internal set; } = new();
+    public Match[] Grep { get; internal set; } = null;
+
+    public static TResult TicksToMilliseconds<TResult>(object value)
+        where TResult : struct
+    {
+        return (TResult)(object)((long)value / 6 * 100);
     }
 }

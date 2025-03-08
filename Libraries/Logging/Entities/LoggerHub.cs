@@ -54,6 +54,11 @@ public class LoggerHub : Singleton<LoggerHub>, ILogger
         Logger.Write(level, message);
     }
 
+    public void Console(string format, params object[]? args)
+    {
+        System.Console.WriteLine(format, args);
+    }
+
     public void Verbose(string message)
     {
         Logger.Write(LogEventLevel.Verbose, message);

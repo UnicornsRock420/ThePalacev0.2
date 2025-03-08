@@ -243,40 +243,39 @@ public static class EnumExts
 
         var _f = (object)flags ?? default(TStruct);
 
-        switch (typeof(TStruct))
+        return typeof(TStruct) switch
         {
-            case Type _t
-                when _t == ByteExts.Types.Byte:
-                return (TStruct)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b);
-            case Type _t
-                when _t == UInt16Exts.Types.UInt16:
-                return (TStruct)(object)(value ? (ushort)_f & ~(ushort)_b : (ushort)_f | (ushort)_b);
-            case Type _t
-                when _t == UInt32Exts.Types.UInt32:
-                return (TStruct)(object)(value ? (uint)_f & ~(uint)_b : (uint)_f | (uint)_b);
-            case Type _t
-                when _t == UInt64Exts.Types.UInt64:
-                return (TStruct)(object)(value ? (ulong)_f & ~(ulong)_b : (ulong)_f | (ulong)_b);
-            case Type _t when _t == UInt128Exts.Types.UInt128:
-                return (TStruct)(object)(value ? (UInt128)_f & ~(UInt128)_b : (UInt128)_f | (UInt128)_b);
-            case Type _t
-                when _t == SByteExts.Types.SByte:
-                return (TStruct)(object)(value ? (sbyte)_f & ~(sbyte)_b : (sbyte)_f | (sbyte)_b);
-            case Type _t
-                when _t == Int16Exts.Types.Int16:
-                return (TStruct)(object)(value ? (short)_f & ~(short)_b : (short)_f | (short)_b);
-            case Type _t
-                when _t == Int32Exts.Types.Int32:
-                return (TStruct)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b);
-            case Type _t
-                when _t == Int64Exts.Types.Int64:
-                return (TStruct)(object)(value ? (long)_f & ~(long)_b : (long)_f | (long)_b);
-            case Type _t
-                when _t == Int128Exts.Types.Int128:
-                return (TStruct)(object)(value ? (Int128)_f & ~(Int128)_b : (Int128)_f | (Int128)_b);
-        }
-
-        return (TStruct)(object)0;
+            Type _t when _t == ByteExts.Types.Byte => (TStruct)(object)(value
+                ? (byte)_f & ~(byte)_b
+                : (byte)_f | (byte)_b),
+            Type _t when _t == UInt16Exts.Types.UInt16 => (TStruct)(object)(value
+                ? (ushort)_f & ~(ushort)_b
+                : (ushort)_f | (ushort)_b),
+            Type _t when _t == UInt32Exts.Types.UInt32 => (TStruct)(object)(value
+                ? (uint)_f & ~(uint)_b
+                : (uint)_f | (uint)_b),
+            Type _t when _t == UInt64Exts.Types.UInt64 => (TStruct)(object)(value
+                ? (ulong)_f & ~(ulong)_b
+                : (ulong)_f | (ulong)_b),
+            Type _t when _t == UInt128Exts.Types.UInt128 => (TStruct)(object)(value
+                ? (UInt128)_f & ~(UInt128)_b
+                : (UInt128)_f | (UInt128)_b),
+            Type _t when _t == SByteExts.Types.SByte => (TStruct)(object)(value
+                ? (sbyte)_f & ~(sbyte)_b
+                : (sbyte)_f | (sbyte)_b),
+            Type _t when _t == Int16Exts.Types.Int16 => (TStruct)(object)(value
+                ? (short)_f & ~(short)_b
+                : (short)_f | (short)_b),
+            Type _t when _t == Int32Exts.Types.Int32 =>
+                (TStruct)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b),
+            Type _t when _t == Int64Exts.Types.Int64 => (TStruct)(object)(value
+                ? (long)_f & ~(long)_b
+                : (long)_f | (long)_b),
+            Type _t when _t == Int128Exts.Types.Int128 => (TStruct)(object)(value
+                ? (Int128)_f & ~(Int128)_b
+                : (Int128)_f | (Int128)_b),
+            _ => (TStruct)(object)0
+        };
     }
 
     public static TResult SetBit<TStruct, TResult>(this TStruct? bits, TStruct? flags, bool value)
@@ -292,40 +291,39 @@ public static class EnumExts
 
         var _f = (object)flags ?? default(TStruct);
 
-        switch (typeof(TStruct))
+        return typeof(TStruct) switch
         {
-            case Type _t
-                when _t == ByteExts.Types.Byte:
-                return (TResult)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b);
-            case Type _t
-                when _t == UInt16Exts.Types.UInt16:
-                return (TResult)(object)(value ? (ushort)_f & ~(ushort)_b : (ushort)_f | (ushort)_b);
-            case Type _t
-                when _t == UInt32Exts.Types.UInt32:
-                return (TResult)(object)(value ? (uint)_f & ~(uint)_b : (uint)_f | (uint)_b);
-            case Type _t
-                when _t == UInt64Exts.Types.UInt64:
-                return (TResult)(object)(value ? (ulong)_f & ~(ulong)_b : (ulong)_f | (ulong)_b);
-            case Type _t when _t == UInt128Exts.Types.UInt128:
-                return (TResult)(object)(value ? (UInt128)_f & ~(UInt128)_b : (UInt128)_f | (UInt128)_b);
-            case Type _t
-                when _t == SByteExts.Types.SByte:
-                return (TResult)(object)(value ? (sbyte)_f & ~(sbyte)_b : (sbyte)_f | (sbyte)_b);
-            case Type _t
-                when _t == Int16Exts.Types.Int16:
-                return (TResult)(object)(value ? (short)_f & ~(short)_b : (short)_f | (short)_b);
-            case Type _t
-                when _t == Int32Exts.Types.Int32:
-                return (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b);
-            case Type _t
-                when _t == Int64Exts.Types.Int64:
-                return (TResult)(object)(value ? (long)_f & ~(long)_b : (long)_f | (long)_b);
-            case Type _t
-                when _t == Int128Exts.Types.Int128:
-                return (TResult)(object)(value ? (Int128)_f & ~(Int128)_b : (Int128)_f | (Int128)_b);
-        }
-
-        return (TResult)(object)0;
+            Type _t when _t == ByteExts.Types.Byte => (TResult)(object)(value
+                ? (byte)_f & ~(byte)_b
+                : (byte)_f | (byte)_b),
+            Type _t when _t == UInt16Exts.Types.UInt16 => (TResult)(object)(value
+                ? (ushort)_f & ~(ushort)_b
+                : (ushort)_f | (ushort)_b),
+            Type _t when _t == UInt32Exts.Types.UInt32 => (TResult)(object)(value
+                ? (uint)_f & ~(uint)_b
+                : (uint)_f | (uint)_b),
+            Type _t when _t == UInt64Exts.Types.UInt64 => (TResult)(object)(value
+                ? (ulong)_f & ~(ulong)_b
+                : (ulong)_f | (ulong)_b),
+            Type _t when _t == UInt128Exts.Types.UInt128 => (TResult)(object)(value
+                ? (UInt128)_f & ~(UInt128)_b
+                : (UInt128)_f | (UInt128)_b),
+            Type _t when _t == SByteExts.Types.SByte => (TResult)(object)(value
+                ? (sbyte)_f & ~(sbyte)_b
+                : (sbyte)_f | (sbyte)_b),
+            Type _t when _t == Int16Exts.Types.Int16 => (TResult)(object)(value
+                ? (short)_f & ~(short)_b
+                : (short)_f | (short)_b),
+            Type _t when _t == Int32Exts.Types.Int32 =>
+                (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b),
+            Type _t when _t == Int64Exts.Types.Int64 => (TResult)(object)(value
+                ? (long)_f & ~(long)_b
+                : (long)_f | (long)_b),
+            Type _t when _t == Int128Exts.Types.Int128 => (TResult)(object)(value
+                ? (Int128)_f & ~(Int128)_b
+                : (Int128)_f | (Int128)_b),
+            _ => (TResult)(object)0
+        };
     }
 
     public static TEnum SetBit<TEnum, TCast>(this TEnum? bits, TEnum? flags, bool value)
@@ -341,41 +339,37 @@ public static class EnumExts
 
         var _f = (object)flags ?? default(TEnum);
 
-        switch (typeof(TCast))
+        return typeof(TCast) switch
         {
-            case Type _t
-                when _t == ByteExts.Types.Byte:
-                return (TEnum)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b);
-            case Type _t
-                when _t == UInt16Exts.Types.UInt16:
-                return (TEnum)(object)(value ? (ushort)_f & ~(ushort)_b : (ushort)_f | (ushort)_b);
-            case Type _t
-                when _t == UInt32Exts.Types.UInt32:
-                return (TEnum)(object)(value ? (uint)_f & ~(uint)_b : (uint)_f | (uint)_b);
-            case Type _t
-                when _t == UInt64Exts.Types.UInt64:
-                return (TEnum)(object)(value ? (ulong)_f & ~(ulong)_b : (ulong)_f | (ulong)_b);
-            case Type _t
-                when _t == UInt128Exts.Types.UInt128:
-                return (TEnum)(object)(value ? (UInt128)_f & ~(UInt128)_b : (UInt128)_f | (UInt128)_b);
-            case Type _t
-                when _t == SByteExts.Types.SByte:
-                return (TEnum)(object)(value ? (sbyte)_f & ~(sbyte)_b : (sbyte)_f | (sbyte)_b);
-            case Type _t
-                when _t == Int16Exts.Types.Int16:
-                return (TEnum)(object)(value ? (short)_f & ~(short)_b : (short)_f | (short)_b);
-            case Type _t
-                when _t == Int32Exts.Types.Int32:
-                return (TEnum)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b);
-            case Type _t
-                when _t == Int64Exts.Types.Int64:
-                return (TEnum)(object)(value ? (long)_f & ~(long)_b : (long)_f | (long)_b);
-            case Type _t
-                when _t == Int128Exts.Types.Int128:
-                return (TEnum)(object)(value ? (Int128)_f & ~(Int128)_b : (Int128)_f | (Int128)_b);
-        }
-
-        return (TEnum)(object)0;
+            Type _t when _t == ByteExts.Types.Byte =>
+                (TEnum)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b),
+            Type _t when _t == UInt16Exts.Types.UInt16 => (TEnum)(object)(value
+                ? (ushort)_f & ~(ushort)_b
+                : (ushort)_f | (ushort)_b),
+            Type _t when _t == UInt32Exts.Types.UInt32 => (TEnum)(object)(value
+                ? (uint)_f & ~(uint)_b
+                : (uint)_f | (uint)_b),
+            Type _t when _t == UInt64Exts.Types.UInt64 => (TEnum)(object)(value
+                ? (ulong)_f & ~(ulong)_b
+                : (ulong)_f | (ulong)_b),
+            Type _t when _t == UInt128Exts.Types.UInt128 => (TEnum)(object)(value
+                ? (UInt128)_f & ~(UInt128)_b
+                : (UInt128)_f | (UInt128)_b),
+            Type _t when _t == SByteExts.Types.SByte => (TEnum)(object)(value
+                ? (sbyte)_f & ~(sbyte)_b
+                : (sbyte)_f | (sbyte)_b),
+            Type _t when _t == Int16Exts.Types.Int16 => (TEnum)(object)(value
+                ? (short)_f & ~(short)_b
+                : (short)_f | (short)_b),
+            Type _t when _t == Int32Exts.Types.Int32 => (TEnum)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b),
+            Type _t when _t == Int64Exts.Types.Int64 => (TEnum)(object)(value
+                ? (long)_f & ~(long)_b
+                : (long)_f | (long)_b),
+            Type _t when _t == Int128Exts.Types.Int128 => (TEnum)(object)(value
+                ? (Int128)_f & ~(Int128)_b
+                : (Int128)_f | (Int128)_b),
+            _ => (TEnum)(object)0
+        };
     }
 
     public static TResult SetBit<TEnum, TCast, TResult>(this TEnum? bits, TEnum? flags, bool value)
@@ -392,40 +386,39 @@ public static class EnumExts
 
         var _f = (object)flags ?? default(TEnum);
 
-        switch (typeof(TCast))
+        return typeof(TCast) switch
         {
-            case Type _t
-                when _t == ByteExts.Types.Byte:
-                return (TResult)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b);
-            case Type _t
-                when _t == UInt16Exts.Types.UInt16:
-                return (TResult)(object)(value ? (ushort)_f & ~(ushort)_b : (ushort)_f | (ushort)_b);
-            case Type _t
-                when _t == UInt32Exts.Types.UInt32:
-                return (TResult)(object)(value ? (uint)_f & ~(uint)_b : (uint)_f | (uint)_b);
-            case Type _t
-                when _t == UInt64Exts.Types.UInt64:
-                return (TResult)(object)(value ? (ulong)_f & ~(ulong)_b : (ulong)_f | (ulong)_b);
-            case Type _t when _t == UInt128Exts.Types.UInt128:
-                return (TResult)(object)(value ? (UInt128)_f & ~(UInt128)_b : (UInt128)_f | (UInt128)_b);
-            case Type _t
-                when _t == SByteExts.Types.SByte:
-                return (TResult)(object)(value ? (sbyte)_f & ~(sbyte)_b : (sbyte)_f | (sbyte)_b);
-            case Type _t
-                when _t == Int16Exts.Types.Int16:
-                return (TResult)(object)(value ? (short)_f & ~(short)_b : (short)_f | (short)_b);
-            case Type _t
-                when _t == Int32Exts.Types.Int32:
-                return (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b);
-            case Type _t
-                when _t == Int64Exts.Types.Int64:
-                return (TResult)(object)(value ? (long)_f & ~(long)_b : (long)_f | (long)_b);
-            case Type _t
-                when _t == Int128Exts.Types.Int128:
-                return (TResult)(object)(value ? (Int128)_f & ~(Int128)_b : (Int128)_f | (Int128)_b);
-        }
-
-        return (TResult)(object)0;
+            Type _t when _t == ByteExts.Types.Byte => (TResult)(object)(value
+                ? (byte)_f & ~(byte)_b
+                : (byte)_f | (byte)_b),
+            Type _t when _t == UInt16Exts.Types.UInt16 => (TResult)(object)(value
+                ? (ushort)_f & ~(ushort)_b
+                : (ushort)_f | (ushort)_b),
+            Type _t when _t == UInt32Exts.Types.UInt32 => (TResult)(object)(value
+                ? (uint)_f & ~(uint)_b
+                : (uint)_f | (uint)_b),
+            Type _t when _t == UInt64Exts.Types.UInt64 => (TResult)(object)(value
+                ? (ulong)_f & ~(ulong)_b
+                : (ulong)_f | (ulong)_b),
+            Type _t when _t == UInt128Exts.Types.UInt128 => (TResult)(object)(value
+                ? (UInt128)_f & ~(UInt128)_b
+                : (UInt128)_f | (UInt128)_b),
+            Type _t when _t == SByteExts.Types.SByte => (TResult)(object)(value
+                ? (sbyte)_f & ~(sbyte)_b
+                : (sbyte)_f | (sbyte)_b),
+            Type _t when _t == Int16Exts.Types.Int16 => (TResult)(object)(value
+                ? (short)_f & ~(short)_b
+                : (short)_f | (short)_b),
+            Type _t when _t == Int32Exts.Types.Int32 =>
+                (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b),
+            Type _t when _t == Int64Exts.Types.Int64 => (TResult)(object)(value
+                ? (long)_f & ~(long)_b
+                : (long)_f | (long)_b),
+            Type _t when _t == Int128Exts.Types.Int128 => (TResult)(object)(value
+                ? (Int128)_f & ~(Int128)_b
+                : (Int128)_f | (Int128)_b),
+            _ => (TResult)(object)0
+        };
     }
 
     public static TResult SetBit<TEnum, TFlags, TCast, TResult>(this TEnum? bits, TFlags? flags, bool value)
@@ -443,40 +436,39 @@ public static class EnumExts
 
         var _f = (object)flags ?? default(TFlags);
 
-        switch (typeof(TCast))
+        return typeof(TCast) switch
         {
-            case Type _t
-                when _t == ByteExts.Types.Byte:
-                return (TResult)(object)(value ? (byte)_f & ~(byte)_b : (byte)_f | (byte)_b);
-            case Type _t
-                when _t == UInt16Exts.Types.UInt16:
-                return (TResult)(object)(value ? (ushort)_f & ~(ushort)_b : (ushort)_f | (ushort)_b);
-            case Type _t
-                when _t == UInt32Exts.Types.UInt32:
-                return (TResult)(object)(value ? (uint)_f & ~(uint)_b : (uint)_f | (uint)_b);
-            case Type _t
-                when _t == UInt64Exts.Types.UInt64:
-                return (TResult)(object)(value ? (ulong)_f & ~(ulong)_b : (ulong)_f | (ulong)_b);
-            case Type _t when _t == UInt128Exts.Types.UInt128:
-                return (TResult)(object)(value ? (UInt128)_f & ~(UInt128)_b : (UInt128)_f | (UInt128)_b);
-            case Type _t
-                when _t == SByteExts.Types.SByte:
-                return (TResult)(object)(value ? (sbyte)_f & ~(sbyte)_b : (sbyte)_f | (sbyte)_b);
-            case Type _t
-                when _t == Int16Exts.Types.Int16:
-                return (TResult)(object)(value ? (short)_f & ~(short)_b : (short)_f | (short)_b);
-            case Type _t
-                when _t == Int32Exts.Types.Int32:
-                return (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b);
-            case Type _t
-                when _t == Int64Exts.Types.Int64:
-                return (TResult)(object)(value ? (long)_f & ~(long)_b : (long)_f | (long)_b);
-            case Type _t
-                when _t == Int128Exts.Types.Int128:
-                return (TResult)(object)(value ? (Int128)_f & ~(Int128)_b : (Int128)_f | (Int128)_b);
-        }
-
-        return (TResult)(object)0;
+            Type _t when _t == ByteExts.Types.Byte => (TResult)(object)(value
+                ? (byte)_f & ~(byte)_b
+                : (byte)_f | (byte)_b),
+            Type _t when _t == UInt16Exts.Types.UInt16 => (TResult)(object)(value
+                ? (ushort)_f & ~(ushort)_b
+                : (ushort)_f | (ushort)_b),
+            Type _t when _t == UInt32Exts.Types.UInt32 => (TResult)(object)(value
+                ? (uint)_f & ~(uint)_b
+                : (uint)_f | (uint)_b),
+            Type _t when _t == UInt64Exts.Types.UInt64 => (TResult)(object)(value
+                ? (ulong)_f & ~(ulong)_b
+                : (ulong)_f | (ulong)_b),
+            Type _t when _t == UInt128Exts.Types.UInt128 => (TResult)(object)(value
+                ? (UInt128)_f & ~(UInt128)_b
+                : (UInt128)_f | (UInt128)_b),
+            Type _t when _t == SByteExts.Types.SByte => (TResult)(object)(value
+                ? (sbyte)_f & ~(sbyte)_b
+                : (sbyte)_f | (sbyte)_b),
+            Type _t when _t == Int16Exts.Types.Int16 => (TResult)(object)(value
+                ? (short)_f & ~(short)_b
+                : (short)_f | (short)_b),
+            Type _t when _t == Int32Exts.Types.Int32 =>
+                (TResult)(object)(value ? (int)_f & ~(int)_b : (int)_f | (int)_b),
+            Type _t when _t == Int64Exts.Types.Int64 => (TResult)(object)(value
+                ? (long)_f & ~(long)_b
+                : (long)_f | (long)_b),
+            Type _t when _t == Int128Exts.Types.Int128 => (TResult)(object)(value
+                ? (Int128)_f & ~(Int128)_b
+                : (Int128)_f | (Int128)_b),
+            _ => (TResult)(object)0
+        };
     }
 
     public static class Types
