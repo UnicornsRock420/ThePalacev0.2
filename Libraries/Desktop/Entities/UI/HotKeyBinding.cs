@@ -2,7 +2,7 @@
 
 namespace ThePalace.Common.Desktop.Entities.UI;
 
-public partial class HotKeyBinding
+public class HotKeyBinding
 {
     public ApiBinding Binding { get; set; } = null;
     public object[] Values { get; set; } = null;

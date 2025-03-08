@@ -4,23 +4,27 @@ using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public partial class ScreenLayer : Disposable
+public class ScreenLayer : Disposable
 {
-    public ScreenLayers Type { get; private set; }
-    public Type ResourceType;
-
-    public int Width => Image?.Width ?? 0;
-    public int Height => Image?.Height ?? 0;
     public Bitmap Image;
     public float Opacity = 1.0F;
+    public Type ResourceType;
     public bool Visible = true;
 
     public ScreenLayer(ScreenLayers type)
     {
         Type = type;
     }
-    ~ScreenLayer() =>
+
+    public ScreenLayers Type { get; }
+
+    public int Width => Image?.Width ?? 0;
+    public int Height => Image?.Height ?? 0;
+
+    ~ScreenLayer()
+    {
         Dispose(false);
+    }
 
     public override void Dispose()
     {
@@ -33,7 +37,14 @@ public partial class ScreenLayer : Disposable
 
     public void Unload()
     {
-        try { Image?.Dispose(); Image = null; } catch { }
+        try
+        {
+            Image?.Dispose();
+            Image = null;
+        }
+        catch
+        {
+        }
     }
 
     public Graphics Initialize(int width, int height)
@@ -55,7 +66,8 @@ public partial class ScreenLayer : Disposable
         return g;
     }
 
-    public void Load(IDesktopSessionState sessionState, LayerLoadingTypes type, string srcPath, int width = 0, int height = 0)
+    public void Load(IDesktopSessionState sessionState, LayerLoadingTypes type, string srcPath, int width = 0,
+        int height = 0)
     {
         if (srcPath == null) throw new ArgumentNullException(nameof(srcPath));
 
@@ -67,7 +79,13 @@ public partial class ScreenLayer : Disposable
             {
                 case LayerLoadingTypes.Filesystem:
                     if (File.Exists(srcPath))
-                        try { backgroundImage = new Bitmap(srcPath); } catch { }
+                        try
+                        {
+                            backgroundImage = new Bitmap(srcPath);
+                        }
+                        catch
+                        {
+                        }
 
                     break;
                 case LayerLoadingTypes.Resource:
@@ -77,11 +95,18 @@ public partial class ScreenLayer : Disposable
                     {
                         if (stream == null) return;
 
-                        try { backgroundImage = new Bitmap(stream); } catch { }
+                        try
+                        {
+                            backgroundImage = new Bitmap(stream);
+                        }
+                        catch
+                        {
+                        }
                     }
 
                     break;
             }
+
             if (backgroundImage == null) return;
 
             Unload();

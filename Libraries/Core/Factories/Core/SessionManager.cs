@@ -4,17 +4,19 @@ using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Core.Factories.Core;
 
-public partial class SessionManager : SingletonDisposable<SessionManager>
+public class SessionManager : SingletonDisposable<SessionManager>
 {
     private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
     public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
 
-    public SessionManager() { }
-    ~SessionManager() => this.Dispose(false);
+    ~SessionManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         _sessions?.Clear();
 
@@ -24,15 +26,16 @@ public partial class SessionManager : SingletonDisposable<SessionManager>
     }
 
     public T CreateSession<T>()
-        where T : ISessionState =>
-        (T)CreateSession(typeof(T));
+        where T : ISessionState
+    {
+        return (T)CreateSession(typeof(T));
+    }
 
     public object CreateSession(Type type)
     {
-        if (this.IsDisposed) return null;
+        if (IsDisposed) return null;
 
-        var sessionState = type.GetInstance() as ISessionState;
-        if (sessionState == null)
+        if (type.GetInstance() is not ISessionState sessionState)
             throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", type.Name));
 
         _sessions.TryAdd(sessionState.Id, sessionState);
@@ -41,8 +44,8 @@ public partial class SessionManager : SingletonDisposable<SessionManager>
 
     public void RemoveSession(ISessionState sessionState)
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
-        _sessions.TryRemove(sessionState.Id, out var _);
+        _sessions.TryRemove(sessionState.Id, out _);
     }
 }

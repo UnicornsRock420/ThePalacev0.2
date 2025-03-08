@@ -7,7 +7,7 @@ using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Common.Desktop.Entities.Core;
 
-public partial class UISessionState : SessionState, IUISessionState
+public class UISessionState : SessionState, IUISessionState
 {
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
 

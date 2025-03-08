@@ -12,13 +12,14 @@ public static class AssetConstants
         DefaultAvatarWidth = 132,
         DefaultAvatarHeight = 132,
 
-        CRC_MAGIC = 0xD9216290,
+        CRC_MAGIC = 0xD9216290
     }
 
     public static readonly DateTime UnixEpoch = DateTime.UnixEpoch;
     public static readonly DateTime PalaceEpoch = new(1995, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    public static readonly uint[] PalacePalette = [
+    public static readonly uint[] PalacePalette =
+    [
         0xFFFFFFFF, 0xFFCCFFFF, 0xFF99FFFF, 0xFF66FFFF, 0xFF33FFFF, 0xFF00FFFF, 0xFFFFDFFF, 0xFFCCDFFF,
         0xFF99DFFF, 0xFF66DFFF, 0xFF33DFFF, 0xFF00DFFF, 0xFFFFBFFF, 0xFFCCBFFF, 0xFF99BFFF, 0xFF66BFFF,
         0xFF33BFFF, 0xFF00BFFF, 0xFFFF9FFF, 0xFFCC9FFF, 0xFF999FFF, 0xFF669FFF, 0xFF339FFF, 0xFF009FFF,

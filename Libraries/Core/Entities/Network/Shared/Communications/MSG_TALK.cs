@@ -6,8 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Shared.Communications;
 
 [Mnemonic("talk")]
-public partial class MSG_TALK : EventParams, IProtocolC2S, IProtocolS2C, IProtocolEcho, ICommunications
+public class MSG_TALK : EventParams, IProtocolC2S, IProtocolS2C, IProtocolEcho, ICommunications
 {
-    [CString(255)]
-    public string? Text { get; set; }
+    [CString(255)] public string? Text { get; set; }
 }

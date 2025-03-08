@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ThePalace.Core.Interfaces.Core;
+﻿namespace ThePalace.Core.Interfaces.Core;
 
 public interface ISettingBase
 {

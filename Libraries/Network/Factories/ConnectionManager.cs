@@ -10,8 +10,22 @@ namespace ThePalace.Network.Factories;
 
 public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
 {
-    public ConnectionManager() { }
-    ~ConnectionManager() => this.Dispose();
+    private const uint CONST_INT_UserIDCounterMax = 9999;
+
+    private volatile ConcurrentDictionary<uint, IConnectionState> _connectionStates = new();
+    private uint _userIDCounter;
+    public IReadOnlyDictionary<uint, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
+
+    public uint UserID
+    {
+        get
+        {
+            if (_userIDCounter >= CONST_INT_UserIDCounterMax)
+                _userIDCounter = 0;
+
+            return ++_userIDCounter;
+        }
+    }
 
     public override void Dispose()
     {
@@ -24,27 +38,16 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
                 _connectionStates.Values.ToList().ForEach(s => s?.Disconnect());
                 _connectionStates.Clear();
             }
+
             _connectionStates = null;
         }
 
         base.Dispose();
     }
 
-    private const uint CONST_INT_UserIDCounterMax = 9999;
-    private uint _userIDCounter = 0;
-
-    private volatile ConcurrentDictionary<uint, IConnectionState> _connectionStates = new();
-    public IReadOnlyDictionary<uint, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
-
-    public uint UserID
+    ~ConnectionManager()
     {
-        get
-        {
-            if (_userIDCounter >= CONST_INT_UserIDCounterMax)
-                _userIDCounter = 0;
-
-            return (uint)++_userIDCounter;
-        }
+        Dispose();
     }
 
     public uint Register(IConnectionState connectionState)
@@ -79,7 +82,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         using (var @lock = LockContext.GetLock(_connectionStates))
         {
-            _connectionStates.Remove(id, out var _);
+            _connectionStates.Remove(id, out _);
         }
     }
 
@@ -90,7 +93,6 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         var id = (uint)0;
 
         foreach (var state in _connectionStates.ToList())
-        {
             if (connectionState.Equals(state) ||
                 (connectionState.Socket?.Handle != null &&
                  state.Value.Socket?.Handle != null &&
@@ -100,19 +102,19 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
                 break;
             }
-        }
 
         if (id > 0)
-        {
             using (var @lock = LockContext.GetLock(_connectionStates))
             {
-                _connectionStates.Remove(id, out var _);
+                _connectionStates.Remove(id, out _);
             }
-        }
     }
 
-    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp) =>
-        new Socket(addressFamily, socketType, protocolType);
+    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream,
+        ProtocolType protocolType = ProtocolType.Tcp)
+    {
+        return new Socket(addressFamily, socketType, protocolType);
+    }
 
     public static NetworkStream CreateNetworkStream(Socket handler)
     {
@@ -121,7 +123,8 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return new NetworkStream(handler);
     }
 
-    public static IConnectionState CreateConnectionState(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, IPEndPoint? hostAddr = null, ConnectionManager? instance = null)
+    public static IConnectionState CreateConnectionState(AddressFamily addressFamily,
+        SocketType socketType = SocketType.Stream, IPEndPoint? hostAddr = null, ConnectionManager? instance = null)
     {
         // TODO: Check banlist record(s)
 
@@ -131,15 +134,12 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         {
             Direction = SocketDirection.Outbound,
             Socket = handler,
-            NetworkStream = CreateNetworkStream(handler),
+            NetworkStream = CreateNetworkStream(handler)
         };
 
-        if (hostAddr != null)
-        {
-            result.Socket.Connect(result.HostAddr = hostAddr);
-        }
+        if (hostAddr != null) result.Socket.Connect(result.HostAddr = hostAddr);
 
-        instance ??= ConnectionManager.Current;
+        instance ??= Current;
         instance?.Register(result);
 
         return result;
@@ -156,10 +156,10 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
             Direction = SocketDirection.Inbound,
             Socket = handler,
             NetworkStream = CreateNetworkStream(handler),
-            RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0),
+            RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0)
         };
 
-        instance ??= ConnectionManager.Current;
+        instance ??= Current;
         instance?.Register(result);
 
         return result;
@@ -173,12 +173,14 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         connectionState.Direction = SocketDirection.Outbound;
 
-        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork);
         connectionState.Socket.Connect(hostAddr);
 
         connectionState.HostAddr = hostAddr;
     }
 
-    public static void DropConnection(IConnectionState connectionState) =>
+    public static void DropConnection(IConnectionState connectionState)
+    {
         connectionState?.Socket?.DropConnection();
+    }
 }

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Client.Rooms;
 
 [Mnemonic("ofNr")]
-public partial class BO_ROOMINFO : IEventHandler<MSG_ROOMINFO>
+public class BO_ROOMINFO : IEventHandler<MSG_ROOMINFO>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

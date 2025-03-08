@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Client.Communications;
 
 [Mnemonic("gmsg")]
-public partial class BO_GMSG : IEventHandler<MSG_GMSG>
+public class BO_GMSG : IEventHandler<MSG_GMSG>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

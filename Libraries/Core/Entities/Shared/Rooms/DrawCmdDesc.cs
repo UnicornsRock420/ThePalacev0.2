@@ -2,10 +2,10 @@
 
 public partial class DrawCmdDesc
 {
+    public DrawCmdRec DrawCmdInfo;
+
     public DrawCmdDesc()
     {
-        DrawCmdInfo = new();
+        DrawCmdInfo = new DrawCmdRec();
     }
-
-    public DrawCmdRec DrawCmdInfo;
 }

@@ -5,36 +5,37 @@ using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Common.Server.Entities.Core
+namespace ThePalace.Common.Server.Entities.Core;
+
+public class ServerSessionState : Disposable, IServerSessionState
 {
-    public class ServerSessionState : Disposable, IServerSessionState
+    public void Dispose()
     {
-        public ServerSessionState() { }
-        ~ServerSessionState() => this.Dispose();
+        ConnectionState?.Dispose();
+        ConnectionState = null;
 
-        public void Dispose()
-        {
-            ConnectionState?.Dispose();
-            ConnectionState = null;
+        UserDesc = null;
+        RegInfo = null;
 
-            UserDesc = null;
-            RegInfo = null;
+        LastActivity = null;
 
-            LastActivity = null;
+        base.Dispose();
+    }
 
-            base.Dispose();
-        }
+    public Guid Id => Guid.NewGuid();
+    public uint UserId { get; set; }
 
-        public Guid Id => Guid.NewGuid();
-        public uint UserId { get; set; }
+    public DateTime? LastActivity { get; set; }
 
-        public DateTime? LastActivity { get; set; }
+    public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
 
-        public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
+    public UserDesc? UserDesc { get; set; } = new();
+    public RegistrationRec? RegInfo { get; set; } = new();
 
-        public UserDesc? UserDesc { get; set; } = new();
-        public RegistrationRec? RegInfo { get; set; } = new();
+    public object? State { get; set; }
 
-        public object? State { get; set; }
+    ~ServerSessionState()
+    {
+        Dispose();
     }
 }

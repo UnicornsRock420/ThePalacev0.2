@@ -8,7 +8,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Testing;
 
 [TestClass]
-public partial class TestEventBus
+public class TestEventBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
     private static readonly EventBus CONST_EventBus = EventBus.Instance;
@@ -50,10 +50,7 @@ public partial class TestEventBus
 
         var types = AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(a =>
-            {
-                return a.FullName?.Contains("ThePalace.Common.Server") == true;
-            })
+            .Where(a => { return a.FullName?.Contains("ThePalace.Common.Server") == true; })
             .SelectMany(a => a.GetTypes())
             .Where(t =>
             {
@@ -64,10 +61,7 @@ public partial class TestEventBus
             .ToList();
 
         var eventBus = EventBus.Instance;
-        foreach (var type in types)
-        {
-            eventBus.Subscribe(type);
-        }
+        foreach (var type in types) eventBus.Subscribe(type);
     }
 
     [TestMethod]
@@ -84,7 +78,7 @@ public partial class TestEventBus
             {
                 SourceID = 123,
                 RefNum = RndGenerator.Next(1337),
-                Request = srcMsg,
+                Request = srcMsg
             });
 
         Assert.IsNotNull(boType);
@@ -104,7 +98,7 @@ public partial class TestEventBus
             {
                 SourceID = 123,
                 RefNum = RndGenerator.Next(1337),
-                Request = srcMsg,
+                Request = srcMsg
             });
 
         Assert.IsNotNull(boType);
@@ -124,7 +118,7 @@ public partial class TestEventBus
             {
                 SourceID = 123,
                 RefNum = RndGenerator.Next(1337),
-                Request = srcMsg,
+                Request = srcMsg
             });
 
         Assert.IsNotNull(boType);

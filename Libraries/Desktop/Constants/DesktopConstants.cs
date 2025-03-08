@@ -1,31 +1,7 @@
-﻿using System.Drawing;
+﻿namespace ThePalace.Common.Desktop.Constants;
 
-namespace ThePalace.Common.Desktop.Constants;
-
-public partial class DesktopConstants
+public class DesktopConstants
 {
-    public static class Font
-    {
-        public const string NAME = "Arial";
-        public const int HEIGHT = 14;
-    }
-
-    public static class AspectRatio
-    {
-        public static class StandardDef
-        {
-            public const int Multiplier = 128;
-            public static readonly Size Ratio = new Size(4, 3);
-            public static readonly Size Default = new Size(Ratio.Width * Multiplier, Ratio.Height * Multiplier);
-        }
-        public static class WidescreenDef
-        {
-            public const int Multiplier = 96;
-            public static readonly Size Ratio = new Size(16, 9);
-            public static readonly Size Default = new Size(Ratio.Width * Multiplier, Ratio.Height * Multiplier);
-        }
-    }
-
     public const int MaxNbrFaces = 13;
     public const int MaxNbrColors = 16;
 
@@ -46,9 +22,34 @@ public partial class DesktopConstants
         0xFF7F00FF,
         0xFFDF00FF,
         0xFFFF00BF,
-        0xFFFF005F,
+        0xFFFF005F
     ];
 
-    public static Color NbrToColor(short colorNbr) =>
-        Color.FromArgb((int)SmileyColours[colorNbr % MaxNbrColors]);
+    public static Color NbrToColor(short colorNbr)
+    {
+        return Color.FromArgb((int)SmileyColours[colorNbr % MaxNbrColors]);
+    }
+
+    public static class Font
+    {
+        public const string NAME = "Arial";
+        public const int HEIGHT = 14;
+    }
+
+    public static class AspectRatio
+    {
+        public static class StandardDef
+        {
+            public const int Multiplier = 128;
+            public static readonly Size Ratio = new(4, 3);
+            public static readonly Size Default = new(Ratio.Width * Multiplier, Ratio.Height * Multiplier);
+        }
+
+        public static class WidescreenDef
+        {
+            public const int Multiplier = 96;
+            public static readonly Size Ratio = new(16, 9);
+            public static readonly Size Default = new(Ratio.Width * Multiplier, Ratio.Height * Multiplier);
+        }
+    }
 }

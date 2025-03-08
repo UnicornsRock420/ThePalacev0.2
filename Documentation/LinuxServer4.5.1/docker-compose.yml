@@ -1,6 +1,6 @@
 services:
   palace-container:
-#    image: palace-image
+    #    image: palace-image
     build: .
     ports:
       - "2222:2222"

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
 
 [Mnemonic("sinf")]
-public partial class BO_SERVERINFO : IEventHandler<MSG_SERVERINFO>
+public class BO_SERVERINFO : IEventHandler<MSG_SERVERINFO>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

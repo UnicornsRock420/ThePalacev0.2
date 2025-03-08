@@ -8,8 +8,8 @@ namespace ThePalace.Core.Entities.Network.Shared.Assets;
 
 [Mnemonic("prPn")]
 [ByteSize(12)]
-public partial class MSG_PROPNEW : EventParams, IProtocolC2S, IProtocolS2C
+public class MSG_PROPNEW : EventParams, IProtocolC2S, IProtocolS2C
 {
-    public AssetSpec PropSpec;
     public Point Pos;
+    public AssetSpec PropSpec;
 }

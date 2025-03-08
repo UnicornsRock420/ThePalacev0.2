@@ -7,7 +7,7 @@ namespace ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
 
 [DynamicSize]
 [Mnemonic("rLst")]
-public partial class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>
+public class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

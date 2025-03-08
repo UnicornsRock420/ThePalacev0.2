@@ -6,49 +6,20 @@ using System.Reflection;
 using System.Xml;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Core;
-using ThePalace.Core.Client.Core;
-using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Interfaces;
 using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Common.Desktop.Factories;
 
-public partial class SettingsManager : Disposable
+public class SettingsManager : Disposable
 {
-    public static class SystemSettings
-    {
-        internal const string Filename = "SystemSettings.xml";
-        internal const string RootNode = "System";
-        internal const string RibbonNode = "Ribbon";
-        internal const string UserFlagsNode = "UserFlags";
-        internal const string RoomFlagsNode = "RoomFlags";
-
-        public static ConcurrentDictionary<string, ItemBase> Ribbon { get; internal set; } = new();
-    }
-    public static class Localization
-    {
-        internal static string Filename
-        {
-            get
-            {
-                var filePath = $@"Localization\Localization.{CultureInfo.CurrentCulture.Name}.xml";
-                if (File.Exists(filePath)) return filePath;
-                else return @"Localization\Localization.en-US.xml";
-            }
-        }
-        internal const string RootNode = "Localization";
-        internal const string RibbonNode = "Ribbon";
-        internal const string UserFlagsNode = "UserFlags";
-        internal const string RoomFlagsNode = "RoomFlags";
-    }
-
-    private static readonly Keys[] _keyModifiers = new Keys[]
+    private static readonly Keys[] _keyModifiers = new[]
     {
         Keys.Control,
         Keys.Shift,
         Keys.Alt,
         Keys.LWin,
-        Keys.RWin,
+        Keys.RWin
     };
 
     //private static readonly Keys[] _keyCharacters = new Keys[]
@@ -106,8 +77,10 @@ public partial class SettingsManager : Disposable
 
     public ConcurrentDictionary<string, ISettingBase> Settings { get; private set; } = new();
 
-    public SettingsManager() { }
-    ~SettingsManager() => Dispose(false);
+    ~SettingsManager()
+    {
+        Dispose(false);
+    }
 
     public new void Dispose()
     {
@@ -119,7 +92,13 @@ public partial class SettingsManager : Disposable
         Settings = null;
 
         foreach (var ribbonNode in SystemSettings.Ribbon.Values)
-            try { ribbonNode?.Unload(); } catch { }
+            try
+            {
+                ribbonNode?.Unload();
+            }
+            catch
+            {
+            }
 
         SystemSettings.Ribbon?.Clear();
         SystemSettings.Ribbon = null;
@@ -131,7 +110,6 @@ public partial class SettingsManager : Disposable
         {
             var options = PluginManager.Current.GetTypes().ToList();
             foreach (var option in options)
-            {
                 try
                 {
                     var instance = option.StaticProperty<ISettingBase>("Current");
@@ -146,7 +124,6 @@ public partial class SettingsManager : Disposable
                     Debug.WriteLine(ex.Message);
 #endif
                 }
-            }
         }
         catch (Exception ex)
         {
@@ -158,8 +135,10 @@ public partial class SettingsManager : Disposable
         return this;
     }
 
-    internal string Read(string path) =>
-        File.ReadAllLines(path).Join('\n');
+    internal string Read(string path)
+    {
+        return File.ReadAllLines(path).Join('\n');
+    }
 
     public void Load(Assembly assembly)
     {
@@ -196,7 +175,6 @@ public partial class SettingsManager : Disposable
 
             var xNode = systemSettings[SystemSettings.RootNode][SystemSettings.RibbonNode] as XmlNode;
             foreach (var ribbonNode in xNode.ChildNodes.Cast<XmlNode>())
-            {
                 try
                 {
                     var nodeName = ribbonNode.Name?.Trim();
@@ -254,11 +232,9 @@ public partial class SettingsManager : Disposable
                     Debug.WriteLine(ex.Message);
 #endif
                 }
-            }
 
             xNode = localizations[Localization.RootNode][Localization.RibbonNode];
             foreach (var ribbonNode in xNode.ChildNodes.Cast<XmlNode>())
-            {
                 try
                 {
                     var nodeName = ribbonNode.Name?.Trim();
@@ -280,7 +256,6 @@ public partial class SettingsManager : Disposable
                     Debug.WriteLine(ex.Message);
 #endif
                 }
-            }
         }
 
         foreach (var ribbonItem in SystemSettings.Ribbon.Values)
@@ -290,14 +265,41 @@ public partial class SettingsManager : Disposable
     public void Save()
     {
         // TODO: Save Settings
-
-
     }
 
     public T GetOption<T>(string settingName)
     {
         if (Settings.GetValue(settingName) is IOption<T> option)
             return option.Value;
-        else return default;
+        return default;
+    }
+
+    public static class SystemSettings
+    {
+        internal const string Filename = "SystemSettings.xml";
+        internal const string RootNode = "System";
+        internal const string RibbonNode = "Ribbon";
+        internal const string UserFlagsNode = "UserFlags";
+        internal const string RoomFlagsNode = "RoomFlags";
+
+        public static ConcurrentDictionary<string, ItemBase> Ribbon { get; internal set; } = new();
+    }
+
+    public static class Localization
+    {
+        internal const string RootNode = "Localization";
+        internal const string RibbonNode = "Ribbon";
+        internal const string UserFlagsNode = "UserFlags";
+        internal const string RoomFlagsNode = "RoomFlags";
+
+        internal static string Filename
+        {
+            get
+            {
+                var filePath = $@"Localization\Localization.{CultureInfo.CurrentCulture.Name}.xml";
+                if (File.Exists(filePath)) return filePath;
+                return @"Localization\Localization.en-US.xml";
+            }
+        }
     }
 }

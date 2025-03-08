@@ -2,8 +2,13 @@ namespace ThePalace.Server.Desktop;
 
 public partial class Program : Form
 {
+    public Program()
+    {
+        InitializeComponent();
+    }
+
     /// <summary>
-    ///  The main entry point for the application.
+    ///     The main entry point for the application.
     /// </summary>
     [STAThread]
     public static void Main()
@@ -12,10 +17,5 @@ public partial class Program : Form
         //// see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
         Application.Run(new Program());
-    }
-
-    public Program()
-    {
-        InitializeComponent();
     }
 }

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Server.Media;
 
 [Mnemonic("fnfe")]
-public partial class BO_FILENOTFND : IEventHandler<MSG_FILENOTFND>
+public class BO_FILENOTFND : IEventHandler<MSG_FILENOTFND>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

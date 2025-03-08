@@ -1,11 +1,14 @@
 ﻿using ThePalace.Core.Enums;
-using sint32 = System.Int32;
+using sint32 = int;
 
 namespace ThePalace.Core.Attributes.Strings;
 
 public class EncryptedStringAttribute : PStringAttribute
 {
-    private EncryptedStringAttribute() { }
+    private EncryptedStringAttribute()
+    {
+    }
+
     public EncryptedStringAttribute(
         sint32 lengthByteSize = 1,
         sint32 maxStringLength = 255,
@@ -16,13 +19,11 @@ public class EncryptedStringAttribute : PStringAttribute
         maxStringLength,
         paddingModulo)
     {
-        _deserializeOptions = deserializeOptions;
-        _serializeOptions = serializeOptions;
+        DeserializeOptions = deserializeOptions;
+        SerializeOptions = serializeOptions;
     }
 
-    private readonly EncryptedStringOptions _deserializeOptions;
-    private readonly EncryptedStringOptions _serializeOptions;
+    public EncryptedStringOptions DeserializeOptions { get; }
 
-    public EncryptedStringOptions DeserializeOptions => _deserializeOptions;
-    public EncryptedStringOptions SerializeOptions => _serializeOptions;
+    public EncryptedStringOptions SerializeOptions { get; }
 }

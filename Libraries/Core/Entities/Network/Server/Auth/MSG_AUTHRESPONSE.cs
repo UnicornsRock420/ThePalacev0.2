@@ -7,10 +7,9 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Auth;
 
 [Mnemonic("autr")]
-public partial class MSG_AUTHRESPONSE : EventParams, IProtocolS2C
+public class MSG_AUTHRESPONSE : EventParams, IProtocolS2C
 {
-    [Str255]
-    public string? NameAndPassword;
+    [Str255] public string? NameAndPassword;
 
     [IgnoreDataMember]
     public string? Username => NameAndPassword

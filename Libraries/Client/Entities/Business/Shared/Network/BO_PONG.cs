@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Network;
 
 [Mnemonic("pong")]
-public partial class BO_PONG : IEventHandler<MSG_PONG>
+public class BO_PONG : IEventHandler<MSG_PONG>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

@@ -5,56 +5,71 @@ using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public partial class MsgBubble : IDisposable
+public class MsgBubble : IDisposable
 {
     private const int maxWidth = 150;
     private const int minWidth = 20;
-
-    public Bitmap Image { get; private set; } = null;
-
-    public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
-    public DateTime Created { get; } = DateTime.UtcNow;
-    private DateTime? _accessed = null;
-    public DateTime Accessed => _accessed ??= DateTime.UtcNow;
-    public bool Visible { get; private set; } = true;
-    public Color Colour { get; private set; } = Color.White;
-    public Point Origin { get; private set; } = new(0, 0);
+    private DateTime? _accessed;
     public Point Location = new(0, 0);
+    public Size TextSize;
 
-    public int Duration { get; private set; } = 0;
-    public string OriginalText { get; private set; } = null;
-    public string[] Text { get; private set; } = null;
-    public string[] MediaFilenames { get; private set; } = null;
-    public Size TextSize = new();
-
-    public MsgBubble(string text) =>
+    public MsgBubble(string text)
+    {
         Parse(text);
-    public MsgBubble(string text, int duration) =>
+    }
+
+    public MsgBubble(string text, int duration)
+    {
         Parse(text, duration);
+    }
+
     public MsgBubble(short colorNbr, string text)
     {
         Colour = DesktopConstants.NbrToColor(colorNbr);
         Parse(text);
     }
+
     public MsgBubble(short colorNbr, string text, int duration)
     {
         Colour = DesktopConstants.NbrToColor(colorNbr);
         Parse(text, duration);
     }
+
     public MsgBubble(Color colour, string text)
     {
         Colour = colour;
         Parse(text);
     }
+
     public MsgBubble(Color colour, string text, int duration)
     {
         Colour = colour;
         Parse(text, duration);
     }
 
+    public Bitmap Image { get; private set; }
+
+    public BubbleTypes Type { get; private set; } = BubbleTypes.Normal;
+    public DateTime Created { get; } = DateTime.UtcNow;
+    public DateTime Accessed => _accessed ??= DateTime.UtcNow;
+    public bool Visible { get; private set; } = true;
+    public Color Colour { get; } = Color.White;
+    public Point Origin { get; private set; } = new(0, 0);
+
+    public int Duration { get; private set; }
+    public string OriginalText { get; private set; }
+    public string[] Text { get; private set; }
+    public string[] MediaFilenames { get; private set; }
+
     public void Dispose()
     {
-        try { Image?.Dispose(); } catch { }
+        try
+        {
+            Image?.Dispose();
+        }
+        catch
+        {
+        }
 
         Text = null;
         MediaFilenames = null;
@@ -72,6 +87,7 @@ public partial class MsgBubble : IDisposable
 
             return;
         }
+
         if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
         {
             var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
@@ -85,6 +101,7 @@ public partial class MsgBubble : IDisposable
                     case '^': Type = BubbleTypes.Sticky; break;
                 }
         }
+
         if (RegexConstants.REGEX_COORDINATES.IsMatch(text))
         {
             var match = RegexConstants.REGEX_COORDINATES.Match(text);
@@ -94,6 +111,7 @@ public partial class MsgBubble : IDisposable
 
             Origin = new Point(x, y);
         }
+
         if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
         {
             var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
@@ -107,6 +125,7 @@ public partial class MsgBubble : IDisposable
                     case '^': Type = BubbleTypes.Sticky; break;
                 }
         }
+
         if (RegexConstants.REGEX_SOUND.IsMatch(text))
         {
             var mediaFilenames = new List<string>();
@@ -117,8 +136,10 @@ public partial class MsgBubble : IDisposable
 
                 mediaFilenames.Add(match.Groups[1].Value);
             }
+
             MediaFilenames = mediaFilenames.ToArray();
         }
+
         if (RegexConstants.REGEX_BUBBLE_TYPE.IsMatch(text))
         {
             var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
@@ -134,6 +155,7 @@ public partial class MsgBubble : IDisposable
         }
 
         #endregion
+
         #region Word(s) & Line Formatting
 
         var words = Common.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
@@ -143,7 +165,8 @@ public partial class MsgBubble : IDisposable
         while (words.Count > 0)
         {
             var newLine = line.Join(" ", words[0]);
-            var newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
+            var newLineSize = TextRenderer.MeasureText(newLine,
+                new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
             if (newLineSize.Width < maxWidth)
                 line.Enqueue(words.Dequeue());
@@ -152,7 +175,8 @@ public partial class MsgBubble : IDisposable
                 words.Count < 1)
             {
                 newLine = line.Join(" ");
-                newLineSize = TextRenderer.MeasureText(newLine, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
+                newLineSize = TextRenderer.MeasureText(newLine,
+                    new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
                 if (newLineSize.Width > TextSize.Width)
                     TextSize.Width = newLineSize.Width;
@@ -181,7 +205,7 @@ public partial class MsgBubble : IDisposable
         var offsetX = (short)11;
         var offsetY = (short)11;
 
-        var w = new int[] { minWidth, TextSize.Width }.Max();
+        var w = new[] { minWidth, TextSize.Width }.Max();
         var h = TextSize.Height;
 
         var x = (short)(Location.X + offsetX);
@@ -208,7 +232,8 @@ public partial class MsgBubble : IDisposable
         using (var colourBrush = new SolidBrush(Colour))
         using (var colourPen = new Pen(colourBrush, 2))
         {
-            var helper = new GraphicsHelper(g, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT), colourPen, colourBrush);
+            var helper = new GraphicsHelper(g, new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT),
+                colourPen, colourBrush);
 
             switch (Type)
             {
@@ -309,6 +334,7 @@ public partial class MsgBubble : IDisposable
         helper.Fill();
         helper.Stroke();
     }
+
     private void Render_Shout(GraphicsHelper helper, int w, int h, short x, short y)
     {
         var SpikeDisplace = (short)20;
@@ -391,6 +417,7 @@ public partial class MsgBubble : IDisposable
         helper.Fill();
         helper.Stroke();
     }
+
     private void Render_Sticky(GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);
@@ -413,6 +440,7 @@ public partial class MsgBubble : IDisposable
         helper.Fill();
         helper.Stroke();
     }
+
     private void Render_Thought(GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);
@@ -563,6 +591,7 @@ public partial class MsgBubble : IDisposable
         helper.Fill();
         helper.Stroke();
     }
+
     private void Render_Thought2(GraphicsHelper helper, int w, int h, short x, short y)
     {
         var r = (short)(x + w);

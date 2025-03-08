@@ -2,32 +2,32 @@
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
-using HotspotID = System.Int16;
-using sint16 = System.Int16;
-using sint32 = System.Int32;
+using HotspotID = short;
+using sint16 = short;
+using sint32 = int;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
 
 [ByteSize(48)]
-public partial class HotspotRec : IStruct
+public class HotspotRec : IStruct
 {
-    public HotSpotEventMask ScriptEventMask;
-    public HotspotFlags Flags;
-    public sint32 SecureInfo;
-    public sint32 RefCon;
-    public Point Loc;
-    public HotspotID HotspotID;
-    public sint16 Dest;
-    public sint16 NbrPts;
-    public sint16 PtsOfst;
-    public HotspotTypes Type;
-    public sint16 GroupID;
-    public sint16 NbrScripts;
-    public sint16 ScriptRecOfst;
-    public sint16 State;
-    public sint16 NbrStates;
-    public sint16 StateRecOfst;
-    public sint16 NameOfst;
-    public sint16 ScriptTextOfst;
     public sint16 AlignReserved;
+    public sint16 Dest;
+    public HotspotFlags Flags;
+    public sint16 GroupID;
+    public HotspotID HotspotID;
+    public Point Loc;
+    public sint16 NameOfst;
+    public sint16 NbrPts;
+    public sint16 NbrScripts;
+    public sint16 NbrStates;
+    public sint16 PtsOfst;
+    public sint32 RefCon;
+    public HotSpotEventMask ScriptEventMask;
+    public sint16 ScriptRecOfst;
+    public sint16 ScriptTextOfst;
+    public sint32 SecureInfo;
+    public sint16 State;
+    public sint16 StateRecOfst;
+    public HotspotTypes Type;
 }

@@ -26,7 +26,7 @@ public interface IJob : IDisposable
     TimeSpan SleepInterval { get; set; }
     ITimer Timer { get; set; }
 
-    abstract IJobState? JobState { get; set; }
+    IJobState? JobState { get; set; }
 
     void Cancel(CancelOptions opts = CancelOptions.Cascade);
     Task<int> Run();
@@ -35,10 +35,10 @@ public interface IJob : IDisposable
 public interface IJob<TCmd> : IJob, IDisposable
     where TCmd : ICmd
 {
-    abstract Action<ConcurrentQueue<TCmd>> Cmd { get; }
+    Action<ConcurrentQueue<TCmd>> Cmd { get; }
     new DisposableList<IJob<TCmd>> SubJobs { get; }
 
-    abstract ConcurrentQueue<TCmd> Queue { get; }
+    ConcurrentQueue<TCmd> Queue { get; }
     void Build(Action<ConcurrentQueue<TCmd>>? cmd = null, CancellationToken? token = null);
     void Enqueue(TCmd cmd);
 }

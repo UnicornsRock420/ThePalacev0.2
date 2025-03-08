@@ -5,17 +5,17 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
-using sint16 = System.Int16;
-using sint32 = System.Int32;
+using sint16 = short;
+using sint32 = int;
 
 namespace ThePalace.Core.Entities.Network.Shared.Users;
 
-[DynamicSize((8 * 9) + 8, 8)]
+[DynamicSize(8 * 9 + 8, 8)]
 [Mnemonic("usrD")]
-public partial class MSG_USERDESC : EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
+public class MSG_USERDESC : EventParams, IProtocolC2S, IProtocolS2C, IStructSerializer
 {
-    public sint16 FaceNbr;
     public sint16 ColorNbr;
+    public sint16 FaceNbr;
     public sint32 NbrProps;
 
     [DynamicSize(8 * 9)] // AssetSpec(8) * Props(9)
@@ -29,10 +29,7 @@ public partial class MSG_USERDESC : EventParams, IProtocolC2S, IProtocolS2C, ISt
 
         PropSpec = new AssetSpec[NbrProps];
 
-        for (int j = 0; j < NbrProps; j++)
-        {
-            PropSpec[j] = new AssetSpec(reader, opts);
-        }
+        for (var j = 0; j < NbrProps; j++) PropSpec[j] = new AssetSpec(reader, opts);
     }
 
     public void Serialize(Stream writer, SerializerOptions opts)
@@ -42,9 +39,6 @@ public partial class MSG_USERDESC : EventParams, IProtocolC2S, IProtocolS2C, ISt
 
         writer.WriteInt32(PropSpec.Length);
 
-        for (int j = 0; j < PropSpec.Length; j++)
-        {
-            PropSpec[j].Serialize(writer, opts);
-        }
+        for (var j = 0; j < PropSpec.Length; j++) PropSpec[j].Serialize(writer, opts);
     }
 }

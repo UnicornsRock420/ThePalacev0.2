@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="System.Drawing.Common" Version="9.0.2" />
-        <PackageReference Include="VVVV.SlimDX" Version="1.0.12" />
+        <PackageReference Include="System.Drawing.Common" Version="9.0.2"/>
+        <PackageReference Include="VVVV.SlimDX" Version="1.0.12"/>
     </ItemGroup>
 
 </Project>

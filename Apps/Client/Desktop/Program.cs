@@ -34,13 +34,86 @@ using ThePalace.Core.Factories.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
+using Connection = ThePalace.Client.Desktop.Forms.Connection;
+using RegexConstants = ThePalace.Core.Constants.RegexConstants;
+
+#if WINDOWS10_0_17763_0_OR_GREATER
+using Microsoft.Toolkit.Uwp.Notifications;
+#endif
 
 namespace ThePalace.Client.Desktop;
 
-public partial class Program : Disposable
+public class Program : Disposable
 {
+    private static readonly ScreenLayers[] CONST_allLayers = Enum.GetValues<ScreenLayers>()
+        .Where(v => !new[] { ScreenLayers.Base, ScreenLayers.DimRoom }.Contains(v))
+        .ToArray();
+
+    private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
+        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
+        .ToList()
+        .AsReadOnly();
+
+    private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
+        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
+        .ToList()
+        .AsReadOnly();
+
+    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings =
+        new Dictionary<IptEventTypes[], ScreenLayers[]>
+        {
+            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayers.Base] },
+            { [IptEventTypes.InChat], [ScreenLayers.Messages] },
+            { [IptEventTypes.NameChange], [ScreenLayers.UserNametag] },
+            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayers.UserProp] },
+            {
+                [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
+                [ScreenLayers.LooseProp]
+            },
+            {
+                [
+                    IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
+                    IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
+                ],
+                [ScreenLayers.SpotImage]
+            },
+            {
+                [
+                    IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
+                    IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
+                ],
+                [ScreenLayers.UserProp, ScreenLayers.UserNametag]
+            },
+            { [IptEventTypes.MsgAssetSend], [ScreenLayers.UserProp, ScreenLayers.LooseProp] },
+            {
+                [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
+                [ScreenLayers.UserProp, ScreenLayers.UserNametag, ScreenLayers.Messages]
+            },
+            { [IptEventTypes.MsgDraw], [ScreenLayers.BottomPaint, ScreenLayers.TopPaint] },
+            {
+                [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
+                [ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage]
+            }
+        }.AsReadOnly();
+
+    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+
+    private readonly ContextMenuStrip _contextMenu = new();
+
+    public Program()
+    {
+        _managedResources.Add(_contextMenu);
+
+        Initialize();
+    }
+
+    public IDesktopSessionState SessionState { get; protected set; } =
+        SessionManager.Current.CreateSession<DesktopSessionState>();
+
+    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
+
     /// <summary>
-    ///  The main entry point for the application.
+    ///     The main entry point for the application.
     /// </summary>
     [STAThread]
     public static void Main()
@@ -53,6 +126,7 @@ public partial class Program : Disposable
         var job = (IJob?)null;
 
         #region Jobs
+
         job = TaskManager.Current.CreateTask<ActionCmd>(q =>
             {
                 // TODO: GUI
@@ -66,11 +140,11 @@ public partial class Program : Disposable
                         cmd.CmdFnc();
                 }
             },
-            jobState: null,
-            opts: RunOptions.UseTimer,
+            null,
+            RunOptions.UseTimer,
             timer: new UITimer
             {
-                Enabled = true,
+                Enabled = true
             });
         if (job != null)
         {
@@ -83,7 +157,7 @@ public partial class Program : Disposable
                     app = new Program();
 
                     return null;
-                },
+                }
             });
         }
 
@@ -101,7 +175,6 @@ public partial class Program : Disposable
                 while ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                 {
                     // TODO: Network
-
                 }
             },
             null,
@@ -119,140 +192,124 @@ public partial class Program : Disposable
                     q.TryDequeue(out var mediaCmd))
                 {
                     // TODO: Media
-
                 }
             },
             null,
             RunOptions.UseResetEvent);
-        if (job != null)
-        {
-            _jobs[ThreadQueues.Media] = job;
-        }
+        if (job != null) _jobs[ThreadQueues.Media] = job;
 
         job = TaskManager.Current.CreateTask<AssetCmd>(q =>
-        {
-            if (!q.IsEmpty &&
-                q.TryDequeue(out var assetCmd))
             {
-                if (!AssetsManager.Current.Assets.ContainsKey(assetCmd.AssetInfo.AssetInfo.AssetSpec.Id))
-                {
-                    // TODO: Assets
-
-                }
-            }
-        },
+                if (!q.IsEmpty &&
+                    q.TryDequeue(out var assetCmd))
+                    if (!AssetsManager.Current.Assets.ContainsKey(assetCmd.AssetInfo.AssetInfo.AssetSpec.Id))
+                    {
+                        // TODO: Assets
+                    }
+            },
             null,
             RunOptions.UseResetEvent);
-        if (job != null)
-        {
-            _jobs[ThreadQueues.Assets] = job;
-        }
+        if (job != null) _jobs[ThreadQueues.Assets] = job;
 
         job = TaskManager.Current.CreateTask(q => TaskManager.Current.Run(resources: FormsManager.Current),
             null,
             RunOptions.UseSleepInterval | RunOptions.RunNow);
-        if (job != null)
-        {
-            _jobs[ThreadQueues.Core] = job;
-        }
+        if (job != null) _jobs[ThreadQueues.Core] = job;
+
+
+        job = TaskManager.Current.CreateTask<ToastCfg>(q =>
+            {
+                if (!q.IsEmpty &&
+                    q.TryDequeue(out var toastArgs))
+                {
+                    var toast = new ToastContentBuilder();
+
+                    foreach (var arg in toastArgs.Args)
+                    {
+                        var _type = arg.Value.GetType();
+                        if (_type == Int32Exts.Types.Int32)
+                            toast.AddArgument(arg.Key, (int)arg.Value);
+                        else if (_type == StringExts.Types.String)
+                            toast.AddArgument(arg.Key, (string)arg.Value);
+                        else if (_type == DoubleExts.Types.Double)
+                            toast.AddArgument(arg.Key, (double)arg.Value);
+                        else if (_type == BooleanExts.Types.Boolean)
+                            toast.AddArgument(arg.Key, (bool)arg.Value);
+                        else if (_type == FloatExts.Types.Float)
+                            toast.AddArgument(arg.Key, (float)arg.Value);
+                    }
+
+                    foreach (var txt in toastArgs.Text)
+                        toast.AddText(txt);
+
+                    toast.Show(t => { t.ExpirationTime = toastArgs.ExpirationTime; });
+                }
+            },
+            null,
+            RunOptions.UseResetEvent);
+        if (job != null) _jobs[ThreadQueues.Assets] = job;
+
         #endregion
 
         Application.Run(FormsManager.Current);
         TaskManager.Current.Shutdown();
     }
 
-    private ContextMenuStrip _contextMenu = new();
-    public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
-
-    private static readonly ScreenLayers[] CONST_allLayers = Enum.GetValues<ScreenLayers>()
-        .Where(v => !new[] { ScreenLayers.Base, ScreenLayers.DimRoom }.Contains(v))
-        .ToArray();
-
-    private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
-        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
-        .ToList()
-        .AsReadOnly();
-
-    private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
-        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
-        .ToList()
-        .AsReadOnly();
-
-    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings = new Dictionary<IptEventTypes[], ScreenLayers[]>
+    ~Program()
     {
-        { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayers.Base] },
-        { [IptEventTypes.InChat], [ScreenLayers.Messages] },
-        { [IptEventTypes.NameChange], [ScreenLayers.UserNametag] },
-        { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayers.UserProp] },
-        { [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved], [ScreenLayers.LooseProp] },
-        { [IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock], [ScreenLayers.SpotImage] },
-        { [IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList, IptEventTypes.MsgUserLog, IptEventTypes.UserEnter], [ScreenLayers.UserProp, ScreenLayers.UserNametag] },
-        { [IptEventTypes.MsgAssetSend], [ScreenLayers.UserProp, ScreenLayers.LooseProp] },
-        { [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove], [ScreenLayers.UserProp, ScreenLayers.UserNametag, ScreenLayers.Messages] },
-        { [IptEventTypes.MsgDraw], [ScreenLayers.BottomPaint, ScreenLayers.TopPaint] },
-        { [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew], [ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage] },
-    }.AsReadOnly();
-
-    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
-    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
-
-    public Program()
-    {
-        this._managedResources.Add(_contextMenu);
-
-        this.Initialize();
+        Dispose(false);
     }
-    ~Program() => this.Dispose(false);
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         base.Dispose();
 
         foreach (var type in CONST_eventTypes)
-            ScriptEvents.Current.UnregisterEvent(type, this.RefreshScreen);
+            ScriptEvents.Current.UnregisterEvent(type, RefreshScreen);
 
-        var trayIcon = this.SessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
-        if (trayIcon != null)
+        if (SessionState.UIControls.GetValue(nameof(NotifyIcon)) is not NotifyIcon trayIcon) return;
+
+        trayIcon.Visible = false;
+
+        try
         {
-            trayIcon.Visible = false;
-            try { trayIcon.Dispose(); } catch { }
+            trayIcon.Dispose();
+        }
+        catch
+        {
         }
     }
 
     public void Initialize()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
-        foreach (var type in CONST_eventTypes)
-        {
-            ScriptEvents.Current.RegisterEvent(type, this.RefreshScreen);
-        }
+        foreach (var type in CONST_eventTypes) ScriptEvents.Current.RegisterEvent(type, RefreshScreen);
 
-        ApiManager.Current.RegisterApi(nameof(this.ShowConnectionForm), this.ShowConnectionForm);
-        ApiManager.Current.RegisterApi(nameof(this.toolStripDropdownlist_Click), this.toolStripDropdownlist_Click);
-        ApiManager.Current.RegisterApi(nameof(this.toolStripMenuItem_Click), this.toolStripMenuItem_Click);
-        ApiManager.Current.RegisterApi(nameof(this.contextMenuItem_Click), this.contextMenuItem_Click);
+        ApiManager.Current.RegisterApi(nameof(ShowConnectionForm), ShowConnectionForm);
+        ApiManager.Current.RegisterApi(nameof(toolStripDropdownlist_Click), toolStripDropdownlist_Click);
+        ApiManager.Current.RegisterApi(nameof(toolStripMenuItem_Click), toolStripMenuItem_Click);
+        ApiManager.Current.RegisterApi(nameof(contextMenuItem_Click), contextMenuItem_Click);
 
         ShowAppForm();
 
 #if WINDOWS10_0_17763_0_OR_GREATER
-        //var toast = new ToastCfg
-        //{
-        //    ExpirationTime = DateTime.Now.AddMinutes(1),
-        //    Args = new Dictionary<string, object>
-        //    {
-        //        { "action", "whisperMsg" },
-        //        { "connectionId", 123 },
-        //        { "conversationId", 456 },
-        //    }.AsReadOnly(),
-        //    Text = new List<string>
-        //    {
-        //        "Beat it like it owes you money!",
-        //    }.AsReadOnly(),
-        //};
-        //TaskManager.Current.DispatchToast(toast);
+        ((Job<ToastCfg>)Jobs[ThreadQueues.Toast])?.Enqueue(new ToastCfg
+        {
+            ExpirationTime = DateTime.Now.AddMinutes(1),
+            Args = new Dictionary<string, object>
+            {
+                { "action", "whisperMsg" },
+                { "connectionId", 123 },
+                { "conversationId", 456 },
+            }.AsReadOnly(),
+            Text = new List<string>
+            {
+                "Beat it like it owes you money!",
+            }.AsReadOnly(),
+        });
 #endif
 
         ((Job<ActionCmd>)_jobs[ThreadQueues.GUI])?.Enqueue(
@@ -260,56 +317,47 @@ public partial class Program : Disposable
             {
                 CmdFnc = a =>
                 {
-                    var sessionState = a[0] as IDesktopSessionState;
-                    if (sessionState == null) return null;
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
 
                     ShowAppForm();
 
                     var form = sessionState.GetForm(nameof(Program));
                     if (form == null) return null;
 
-                    var trayIcon = sessionState.UIControls.GetValue(nameof(NotifyIcon)) as NotifyIcon;
-                    if (trayIcon == null)
-                    {
-                        trayIcon = new NotifyIcon
-                        {
-                            ContextMenuStrip = new ContextMenuStrip(),
-                            Icon = form.Icon,
-                            Visible = true,
-                        };
-                        sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+                    if (sessionState.UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon) return null;
 
-                        trayIcon.ContextMenuStrip.Items.Add("Exit", null, new EventHandler((sender, e) => TaskManager.Current.Dispose()));
-                    }
+                    trayIcon = new NotifyIcon
+                    {
+                        ContextMenuStrip = new ContextMenuStrip(),
+                        Icon = form.Icon,
+                        Visible = true
+                    };
+                    sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+
+                    trayIcon.ContextMenuStrip.Items.Add("Exit", null, (sender, e) => TaskManager.Current.Dispose());
 
                     return null;
                 },
-                Values = [this.SessionState],
+                Values = [SessionState]
             });
-
-        return;
     }
 
-    public void RefreshScreen(object sender, EventArgs e)
+    public static void RefreshScreen(object sender, EventArgs e)
     {
-        var sessionState = sender as IDesktopSessionState;
-        if (sessionState == null) return;
+        if (sender is not IDesktopSessionState sessionState) return;
 
-        var scriptEvent = e as ScriptEvent;
-        if (scriptEvent == null) return;
+        if (e is not ScriptEvent scriptEvent) return;
 
         var uiRefresh = CONST_uiRefreshEvents.Contains(scriptEvent.EventType);
 
         var screenLayers = null as ScreenLayers[];
         foreach (var layer in CONST_EventLayerMappings)
-        {
             if (CONST_EventLayerMappings.Keys.Contains(scriptEvent.EventType))
             {
                 screenLayers = layer.Value;
 
                 break;
             }
-        }
 
         ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
         {
@@ -338,84 +386,83 @@ public partial class Program : Disposable
 
                         sessionState.RefreshRibbon();
 
-                        ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, sessionState, null, sessionState.ScriptState);
+                        ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, sessionState, null,
+                            sessionState.ScriptState);
                         ScriptEvents.Current.Invoke(IptEventTypes.Enter, sessionState, null, sessionState.ScriptState);
 
                         break;
                 }
 
                 return null;
-            },
+            }
         });
     }
 
     private void ShowAppForm()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         var form = FormsManager.Current.CreateForm<FormDialog>(new FormCfg
         {
-            Load = new EventHandler((sender, e) => _jobs[ThreadQueues.GUI].Run()),
+            Load = (sender, e) => _jobs[ThreadQueues.GUI].Run(),
             WindowState = FormWindowState.Minimized,
             AutoScaleMode = AutoScaleMode.Font,
             AutoScaleDimensions = new SizeF(7F, 15F),
             Margin = new Padding(0, 0, 0, 0),
-            Visible = false,
+            Visible = false
         });
         if (form == null) return;
 
-        this.SessionState.RegisterForm(nameof(Program), form);
+        SessionState.RegisterForm(nameof(Program), form);
 
-        form.SessionState = this.SessionState;
-        form.FormClosed += new FormClosedEventHandler((sender, e) =>
-            this.SessionState.UnregisterForm(nameof(Program), sender as FormBase));
+        form.SessionState = SessionState;
+        form.FormClosed += (sender, e) =>
+            SessionState.UnregisterForm(nameof(Program), sender as FormBase);
 
-        form.MouseMove += new MouseEventHandler((sender, e) =>
+        form.MouseMove += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.MouseUp += new MouseEventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, SessionState, null, SessionState.ScriptState);
+        };
+        form.MouseUp += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.MouseDown += new MouseEventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, SessionState, null, SessionState.ScriptState);
+        };
+        form.MouseDown += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.DragEnter += new DragEventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, SessionState, null, SessionState.ScriptState);
+        };
+        form.DragEnter += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.DragLeave += new EventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+        };
+        form.DragLeave += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.DragOver += new DragEventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+        };
+        form.DragOver += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, this.SessionState, null, this.SessionState.ScriptState);
-        });
-        form.Resize += new EventHandler((sender, e) =>
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+        };
+        form.Resize += (sender, e) =>
         {
-            this.SessionState.LastActivity = DateTime.UtcNow;
+            SessionState.LastActivity = DateTime.UtcNow;
 
-            var form = sender as FormBase;
-            if (form == null ||
-                form.WindowState != FormWindowState.Normal) return;
+            if (sender is not FormBase { WindowState: FormWindowState.Normal } form) return;
 
-            var screenWidth = (Screen.PrimaryScreen?.Bounds.Width ?? 0);
-            var screenHeight = (Screen.PrimaryScreen?.Bounds.Height ?? 0);
+            var screenWidth = Screen.PrimaryScreen?.Bounds.Width ?? 0;
+            var screenHeight = Screen.PrimaryScreen?.Bounds.Height ?? 0;
 
             if (form.Location.X < 0 ||
                 form.Location.Y < 0 ||
@@ -427,17 +474,14 @@ public partial class Program : Disposable
             }
 
             form.Location = new Point(
-                (screenWidth / 2) - (form.Width / 2),
-                (screenHeight / 2) - (form.Height / 2));
+                screenWidth / 2 - form.Width / 2,
+                screenHeight / 2 - form.Height / 2);
 
-            var toolStrip = this.SessionState.GetControl("toolStrip") as ToolStrip;
-            if (toolStrip != null)
-            {
+            if (SessionState.GetControl("toolStrip") is ToolStrip toolStrip)
                 toolStrip.Size = new Size(form.Width, form.Height);
-            }
 
-            this.SessionState.RefreshUI();
-        });
+            SessionState.RefreshUI();
+        };
 
         FormsManager.UpdateForm(form, new FormCfg
         {
@@ -446,13 +490,12 @@ public partial class Program : Disposable
                 DesktopConstants.AspectRatio.WidescreenDef.Default.Height),
             WindowState = FormWindowState.Normal,
             Visible = true,
-            Focus = true,
+            Focus = true
         });
 
         var tabIndex = 0;
 
-        var toolStrip = this.SessionState.GetControl("toolStrip") as ToolStrip;
-        if (toolStrip == null)
+        if (SessionState.GetControl("toolStrip") is not ToolStrip toolStrip)
         {
             toolStrip = FormsManager.Current.CreateControl<FormBase, ToolStrip>(form, true, new ControlCfg
             {
@@ -460,12 +503,12 @@ public partial class Program : Disposable
                 TabIndex = 0, //tabIndex++,
                 Title = string.Empty,
                 //Size = new Size(800, 25),
-                Margin = new Padding(0, 0, 0, 0),
+                Margin = new Padding(0, 0, 0, 0)
             })?.FirstOrDefault();
 
             if (toolStrip != null)
             {
-                this.SessionState.RegisterControl(nameof(toolStrip), toolStrip);
+                SessionState.RegisterControl(nameof(toolStrip), toolStrip);
 
                 toolStrip.Stretch = true;
                 toolStrip.GripMargin = new Padding(0);
@@ -473,69 +516,68 @@ public partial class Program : Disposable
                 toolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
                 toolStrip.RenderMode = ToolStripRenderMode.Professional;
                 toolStrip.Renderer = new CustomToolStripRenderer();
-                toolStrip.ItemClicked += new ToolStripItemClickedEventHandler(this.toolStrip_ItemClicked);
+                toolStrip.ItemClicked += toolStrip_ItemClicked;
             }
         }
 
-        var imgScreen = this.SessionState.GetControl("imgScreen") as PictureBox;
-        if (imgScreen == null)
+        if (SessionState.GetControl("imgScreen") is not PictureBox imgScreen)
         {
             imgScreen = FormsManager.Current.CreateControl<FormBase, PictureBox>(form, true, new ControlCfg
             {
                 Visible = true,
                 TabIndex = 0, //tabIndex++,
                 Margin = new Padding(0, 0, 0, 0),
-                BorderStyle = BorderStyle.FixedSingle,
+                BorderStyle = BorderStyle.FixedSingle
             })?.FirstOrDefault();
 
             if (imgScreen != null)
             {
-                imgScreen.MouseClick += new MouseEventHandler((sender, e) =>
+                imgScreen.MouseClick += (sender, e) =>
                 {
-                    if (!this.SessionState.ConnectionState.IsConnected())
+                    if (!SessionState.ConnectionState.IsConnected())
+                    {
                         ShowConnectionForm();
+                    }
                     else
                     {
-                        var point = new ThePalace.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                        var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
                         switch (e.Button)
                         {
                             case MouseButtons.Left:
-                                this.SessionState.UserDesc.UserInfo.RoomPos = point;
+                                SessionState.UserDesc.UserInfo.RoomPos = point;
 
                                 var user = null as UserDesc;
-                                user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
+                                user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                                 if (user != null)
                                 {
                                     user.UserInfo.RoomPos = point;
                                     user.Extended["CurrentMessage"] = null;
 
-                                    var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
-                                    if (queue != null) queue.Clear();
+                                    if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue)
+                                        queue.Clear();
 
-                                    this.SessionState.RefreshScreen(
+                                    SessionState.RefreshScreen(
                                         ScreenLayers.UserProp,
                                         ScreenLayers.UserNametag,
                                         ScreenLayers.Messages);
 
-                                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                     {
                                         CmdFnc = a =>
                                         {
-                                            var sessionState = a[0] as IDesktopSessionState;
-                                            if (sessionState == null) return null;
+                                            if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                            var point = a[1] as ThePalace.Core.Entities.Shared.Types.Point;
-                                            if (point == null) return null;
+                                            if (a[1] is not Core.Entities.Shared.Types.Point point) return null;
 
                                             sessionState.Send(new MSG_USERMOVE
                                             {
-                                                Pos = point,
+                                                Pos = point
                                             });
 
                                             return null;
                                         },
-                                        Values = [this.SessionState, point],
+                                        Values = [SessionState, point]
                                     });
                                 }
 
@@ -549,118 +591,127 @@ public partial class Program : Disposable
                                     toolStripItem.Tag = new object[]
                                     {
                                         ContextMenuCommandTypes.MSG_USERMOVE,
-                                        point,
+                                        point
                                     };
                                     toolStripItem.Click += contextMenuItem_Click;
                                 }
 
-                                if ((this.SessionState.RoomUsers?.Count ?? 0) > 0)
-                                    foreach (var roomUser in this.SessionState.RoomUsers.Values)
+                                if ((SessionState.RoomUsers?.Count ?? 0) > 0)
+                                    foreach (var roomUser in SessionState.RoomUsers.Values)
                                         if (roomUser.UserInfo.UserId == 0 ||
-                                            roomUser.UserInfo.RoomPos == null) continue;
-                                        else if (roomUser.UserInfo.UserId != this.SessionState.UserId &&
-                                                 BinaryOpsExts.IsPointInPolygon(
-                                                     point,
-                                                     roomUser.UserInfo.RoomPos.GetBoundingBox(
-                                                         new Size(
-                                                             (int)AssetConstants.Values.DefaultPropWidth,
-                                                             (int)AssetConstants.Values.DefaultPropHeight),
-                                                         true)))
+                                            roomUser.UserInfo.RoomPos == null)
                                         {
-                                            toolStripItem = _contextMenu.Items.Add($"Select User: {roomUser.UserInfo.Name}");
+                                            continue;
+                                        }
+                                        else if (roomUser.UserInfo.UserId != SessionState.UserId &&
+                                                 point.IsPointInPolygon(roomUser.UserInfo.RoomPos.GetBoundingBox(
+                                                     new Size(
+                                                         (int)AssetConstants.Values.DefaultPropWidth,
+                                                         (int)AssetConstants.Values.DefaultPropHeight),
+                                                     true)))
+                                        {
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Select User: {roomUser.UserInfo.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.UI_USERSELECT,
-                                                    roomUser.UserInfo.UserId,
+                                                    roomUser.UserInfo.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
-                                            if (this.SessionState.UserDesc.IsModerator ||
-                                                this.SessionState.UserDesc.IsAdministrator)
+                                            if (SessionState.UserDesc.IsModerator ||
+                                                SessionState.UserDesc.IsAdministrator)
                                             {
-                                                toolStripItem = _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_PIN,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Unpin User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Unpin User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_UNPIN,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Gag User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Gag User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_GAG,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Ungag User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Ungag User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_UNGAG,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Propgag User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Propgag User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_PROPGAG,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.CMD_UNPROPGAG,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
 
-                                                toolStripItem = _contextMenu.Items.Add($"Kill User: {roomUser.UserInfo.Name}");
+                                                toolStripItem =
+                                                    _contextMenu.Items.Add($"Kill User: {roomUser.UserInfo.Name}");
                                                 if (toolStripItem != null)
                                                 {
                                                     toolStripItem.Tag = new object[]
                                                     {
                                                         ContextMenuCommandTypes.MSG_KILLUSER,
-                                                        roomUser.UserInfo.UserId,
+                                                        roomUser.UserInfo.UserId
                                                     };
                                                     toolStripItem.Click += contextMenuItem_Click;
                                                 }
                                             }
                                         }
 
-                                if ((this.SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
+                                if ((SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
                                 {
                                     toolStripItem = _contextMenu.Items.Add("Delete All Props");
                                     if (toolStripItem != null)
@@ -668,13 +719,13 @@ public partial class Program : Disposable
                                         toolStripItem.Tag = new object[]
                                         {
                                             ContextMenuCommandTypes.MSG_PROPDEL,
-                                            -1,
+                                            -1
                                         };
                                         toolStripItem.Click += contextMenuItem_Click;
                                     }
 
                                     var j = 0;
-                                    foreach (var looseProp in this.SessionState.RoomInfo.LooseProps)
+                                    foreach (var looseProp in SessionState.RoomInfo.LooseProps)
                                     {
                                         if (looseProp.Loc == null) continue;
 
@@ -688,24 +739,26 @@ public partial class Program : Disposable
                                                         prop.Height),
                                                     true)))
                                         {
-                                            toolStripItem = _contextMenu.Items.Add($"Select Prop: {looseProp.AssetSpec.Id}");
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Select Prop: {looseProp.AssetSpec.Id}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.UI_PROPSELECT,
-                                                    j,
+                                                    j
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
-                                            toolStripItem = _contextMenu.Items.Add($"Delete Prop: {looseProp.AssetSpec.Id}");
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Delete Prop: {looseProp.AssetSpec.Id}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.MSG_PROPDEL,
-                                                    j,
+                                                    j
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
@@ -715,35 +768,35 @@ public partial class Program : Disposable
                                     }
                                 }
 
-                                if ((this.SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                                    foreach (var hotSpot in this.SessionState.RoomInfo.HotSpots)
+                                if ((SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
+                                    foreach (var hotSpot in SessionState.RoomInfo.HotSpots)
                                         if (point.IsPointInPolygon(hotSpot.Vortexes.ToArray()))
                                         {
-                                            toolStripItem = _contextMenu.Items.Add($"Select Spot: {hotSpot.SpotInfo.HotspotID}");
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Select Spot: {hotSpot.SpotInfo.HotspotID}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.UI_SPOTSELECT,
-                                                    hotSpot.SpotInfo.HotspotID,
+                                                    hotSpot.SpotInfo.HotspotID
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
-                                            if (this.SessionState.UserDesc.IsModerator ||
-                                                this.SessionState.UserDesc.IsAdministrator)
+                                            if (!SessionState.UserDesc.IsModerator &&
+                                                !SessionState.UserDesc.IsAdministrator) continue;
+
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Delete Spot: {hotSpot.SpotInfo.HotspotID}");
+                                            if (toolStripItem == null) continue;
+
+                                            toolStripItem.Tag = new object[]
                                             {
-                                                toolStripItem = _contextMenu.Items.Add($"Delete Spot: {hotSpot.SpotInfo.HotspotID}");
-                                                if (toolStripItem != null)
-                                                {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.MSG_SPOTDEL,
-                                                        hotSpot.SpotInfo.HotspotID,
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
-                                            }
+                                                ContextMenuCommandTypes.MSG_SPOTDEL,
+                                                hotSpot.SpotInfo.HotspotID
+                                            };
+                                            toolStripItem.Click += contextMenuItem_Click;
                                         }
 
                                 _contextMenu.Show(Cursor.Position);
@@ -751,19 +804,22 @@ public partial class Program : Disposable
                                 break;
                         }
                     }
-                });
-                imgScreen.MouseMove += new MouseEventHandler((sender, e) =>
+                };
+                imgScreen.MouseMove += (sender, e) =>
                 {
                     imgScreen.Cursor = Cursors.Default;
 
-                    if (this.SessionState.ConnectionState.IsConnected())
+                    if (SessionState.ConnectionState.IsConnected())
                     {
-                        var point = new ThePalace.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                        var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
-                        if ((this.SessionState.RoomUsers?.Count ?? 0) > 0)
-                            foreach (var roomUser in this.SessionState.RoomUsers.Values)
+                        if ((SessionState.RoomUsers?.Count ?? 0) > 0)
+                            foreach (var roomUser in SessionState.RoomUsers.Values)
                                 if (roomUser.UserInfo.UserId == 0 ||
-                                    roomUser.UserInfo.RoomPos == null) continue;
+                                    roomUser.UserInfo.RoomPos == null)
+                                {
+                                    continue;
+                                }
                                 else if (point.IsPointInPolygon(
                                              roomUser.UserInfo.RoomPos.GetBoundingBox(
                                                  new Size(
@@ -775,8 +831,8 @@ public partial class Program : Disposable
                                     break;
                                 }
 
-                        if ((this.SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
-                            foreach (var looseProp in this.SessionState.RoomInfo.LooseProps)
+                        if ((SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
+                            foreach (var looseProp in SessionState.RoomInfo.LooseProps)
                             {
                                 if (looseProp.Loc == null) continue;
 
@@ -795,37 +851,35 @@ public partial class Program : Disposable
                                 }
                             }
 
-                        if ((this.SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                            foreach (var hotSpot in this.SessionState.RoomInfo.HotSpots)
+                        if ((SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
+                            foreach (var hotSpot in SessionState.RoomInfo.HotSpots)
                                 if (point.IsPointInPolygon(hotSpot.Vortexes.ToArray()))
                                 {
                                     imgScreen.Cursor = Cursors.Hand;
                                     break;
                                 }
                     }
-                });
+                };
 
-                this.SessionState.RegisterControl(nameof(imgScreen), imgScreen);
+                SessionState.RegisterControl(nameof(imgScreen), imgScreen);
             }
         }
 
-        var labelInfo = this.SessionState.GetControl("labelInfo") as Label;
-        if (labelInfo == null)
+        if (SessionState.GetControl("labelInfo") is not Label labelInfo)
         {
             labelInfo = FormsManager.Current.CreateControl<FormBase, Label>(form, true, new ControlCfg
             {
                 Visible = true,
                 TabIndex = 0, //tabIndex++,
                 Title = string.Empty,
-                Margin = new Padding(0, 0, 0, 0),
+                Margin = new Padding(0, 0, 0, 0)
             })?.FirstOrDefault();
 
             if (labelInfo != null)
-                this.SessionState.RegisterControl(nameof(labelInfo), labelInfo);
+                SessionState.RegisterControl(nameof(labelInfo), labelInfo);
         }
 
-        var txtInput = this.SessionState.GetControl("txtInput") as TextBox;
-        if (txtInput == null)
+        if (SessionState.GetControl("txtInput") is not TextBox txtInput)
         {
             txtInput = FormsManager.Current.CreateControl<FormBase, TextBox>(form, true, new ControlCfg
             {
@@ -835,22 +889,19 @@ public partial class Program : Disposable
                 Margin = new Padding(0, 0, 0, 0),
                 BackColor = Color.FromKnownColor(KnownColor.DimGray),
                 Multiline = true,
-                MaxLength = 255,
+                MaxLength = 255
             })?.FirstOrDefault();
 
             if (txtInput != null)
             {
-                txtInput.LostFocus += new EventHandler((sender, e) =>
+                txtInput.LostFocus += (sender, e) =>
                 {
                     txtInput.BackColor = Color.FromKnownColor(KnownColor.LightGray);
-                });
-                txtInput.GotFocus += new EventHandler((sender, e) =>
+                };
+                txtInput.GotFocus += (sender, e) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.White); };
+                txtInput.KeyUp += (sender, e) =>
                 {
-                    txtInput.BackColor = Color.FromKnownColor(KnownColor.White);
-                });
-                txtInput.KeyUp += new KeyEventHandler((sender, e) =>
-                {
-                    this.SessionState.LastActivity = DateTime.UtcNow;
+                    SessionState.LastActivity = DateTime.UtcNow;
 
                     if (e.KeyCode == Keys.Tab)
                     {
@@ -859,14 +910,14 @@ public partial class Program : Disposable
                         txtInput.Text = string.Empty;
                     }
 
-                    if (!this.SessionState?.ConnectionState?.IsConnected() ?? false)
+                    if (!SessionState?.ConnectionState?.IsConnected() ?? false)
                     {
-                        this.ShowConnectionForm();
+                        ShowConnectionForm();
 
                         return;
                     }
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, this.SessionState, null, this.SessionState.ScriptState);
+                    ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, SessionState, null, SessionState.ScriptState);
 
                     if (e.KeyCode == Keys.Enter)
                     {
@@ -883,11 +934,9 @@ public partial class Program : Disposable
                                 {
                                     CmdFnc = a =>
                                     {
-                                        var sessionState = a[0] as IDesktopSessionState;
-                                        if (sessionState == null) return null;
+                                        if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                        var text = a[1] as string;
-                                        if (text == null) return null;
+                                        if (a[1] is not string text) return null;
 
                                         try
                                         {
@@ -904,52 +953,49 @@ public partial class Program : Disposable
 
                                         return null;
                                     },
-                                    Values = [this.SessionState, string.Concat(text.Skip(1))],
+                                    Values = [SessionState, string.Concat(text.Skip(1))]
                                 });
                             }
                             else
                             {
                                 var xTalk = new MSG_XTALK
                                 {
-                                    Text = text,
+                                    Text = text
                                 };
 
-                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, this.SessionState, xTalk, this.SessionState.ScriptState);
-                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, this.SessionState, xTalk, this.SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk,
+                                    SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk,
+                                    SessionState.ScriptState);
 
-                                var iptTracking = this.SessionState.ScriptState as IptTracking;
-                                if (iptTracking != null)
+                                if (SessionState.ScriptState is IptTracking iptTracking)
                                 {
                                     if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
                                         xTalk.Text = iptTracking.Variables["CHATSTR"].Value.Value.ToString();
 
                                     if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    {
                                         ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                         {
                                             CmdFnc = a =>
                                             {
-                                                var sessionState = a[0] as IDesktopSessionState;
-                                                if (sessionState == null) return null;
+                                                if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                                var xTalk = a[1] as MSG_XTALK;
-                                                if (xTalk == null) return null;
+                                                if (a[1] is not MSG_XTALK xTalk) return null;
 
                                                 sessionState?.Send(xTalk);
 
                                                 return null;
                                             },
-                                            Values = [this.SessionState, xTalk],
+                                            Values = [SessionState, xTalk]
                                         });
-                                    }
                                 }
                             }
                         }
                     }
-                });
-                txtInput.KeyDown += new KeyEventHandler((sender, e) =>
+                };
+                txtInput.KeyDown += (sender, e) =>
                 {
-                    this.SessionState.LastActivity = DateTime.UtcNow;
+                    SessionState.LastActivity = DateTime.UtcNow;
 
                     if (e.KeyCode == Keys.Tab)
                     {
@@ -958,28 +1004,29 @@ public partial class Program : Disposable
                         txtInput.Text = string.Empty;
                     }
 
-                    if (!this.SessionState?.ConnectionState?.IsConnected() ?? false) return;
+                    if (!SessionState?.ConnectionState?.IsConnected() ?? false) return;
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, this.SessionState, null, this.SessionState.ScriptState);
-                });
+                    ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, SessionState, null, SessionState.ScriptState);
+                };
 
-                this.SessionState.RegisterControl(nameof(txtInput), txtInput);
+                SessionState.RegisterControl(nameof(txtInput), txtInput);
             }
         }
 
-        this.SessionState.RefreshScreen(ScreenLayers.Base);
-        this.SessionState.RefreshUI();
+        SessionState.RefreshScreen(ScreenLayers.Base);
+        SessionState.RefreshUI();
 
         ShowConnectionForm();
     }
+
     private void ShowConnectionForm(object sender = null, EventArgs e = null)
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
-        var connectionForm = this.SessionState.GetForm<Forms.Connection>(nameof(Forms.Connection));
+        var connectionForm = SessionState.GetForm<Connection>(nameof(Connection));
         if (connectionForm == null)
         {
-            connectionForm = FormsManager.Current.CreateForm<Forms.Connection>(
+            connectionForm = FormsManager.Current.CreateForm<Connection>(
                 new FormCfg
                 {
                     AutoScaleDimensions = new SizeF(7F, 15F),
@@ -988,46 +1035,43 @@ public partial class Program : Disposable
                     StartPosition = FormStartPosition.CenterScreen,
                     Margin = new Padding(0, 0, 0, 0),
                     Size = new Size(303, 182),
-                    Visible = true,
+                    Visible = true
                 });
             if (connectionForm == null) return;
 
-            connectionForm.SessionState = this.SessionState;
-            connectionForm.FormClosed += new FormClosedEventHandler((sender, e) =>
+            connectionForm.SessionState = SessionState;
+            connectionForm.FormClosed += (sender, e) =>
             {
-                this.SessionState.UnregisterForm(nameof(Forms.Connection), sender as FormBase);
-            });
+                SessionState.UnregisterForm(nameof(Connection), sender as FormBase);
+            };
 
             if (connectionForm != null)
             {
-                this.SessionState.RegisterForm(nameof(Forms.Connection), connectionForm);
+                SessionState.RegisterForm(nameof(Connection), connectionForm);
 
-                var buttonDisconnect = connectionForm.Controls
-                    .Cast<Control>()
-                    .Where(c => c.Name == "buttonDisconnect")
-                    .FirstOrDefault() as Button;
-                if (buttonDisconnect != null)
+                if (connectionForm.Controls
+                        .Cast<Control>()
+                        .Where(c => c.Name == "buttonDisconnect")
+                        .FirstOrDefault() is Button buttonDisconnect)
                 {
-                    buttonDisconnect.Click += new EventHandler((sender, e) =>
+                    buttonDisconnect.Click += (sender, e) =>
                     {
-                        if ((this.SessionState.ConnectionState?.IsConnected() ?? false) == true)
-                            this.SessionState.ConnectionState.Socket?.DropConnection();
+                        if ((SessionState.ConnectionState?.IsConnected() ?? false))
+                            SessionState.ConnectionState.Socket?.DropConnection();
 
-                        var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
+                        var connectionForm = SessionState.GetForm(nameof(Connection));
                         connectionForm?.Close();
-                    });
-                    buttonDisconnect.Visible = this.SessionState?.ConnectionState?.IsConnected() ?? false;
+                    };
+                    buttonDisconnect.Visible = SessionState?.ConnectionState?.IsConnected() ?? false;
                 }
 
-                var buttonConnect = connectionForm.Controls
-                    .Cast<Control>()
-                    .Where(c => c.Name == "buttonConnect")
-                    .FirstOrDefault() as Button;
-                if (buttonConnect != null)
-                {
-                    buttonConnect.Click += new EventHandler((sender, e) =>
+                if (connectionForm.Controls
+                        .Cast<Control>()
+                        .Where(c => c.Name == "buttonConnect")
+                        .FirstOrDefault() is Button buttonConnect)
+                    buttonConnect.Click += (sender, e) =>
                     {
-                        var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
+                        var connectionForm = SessionState.GetForm(nameof(Connection));
                         if (connectionForm != null)
                         {
                             //var checkBoxNewTab = connectionForm.Controls
@@ -1037,88 +1081,72 @@ public partial class Program : Disposable
                             //if (checkBoxNewTab?.Checked == true)
                             //{
                             //}
+                            if (connectionForm.Controls
+                                    .Cast<Control>()
+                                    .Where(c => c.Name == "comboBoxUsernames")
+                                    .FirstOrDefault() is ComboBox comboBoxUsernames)
+                                SessionState.RegInfo.UserName = SessionState.RegInfo.UserName = comboBoxUsernames.Text;
 
-                            var comboBoxUsernames = connectionForm.Controls
-                                .Cast<Control>()
-                                .Where(c => c.Name == "comboBoxUsernames")
-                                .FirstOrDefault() as ComboBox;
-                            if (comboBoxUsernames != null)
-                            {
-                                this.SessionState.RegInfo.UserName = this.SessionState.RegInfo.UserName = comboBoxUsernames.Text;
-                            }
-
-                            var textBoxRoomID = connectionForm.Controls
-                                .Cast<Control>()
-                                .Where(c => c.Name == "textBoxRoomID")
-                                .FirstOrDefault() as TextBox;
-                            if (textBoxRoomID != null)
+                            if (connectionForm.Controls
+                                    .Cast<Control>()
+                                    .Where(c => c.Name == "textBoxRoomID")
+                                    .FirstOrDefault() is TextBox textBoxRoomID)
                             {
                                 var roomID = (short)0;
 
                                 if (!string.IsNullOrEmpty(textBoxRoomID.Text))
                                     roomID = Convert.ToInt16(textBoxRoomID.Text);
 
-                                this.SessionState.RegInfo.DesiredRoom = roomID;
+                                SessionState.RegInfo.DesiredRoom = roomID;
                             }
 
-                            var comboBoxAddresses = connectionForm.Controls
-                                .Cast<Control>()
-                                .Where(c => c.Name == "comboBoxAddresses")
-                                .FirstOrDefault() as ComboBox;
-                            if (comboBoxAddresses != null &&
+                            if (connectionForm.Controls
+                                    .Cast<Control>()
+                                    .Where(c => c.Name == "comboBoxAddresses")
+                                    .FirstOrDefault() is ComboBox comboBoxAddresses &&
                                 !string.IsNullOrWhiteSpace(comboBoxAddresses.Text))
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     CmdFnc = a =>
                                     {
-                                        var sessionState = a[0] as IDesktopSessionState;
-                                        if (sessionState == null) return null;
+                                        if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                        var url = a[1] as string;
-                                        if (url == null) return null;
+                                        if (a[1] is not string url) return null;
 
                                         if (IPEndPoint.TryParse(url, out var result))
-                                        {
                                             sessionState.ConnectionState.Connect(result);
-                                        }
 
                                         return null;
                                     },
-                                    Values = [this.SessionState, $"palace://{comboBoxAddresses.Text}"],
+                                    Values = [SessionState, $"palace://{comboBoxAddresses.Text}"]
                                 });
 
                             connectionForm.Close();
                         }
-                    });
-                }
+                    };
 
-                var buttonCancel = connectionForm.Controls
-                    .Cast<Control>()
-                    .Where(c => c.Name == "buttonCancel")
-                    .FirstOrDefault() as Button;
-                if (buttonCancel != null)
-                {
-                    buttonCancel.Click += new EventHandler((sender, e) =>
+                if (connectionForm.Controls
+                        .Cast<Control>()
+                        .Where(c => c.Name == "buttonCancel")
+                        .FirstOrDefault() is Button buttonCancel)
+                    buttonCancel.Click += (sender, e) =>
                     {
-                        var connectionForm = this.SessionState.GetForm(nameof(Forms.Connection));
+                        var connectionForm = SessionState.GetForm(nameof(Connection));
                         connectionForm?.Close();
-                    });
-                }
+                    };
 
-                var comboBoxUsernames = connectionForm.Controls
-                    .Cast<Control>()
-                    .Where(c => c.Name == "comboBoxUsernames")
-                    .FirstOrDefault() as ComboBox;
-                if (comboBoxUsernames != null)
+                if (connectionForm.Controls
+                        .Cast<Control>()
+                        .Where(c => c.Name == "comboBoxUsernames")
+                        .FirstOrDefault() is ComboBox comboBoxUsernames)
                 {
-                    var usernamesList = SettingsManager.Current.Settings[@"\GUI\Connection\Usernames"] as ISettingList;
-                    if (usernamesList != null)
+                    if (SettingsManager.Current.Settings[@"\GUI\Connection\Usernames"] is ISettingList usernamesList)
                     {
                         comboBoxUsernames.Items.AddRange(usernamesList.Text
                             .Select(v => new ComboboxItem
                             {
                                 Text = v,
-                                Value = v,
+                                Value = v
                             })
                             .ToArray());
 
@@ -1126,20 +1154,18 @@ public partial class Program : Disposable
                     }
                 }
 
-                var comboBoxAddresses = connectionForm.Controls
-                    .Cast<Control>()
-                    .Where(c => c.Name == "comboBoxAddresses")
-                    .FirstOrDefault() as ComboBox;
-                if (comboBoxAddresses != null)
+                if (connectionForm.Controls
+                        .Cast<Control>()
+                        .Where(c => c.Name == "comboBoxAddresses")
+                        .FirstOrDefault() is ComboBox comboBoxAddresses)
                 {
-                    var addressesList = SettingsManager.Current.Settings[@"\GUI\Connection\Addresses"] as ISettingList;
-                    if (addressesList != null)
+                    if (SettingsManager.Current.Settings[@"\GUI\Connection\Addresses"] is ISettingList addressesList)
                     {
                         comboBoxAddresses.Items.AddRange(addressesList.Text
                             .Select(v => new ComboboxItem
                             {
                                 Text = v,
-                                Value = v,
+                                Value = v
                             })
                             .ToArray());
 
@@ -1156,10 +1182,10 @@ public partial class Program : Disposable
             connectionForm.Show();
             connectionForm.Focus();
 
-            this.SessionState.RefreshScreen(ScreenLayers.Base);
-            this.SessionState.RefreshUI();
-            this.SessionState.RefreshScreen();
-            this.SessionState.RefreshRibbon();
+            SessionState.RefreshScreen(ScreenLayers.Base);
+            SessionState.RefreshUI();
+            SessionState.RefreshScreen();
+            SessionState.RefreshRibbon();
         }
     }
 
@@ -1172,97 +1198,93 @@ public partial class Program : Disposable
             {
                 case nameof(GoBack):
                 case nameof(GoForward):
-                    if (this.SessionState.ConnectionState.IsConnected() &&
-                        (this.SessionState.History.History.Count > 0))
+                    if (SessionState.ConnectionState.IsConnected() &&
+                        SessionState.History.History.Count > 0)
                     {
                         var url = null as string;
 
                         switch (name)
                         {
                             case nameof(GoBack):
-                                if ((!this.SessionState.History.Position.HasValue ||
-                                     this.SessionState.History.History.Keys.Min() != this.SessionState.History.Position.Value))
-                                    url = this.SessionState.History.Back();
+                                if (!SessionState.History.Position.HasValue ||
+                                    SessionState.History.History.Keys.Min() != SessionState.History.Position.Value)
+                                    url = SessionState.History.Back();
                                 break;
                             case nameof(GoForward):
-                                if (this.SessionState.History.Position.HasValue &&
-                                    this.SessionState.History.History.Keys.Max() != this.SessionState.History.Position.Value)
-                                    url = this.SessionState.History.Forward();
+                                if (SessionState.History.Position.HasValue &&
+                                    SessionState.History.History.Keys.Max() != SessionState.History.Position.Value)
+                                    url = SessionState.History.Forward();
                                 break;
                         }
 
                         if (url != null &&
-                            ThePalace.Core.Constants.RegexConstants.REGEX_PALACEURL.IsMatch(url))
+                            RegexConstants.REGEX_PALACEURL.IsMatch(url))
                         {
-                            var match = ThePalace.Core.Constants.RegexConstants.REGEX_PALACEURL.Match(url);
+                            var match = RegexConstants.REGEX_PALACEURL.Match(url);
                             if (match.Groups.Count < 2) break;
 
                             var host = match.Groups[1].Value;
                             var port = match.Groups.Count > 2 &&
                                        !string.IsNullOrWhiteSpace(match.Groups[2].Value)
-                                ? Convert.ToUInt16(match.Groups[2].Value) : (ushort)0;
+                                ? Convert.ToUInt16(match.Groups[2].Value)
+                                : (ushort)0;
                             var roomID = match.Groups.Count > 3 &&
                                          !string.IsNullOrWhiteSpace(match.Groups[3].Value)
-                                ? Convert.ToInt16(match.Groups[3].Value) : (short)0;
+                                ? Convert.ToInt16(match.Groups[3].Value)
+                                : (short)0;
 
-                            if ((this.SessionState.ConnectionState?.IsConnected() ?? false) &&
-                                this.SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
-                                this.SessionState.ConnectionState.HostAddr.Port == port &&
+                            if ((SessionState.ConnectionState?.IsConnected() ?? false) &&
+                                SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
+                                SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     CmdFnc = a =>
                                     {
-                                        var sessionState = a[0] as IDesktopSessionState;
-                                        if (sessionState == null) return null;
+                                        if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                        var roomID = a[1] as short?;
-                                        if (roomID == null) return null;
+                                        if (a[1] is not short roomID) return null;
 
                                         sessionState?.Send(new MSG_ROOMGOTO
                                         {
-                                            Dest = roomID.Value,
+                                            Dest = roomID
                                         });
 
                                         return null;
                                     },
-                                    Values = [this.SessionState, roomID],
+                                    Values = [SessionState, roomID]
                                 });
                             else
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     CmdFnc = a =>
                                     {
-                                        var sessionState = a[0] as IDesktopSessionState;
-                                        if (sessionState == null) return null;
+                                        if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                                        var url = a[1] as string;
-                                        if (url == null) return null;
+                                        if (a[1] is not string url) return null;
 
                                         if (IPEndPoint.TryParse(url, out var result))
-                                        {
                                             ConnectionManager.Connect(sessionState.ConnectionState, result);
-                                        }
 
                                         return null;
                                     },
-                                    Values = [this.SessionState, url],
+                                    Values = [SessionState, url]
                                 });
                         }
                     }
 
                     break;
-                case nameof(Connection):
-                    ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(this.SessionState, null);
+                case nameof(Entities.Ribbon.Connection):
+                    ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(SessionState, null);
                     break;
                 case nameof(Chatlog):
-                    ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(this.SessionState, null);
+                    ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(SessionState, null);
                     break;
                 case nameof(UsersList):
-                    ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(this.SessionState, null);
+                    ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(SessionState, null);
                     break;
                 case nameof(RoomsList):
-                    ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(this.SessionState, null);
+                    ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(SessionState, null);
                     break;
                 case nameof(Bookmarks):
                 case nameof(LiveDirectory):
@@ -1276,24 +1298,25 @@ public partial class Program : Disposable
                     break;
             }
     }
+
     private void toolStripDropdownlist_Click(object sender = null, EventArgs e = null)
     {
     }
+
     private void toolStripMenuItem_Click(object sender = null, EventArgs e = null)
     {
     }
+
     private void contextMenuItem_Click(object sender = null, EventArgs e = null)
     {
-        var contextMenuItem = sender as ToolStripMenuItem;
-        if (contextMenuItem == null) return;
+        if (sender is not ToolStripMenuItem contextMenuItem) return;
 
-        var values = contextMenuItem.Tag as object[];
-        if (values == null) return;
+        if (contextMenuItem.Tag is not object[] values) return;
 
         var cmd = (ContextMenuCommandTypes)values[0];
 
-        if (this.SessionState.UserDesc.IsModerator ||
-            this.SessionState.UserDesc.IsAdministrator)
+        if (SessionState.UserDesc.IsModerator ||
+            SessionState.UserDesc.IsAdministrator)
             switch (cmd)
             {
                 case ContextMenuCommandTypes.CMD_PIN:
@@ -1302,85 +1325,78 @@ public partial class Program : Disposable
                 case ContextMenuCommandTypes.CMD_UNGAG:
                 case ContextMenuCommandTypes.CMD_PROPGAG:
                 case ContextMenuCommandTypes.CMD_UNPROPGAG:
+                {
+                    var value = (int)values[1];
+
+                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                     {
-                        var value = (Int32)values[1];
-
-                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        CmdFnc = a =>
                         {
-                            CmdFnc = a =>
+                            if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                            if (a[1] is not int value) return null;
+
+                            if (a[2] is not ContextMenuCommandTypes cmd) return null;
+
+                            sessionState.Send(new MSG_WHISPER
                             {
-                                var sessionState = a[0] as IDesktopSessionState;
-                                if (sessionState == null) return null;
+                                TargetID = value,
+                                Text = $"`{cmd.GetDescription()}"
+                            });
 
-                                var value = a[1] as Int32?;
-                                if (value == null) return null;
-
-                                var cmd = a[2] as ContextMenuCommandTypes?;
-                                if (cmd == null) return null;
-
-                                sessionState.Send(new MSG_WHISPER
-                                {
-                                    TargetID = value.Value,
-                                    Text = $"`{cmd.Value.GetDescription()}",
-                                });
-
-                                return null;
-                            },
-                            Values = [this.SessionState, value, cmd],
-                        });
-                    }
+                            return null;
+                        },
+                        Values = [SessionState, value, cmd]
+                    });
+                }
 
                     break;
                 case ContextMenuCommandTypes.MSG_KILLUSER:
+                {
+                    var value = (uint)values[1];
+
+                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                     {
-                        var value = (UInt32)values[1];
-
-                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        CmdFnc = a =>
                         {
-                            CmdFnc = a =>
+                            if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                            if (a[1] is not uint value) return null;
+
+                            sessionState.Send(new MSG_KILLUSER
                             {
-                                var sessionState = a[0] as IDesktopSessionState;
-                                if (sessionState == null) return null;
+                                TargetID = value
+                            });
 
-                                var value = a[1] as UInt32?;
-                                if (value == null) return null;
-
-                                sessionState.Send(new MSG_KILLUSER
-                                {
-                                    TargetID = value.Value,
-                                });
-
-                                return null;
-                            },
-                            Values = [this.SessionState, value],
-                        });
-                    }
+                            return null;
+                        },
+                        Values = [SessionState, value]
+                    });
+                }
 
                     break;
                 case ContextMenuCommandTypes.MSG_SPOTDEL:
+                {
+                    var value = (short)values[1];
+
+                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                     {
-                        var value = (short)values[1];
-
-                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                        CmdFnc = a =>
                         {
-                            CmdFnc = a =>
+                            if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                            if (a[1] is not short value) return null;
+
+                            sessionState.Send(new MSG_SPOTDEL
                             {
-                                var sessionState = a[0] as IDesktopSessionState;
-                                if (sessionState == null) return null;
+                                SpotID = value
+                            });
 
-                                var value = a[1] as short?;
-                                if (value == null) return null;
-
-                                sessionState.Send(new MSG_SPOTDEL
-                                {
-                                    SpotID = value.Value,
-                                });
-
-                                return null;
-                            },
-                            Values = [this.SessionState, value],
-                        });
-                    }
+                            return null;
+                        },
+                        Values = [SessionState, value]
+                    });
+                }
 
                     break;
             }
@@ -1388,102 +1404,97 @@ public partial class Program : Disposable
         switch (cmd)
         {
             case ContextMenuCommandTypes.UI_SPOTSELECT:
-                {
-                    var value = (Int32)values[1];
+            {
+                var value = (int)values[1];
 
-                    this.SessionState.SelectedHotSpot = this.SessionState.RoomInfo?.HotSpots
-                        ?.Where(s => s.SpotInfo.HotspotID == value)
-                        ?.FirstOrDefault();
-                }
+                SessionState.SelectedHotSpot = SessionState.RoomInfo?.HotSpots
+                    ?.Where(s => s.SpotInfo.HotspotID == value)
+                    ?.FirstOrDefault();
+            }
 
                 break;
             case ContextMenuCommandTypes.UI_PROPSELECT:
-                {
-                    var value = (Int32)values[1];
+            {
+                var value = (int)values[1];
 
-                    this.SessionState.SelectedProp = this.SessionState.RoomInfo?.LooseProps
-                        ?.Where(s => s.AssetSpec.Id == value)
-                        ?.Select(s => s.AssetSpec)
-                        ?.FirstOrDefault();
-                }
+                SessionState.SelectedProp = SessionState.RoomInfo?.LooseProps
+                    ?.Where(s => s.AssetSpec.Id == value)
+                    ?.Select(s => s.AssetSpec)
+                    ?.FirstOrDefault();
+            }
 
                 break;
             case ContextMenuCommandTypes.UI_USERSELECT:
-                {
-                    var value = (UInt32)values[1];
+            {
+                var value = (uint)values[1];
 
-                    this.SessionState.SelectedUser = this.SessionState.RoomUsers.GetValueLocked(value);
-                }
+                SessionState.SelectedUser = SessionState.RoomUsers.GetValueLocked(value);
+            }
 
                 break;
             case ContextMenuCommandTypes.MSG_PROPDEL:
-                {
-                    var value = (Int32)values[1];
+            {
+                var value = (int)values[1];
 
-                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
+                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
+                {
+                    CmdFnc = a =>
+                    {
+                        if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                        if (a[1] is not int value) return null;
+
+                        sessionState.Send(new MSG_PROPDEL
+                        {
+                            PropNum = value
+                        });
+
+                        return null;
+                    },
+                    Values = [SessionState, value]
+                });
+            }
+
+                break;
+            case ContextMenuCommandTypes.MSG_USERMOVE:
+            {
+                var value = values[1] as Core.Entities.Shared.Types.Point;
+
+                SessionState.UserDesc.UserInfo.RoomPos = value;
+
+                var user = null as UserDesc;
+                user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
+                if (user != null)
+                {
+                    user.UserInfo.RoomPos = value;
+                    user.Extended["CurrentMessage"] = null;
+
+                    if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue) queue.Clear();
+
+                    SessionState.RefreshScreen(
+                        ScreenLayers.UserProp,
+                        ScreenLayers.UserNametag,
+                        ScreenLayers.Messages);
+
+                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                     {
                         CmdFnc = a =>
                         {
-                            var sessionState = a[0] as IDesktopSessionState;
-                            if (sessionState == null) return null;
+                            if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                            var value = a[1] as Int32?;
-                            if (value == null) return null;
+                            if (a[1] is not Core.Entities.Shared.Types.Point value) return null;
 
-                            sessionState.Send(new MSG_PROPDEL
+                            sessionState.Send(new MSG_USERMOVE
                             {
-                                PropNum = value.Value,
+                                Pos = value
                             });
 
                             return null;
                         },
-                        Values = [this.SessionState, value],
+                        Values = [SessionState, value]
                     });
                 }
-
-                break;
-            case ContextMenuCommandTypes.MSG_USERMOVE:
-                {
-                    var value = values[1] as ThePalace.Core.Entities.Shared.Types.Point;
-
-                    this.SessionState.UserDesc.UserInfo.RoomPos = value;
-
-                    var user = null as UserDesc;
-                    user = this.SessionState.RoomUsers.GetValueLocked(this.SessionState.UserId);
-                    if (user != null)
-                    {
-                        user.UserInfo.RoomPos = value;
-                        user.Extended["CurrentMessage"] = null;
-
-                        var queue = user.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
-                        if (queue != null) queue.Clear();
-
-                        this.SessionState.RefreshScreen(
-                            ScreenLayers.UserProp,
-                            ScreenLayers.UserNametag,
-                            ScreenLayers.Messages);
-
-                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new()
-                        {
-                            CmdFnc = a =>
-                            {
-                                var sessionState = a[0] as IDesktopSessionState;
-                                if (sessionState == null) return null;
-
-                                var value = a[1] as ThePalace.Core.Entities.Shared.Types.Point;
-                                if (value == null) return null;
-
-                                sessionState.Send(new MSG_USERMOVE
-                                {
-                                    Pos = value,
-                                });
-
-                                return null;
-                            },
-                            Values = [this.SessionState, value],
-                        });
-                    }
-                }
+            }
 
                 break;
         }

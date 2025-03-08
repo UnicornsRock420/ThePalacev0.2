@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Core.Database.Core.Model;
 
-public partial class BanRec
+public class BanRec
 {
     public Guid Id { get; set; }
     public DateTime CreatedDate { get; set; }

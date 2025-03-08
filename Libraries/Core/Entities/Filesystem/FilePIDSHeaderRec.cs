@@ -1,9 +1,9 @@
 ﻿using ThePalace.Core.Entities.Shared.Types;
-using sint32 = System.Int32;
+using sint32 = int;
 
 namespace ThePalace.Core.Entities.Filesystem;
 
-public partial struct FilePIDSHeaderRec
+public struct FilePIDSHeaderRec
 {
     public AssetSpec AssetSpec;
     public sint32 dataOffset;

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Users;
 
 [Mnemonic("uLoc")]
-public partial class BO_USERMOVE : IEventHandler<MSG_USERMOVE>
+public class BO_USERMOVE : IEventHandler<MSG_USERMOVE>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

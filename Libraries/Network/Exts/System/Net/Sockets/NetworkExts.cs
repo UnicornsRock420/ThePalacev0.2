@@ -14,24 +14,32 @@ public static class NetworkExts
             () => handler?.Disconnect(false),
             () => handler?.Shutdown(SocketShutdown.Both),
             () => handler?.Close(),
-            () => handler?.Dispose(),
+            () => handler?.Dispose()
         };
 
         foreach (var action in actions)
-        {
-            try { action(); } catch { }
-        }
+            try
+            {
+                action();
+            }
+            catch
+            {
+            }
     }
 
-    public static void SetKeepAlive(this Socket handler, bool on = true, int keepAliveInterval_InMilliseconds = 15000, int keepAliveTime_InMilliseconds = 15000)
+    public static void SetKeepAlive(this Socket handler, bool on = true, int keepAliveInterval_InMilliseconds = 15000,
+        int keepAliveTime_InMilliseconds = 15000)
     {
         var size = Marshal.SizeOf(new uint());
 
         if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            setsockopt((int)handler.Handle, /* SOL_SOCKET */ 0x01, /* SO_KEEPALIVE */ 0x09, BitConverter.GetBytes(on ? 1 : 0), size);
-            setsockopt((int)handler.Handle, /* IPPROTO_TCP */ 0x06, /* TCP_KEEPIDLE */ 0x04, BitConverter.GetBytes(keepAliveInterval_InMilliseconds), size);
-            setsockopt((int)handler.Handle, /* IPPROTO_TCP */ 0x06, /* TCP_KEEPINTVL */ 0x05, BitConverter.GetBytes(keepAliveInterval_InMilliseconds), size);
+            setsockopt((int)handler.Handle, /* SOL_SOCKET */ 0x01, /* SO_KEEPALIVE */ 0x09,
+                BitConverter.GetBytes(on ? 1 : 0), size);
+            setsockopt((int)handler.Handle, /* IPPROTO_TCP */ 0x06, /* TCP_KEEPIDLE */ 0x04,
+                BitConverter.GetBytes(keepAliveInterval_InMilliseconds), size);
+            setsockopt((int)handler.Handle, /* IPPROTO_TCP */ 0x06, /* TCP_KEEPINTVL */ 0x05,
+                BitConverter.GetBytes(keepAliveInterval_InMilliseconds), size);
         }
         else
         {
@@ -45,9 +53,13 @@ public static class NetworkExts
         }
     }
 
-    public static IPAddress? GetIPAddress(this Socket handler) =>
-        ((IPEndPoint)handler?.RemoteEndPoint)?.Address;
+    public static IPAddress? GetIPAddress(this Socket handler)
+    {
+        return ((IPEndPoint)handler?.RemoteEndPoint)?.Address;
+    }
 
-    public static int? GetPort(this Socket handler) =>
-        ((IPEndPoint)handler?.RemoteEndPoint)?.Port;
+    public static int? GetPort(this Socket handler)
+    {
+        return ((IPEndPoint)handler?.RemoteEndPoint)?.Port;
+    }
 }

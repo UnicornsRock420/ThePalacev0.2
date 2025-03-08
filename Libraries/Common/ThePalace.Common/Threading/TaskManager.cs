@@ -1,24 +1,47 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Common.Factories;
 using ThePalace.Common.Interfaces.Threading;
+using ITimer = ThePalace.Common.Interfaces.Threading.ITimer;
 
 namespace ThePalace.Common.Threading;
 
-public partial class TaskManager : SingletonDisposable<TaskManager>
+public class TaskManager : SingletonDisposable<TaskManager>
 {
     private const int CONST_defaultSleepInterval = 1500;
 
-    static TaskManager() => _globalToken = CancellationTokenFactory.NewToken();
+    private static readonly CancellationTokenSource _globalToken = CancellationTokenFactory.NewToken();
 
-    public TaskManager() => Jobs = new();
+    private static readonly TaskStatus[] _expiredStates =
+    [
+        TaskStatus.Canceled,
+        TaskStatus.Faulted,
+        TaskStatus.RanToCompletion
+    ];
 
-    ~TaskManager() => Dispose();
+    public TaskManager()
+    {
+    }
+
+    public Dictionary<Guid, IJob> Jobs { get; protected set; } = new();
+
+    public static CancellationToken GlobalToken => _globalToken.Token;
+
+    ~TaskManager()
+    {
+        Dispose();
+    }
 
     public override void Dispose()
     {
         if (!_globalToken.IsCancellationRequested)
         {
-            try { _globalToken.CancelAsync(); } catch { }
+            try
+            {
+                _globalToken.CancelAsync();
+            }
+            catch
+            {
+            }
 
             Thread.Sleep(450);
 
@@ -28,8 +51,21 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
                 .ToList()
                 .ForEach(j =>
                 {
-                    try { j.Cancel(); } catch { }
-                    try { j.Dispose(); } catch { }
+                    try
+                    {
+                        j.Cancel();
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        j.Dispose();
+                    }
+                    catch
+                    {
+                    }
 
                     j.JobState = null;
                 });
@@ -45,13 +81,8 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         GC.SuppressFinalize(this);
     }
 
-    private static readonly CancellationTokenSource _globalToken;
-
-    public Dictionary<Guid, IJob> Jobs { get; protected set; }
-
-    public static CancellationToken GlobalToken => _globalToken.Token;
-
-    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, Interfaces.Threading.ITimer? timer = null)
+    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState,
+        RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
     {
         if (_globalToken.IsCancellationRequested) return null;
 
@@ -65,19 +96,16 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         {
             if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
                 job.Timer != null)
-            {
                 job.Timer.Start();
-            }
             else
-            {
                 job.Task.Start();
-            }
         }
 
         return job;
     }
 
-    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState, RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, Interfaces.Threading.ITimer? timer = null)
+    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState,
+        RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
         where TCmd : ICmd
     {
         if (_globalToken.IsCancellationRequested) return null;
@@ -92,13 +120,9 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         {
             if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
                 job.Timer != null)
-            {
                 job.Timer.Start();
-            }
             else
-            {
                 job.Task.Start();
-            }
         }
 
         return job;
@@ -119,13 +143,9 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
             {
                 if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
                     job.Timer != null)
-                {
                     job.Timer.Start();
-                }
                 else
-                {
                     job.Run();
-                }
             }
         }
     }
@@ -139,12 +159,6 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         return true;
     }
 
-    private static readonly TaskStatus[] _expiredStates =
-    [
-        TaskStatus.Canceled,
-        TaskStatus.Faulted,
-        TaskStatus.RanToCompletion,
-    ];
     private void Cleanup()
     {
         var jobs = Jobs.Values
@@ -152,39 +166,44 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
             .ToList();
 
         foreach (var job in jobs)
-        {
             if (_expiredStates.Contains(job.Task.Status))
             {
                 if ((job.Options & RunOptions.UseTimer) == RunOptions.UseTimer) continue;
 
-                try { job.Cancel(); } catch { }
-                try { job.Dispose(); } catch { }
+                try
+                {
+                    job.Cancel();
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    job.Dispose();
+                }
+                catch
+                {
+                }
 
                 if (Jobs.ContainsKey(job.Id))
-                {
                     Jobs.Remove(job.Id);
-                }
                 else if (
                     job.ParentId.HasValue &&
                     Jobs.ContainsKey(job.ParentId.Value))
-                {
                     Jobs[job.ParentId.Value].SubJobs.Remove(job);
-                }
             }
-        }
     }
 
-    public async Task Run(TimeSpan? sleepInterval = null, CancellationToken? token = null, params IDisposable[] resources)
+    public async Task Run(TimeSpan? sleepInterval = null, CancellationToken? token = null,
+        params IDisposable[] resources)
     {
-        if ((resources?.Length ?? 0) > 0)
-        {
-            _managedResources.AddRange(resources);
-        }
+        if ((resources?.Length ?? 0) > 0) _managedResources.AddRange(resources);
 
         sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
         while (!GlobalToken.IsCancellationRequested &&
-               (!token.HasValue || !token.Value.IsCancellationRequested))
+               token is not { IsCancellationRequested: true })
         {
             Cleanup();
 
@@ -193,13 +212,15 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
                     .SelectMany(j => j.SubJobs))
                 .ToList();
             foreach (var job in jobs)
-            {
                 if (!_expiredStates.Contains(job.Task.Status) &&
                     job.Task.Status != TaskStatus.Running)
-                {
-                    try { job.Run(); } catch { }
-                }
-            }
+                    try
+                    {
+                        job.Run();
+                    }
+                    catch
+                    {
+                    }
 
             Task.WaitAny(jobs.Select(j => j.Task).ToArray());
 
@@ -214,5 +235,8 @@ public partial class TaskManager : SingletonDisposable<TaskManager>
         }
     }
 
-    public void Shutdown() => Dispose();
+    public void Shutdown()
+    {
+        Dispose();
+    }
 }

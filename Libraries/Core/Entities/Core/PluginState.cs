@@ -3,7 +3,10 @@ using System.Runtime.Loader;
 
 namespace ThePalace.Core.Entities.Core;
 
-public partial class PluginState : AssemblyLoadContext
+public class PluginState : AssemblyLoadContext
 {
-    protected override Assembly Load(AssemblyName assemblyName) => null;
+    protected override Assembly Load(AssemblyName assemblyName)
+    {
+        return null;
+    }
 }

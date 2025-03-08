@@ -2,32 +2,39 @@
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
-using sint16 = System.Int16;
+using sint16 = short;
 
 namespace ThePalace.Core.Entities.Shared.Types;
 
 [ByteSize(4)]
-public partial class Point : IStructSerializer
+public class Point : IStructSerializer
 {
+    public sint16 HAxis;
+
+    public sint16 VAxis;
+
     public Point()
     {
         VAxis = (sint16)RndGenerator.Next(0, 384);
         HAxis = (sint16)RndGenerator.Next(0, 512);
     }
+
     public Point(sint16 vAxis, sint16 hAxis)
     {
         VAxis = vAxis;
         HAxis = hAxis;
     }
-    public Point(Stream reader, SerializerOptions opts = SerializerOptions.None) => Deserialize(reader, opts);
+
+    public Point(Stream reader, SerializerOptions opts = SerializerOptions.None)
+    {
+        Deserialize(reader, opts);
+    }
+
     public Point(Point assetSpec)
     {
         HAxis = assetSpec.HAxis;
         VAxis = assetSpec.VAxis;
     }
-
-    public sint16 VAxis;
-    public sint16 HAxis;
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {

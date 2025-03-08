@@ -2,11 +2,15 @@
 
 public static class CancellationTokenFactory
 {
-    public static CancellationTokenSource NewToken() => new();
-
-    public static void NewLinkedToken(out CancellationTokenSource newToken, out CancellationTokenSource linkedToken, params CancellationToken[] tokens)
+    public static CancellationTokenSource NewToken()
     {
-        newToken = new();
+        return new CancellationTokenSource();
+    }
+
+    public static void NewLinkedToken(out CancellationTokenSource newToken, out CancellationTokenSource linkedToken,
+        params CancellationToken[] tokens)
+    {
+        newToken = new CancellationTokenSource();
 
         var _tokens = new List<CancellationToken>(tokens);
         _tokens.Add(TaskManager.GlobalToken);

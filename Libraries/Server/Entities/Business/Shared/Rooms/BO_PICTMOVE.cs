@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Shared.Rooms;
 
 [Mnemonic("pLoc")]
-public partial class BO_PICTMOVE : IEventHandler<MSG_PICTMOVE>
+public class BO_PICTMOVE : IEventHandler<MSG_PICTMOVE>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

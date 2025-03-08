@@ -9,17 +9,19 @@ namespace ThePalace.Core.Client.Core;
 
 public delegate void HotKeyAction(ISessionState sessionState, Keys keys, object sender = null);
 
-public partial class HotKeyManager : SingletonDisposable<HotKeyManager>
+public class HotKeyManager : SingletonDisposable<HotKeyManager>
 {
     private ConcurrentDictionary<Keys, HotKeyBinding> _keyBindings = new();
     public IReadOnlyDictionary<Keys, HotKeyBinding> KeyBindings => _keyBindings.AsReadOnly();
 
-    public HotKeyManager() { }
-    ~HotKeyManager() => Dispose(false);
+    ~HotKeyManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         _keyBindings.Clear();
         _keyBindings = null;
@@ -34,19 +36,19 @@ public partial class HotKeyManager : SingletonDisposable<HotKeyManager>
             _keyBindings.TryAdd(keys, new HotKeyBinding
             {
                 Binding = binding,
-                Values = values,
+                Values = values
             });
     }
 
     public void UnregisterHotKey(Keys keys)
     {
         if (!_keyBindings.ContainsKey(keys))
-            _keyBindings.TryRemove(keys, out var _);
+            _keyBindings.TryRemove(keys, out _);
     }
 
     public bool Invoke(ISessionState sessionState, Keys keys, object sender = null, params object[] values)
     {
-        if (this.IsDisposed) return false;
+        if (IsDisposed) return false;
 
         if (_keyBindings.ContainsKey(keys))
             try
@@ -56,7 +58,7 @@ public partial class HotKeyManager : SingletonDisposable<HotKeyManager>
                     Keys = keys,
                     Sender = sender,
                     HotKeyState = _keyBindings[keys].Values,
-                    EventState = values,
+                    EventState = values
                 });
 
                 return true;

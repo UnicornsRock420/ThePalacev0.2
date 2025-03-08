@@ -1,9 +1,9 @@
 ﻿namespace System;
 
 /// <summary>
-/// <see cref="TypeCode"/>
+///     <see cref="TypeCode" />
 /// </summary>
-public enum TypeCodeEnum : int
+public enum TypeCodeEnum
 {
     Void = unchecked(-1),
     Empty = TypeCode.Empty,

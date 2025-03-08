@@ -5,29 +5,44 @@ using ThePalace.Core.Entities.Core;
 
 namespace ThePalace.Core;
 
-public partial class PluginManager : SingletonDisposable<PluginManager>
+public class PluginManager : SingletonDisposable<PluginManager>
 {
+    private readonly PluginState _pluginContext = new();
     private ConcurrentDictionary<Guid, Assembly> _plugins = new();
     public IReadOnlyDictionary<Guid, Assembly> Plugins => _plugins.AsReadOnly();
 
-    private readonly PluginState _pluginContext = new();
-
-    public PluginManager() { }
-    ~PluginManager() => this.Dispose(false);
+    ~PluginManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         base.Dispose();
 
-        try { _plugins?.Clear(); _plugins = null; } catch { }
-        try { _pluginContext?.Unload(); } catch { }
+        try
+        {
+            _plugins?.Clear();
+            _plugins = null;
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            _pluginContext?.Unload();
+        }
+        catch
+        {
+        }
     }
 
     public void LoadPlugins()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         var path = Path.Combine(Environment.CurrentDirectory, "Plugins");
         if (!Directory.Exists(path))
@@ -40,21 +55,23 @@ public partial class PluginManager : SingletonDisposable<PluginManager>
 
     public Type GetType(string typeName)
     {
-        if (this.IsDisposed) return null;
+        if (IsDisposed) return null;
 
         foreach (var plugin in _plugins.Values)
             try
             {
                 return plugin?.GetType(typeName);
             }
-            catch { }
+            catch
+            {
+            }
 
         return null;
     }
 
     public List<Type> GetTypes()
     {
-        if (this.IsDisposed) return null;
+        if (IsDisposed) return null;
 
         var result = new List<Type>();
 
@@ -63,7 +80,9 @@ public partial class PluginManager : SingletonDisposable<PluginManager>
             {
                 result.AddRange(plugin?.GetTypes());
             }
-            catch { }
+            catch
+            {
+            }
 
         return result;
     }

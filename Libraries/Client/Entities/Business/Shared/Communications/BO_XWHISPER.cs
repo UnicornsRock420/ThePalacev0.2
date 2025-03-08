@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Communications;
 
 [Mnemonic("xwis")]
-public partial class BO_XWHISPER : IEventHandler<MSG_XWHISPER>
+public class BO_XWHISPER : IEventHandler<MSG_XWHISPER>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

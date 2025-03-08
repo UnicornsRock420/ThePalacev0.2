@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Server.Rooms;
 
 [Mnemonic("endr")]
-public partial class BO_ROOMDESCEND : IEventHandler<MSG_ROOMDESCEND>
+public class BO_ROOMDESCEND : IEventHandler<MSG_ROOMDESCEND>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

@@ -1,12 +1,11 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
-using sint32 = System.Int32;
-using uint32 = System.UInt32;
+using uint32 = uint;
 
 namespace ThePalace.Core.Enums.Palace;
 
 [Flags]
 [ByteSize(2)]
-public enum ServerPermissions : sint32
+public enum ServerPermissions
 {
     PM_AllowGuests = 0x0001,
     PM_AllowCyborgs = 0x0002,
@@ -21,8 +20,8 @@ public enum ServerPermissions : sint32
     PM_PurgeInactiveProps = 0x0400,
     PM_KillFlooders = 0x0800,
     PM_NoSpoofing = 0x1000,
-    PM_MemberCreateRooms = 0x2000,
-};
+    PM_MemberCreateRooms = 0x2000
+}
 
 [Flags]
 [ByteSize(4)]
@@ -37,11 +36,11 @@ public enum ServerOptions : uint32
     SO_PoundProtect = 0x00000040,
     SO_SortOptions = 0x00000080,
     SO_AuthTrackLogOff = 0x00000100,
-    SO_JavaSecure = 0x00000200,
-};
+    SO_JavaSecure = 0x00000200
+}
 
 [ByteSize(4)]
-public enum ServerDownFlags : sint32
+public enum ServerDownFlags
 {
     SD_Unknown = 0,
     SD_LoggedOff = 1,
@@ -59,5 +58,5 @@ public enum ServerDownFlags : sint32
     SD_BanishKill = 13,
     SD_NoGuests = 14,
     SD_DemoExpired = 15,
-    SD_Verbose = 16,
-};
+    SD_Verbose = 16
+}

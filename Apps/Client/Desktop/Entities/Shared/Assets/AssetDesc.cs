@@ -1,51 +1,60 @@
-﻿using ICSharpCode.SharpZipLib.GZip;
+﻿using System.Runtime.Serialization;
+using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using System.Runtime.Serialization;
 using ThePalace.Core.Constants;
 using ThePalace.Logging.Entities;
-using sint16 = System.Int16;
+using Point = ThePalace.Core.Entities.Shared.Types.Point;
+using sint16 = short;
 
 namespace ThePalace.Client.Desktop.Entities.Shared.Assets;
 
-public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
+public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 {
-    ~AssetDesc() => Dispose();
+    [IgnoreDataMember] public string? Format;
+
+    [IgnoreDataMember] public sint16 Height;
+
+    [IgnoreDataMember] public Bitmap Image;
+
+    [IgnoreDataMember] public Point Offset;
+
+    [IgnoreDataMember] public sint16 Width;
+
+    ~AssetDesc()
+    {
+        Dispose();
+    }
 
     public override void Dispose()
     {
-        try { Image?.Dispose(); Image = null; } catch { }
+        try
+        {
+            Image?.Dispose();
+            Image = null;
+        }
+        catch
+        {
+        }
 
         base.Dispose();
 
         GC.SuppressFinalize(this);
     }
 
-    [IgnoreDataMember]
-    public sint16 Width;
-    [IgnoreDataMember]
-    public sint16 Height;
-    [IgnoreDataMember]
-    public Bitmap Image;
-    [IgnoreDataMember]
-    public ThePalace.Core.Entities.Shared.Types.Point Offset;
-    [IgnoreDataMember]
-    public string? Format;
-
     public static Bitmap Render(AssetDesc asset)
     {
         if (asset.AssetInfo.IsCustom32Bit)
             return RenderCustom32bit(asset);
-        else if (asset.AssetInfo.IsLegacy32Bit)
+        if (asset.AssetInfo.IsLegacy32Bit)
             return RenderLegacy32bit(asset);
-        else if (asset.AssetInfo.IsLegacy16Bit)
+        if (asset.AssetInfo.IsLegacy16Bit)
             return RenderLegacy16bit(asset);
-        else if (asset.AssetInfo.IsLegacyS20Bit)
+        if (asset.AssetInfo.IsLegacyS20Bit)
             return RenderLegacyS20bit(asset);
-        else if (asset.AssetInfo.IsLegacy20Bit)
+        if (asset.AssetInfo.IsLegacy20Bit)
             return RenderLegacy20bit(asset);
-        else
-            return RenderLegacy8bit(asset);
+        return RenderLegacy8bit(asset);
     }
 
     private static Bitmap RenderLegacy8bit(AssetDesc asset)
@@ -88,6 +97,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return result;
     }
+
     private static Bitmap RenderLegacy16bit(AssetDesc asset)
     {
         var result = new Bitmap(asset.Width, asset.Height);
@@ -118,11 +128,11 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
         {
             ofst = x * 2;
 
-            C = inflatedData[ofst] << 8 | inflatedData[ofst + 1];
-            r = (inflatedData[ofst] >> 3 & 31) * ditherS20bit & 0xFF;
-            g = (C >> 6 & 31) * ditherS20bit & 0xFF;
-            b = (C >> 1 & 31) * ditherS20bit & 0xFF;
-            a = (C & 1) * 255 & 0xFF;
+            C = (inflatedData[ofst] << 8) | inflatedData[ofst + 1];
+            r = (((inflatedData[ofst] >> 3) & 31) * ditherS20bit) & 0xFF;
+            g = (((C >> 6) & 31) * ditherS20bit) & 0xFF;
+            b = (((C >> 1) & 31) * ditherS20bit) & 0xFF;
+            a = ((C & 1) * 255) & 0xFF;
 
             colour = Color.FromArgb(a, r, g, b);
             var _x = y % asset.Width;
@@ -133,6 +143,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return result;
     }
+
     private static Bitmap RenderLegacy20bit(AssetDesc asset)
     {
         var result = new Bitmap(asset.Width, asset.Height);
@@ -163,12 +174,12 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
         {
             ofst = x * 5;
 
-            r = (inflatedData[ofst] >> 2 & 63) * dither20bit;
-            C = inflatedData[ofst] << 8 | inflatedData[ofst + 1];
-            g = (C >> 4 & 63) * dither20bit;
-            C = inflatedData[ofst + 1] << 8 | inflatedData[ofst + 2];
-            b = (C >> 6 & 63) * dither20bit;
-            a = (C >> 4 & 3) * 85;
+            r = ((inflatedData[ofst] >> 2) & 63) * dither20bit;
+            C = (inflatedData[ofst] << 8) | inflatedData[ofst + 1];
+            g = ((C >> 4) & 63) * dither20bit;
+            C = (inflatedData[ofst + 1] << 8) | inflatedData[ofst + 2];
+            b = ((C >> 6) & 63) * dither20bit;
+            a = ((C >> 4) & 3) * 85;
 
             colour = Color.FromArgb(a, r, g, b);
             var _x = y % asset.Width;
@@ -176,11 +187,11 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
             result.SetPixel(_x, _y, colour);
             y++;
 
-            C = inflatedData[ofst + 2] << 8 | inflatedData[ofst + 3];
-            r = (C >> 6 & 63) * dither20bit;
+            C = (inflatedData[ofst + 2] << 8) | inflatedData[ofst + 3];
+            r = ((C >> 6) & 63) * dither20bit;
             g = (C & 63) * dither20bit;
             C = inflatedData[ofst + 4];
-            b = (C >> 2 & 63) * dither20bit;
+            b = ((C >> 2) & 63) * dither20bit;
             a = (C & 3) * 85;
 
             colour = Color.FromArgb(a, r, g, b);
@@ -192,6 +203,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return result;
     }
+
     private static Bitmap RenderLegacyS20bit(AssetDesc asset)
     {
         var result = new Bitmap(asset.Width, asset.Height);
@@ -222,12 +234,12 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
         {
             ofst = x * 5;
 
-            r = (inflatedData[ofst] >> 3 & 31) * ditherS20bit & 0xFF;
-            C = inflatedData[ofst] << 8 | inflatedData[ofst + 1];
-            g = (C >> 6 & 31) * ditherS20bit & 0xFF;
-            b = (C >> 1 & 31) * ditherS20bit & 0xFF;
-            C = inflatedData[ofst + 1] << 8 | inflatedData[ofst + 2];
-            a = (C >> 4 & 31) * ditherS20bit & 0xFF;
+            r = (((inflatedData[ofst] >> 3) & 31) * ditherS20bit) & 0xFF;
+            C = (inflatedData[ofst] << 8) | inflatedData[ofst + 1];
+            g = (((C >> 6) & 31) * ditherS20bit) & 0xFF;
+            b = (((C >> 1) & 31) * ditherS20bit) & 0xFF;
+            C = (inflatedData[ofst + 1] << 8) | inflatedData[ofst + 2];
+            a = (((C >> 4) & 31) * ditherS20bit) & 0xFF;
 
             colour = Color.FromArgb(a, r, g, b);
             var _x = y % asset.Width;
@@ -235,12 +247,12 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
             result.SetPixel(_x, _y, colour);
             y++;
 
-            C = inflatedData[ofst + 2] << 8 | inflatedData[ofst + 3];
-            r = (C >> 7 & 31) * ditherS20bit & 0xFF;
-            g = (C >> 2 & 31) * ditherS20bit & 0xFF;
-            C = inflatedData[ofst + 3] << 8 | inflatedData[ofst + 4];
-            b = (C >> 5 & 31) * ditherS20bit & 0xFF;
-            a = (C & 31) * ditherS20bit & 0xFF;
+            C = (inflatedData[ofst + 2] << 8) | inflatedData[ofst + 3];
+            r = (((C >> 7) & 31) * ditherS20bit) & 0xFF;
+            g = (((C >> 2) & 31) * ditherS20bit) & 0xFF;
+            C = (inflatedData[ofst + 3] << 8) | inflatedData[ofst + 4];
+            b = (((C >> 5) & 31) * ditherS20bit) & 0xFF;
+            a = ((C & 31) * ditherS20bit) & 0xFF;
 
             colour = Color.FromArgb(a, r, g, b);
             _x = y % asset.Width;
@@ -251,6 +263,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return result;
     }
+
     private static Bitmap RenderLegacy32bit(AssetDesc asset)
     {
         var inflatedData = InflateData(asset.Data) ?? asset.Data;
@@ -266,6 +279,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return RenderByteArray(inflatedData);
     }
+
     private static Bitmap RenderCustom32bit(AssetDesc asset)
     {
         var result = RenderByteArray(asset.Data);
@@ -274,6 +288,7 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
         return null;
     }
+
     private static Bitmap RenderByteArray(byte[] data)
     {
         using (var memInput = new MemoryStream(data))
@@ -296,11 +311,11 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
     private static byte[] InflateData(byte[] byteInput)
     {
-        var types = new Type[]
+        var types = new[]
         {
             typeof(InflaterInputStream),
             typeof(ZipInputStream),
-            typeof(GZipInputStream),
+            typeof(GZipInputStream)
         };
 
         foreach (var type in types)
@@ -310,7 +325,9 @@ public partial class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
                 {
                     using (var memInput = new MemoryStream(byteInput))
                     using (var zipInput = type.GetInstance(memInput) as InflaterInputStream)
+                    {
                         zipInput.CopyTo(memOutput);
+                    }
 
                     return memOutput.GetBuffer();
                 }

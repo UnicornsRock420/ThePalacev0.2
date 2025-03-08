@@ -2,35 +2,38 @@
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
 
-public partial class HotspotDesc : IDisposable
+public class HotspotDesc : IDisposable
 {
+    public string? Name;
+    public string? Script;
+
+    public HotspotRec? SpotInfo;
+
+    public List<HotspotStateDesc>? States;
+    public List<Point>? Vortexes;
+
     public HotspotDesc()
     {
-        SpotInfo = new();
-        States = new();
-        Vortexes = new();
+        SpotInfo = new HotspotRec();
+        States = new List<HotspotStateDesc>();
+        Vortexes = new List<Point>();
     }
-
-    ~HotspotDesc() => this.Dispose();
 
     public void Dispose()
     {
         SpotInfo = null;
 
-        this.States?.Clear();
-        this.States = null;
+        States?.Clear();
+        States = null;
 
-        this.Vortexes?.Clear();
-        this.Vortexes = null;
+        Vortexes?.Clear();
+        Vortexes = null;
 
         GC.SuppressFinalize(this);
     }
 
-    public HotspotRec? SpotInfo;
-
-    public string? Name;
-    public string? Script;
-
-    public List<HotspotStateDesc>? States;
-    public List<Point>? Vortexes;
+    ~HotspotDesc()
+    {
+        Dispose();
+    }
 }

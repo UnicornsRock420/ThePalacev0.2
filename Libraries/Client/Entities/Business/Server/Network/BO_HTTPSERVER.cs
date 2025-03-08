@@ -7,7 +7,7 @@ namespace ThePalace.Common.Client.Entities.Business.Server.Network;
 
 [DynamicSize]
 [Mnemonic("HTTP")]
-public partial class BO_HTTPSERVER : IEventHandler<MSG_HTTPSERVER>
+public class BO_HTTPSERVER : IEventHandler<MSG_HTTPSERVER>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

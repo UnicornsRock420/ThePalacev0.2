@@ -6,7 +6,7 @@ namespace ThePalace.Database.Core.Factories;
 
 public class SqlConnectionFactory(string connectionString) : ISqlConnectionFactory
 {
-    ~SqlConnectionFactory() => this.Dispose();
+    private IDbConnection _connection;
 
     public void Dispose()
     {
@@ -14,7 +14,6 @@ public class SqlConnectionFactory(string connectionString) : ISqlConnectionFacto
     }
 
     public string ConnectionString { get; internal set; } = connectionString;
-    private IDbConnection _connection;
 
     public IDbConnection GetOpenConnection()
     {
@@ -37,6 +36,13 @@ public class SqlConnectionFactory(string connectionString) : ISqlConnectionFacto
         return connection;
     }
 
-    public string GetConnectionString() =>
-        ConnectionString;
+    ~SqlConnectionFactory()
+    {
+        Dispose();
+    }
+
+    public string GetConnectionString()
+    {
+        return ConnectionString;
+    }
 }

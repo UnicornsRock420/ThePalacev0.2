@@ -1,14 +1,17 @@
-﻿using ThePalace.Core.Entities.Core;
+﻿using System.Drawing;
+using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
+using AttributeExts = ThePalace.Core.Exts.AttributeExts;
+using Point = ThePalace.Core.Entities.Shared.Types.Point;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
 
 public partial class DrawCmdDesc : RawStream, IStructSerializer
 {
-    private static readonly int CONST_INT_SIZEOF_MSG_Header = Exts.AttributeExts.GetByteSize<MSG_Header>();
-    private static readonly int CONST_INT_SIZEOF_POINT = Exts.AttributeExts.GetByteSize<Types.Point>();
+    private static readonly int CONST_INT_SIZEOF_MSG_Header = AttributeExts.GetByteSize<MSG_Header>();
+    private static readonly int CONST_INT_SIZEOF_POINT = AttributeExts.GetByteSize<Point>();
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
@@ -34,7 +37,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
 
                 var vAxis = reader.ReadInt16();
                 var hAxis = reader.ReadInt16();
-                Pos = new(hAxis, vAxis);
+                Pos = new Point(hAxis, vAxis);
 
                 Points = [];
                 while (Points.Count < nbrPoints &&
@@ -42,7 +45,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
                 {
                     vAxis = reader.ReadInt16();
                     hAxis = reader.ReadInt16();
-                    var p = new Types.Point(vAxis, hAxis);
+                    var p = new Point(vAxis, hAxis);
 
                     Points.Add(p);
                 }
@@ -57,7 +60,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
                 Green = (byte)reader.ReadInt16().SwapShort();
                 Blue = (byte)reader.ReadInt16().SwapShort();
 
-                Rect = new();
+                Rect = new Rectangle();
                 Rect.X = reader.ReadInt16();
                 Rect.Y = reader.ReadInt16();
                 Rect.Width = reader.ReadInt16();
@@ -77,7 +80,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
 
                 var vAxis = reader.ReadInt16();
                 var hAxis = reader.ReadInt16();
-                Pos = new(hAxis, vAxis);
+                Pos = new Point(hAxis, vAxis);
 
                 Text = ReadPString(128, 1);
 
@@ -95,7 +98,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
 
                 var vAxis = reader.ReadInt16();
                 var hAxis = reader.ReadInt16();
-                Pos = new(hAxis, vAxis);
+                Pos = new Point(hAxis, vAxis);
 
                 // TODO:
 

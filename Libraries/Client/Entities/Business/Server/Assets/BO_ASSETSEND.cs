@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Server.Assets;
 
 [Mnemonic("sAst")]
-public partial class BO_ASSETSEND : IEventHandler<MSG_ASSETSEND>
+public class BO_ASSETSEND : IEventHandler<MSG_ASSETSEND>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

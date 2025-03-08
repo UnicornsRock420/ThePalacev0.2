@@ -8,12 +8,12 @@ namespace ThePalace.Core.Entities.Network.Client.Network;
 
 [ByteSize(128)]
 [Mnemonic("regi")]
-public partial class MSG_LOGON : EventParams, IProtocolC2S
+public class MSG_LOGON : EventParams, IProtocolC2S
 {
+    public RegistrationRec RegInfo;
+
     public MSG_LOGON()
     {
-        RegInfo = new();
+        RegInfo = new RegistrationRec();
     }
-
-    public RegistrationRec RegInfo;
 }

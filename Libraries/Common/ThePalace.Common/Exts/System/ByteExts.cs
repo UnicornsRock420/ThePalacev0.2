@@ -1,21 +1,17 @@
-﻿using ICSharpCode.SharpZipLib.GZip;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
+using ICSharpCode.SharpZipLib.GZip;
 
 namespace System;
 
 public static class ByteExts
 {
-    public static class Types
-    {
-        public static readonly Type Byte = typeof(Byte);
-        public static readonly Type ByteArray = typeof(Byte[]);
-        public static readonly Type ByteList = typeof(List<Byte>);
-    }
-
     //static ByteExts() { }
 
-    public static byte[] GetBytes(this byte value) => [value];
+    public static byte[] GetBytes(this byte value)
+    {
+        return [value];
+    }
 
     public static byte[] EnsureBigEndian(this byte[] value)
     {
@@ -33,8 +29,10 @@ public static class ByteExts
         return result.ToString();
     }
 
-    public static string ToBase64(this byte[] value) =>
-        (value?.Length ?? 0) < 1 ? null : Convert.ToBase64String(value);
+    public static string ToBase64(this byte[] value)
+    {
+        return (value?.Length ?? 0) < 1 ? null : Convert.ToBase64String(value);
+    }
 
     public static T FromBase64<T>(this byte[] value)
         where T : class
@@ -65,15 +63,20 @@ public static class ByteExts
         return BitConverter.ToUInt32(value, offset);
     }
 
-    public static string GetString(this IEnumerable<byte> value, int limit = 0, int offset = 0) =>
-        value.ToArray().GetString(limit, offset);
+    public static string GetString(this IEnumerable<byte> value, int limit = 0, int offset = 0)
+    {
+        return value.ToArray().GetString(limit, offset);
+    }
+
     public static string GetString(this byte[] input, int limit = 0, int offset = 0)
     {
         if ((input?.Length ?? 0) < 1) return string.Empty;
 
         if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit), nameof(limit) + " cannot be less than 0");
-        else if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), nameof(offset) + " cannot be less than 0");
-        else if ((offset + limit) > input.Length) throw new IndexOutOfRangeException(nameof(offset) + " is out of bounds of the source");
+        if (offset < 0)
+            throw new ArgumentOutOfRangeException(nameof(offset), nameof(offset) + " cannot be less than 0");
+        if (offset + limit > input.Length)
+            throw new IndexOutOfRangeException(nameof(offset) + " is out of bounds of the source");
 
         if (limit < 1 || limit > input.Length)
             limit = input.Length;
@@ -84,70 +87,50 @@ public static class ByteExts
             .Select(b => (char)b));
     }
 
-    public static List<byte> GetRange(this IEnumerable<byte> value, int max = 0, int offset = 0) =>
-        value.ToArray().GetRange(max, offset);
+    public static List<byte> GetRange(this IEnumerable<byte> value, int max = 0, int offset = 0)
+    {
+        return value.ToArray().GetRange(max, offset);
+    }
+
     public static List<byte> GetRange(this byte[] value, int max = 0, int offset = 0)
     {
-        if (max < 1)
-        {
-            max = 0;
-        }
-        if (max > value.Length)
-        {
-            max = value.Length;
-        }
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (max < 1) max = 0;
+        if (max > value.Length) max = value.Length;
+        if (offset < 1) offset = 0;
 
         if (max > 0)
-        {
             return value
                 .Skip(offset)
                 .Take(max)
                 .ToList();
-        }
-        else
-        {
-            return value
-                .Skip(offset)
-                .ToList();
-        }
+
+        return value
+            .Skip(offset)
+            .ToList();
     }
 
-    public static void AddRange(this List<byte> dest, IEnumerable<byte> source, int max = 0, int offset = 0) =>
+    public static void AddRange(this List<byte> dest, IEnumerable<byte> source, int max = 0, int offset = 0)
+    {
         dest.AddRange(source.ToArray(), max, offset);
+    }
+
     public static void AddRange(this List<byte> dest, byte[] source, int max = 0, int offset = 0)
     {
-        if (max < 1)
-        {
-            max = 0;
-        }
-        if (max > source.Length)
-        {
-            max = source.Length;
-        }
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (max < 1) max = 0;
+        if (max > source.Length) max = source.Length;
+        if (offset < 1) offset = 0;
 
         var range = new List<byte>();
 
         if (max > 0)
-        {
             range = source
                 .Skip(offset)
                 .Take(max)
                 .ToList();
-        }
         else
-        {
             range = source
                 .Skip(offset)
                 .ToList();
-        }
 
         dest.AddRange(range);
     }
@@ -155,22 +138,32 @@ public static class ByteExts
     public static string ComputeMd5(this byte[] value)
     {
         using (var md5 = MD5.Create())
+        {
             return string.Concat(
                 md5.ComputeHash(value)
                     .Select(b => b.ToString("X2")));
+        }
     }
 
-    public static char[] GetChars(this string value, int limit = 0, int offset = 0) =>
-        value.GetBytes().GetChars(limit, offset);
-    public static char[] GetChars(this IEnumerable<byte> value, int limit = 0, int offset = 0) =>
-        value.ToArray().GetChars(limit, offset);
+    public static char[] GetChars(this string value, int limit = 0, int offset = 0)
+    {
+        return value.GetBytes().GetChars(limit, offset);
+    }
+
+    public static char[] GetChars(this IEnumerable<byte> value, int limit = 0, int offset = 0)
+    {
+        return value.ToArray().GetChars(limit, offset);
+    }
+
     public static char[] GetChars(this byte[] value, int limit = 0, int offset = 0)
     {
         if ((value?.Length ?? 0) < 1) return [];
 
         if (limit < 0) throw new ArgumentOutOfRangeException(nameof(limit), nameof(limit) + " cannot be less than 0");
-        if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), nameof(offset) + " cannot be less than 0");
-        if ((offset + limit) > value.Length) throw new IndexOutOfRangeException(nameof(offset) + " is out of bounds of the source");
+        if (offset < 0)
+            throw new ArgumentOutOfRangeException(nameof(offset), nameof(offset) + " cannot be less than 0");
+        if (offset + limit > value.Length)
+            throw new IndexOutOfRangeException(nameof(offset) + " is out of bounds of the source");
 
         if (limit < 1 || limit > value.Length)
             limit = value.Length;
@@ -180,5 +173,12 @@ public static class ByteExts
             .Take(limit)
             .Select(b => (char)b)
             .ToArray();
+    }
+
+    public static class Types
+    {
+        public static readonly Type Byte = typeof(byte);
+        public static readonly Type ByteArray = typeof(byte[]);
+        public static readonly Type ByteList = typeof(List<byte>);
     }
 }

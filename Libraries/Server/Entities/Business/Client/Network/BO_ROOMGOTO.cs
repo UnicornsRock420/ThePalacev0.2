@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Client.Network;
 
 [Mnemonic("navR")]
-public partial class BO_ROOMGOTO : IEventHandler<MSG_ROOMGOTO>
+public class BO_ROOMGOTO : IEventHandler<MSG_ROOMGOTO>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

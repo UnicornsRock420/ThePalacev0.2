@@ -5,7 +5,7 @@ public enum FeatureTypes : short
     CORE,
     GUI,
     MEDIA,
-    NETWORK,
+    NETWORK
 }
 
 public enum SubFeatureTypes : short
@@ -22,14 +22,14 @@ public enum SubFeatureTypes : short
     PROTOCOL,
     SCRIPTING,
     SYSTRAYICON,
-    VIDEO,
+    VIDEO
 }
 
 public enum PurposeTypes : short
 {
     VOID,
     PROVIDER,
-    CONSUMER,
+    CONSUMER
 }
 
 public enum DeviceTypes : short
@@ -40,5 +40,5 @@ public enum DeviceTypes : short
     USB,
     BLUETOOTH,
     STORAGE,
-    VIRTUAL,
+    VIRTUAL
 }

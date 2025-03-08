@@ -5,6 +5,6 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Rooms;
 
 [Mnemonic("endr")]
-public partial class MSG_ROOMDESCEND : EventParams, IProtocolS2C
+public class MSG_ROOMDESCEND : EventParams, IProtocolS2C
 {
 }

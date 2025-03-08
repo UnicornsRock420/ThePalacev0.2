@@ -5,11 +5,12 @@ namespace ThePalace.Common.Desktop.Forms.Core;
 
 public class FormBase : Form
 {
-    public FormBase() { }
-
-    ~FormBase() => base.Dispose(false);
-
     public IUISessionState SessionState;
+
+    ~FormBase()
+    {
+        base.Dispose(false);
+    }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {

@@ -9,10 +9,14 @@ namespace Sandbox;
 
 public partial class Program : Form
 {
+    public Program()
+    {
+        InitializeComponent();
+    }
     //private static readonly ManualResetEvent _event = new(false);
 
     /// <summary>
-    ///  The main entry point for the application.
+    ///     The main entry point for the application.
     /// </summary>
     [STAThread]
     public static void Main()
@@ -31,11 +35,6 @@ public partial class Program : Form
         //Experiment5();
         //Experiment6();
         //Experiment7();
-    }
-
-    public Program()
-    {
-        InitializeComponent();
     }
 
     private static void Experiment4()
@@ -60,10 +59,8 @@ public partial class Program : Form
     private static void Experiment6()
     {
         var taskManager = new TaskManager();
-        var job = taskManager.CreateTask(q =>
-        {
-            Console.WriteLine("Test123");
-        }, null, RunOptions.RunNow | RunOptions.RunOnce);
+        var job = taskManager.CreateTask(q => { Console.WriteLine("Test123"); }, null,
+            RunOptions.RunNow | RunOptions.RunOnce);
 
         taskManager.Run();
     }
@@ -71,6 +68,7 @@ public partial class Program : Form
     private static void Experiment7()
     {
         SoundManager.Current.Play(@"Media\Yes.mp3");
-        SoundManager.Current.PlaySound(@"Media\Boing.wav", PlaySoundFlags.SND_ASYNC | PlaySoundFlags.SND_NOWAIT | PlaySoundFlags.SND_SYSTEM | PlaySoundFlags.SND_LOOP);
+        SoundManager.Current.PlaySound(@"Media\Boing.wav",
+            PlaySoundFlags.SND_ASYNC | PlaySoundFlags.SND_NOWAIT | PlaySoundFlags.SND_SYSTEM | PlaySoundFlags.SND_LOOP);
     }
 }

@@ -8,31 +8,28 @@ public static class Cache
     private static readonly ConcurrentDictionary<string, object> _memory;
     private static readonly ObjectCache _cache;
 
-    public static class Types
-    {
-        public const string ClassName = nameof(Cache);
-        public static readonly Type Cache = typeof(Cache);
-    }
-
     static Cache()
     {
         _memory = new ConcurrentDictionary<string, object>();
         _cache = MemoryCache.Default;
     }
 
-    public static void Dispose() =>
+    public static void Dispose()
+    {
         _memory?.Clear();
+    }
 
-    public static bool ContainsKey(string key) =>
-        _memory.ContainsKey(key);
+    public static bool ContainsKey(string key)
+    {
+        return _memory.ContainsKey(key);
+    }
 
     public static T GetCache<T>(string key)
     {
         if (!string.IsNullOrWhiteSpace(key) &&
             _memory.ContainsKey(key))
             return (T)_memory[key];
-        else
-            return default;
+        return default;
     }
 
     public static void SetCache<T>(string key, T value)
@@ -45,11 +42,15 @@ public static class Cache
                 _memory.TryAdd(key, value);
     }
 
-    public static T GetCache<T>(string key, Func<T> callbackGenerateValue, TimeSpan? expiresIn = null, CacheItemPriority priority = CacheItemPriority.Default, TimeSpan? ifUnusedRemoveIn = null, string regionName = null)
+    public static T GetCache<T>(string key, Func<T> callbackGenerateValue, TimeSpan? expiresIn = null,
+        CacheItemPriority priority = CacheItemPriority.Default, TimeSpan? ifUnusedRemoveIn = null,
+        string regionName = null)
         where T : class
     {
-        if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), nameof(key) + " cannot be null");
-        else if (callbackGenerateValue == null) throw new ArgumentNullException(nameof(callbackGenerateValue), "Callback cannot be null");
+        if (string.IsNullOrWhiteSpace(key))
+            throw new ArgumentNullException(nameof(key), nameof(key) + " cannot be null");
+        if (callbackGenerateValue == null)
+            throw new ArgumentNullException(nameof(callbackGenerateValue), "Callback cannot be null");
 
         T value = null;
 
@@ -62,24 +63,33 @@ public static class Cache
             {
                 var policy = new CacheItemPolicy
                 {
-                    Priority = priority,
+                    Priority = priority
                 };
 
                 if (expiresIn.HasValue)
-                    policy.AbsoluteExpiration = (DateTimeOffset)DateTime.UtcNow.Add(expiresIn.Value);
+                    policy.AbsoluteExpiration = DateTime.UtcNow.Add(expiresIn.Value);
 
                 if (ifUnusedRemoveIn.HasValue)
                     policy.SlidingExpiration = ifUnusedRemoveIn.Value;
 
                 _cache.Set(new CacheItem(key, value, regionName), policy);
             }
-            catch { }
+            catch
+            {
+            }
 
         return value;
     }
 
     public static void RemoveKey(string key, string regionName = null)
     {
-        if (string.IsNullOrWhiteSpace(key)) throw new ArgumentNullException(nameof(key), nameof(key) + " cannot be null");
+        if (string.IsNullOrWhiteSpace(key))
+            throw new ArgumentNullException(nameof(key), nameof(key) + " cannot be null");
+    }
+
+    public static class Types
+    {
+        public const string ClassName = nameof(Cache);
+        public static readonly Type Cache = typeof(Cache);
     }
 }

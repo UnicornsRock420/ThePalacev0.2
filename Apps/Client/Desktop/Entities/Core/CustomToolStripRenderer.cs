@@ -1,34 +1,33 @@
-﻿using System.Timers;
-using ThePalace.Common.Desktop.Entities.Ribbon;
+﻿using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
+using Timer = System.Timers.Timer;
 
 namespace ThePalace.Client.Desktop.Entities.Core;
 
-public partial class CustomToolStripRenderer : ToolStripProfessionalRenderer
+public class CustomToolStripRenderer : ToolStripProfessionalRenderer
 {
-    private volatile System.Timers.Timer _timer = new(250);
-    private volatile ToolStripItem _item1 = null;
-    private volatile ItemBase _item2 = null;
+    private volatile ToolStripItem _item1;
+    private volatile ItemBase _item2;
+    private volatile Timer _timer = new(250);
 
     public CustomToolStripRenderer()
     {
-        _timer.Elapsed += new ElapsedEventHandler(
-            (sender, e) =>
-            {
-                if (_item1 != null &&
-                    _item2?.HoverFrames != null)
-                    try
-                    {
-                        _item1.Image = _item2.NextFrame();
-                    }
-                    catch
-                    {
-                        _timer.Stop();
+        _timer.Elapsed += (sender, e) =>
+        {
+            if (_item1 != null &&
+                _item2?.HoverFrames != null)
+                try
+                {
+                    _item1.Image = _item2.NextFrame();
+                }
+                catch
+                {
+                    _timer.Stop();
 
-                        _item1 = null;
-                        _item2 = null;
-                    }
-            });
+                    _item1 = null;
+                    _item2 = null;
+                }
+        };
     }
 
     protected override void OnRenderButtonBackground(ToolStripItemRenderEventArgs e)

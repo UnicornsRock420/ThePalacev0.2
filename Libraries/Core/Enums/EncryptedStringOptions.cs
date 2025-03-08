@@ -7,5 +7,5 @@ public enum EncryptedStringOptions : short
     EncryptString = 0x01,
     DecryptString = 0x02,
     FromHex = 0x04,
-    ToHex = 0x08,
+    ToHex = 0x08
 }

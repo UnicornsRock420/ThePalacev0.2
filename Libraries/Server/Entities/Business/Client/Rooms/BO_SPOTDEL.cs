@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Client.Rooms;
 
 [Mnemonic("opSd")]
-public partial class BO_SPOTDEL : IEventHandler<MSG_SPOTDEL>
+public class BO_SPOTDEL : IEventHandler<MSG_SPOTDEL>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

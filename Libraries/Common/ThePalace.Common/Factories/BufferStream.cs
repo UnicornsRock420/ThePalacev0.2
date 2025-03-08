@@ -3,40 +3,59 @@
 namespace ThePalace.Common.Factories;
 
 /// <summary>
-/// This stream maintains data only until the data is read, then it is purged from the stream.
+///     This stream maintains data only until the data is read, then it is purged from the stream.
 /// </summary>
 public class BufferStream : Stream
 {
-    /// <summary>
-    /// Represents a single write into the BufferStream. Each write is a seperate chunk
-    /// </summary>
-    private class Chunk(byte[]? data = null, int position = 0)
-    {
-        /// <summary>
-        /// As we read through the chunk, the start index will increment.When we get to the end of the chunk,
-        /// we will remove the chunk
-        /// </summary>
-        public int Position { get; set; } = position;
-
-        /// <summary>
-        /// Actual Data
-        /// </summary>
-        public byte[] Data { get; } = data;
-
-        public int Length => Data?.Length ?? 0;
-    }
-
-    public BufferStream() => this._chunks = new();
-
     //Maintains the streams data.The Queue object provides an easy and efficient way to add and remove data
     //Each item in the queue represents each write to the stream.Every call to write translates to an item in the queue
-    private ConcurrentQueue<Chunk> _chunks;
+    private readonly ConcurrentQueue<Chunk> _chunks;
+
+    public BufferStream()
+    {
+        _chunks = new ConcurrentQueue<Chunk>();
+    }
+
+    public override bool CanSeek => CanSeekOveride;
+    public bool CanSeekOveride { get; set; } = false;
+
+    /// <summary>
+    ///     Always returns 0
+    /// </summary>
+    public override long Position
+    {
+        //We're always at the start of the stream, because as the stream purges what we've read
+        get => 0;
+        set
+        {
+            if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name));
+
+            _read(null, 0, (int)value);
+        }
+    }
+
+    public override bool CanWrite => true;
+
+    public override bool CanRead => true;
+
+    public long Count => _chunks?.Count ?? 0;
+
+    public override long Length
+    {
+        get
+        {
+            using (var @lock = LockContext.GetLock(_chunks))
+            {
+                return (_chunks?.Count ?? 0) < 1 ? 0 : _chunks.Sum(b => b.Length - b.Position);
+            }
+        }
+    }
 
     public byte[] Dequeue()
     {
-        if ((this._chunks?.Count ?? 0) < 1) return [];
+        if ((_chunks?.Count ?? 0) < 1) return [];
 
-        this._chunks.TryDequeue(out var chunk);
+        _chunks.TryDequeue(out var chunk);
         if (chunk?.Position == 0) return chunk.Data;
 
         var count = chunk.Length - chunk.Position;
@@ -47,7 +66,7 @@ public class BufferStream : Stream
     }
 
     /// <summary>
-    /// Reads up to count bytes from the stream, and removes the read data from the stream.
+    ///     Reads up to count bytes from the stream, and removes the read data from the stream.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
@@ -61,12 +80,12 @@ public class BufferStream : Stream
 
         //Read until we hit the requested count, or until we hav nothing left to read
         while (iTotalBytesRead <= count &&
-               this._chunks.Count > 0)
+               _chunks.Count > 0)
         {
             //Get first chunk from the queue
-            using (var @lock = LockContext.GetLock(this._chunks))
+            using (var @lock = LockContext.GetLock(_chunks))
             {
-                this._chunks.TryPeek(out chunk);
+                _chunks.TryPeek(out chunk);
             }
 
             //Determine how much of the chunk there is left to read
@@ -78,36 +97,33 @@ public class BufferStream : Stream
             if (iBytesToRead > 0)
             {
                 if (buffer != null)
-                {
                     //Read from the chunk into the buffer
                     Buffer.BlockCopy(chunk.Data, chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
-                }
 
                 iTotalBytesRead += iBytesToRead;
                 iRemainingBytesToRead -= iBytesToRead;
 
                 //If the entire chunk has been read,  remove it
                 if (chunk.Position + iBytesToRead >= chunk.Data.Length)
-                {
-                    using (var @lock = LockContext.GetLock(this._chunks))
+                    using (var @lock = LockContext.GetLock(_chunks))
                     {
-                        this._chunks.TryDequeue(out var _);
+                        _chunks.TryDequeue(out _);
                     }
-                }
                 else
-                {
                     //Otherwise just update the chunk read start index, so we know where to start reading on the next call
                     chunk.Position += iBytesToRead;
-                }
             }
-            else break;
+            else
+            {
+                break;
+            }
         }
 
         return iTotalBytesRead;
     }
 
     /// <summary>
-    /// Reads up to count bytes from the stream, and removes the read data from the stream.
+    ///     Reads up to count bytes from the stream, and removes the read data from the stream.
     /// </summary>
     /// <param name="buffer"></param>
     /// <param name="offset"></param>
@@ -115,78 +131,70 @@ public class BufferStream : Stream
     /// <returns></returns>
     public override int Read(byte[] buffer, int offset, int count)
     {
-        this.ValidateBufferArgs(buffer, offset, count);
+        ValidateBufferArgs(buffer, offset, count);
 
-        return this._read(buffer, offset, count);
+        return _read(buffer, offset, count);
     }
 
     private void ValidateBufferArgs(byte[]? buffer, int offset, int count)
     {
         if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset), "offset must be non-negative");
         if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "count must be non-negative");
-        if (((buffer?.Length ?? 0) - offset) < count) throw new ArgumentException("requested count exceeds available size");
+        if ((buffer?.Length ?? 0) - offset < count)
+            throw new ArgumentException("requested count exceeds available size");
     }
 
     /// <summary>
-    /// Writes data to the stream
+    ///     Writes data to the stream
     /// </summary>
     /// <param name="buffer">Data to copy into the stream</param>
     /// <param name="offset"></param>
     /// <param name="count"></param>
     public override void Write(byte[] buffer, int offset, int count)
     {
-        this.ValidateBufferArgs(buffer, offset, count);
+        ValidateBufferArgs(buffer, offset, count);
 
         //We don't want to use the buffer passed in, as it could be altered by the caller
         var bufSave = new byte[count];
         Buffer.BlockCopy(buffer, offset, bufSave, 0, count);
 
         //Add the data to the queue
-        using (var @lock = LockContext.GetLock(this._chunks))
+        using (var @lock = LockContext.GetLock(_chunks))
         {
-            this._chunks.Enqueue(new Chunk(bufSave));
+            _chunks.Enqueue(new Chunk(bufSave));
         }
     }
 
-    public override bool CanSeek => CanSeekOveride;
-    public bool CanSeekOveride { get; set; } = false;
+    public override long Seek(long offset, SeekOrigin origin)
+    {
+        return Position = offset;
+    }
+
+    public override void SetLength(long value)
+    {
+        throw new NotSupportedException(string.Format("{0} length can not be changed", GetType().Name));
+    }
+
+    public override void Flush()
+    {
+    }
 
     /// <summary>
-    /// Always returns 0
+    ///     Represents a single write into the BufferStream. Each write is a seperate chunk
     /// </summary>
-    public override long Position
+    private class Chunk(byte[]? data = null, int position = 0)
     {
-        //We're always at the start of the stream, because as the stream purges what we've read
-        get => 0;
-        set
-        {
-            if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", this.GetType().Name));
+        /// <summary>
+        ///     As we read through the chunk, the start index will increment.When we get to the end of the chunk,
+        ///     we will remove the chunk
+        /// </summary>
+        public int Position { get; set; } = position;
 
-            this._read(null, 0, (int)value);
-        }
+        /// <summary>
+        ///     Actual Data
+        /// </summary>
+        public byte[] Data { get; } = data;
+
+        public int Length => Data?.Length ?? 0;
     }
-
-    public override bool CanWrite => true;
-
-    public override long Seek(long offset, SeekOrigin origin) => this.Position = offset;
-
-    public override void SetLength(long value) =>
-        throw new NotSupportedException(string.Format("{0} length can not be changed", this.GetType().Name));
-
-    public override bool CanRead => true;
-
-    public long Count => (this._chunks?.Count ?? 0);
-
-    public override long Length
-    {
-        get
-        {
-            using (var @lock = LockContext.GetLock(this._chunks))
-            {
-                return (this._chunks?.Count ?? 0) < 1 ? 0 : this._chunks.Sum(b => b.Length - b.Position);
-            }
-        }
-    }
-
-    public override void Flush() { }
 }

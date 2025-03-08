@@ -3,20 +3,20 @@ using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
-using uint16 = System.UInt16;
-using uint32 = System.UInt32;
+using uint16 = ushort;
+using uint32 = uint;
 
 namespace ThePalace.Core.Entities.Shared.Assets;
 
 [ByteSize(40)]
-public partial class AssetDescRec : IStruct
+public class AssetDescRec : IStruct
 {
     public uint16 AssetFlags;
+
+    [Str31] public string? Name;
+
     public uint16 PropFlags;
     public uint32 Size;
-
-    [Str31]
-    public string? Name;
 
     public void Deserialize(Stream reader, SerializerOptions opts)
     {

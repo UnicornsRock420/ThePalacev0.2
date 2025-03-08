@@ -2,18 +2,35 @@
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Interfaces.Data;
-using RoomID = System.Int16;
-using sint16 = System.Int16;
-using UserID = System.Int32;
+using RoomID = short;
+using sint16 = short;
+using UserID = int;
 
 namespace ThePalace.Core.Entities.Shared;
 
-public partial class UserRec : IDisposable, IStruct
+public class UserRec : IDisposable, IStruct
 {
+    public sint16 AwayFlag;
+    public sint16 ColorNbr;
+    public sint16 FaceNbr;
+
+    [Str31] public string? Name;
+
+    public sint16 NbrProps;
+    public sint16 OpenToMsgs;
+
+    [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)
+    public AssetSpec[] PropSpec;
+
+    public RoomID RoomID;
+    public Point RoomPos;
+
+    public UserID UserId;
+
     public UserRec()
     {
-        this.RoomPos = new();
-        this.PropSpec = new AssetSpec[9];
+        RoomPos = new Point();
+        PropSpec = new AssetSpec[9];
     }
 
     public void Dispose()
@@ -22,20 +39,4 @@ public partial class UserRec : IDisposable, IStruct
 
         GC.SuppressFinalize(this);
     }
-
-    public UserID UserId;
-    public Point RoomPos;
-
-    [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)
-    public AssetSpec[] PropSpec;
-
-    public RoomID RoomID;
-    public sint16 FaceNbr;
-    public sint16 ColorNbr;
-    public sint16 AwayFlag;
-    public sint16 OpenToMsgs;
-    public sint16 NbrProps;
-
-    [Str31]
-    public string? Name;
 }

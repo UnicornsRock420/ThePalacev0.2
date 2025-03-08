@@ -2,22 +2,26 @@
 
 public static class UInt16Exts
 {
-    public static class Types
-    {
-        public static readonly Type UInt16 = typeof(UInt16);
-        public static readonly Type UInt16Array = typeof(UInt16[]);
-        public static readonly Type UInt16List = typeof(List<UInt16>);
-    }
-
     //static UInt16Exts() { }
 
-    public static byte[] GetBytes(this UInt16 value) =>
-        BitConverter.GetBytes(value);
+    public static byte[] GetBytes(this ushort value)
+    {
+        return BitConverter.GetBytes(value);
+    }
 
-    public static UInt16 SwapShort(this UInt16 value) =>
-        BitConverter.ToUInt16(
+    public static ushort SwapShort(this ushort value)
+    {
+        return BitConverter.ToUInt16(
             BitConverter
                 .GetBytes(value)
                 .Reverse()
                 .ToArray());
+    }
+
+    public static class Types
+    {
+        public static readonly Type UInt16 = typeof(ushort);
+        public static readonly Type UInt16Array = typeof(ushort[]);
+        public static readonly Type UInt16List = typeof(List<ushort>);
+    }
 }

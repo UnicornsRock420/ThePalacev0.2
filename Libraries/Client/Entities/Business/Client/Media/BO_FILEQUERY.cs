@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Client.Media;
 
 [Mnemonic("qFil")]
-public partial class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>
+public class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

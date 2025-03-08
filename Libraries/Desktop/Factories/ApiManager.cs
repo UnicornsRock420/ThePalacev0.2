@@ -4,17 +4,19 @@ using ThePalace.Common.Factories;
 
 namespace ThePalace.Common.Desktop.Factories;
 
-public partial class ApiManager : SingletonDisposable<ApiManager>
+public class ApiManager : SingletonDisposable<ApiManager>
 {
     private ConcurrentDictionary<string, ApiBinding> _apiBindings = new();
     public IReadOnlyDictionary<string, ApiBinding> ApiBindings => _apiBindings;
 
-    public ApiManager() { }
-    ~ApiManager() => Dispose(false);
+    ~ApiManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         base.Dispose();
 
@@ -28,13 +30,13 @@ public partial class ApiManager : SingletonDisposable<ApiManager>
             binding != null)
             _apiBindings.TryAdd(friendlyName, new ApiBinding
             {
-                Binding = binding,
+                Binding = binding
             });
     }
 
     public void UnregisterApi(string friendlyName)
     {
         if (!_apiBindings.ContainsKey(friendlyName))
-            _apiBindings.TryRemove(friendlyName, out var _);
+            _apiBindings.TryRemove(friendlyName, out _);
     }
 }
