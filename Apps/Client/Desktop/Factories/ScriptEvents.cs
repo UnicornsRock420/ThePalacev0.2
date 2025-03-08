@@ -22,7 +22,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
 
     ~ScriptEvents()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

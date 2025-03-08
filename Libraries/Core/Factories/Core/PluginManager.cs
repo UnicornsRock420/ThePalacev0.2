@@ -13,7 +13,7 @@ public class PluginManager : SingletonDisposable<PluginManager>
 
     ~PluginManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

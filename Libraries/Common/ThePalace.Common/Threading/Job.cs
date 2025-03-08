@@ -10,11 +10,12 @@ public enum RunOptions
 {
     None = 0,
     BreakOnError = 0x01,
-    RunNow = 0x02,
-    RunOnce = 0x04,
-    UseResetEvent = 0x08,
-    UseSleepInterval = 0x10,
-    UseTimer = 0x20
+    DoRunLog = 0x02,
+    RunNow = 0x04,
+    RunOnce = 0x08,
+    UseResetEvent = 0x10,
+    UseSleepInterval = 0x20,
+    UseTimer = 0x40
 }
 
 [Flags]
@@ -27,11 +28,39 @@ public enum CancelOptions
 
 public class RunLog
 {
-    public DateTime Start { get; set; }
+    public RunLog()
+    {
+    }
+
+    public RunLog(bool begin = true)
+    {
+        if (begin)
+            Start();
+    }
+
+    public DateTime Began { get; set; }
     public DateTime? Finish { get; set; }
     public DateTime? Error { get; set; }
     public Exception? Exception { get; set; }
-    public TimeSpan Duration => (Finish ?? Error ?? DateTime.UtcNow).Subtract(Start);
+    public TimeSpan Duration => (Finish ?? Error ?? DateTime.UtcNow).Subtract(Began);
+
+    public void Start()
+    {
+        Began = DateTime.UtcNow;
+    }
+
+    public void Stop(Exception? ex = null)
+    {
+        if (ex == null)
+        {
+            Finish = DateTime.UtcNow;
+        }
+        else
+        {
+            Error = DateTime.UtcNow;
+            Exception = ex;
+        }
+    }
 }
 
 public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
@@ -41,34 +70,42 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
     public Job()
     {
-        TokenSource = CancellationTokenFactory.NewToken();
-        SubJobs = new DisposableList<IJob<TCmd>>();
-        RunLogs = new List<RunLog>();
-        Errors = new List<Exception>();
-
         IsRunning = false;
+
+        TokenSource = CancellationTokenFactory.NewToken();
+        SubJobs = new();
+        Errors = new();
+        Queue = new();
+
+        JobState = null;
 
         Completions = 0;
         Failures = 0;
 
-        SleepInterval = TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
-        Queue = new ConcurrentQueue<TCmd>();
-        JobState = null;
-
-        _managedResources.AddRange([ResetEvent, TokenSource, Task]);
+        _managedResources.AddRange([TokenSource]);
     }
 
-    public Job(Action<ConcurrentQueue<TCmd>>? cmd = null, IJobState? jobState = null,
-        RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null) : this()
+    public Job(
+        Action<ConcurrentQueue<TCmd>>? cmd = null,
+        IJobState? jobState = null,
+        RunOptions opts = RunOptions.UseSleepInterval,
+        TimeSpan? sleepInterval = null,
+        ITimer? timer = null) : this()
     {
-        if (cmd == null) throw new ArgumentNullException(nameof(cmd));
-
-        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
+        ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
 
         JobState = jobState;
         Options = opts;
 
-        if (sleepInterval != null) SleepInterval = sleepInterval.Value;
+        if ((opts & RunOptions.DoRunLog) == RunOptions.DoRunLog)
+        {
+            RunLogs = new();
+        }
+
+        sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
+        if ((opts & RunOptions.UseSleepInterval) == RunOptions.UseSleepInterval &&
+            sleepInterval != null)
+            SleepInterval = sleepInterval.Value;
 
         if ((opts & RunOptions.UseTimer) == RunOptions.UseTimer &&
             timer != null)
@@ -78,7 +115,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             Timer.Tick += (s, a) => { TimerRun(); };
         }
 
-        if ((opts & RunOptions.UseResetEvent) == RunOptions.UseResetEvent) ResetEvent = new ManualResetEvent(false);
+        if ((opts & RunOptions.UseResetEvent) == RunOptions.UseResetEvent)
+            ResetEvent = new(false);
 
         Build(Cmd = cmd);
     }
@@ -92,12 +130,28 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         Options = parent.Options;
     }
 
-    public int LogLimit { get; set; } = 20;
-
-    public int ErrorLimit { get; set; } = 50;
-
     public override void Dispose()
     {
+        try
+        {
+            ResetEvent?.Dispose();
+        }
+        catch
+        {
+        }
+
+        ResetEvent = null;
+
+        try
+        {
+            Task?.Dispose();
+        }
+        catch
+        {
+        }
+
+        Task = null;
+
         SubJobs?.ToList()?.ForEach(j =>
         {
             try
@@ -109,6 +163,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             }
         });
         SubJobs?.Clear();
+        SubJobs = null;
 
         RunLogs?.ToList()?.ForEach(l =>
         {
@@ -128,14 +183,15 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
         Queue?.ToList()?.ForEach(l =>
         {
-            if (l is IDisposable i)
-                try
-                {
-                    i?.Dispose();
-                }
-                catch
-                {
-                }
+            if (l is not IDisposable i) return;
+
+            try
+            {
+                i?.Dispose();
+            }
+            catch
+            {
+            }
         });
         Queue?.Clear();
         Queue = null;
@@ -150,28 +206,50 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         Task = null;
     }
 
-    public virtual Action<ConcurrentQueue<TCmd>> Cmd { get; protected set; }
-    public Task Task { get; protected set; }
-    public List<RunLog> RunLogs { get; protected set; }
-    public List<Exception> Errors { get; protected set; }
+    ~Job()
+    {
+        Dispose();
+    }
+
+
+    #region Task/Thread Properties
+
+    public Guid Id { get; } = Guid.NewGuid();
+    public Guid? ParentId { get; protected set; }
+
+    public RunOptions Options { get; set; }
 
     public CancellationTokenSource TokenSource { get; protected set; }
     public CancellationToken Token => TokenSource.Token;
 
-    DisposableList<IJob> IJob.SubJobs => new(SubJobs);
-    public DisposableList<IJob<TCmd>> SubJobs { get; protected set; }
+    public virtual Action<ConcurrentQueue<TCmd>> Cmd { get; protected set; }
+    public Task Task { get; protected set; }
 
-    public RunOptions Options { get; set; }
-    public Guid Id { get; } = Guid.NewGuid();
-    public Guid? ParentId { get; protected set; }
-    public bool IsRunning { get; protected set; }
-    public int Completions { get; protected set; }
-    public int Failures { get; protected set; }
+    public DisposableList<IJob<TCmd>> SubJobs { get; protected set; }
+    DisposableList<IJob> IJob.SubJobs => new(SubJobs);
+
     public ManualResetEvent ResetEvent { get; protected set; }
     public TimeSpan SleepInterval { get; set; }
     public ITimer Timer { get; set; }
-    public ConcurrentQueue<TCmd> Queue { get; protected set; }
+
+    public virtual ConcurrentQueue<TCmd> Queue { get; protected set; }
     public virtual IJobState? JobState { get; set; }
+
+    #endregion
+
+    #region Logging
+
+    public bool IsRunning { get; protected set; }
+    public int Completions { get; protected set; }
+    public int Failures { get; protected set; }
+
+    public int LogLimit { get; set; } = 20;
+    public List<RunLog> RunLogs { get; protected set; }
+
+    public int ErrorLimit { get; set; } = 50;
+    public List<Exception> Errors { get; protected set; }
+
+    #endregion
 
     public void Cancel(CancelOptions opts = CancelOptions.Cascade)
     {
@@ -221,12 +299,37 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         Task = new Task(() => { (cmd ?? Cmd)(Queue); }, token ?? TokenSource.Token);
     }
 
+    protected int TimerRun()
+    {
+        var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
+        if (!doUseTimer) return -1;
+
+        IsRunning = true;
+
+        if (Task.Status != TaskStatus.Running)
+            try
+            {
+                Cmd(Queue);
+
+                IsRunning = false;
+                Completions++;
+            }
+            catch (Exception ex)
+            {
+                IsRunning = false;
+                Failures++;
+
+                return -1;
+            }
+
+        return Failures > 0 ? -1 : 0;
+    }
+
     public async Task<int> Run()
     {
         if (Task == null) throw new NullReferenceException(nameof(Job<TCmd>) + "." + nameof(Task));
-        
-        var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
-        if (doUseTimer)
+
+        if ((Options & RunOptions.UseTimer) == RunOptions.UseTimer)
         {
             if (!(Timer?.Enabled ?? true))
                 Timer.Start();
@@ -234,6 +337,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             return 0;
         }
 
+        var doRunLog = (Options & RunOptions.DoRunLog) == RunOptions.DoRunLog;
         var doBreakOnError = (Options & RunOptions.BreakOnError) == RunOptions.BreakOnError;
         var doRunRunOnce = (Options & RunOptions.RunOnce) == RunOptions.RunOnce;
         var doUseSleepInterval = (Options & RunOptions.UseSleepInterval) == RunOptions.UseSleepInterval;
@@ -241,42 +345,53 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
         if (doUseManualResetEvent) ResetEvent.Reset();
 
+        var runLog = (RunLog?)null;
+
         while (!TokenSource.IsCancellationRequested)
         {
-            var runLog = new RunLog
+            if (doRunLog)
             {
-                Start = DateTime.UtcNow
-            };
+                runLog = new RunLog();
+                runLog.Start();
+            }
+
             IsRunning = true;
 
             try
             {
                 Task.Start();
 
-                runLog.Finish = DateTime.UtcNow;
+                if (doRunLog)
+                    runLog.Stop();
 
                 IsRunning = false;
+
                 Completions++;
             }
             catch (Exception ex)
             {
-                runLog.Error = DateTime.UtcNow;
+                if (doRunLog)
+                    runLog.Stop(ex);
 
                 IsRunning = false;
+
                 Failures++;
 
                 if (Errors.Count >= LogLimit)
                     Errors.RemoveAt(0);
 
-                Errors.Add(runLog.Exception = ex);
+                Errors.Add(ex);
             }
 
             TokenSource.Token.ThrowIfCancellationRequested();
 
-            if (RunLogs.Count >= ErrorLimit)
-                RunLogs.RemoveAt(0);
+            if (doRunLog)
+            {
+                if (RunLogs.Count >= ErrorLimit)
+                    RunLogs.RemoveAt(0);
 
-            RunLogs.Add(runLog);
+                RunLogs.Add(runLog);
+            }
 
             if (doRunRunOnce && runLog.Finish.HasValue) return 0;
 
@@ -310,36 +425,5 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
     public void Enqueue(TCmd cmd)
     {
         Queue.Enqueue(cmd);
-    }
-
-    ~Job()
-    {
-        Dispose();
-    }
-
-    protected int TimerRun()
-    {
-        var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
-        if (!doUseTimer) return -1;
-
-        IsRunning = true;
-
-        if (Task.Status != TaskStatus.Running)
-            try
-            {
-                Cmd(Queue);
-
-                IsRunning = false;
-                Completions++;
-            }
-            catch (Exception ex)
-            {
-                IsRunning = false;
-                Failures++;
-
-                return -1;
-            }
-
-        return Failures > 0 ? -1 : 0;
     }
 }

@@ -79,7 +79,7 @@ public class SettingsManager : Disposable
 
     ~SettingsManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public new void Dispose()

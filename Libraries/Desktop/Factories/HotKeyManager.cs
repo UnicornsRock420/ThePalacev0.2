@@ -16,7 +16,7 @@ public class HotKeyManager : SingletonDisposable<HotKeyManager>
 
     ~HotKeyManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

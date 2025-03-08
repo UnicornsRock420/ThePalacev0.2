@@ -45,8 +45,8 @@ namespace ThePalace.Client.Desktop;
 
 public class Program : Disposable
 {
-    private static readonly ScreenLayers[] CONST_allLayers = Enum.GetValues<ScreenLayers>()
-        .Where(v => !new[] { ScreenLayers.Base, ScreenLayers.DimRoom }.Contains(v))
+    private static readonly ScreenLayerTypes[] CONST_allLayers = Enum.GetValues<ScreenLayerTypes>()
+        .Where(v => !new[] { ScreenLayerTypes.Base, ScreenLayerTypes.DimRoom }.Contains(v))
         .ToArray();
 
     private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
@@ -59,40 +59,40 @@ public class Program : Disposable
         .ToList()
         .AsReadOnly();
 
-    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayers[]> CONST_EventLayerMappings =
-        new Dictionary<IptEventTypes[], ScreenLayers[]>
+    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayerTypes[]> CONST_EventLayerMappings =
+        new Dictionary<IptEventTypes[], ScreenLayerTypes[]>
         {
-            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayers.Base] },
-            { [IptEventTypes.InChat], [ScreenLayers.Messages] },
-            { [IptEventTypes.NameChange], [ScreenLayers.UserNametag] },
-            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayers.UserProp] },
+            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayerTypes.Base] },
+            { [IptEventTypes.InChat], [ScreenLayerTypes.Messages] },
+            { [IptEventTypes.NameChange], [ScreenLayerTypes.UserNametag] },
+            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayerTypes.UserProp] },
             {
                 [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
-                [ScreenLayers.LooseProp]
+                [ScreenLayerTypes.LooseProp]
             },
             {
                 [
                     IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
                     IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
                 ],
-                [ScreenLayers.SpotImage]
+                [ScreenLayerTypes.SpotImage]
             },
             {
                 [
                     IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
                     IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
                 ],
-                [ScreenLayers.UserProp, ScreenLayers.UserNametag]
+                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag]
             },
-            { [IptEventTypes.MsgAssetSend], [ScreenLayers.UserProp, ScreenLayers.LooseProp] },
+            { [IptEventTypes.MsgAssetSend], [ScreenLayerTypes.UserProp, ScreenLayerTypes.LooseProp] },
             {
                 [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
-                [ScreenLayers.UserProp, ScreenLayers.UserNametag, ScreenLayers.Messages]
+                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag, ScreenLayerTypes.Messages]
             },
-            { [IptEventTypes.MsgDraw], [ScreenLayers.BottomPaint, ScreenLayers.TopPaint] },
+            { [IptEventTypes.MsgDraw], [ScreenLayerTypes.BottomPaint, ScreenLayerTypes.TopPaint] },
             {
                 [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
-                [ScreenLayers.SpotBorder, ScreenLayers.SpotNametag, ScreenLayers.SpotImage]
+                [ScreenLayerTypes.SpotBorder, ScreenLayerTypes.SpotNametag, ScreenLayerTypes.SpotImage]
             }
         }.AsReadOnly();
 
@@ -257,7 +257,7 @@ public class Program : Disposable
 
     ~Program()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()
@@ -350,7 +350,7 @@ public class Program : Disposable
 
         var uiRefresh = CONST_uiRefreshEvents.Contains(scriptEvent.EventType);
 
-        var screenLayers = null as ScreenLayers[];
+        var screenLayers = null as ScreenLayerTypes[];
         foreach (var layer in CONST_EventLayerMappings)
             if (CONST_EventLayerMappings.Keys.Contains(scriptEvent.EventType))
             {
@@ -363,8 +363,8 @@ public class Program : Disposable
         {
             CmdFnc = a =>
             {
-                if (screenLayers.Contains(ScreenLayers.Base))
-                    sessionState.RefreshScreen(ScreenLayers.Base);
+                if (screenLayers.Contains(ScreenLayerTypes.Base))
+                    sessionState.RefreshScreen(ScreenLayerTypes.Base);
 
                 if (uiRefresh)
                 {
@@ -372,7 +372,7 @@ public class Program : Disposable
                     sessionState.RefreshRibbon();
                 }
 
-                if (!screenLayers.Contains(ScreenLayers.Base))
+                if (!screenLayers.Contains(ScreenLayerTypes.Base))
                     sessionState.RefreshScreen(screenLayers);
                 else
                     sessionState.RefreshScreen(CONST_allLayers);
@@ -558,9 +558,9 @@ public class Program : Disposable
                                         queue.Clear();
 
                                     SessionState.RefreshScreen(
-                                        ScreenLayers.UserProp,
-                                        ScreenLayers.UserNametag,
-                                        ScreenLayers.Messages);
+                                        ScreenLayerTypes.UserProp,
+                                        ScreenLayerTypes.UserNametag,
+                                        ScreenLayerTypes.Messages);
 
                                     ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                     {
@@ -1013,7 +1013,7 @@ public class Program : Disposable
             }
         }
 
-        SessionState.RefreshScreen(ScreenLayers.Base);
+        SessionState.RefreshScreen(ScreenLayerTypes.Base);
         SessionState.RefreshUI();
 
         ShowConnectionForm();
@@ -1182,7 +1182,7 @@ public class Program : Disposable
             connectionForm.Show();
             connectionForm.Focus();
 
-            SessionState.RefreshScreen(ScreenLayers.Base);
+            SessionState.RefreshScreen(ScreenLayerTypes.Base);
             SessionState.RefreshUI();
             SessionState.RefreshScreen();
             SessionState.RefreshRibbon();
@@ -1472,9 +1472,9 @@ public class Program : Disposable
                     if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue) queue.Clear();
 
                     SessionState.RefreshScreen(
-                        ScreenLayers.UserProp,
-                        ScreenLayers.UserNametag,
-                        ScreenLayers.Messages);
+                        ScreenLayerTypes.UserProp,
+                        ScreenLayerTypes.UserNametag,
+                        ScreenLayerTypes.Messages);
 
                     ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                     {

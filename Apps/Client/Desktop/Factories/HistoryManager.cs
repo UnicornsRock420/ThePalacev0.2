@@ -13,7 +13,7 @@ public class HistoryManager : SingletonDisposable<HistoryManager>
 
     ~HistoryManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

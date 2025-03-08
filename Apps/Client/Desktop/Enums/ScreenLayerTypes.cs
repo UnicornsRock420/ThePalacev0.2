@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Client.Desktop.Enums;
 
-public enum ScreenLayers : short
+public enum ScreenLayerTypes : short
 {
     Base,
     LooseProp,

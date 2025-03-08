@@ -11,6 +11,6 @@ public partial class Settings : FormBase
 
     ~Settings()
     {
-        this.Dispose(false);
+        this.Dispose();
     }
 }

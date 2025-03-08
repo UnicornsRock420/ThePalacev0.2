@@ -15,7 +15,7 @@ public static class ObjectExts
 
     public static IntPtr ToIntPtr<T>(this T obj)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj), nameof(obj) + " cannot be null");
+        ArgumentNullException.ThrowIfNull(obj, nameof(obj) + " cannot be null");
 
         var result = IntPtr.Zero;
         var type = typeof(T);
@@ -69,7 +69,8 @@ public static class ObjectExts
 
     public static void ClearEvents(this object obj, string eventName)
     {
-        if (obj == null) throw new ArgumentNullException(nameof(obj), nameof(obj) + " cannot be null");
+        ArgumentNullException.ThrowIfNull(obj, nameof(obj) + " cannot be null");
+        
         if (string.IsNullOrWhiteSpace(eventName))
             throw new ArgumentNullException(nameof(eventName), nameof(eventName) + " cannot be null");
 

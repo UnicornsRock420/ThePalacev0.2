@@ -13,7 +13,7 @@ namespace ThePalace.Common.Desktop.Interfaces;
 public interface IDesktopSessionState : IUISessionState
 {
     IReadOnlyDictionary<string, IDisposable> UIControls { get; }
-    IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers { get; }
+    IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers { get; }
 
     bool Visible { get; set; }
     double Scale { get; set; }
@@ -38,9 +38,9 @@ public interface IDesktopSessionState : IUISessionState
 
     void RefreshRibbon();
     void RefreshUI();
-    void RefreshScreen(params ScreenLayers[] layers);
-    void LayerVisibility(bool visible, params ScreenLayers[] layers);
-    void LayerOpacity(float opacity, params ScreenLayers[] layers);
+    void RefreshScreen(params ScreenLayerTypes[] layers);
+    void LayerVisibility(bool visible, params ScreenLayerTypes[] layers);
+    void LayerOpacity(float opacity, params ScreenLayerTypes[] layers);
 
     FormBase GetForm(string friendlyName);
     T GetForm<T>(string friendlyName) where T : FormBase;

@@ -1,51 +1,43 @@
 ﻿using System.Collections;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Common.Factories;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class ScreenLayer : Disposable
+public class ScreenLayer : Disposable, IScreenLayer
 {
-    public Bitmap Image;
-    public float Opacity = 1.0F;
-    public Type ResourceType;
-    public bool Visible = true;
-
-    public ScreenLayer(ScreenLayers type)
+    private ScreenLayer()
     {
-        Type = type;
     }
 
-    public ScreenLayers Type { get; }
-
-    public int Width => Image?.Width ?? 0;
-    public int Height => Image?.Height ?? 0;
+    public ScreenLayer(ScreenLayerTypes layerType)
+    {
+        LayerLayerType = layerType;
+    }
 
     ~ScreenLayer()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()
     {
         if (IsDisposed) return;
 
-        base.Dispose();
-
         Unload();
+
+        base.Dispose();
     }
 
-    public void Unload()
-    {
-        try
-        {
-            Image?.Dispose();
-            Image = null;
-        }
-        catch
-        {
-        }
-    }
+    public Type ResourceType { get; set; }
+    public bool Visible { get; set; } = true;
+    public float Opacity { get; set; } = 1.0F;
+    public Bitmap Image { get; set; }
+
+    public ScreenLayerTypes LayerLayerType { get; }
+    public int Width => Image?.Width ?? 0;
+    public int Height => Image?.Height ?? 0;
 
     public Graphics Initialize(int width, int height)
     {
@@ -66,45 +58,43 @@ public class ScreenLayer : Disposable
         return g;
     }
 
-    public void Load(IDesktopSessionState sessionState, LayerLoadingTypes type, string srcPath, int width = 0,
-        int height = 0)
+    public void Load(
+        IDesktopSessionState sessionState,
+        LayerLoadingTypes layerType,
+        string srcPath,
+        int? width = null,
+        int? height = null)
     {
-        if (srcPath == null) throw new ArgumentNullException(nameof(srcPath));
+        ArgumentNullException.ThrowIfNull(srcPath, nameof(srcPath));
 
-        lock (this)
+        using (var @lock = LockContext.GetLock(this))
         {
             var backgroundImage = null as Bitmap;
 
-            switch (type)
+            try
             {
-                case LayerLoadingTypes.Filesystem:
-                    if (File.Exists(srcPath))
-                        try
-                        {
+                switch (layerType)
+                {
+                    case LayerLoadingTypes.Filesystem:
+                        if (File.Exists(srcPath))
                             backgroundImage = new Bitmap(srcPath);
-                        }
-                        catch
-                        {
-                        }
 
-                    break;
-                case LayerLoadingTypes.Resource:
-                    using (var stream = ResourceType
-                               ?.Assembly
-                               ?.GetManifestResourceStream(srcPath))
-                    {
-                        if (stream == null) return;
-
-                        try
+                        break;
+                    case LayerLoadingTypes.Resource:
+                        using (var stream = ResourceType
+                                   ?.Assembly
+                                   ?.GetManifestResourceStream(srcPath))
                         {
+                            if (stream == null) return;
+
                             backgroundImage = new Bitmap(stream);
                         }
-                        catch
-                        {
-                        }
-                    }
 
-                    break;
+                        break;
+                }
+            }
+            catch
+            {
             }
 
             if (backgroundImage == null) return;
@@ -114,11 +104,23 @@ public class ScreenLayer : Disposable
             Image = backgroundImage;
             Image.Tag = Path.GetFileName(srcPath);
 
-            if (Type == ScreenLayers.Base)
-            {
-                sessionState.ScreenWidth = backgroundImage.Width;
-                sessionState.ScreenHeight = backgroundImage.Height;
-            }
+            if (LayerLayerType != ScreenLayerTypes.Base &&
+                (!width.HasValue || !height.HasValue)) return;
+
+            sessionState.ScreenWidth = width ?? backgroundImage.Width;
+            sessionState.ScreenHeight = height ?? backgroundImage.Height;
+        }
+    }
+
+    public void Unload()
+    {
+        try
+        {
+            Image?.Dispose();
+            Image = null;
+        }
+        catch
+        {
         }
     }
 }

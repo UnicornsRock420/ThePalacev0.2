@@ -13,7 +13,7 @@ public static class StreamExts
     public static sbyte ReadSByte<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -27,7 +27,7 @@ public static class StreamExts
     public static short ReadInt16<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -41,7 +41,7 @@ public static class StreamExts
     public static int ReadInt32<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -55,7 +55,7 @@ public static class StreamExts
     public static long ReadInt64<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -69,7 +69,7 @@ public static class StreamExts
     public static byte ReadByte<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -83,7 +83,7 @@ public static class StreamExts
     public static ushort ReadUInt16<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -97,7 +97,7 @@ public static class StreamExts
     public static uint ReadUInt32<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
@@ -111,7 +111,7 @@ public static class StreamExts
     public static ulong ReadUInt64<TStream>(this TStream stream, int offset = 0)
         where TStream : Stream
     {
-        if (stream == null) throw new ArgumentNullException(nameof(stream));
+        ArgumentNullException.ThrowIfNull(stream, nameof(stream));
 
         if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 

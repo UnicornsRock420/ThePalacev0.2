@@ -11,6 +11,6 @@ public partial class Logging : FormBase
 
     ~Logging()
     {
-        this.Dispose(false);
+        this.Dispose();
     }
 }

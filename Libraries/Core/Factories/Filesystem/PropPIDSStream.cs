@@ -6,9 +6,14 @@ namespace ThePalace.Core.Factories.Filesystem
 {
     public partial class PropPIDSStream : StreamBase
     {
-        public PropPIDSStream() { }
-        ~PropPIDSStream() =>
-            Dispose(false);
+        public PropPIDSStream()
+        {
+        }
+
+        ~PropPIDSStream()
+        {
+            Dispose();
+        }
 
         public void Read(PropPROPSStream filePROPSReader, out List<AssetRec> assets)
         {

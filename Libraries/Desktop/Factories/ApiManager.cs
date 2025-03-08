@@ -11,7 +11,7 @@ public class ApiManager : SingletonDisposable<ApiManager>
 
     ~ApiManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

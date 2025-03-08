@@ -14,7 +14,7 @@ public class CmdTask : Disposable
 
     ~CmdTask()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

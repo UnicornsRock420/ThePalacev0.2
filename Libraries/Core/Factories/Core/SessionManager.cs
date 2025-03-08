@@ -11,7 +11,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
 
     ~SessionManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

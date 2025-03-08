@@ -34,7 +34,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     ~AssetsManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     public override void Dispose()

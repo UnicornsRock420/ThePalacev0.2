@@ -22,10 +22,6 @@ public class TaskManager : SingletonDisposable<TaskManager>
     {
     }
 
-    public Dictionary<Guid, IJob> Jobs { get; protected set; } = new();
-
-    public static CancellationToken GlobalToken => _globalToken.Token;
-
     ~TaskManager()
     {
         Dispose();
@@ -80,6 +76,10 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
         GC.SuppressFinalize(this);
     }
+
+    public Dictionary<Guid, IJob> Jobs { get; protected set; } = new();
+
+    public static CancellationToken GlobalToken => _globalToken.Token;
 
     public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
@@ -166,36 +166,36 @@ public class TaskManager : SingletonDisposable<TaskManager>
             .ToList();
 
         foreach (var job in jobs)
-            if (_expiredStates.Contains(job.Task.Status))
+        {
+            if (!_expiredStates.Contains(job.Task.Status) ||
+                (job.Options & RunOptions.UseTimer) == RunOptions.UseTimer) continue;
+
+            try
             {
-                if ((job.Options & RunOptions.UseTimer) == RunOptions.UseTimer) continue;
-
-                try
-                {
-                    job.Cancel();
-                }
-                catch
-                {
-                }
-
-                try
-                {
-                    job.Dispose();
-                }
-                catch
-                {
-                }
-
-                if (Jobs.ContainsKey(job.Id))
-                    Jobs.Remove(job.Id);
-                else if (
-                    job.ParentId.HasValue &&
-                    Jobs.ContainsKey(job.ParentId.Value))
-                    Jobs[job.ParentId.Value].SubJobs.Remove(job);
+                job.Cancel();
             }
+            catch
+            {
+            }
+
+            try
+            {
+                job.Dispose();
+            }
+            catch
+            {
+            }
+
+            if (!Jobs.Remove(job.Id, out var _) &&
+                job.ParentId.HasValue &&
+                Jobs.TryGetValue(job.ParentId.Value, out var _))
+                Jobs[job.ParentId.Value].SubJobs.Remove(job);
+        }
     }
 
-    public async Task Run(TimeSpan? sleepInterval = null, CancellationToken? token = null,
+    public async Task Run(
+        TimeSpan? sleepInterval = null,
+        CancellationToken? token = null,
         params IDisposable[] resources)
     {
         if ((resources?.Length ?? 0) > 0) _managedResources.AddRange(resources);

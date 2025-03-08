@@ -17,7 +17,7 @@ namespace ThePalace.Core.Factories.Filesystem
     {
         public PropPRPStream() { }
         ~PropPRPStream() =>
-            Dispose(false);
+            Dispose();
 
         public void Read(out List<AssetRec> assets)
         {

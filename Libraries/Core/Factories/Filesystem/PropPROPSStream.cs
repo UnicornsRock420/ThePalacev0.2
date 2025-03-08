@@ -11,9 +11,14 @@ namespace ThePalace.Core.Factories.Filesystem
     {
         private const int INT_NAMEBLOCKSIZE = 32;
 
-        public PropPROPSStream() { }
-        ~PropPROPSStream() =>
-            Dispose(false);
+        public PropPROPSStream()
+        {
+        }
+
+        ~PropPROPSStream()
+        {
+            Dispose();
+        }
 
         public long Filesize
         {

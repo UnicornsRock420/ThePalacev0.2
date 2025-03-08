@@ -9,7 +9,7 @@ public class FormBase : Form
 
     ~FormBase()
     {
-        base.Dispose(false);
+        base.Dispose();
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)

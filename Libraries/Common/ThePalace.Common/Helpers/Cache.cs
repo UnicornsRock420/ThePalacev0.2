@@ -1,21 +1,24 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.Caching;
+using ThePalace.Common.Factories;
 
 namespace ThePalace.Common.Helpers;
 
 public static class Cache
 {
-    private static readonly ConcurrentDictionary<string, object> _memory;
-    private static readonly ObjectCache _cache;
-
-    static Cache()
-    {
-        _memory = new ConcurrentDictionary<string, object>();
-        _cache = MemoryCache.Default;
-    }
+    private static readonly ConcurrentDictionary<string, object> _memory = new();
+    private static readonly ObjectCache _cache = MemoryCache.Default;
 
     public static void Dispose()
     {
+        foreach (var p in _memory?.Values?.ToList() ?? [])
+        {
+            if (p is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
+
         _memory?.Clear();
     }
 
@@ -26,57 +29,67 @@ public static class Cache
 
     public static T GetCache<T>(string key)
     {
-        if (!string.IsNullOrWhiteSpace(key) &&
-            _memory.ContainsKey(key))
-            return (T)_memory[key];
-        return default;
+        if (string.IsNullOrWhiteSpace(key) ||
+            !_memory.ContainsKey(key)) return default(T);
+
+        using (var @lock = LockContext.GetLock(_memory))
+        {
+            return (T)_memory[key] ?? default(T);
+        }
     }
 
     public static void SetCache<T>(string key, T value)
     {
         if (!string.IsNullOrWhiteSpace(key) &&
             value != null)
-            if (_memory.ContainsKey(key))
-                _memory[key] = value;
-            else
-                _memory.TryAdd(key, value);
+            using (var @lock = LockContext.GetLock(_memory))
+            {
+                if (_memory.ContainsKey(key))
+                    _memory[key] = value;
+                else
+                    _memory.TryAdd(key, value);
+            }
     }
 
-    public static T GetCache<T>(string key, Func<T> callbackGenerateValue, TimeSpan? expiresIn = null,
-        CacheItemPriority priority = CacheItemPriority.Default, TimeSpan? ifUnusedRemoveIn = null,
+    public static T GetCache<T>(
+        string key,
+        Func<T> callbackGenerateValue,
+        TimeSpan? expiresIn = null,
+        CacheItemPriority priority = CacheItemPriority.Default,
+        TimeSpan? ifUnusedRemoveIn = null,
         string regionName = null)
         where T : class
     {
         if (string.IsNullOrWhiteSpace(key))
             throw new ArgumentNullException(nameof(key), nameof(key) + " cannot be null");
-        if (callbackGenerateValue == null)
-            throw new ArgumentNullException(nameof(callbackGenerateValue), "Callback cannot be null");
+        ArgumentNullException.ThrowIfNull(callbackGenerateValue, nameof(callbackGenerateValue) + " cannot be null");
 
-        T value = null;
+        T value = default(T);
 
         if (value != null) return value;
 
         value = callbackGenerateValue();
 
-        if (value != null)
-            try
+        if (value == null) return default(T);
+
+        try
+        {
+            var policy = new CacheItemPolicy
             {
-                var policy = new CacheItemPolicy
-                {
-                    Priority = priority
-                };
+                Priority = priority
+            };
 
-                if (expiresIn.HasValue)
-                    policy.AbsoluteExpiration = DateTime.UtcNow.Add(expiresIn.Value);
+            if (expiresIn.HasValue)
+                policy.AbsoluteExpiration = DateTime.UtcNow.Add(expiresIn.Value);
 
-                if (ifUnusedRemoveIn.HasValue)
-                    policy.SlidingExpiration = ifUnusedRemoveIn.Value;
+            if (ifUnusedRemoveIn.HasValue)
+                policy.SlidingExpiration = ifUnusedRemoveIn.Value;
 
-                _cache.Set(new CacheItem(key, value, regionName), policy);
-            }
-            catch
-            {
-            }
+            _cache.Set(new CacheItem(key, value, regionName), policy);
+        }
+        catch
+        {
+        }
 
         return value;
     }

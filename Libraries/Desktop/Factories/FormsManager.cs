@@ -61,7 +61,7 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
 
     ~FormsManager()
     {
-        Dispose(false);
+        Dispose();
     }
 
     private void _FormClosed(object sender, EventArgs e)
