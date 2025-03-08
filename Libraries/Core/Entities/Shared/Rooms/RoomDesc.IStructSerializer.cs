@@ -1,10 +1,9 @@
-﻿using System.Buffers;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
-using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
+using AttributeExts = ThePalace.Core.Exts.AttributeExts;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
 
@@ -30,30 +29,30 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
         try
         {
-            this.RoomInfo.RoomFlags = (RoomFlags)this.ReadInt32();
-            this.RoomInfo.FacesID = this.ReadInt32();
-            this.RoomInfo.RoomID = this.ReadInt16();
-            roomNameOfst = this.ReadInt16();
-            pictNameOfst = this.ReadInt16();
-            artistNameOfst = this.ReadInt16();
-            passwordOfst = this.ReadInt16();
-            nbrHotspots = this.ReadInt16();
-            hotspotOfst = this.ReadInt16();
-            nbrPictures = this.ReadInt16();
-            pictureOfst = this.ReadInt16();
-            nbrDrawCmds = this.ReadInt16();
-            firstDrawCmd = this.ReadInt16();
-            nbrPeople = this.ReadInt16();
-            nbrLProps = this.ReadInt16();
-            firstLProp = this.ReadInt16();
-            reserved = this.ReadInt16();
-            lenVars = this.ReadInt16();
+            RoomInfo.RoomFlags = (RoomFlags)ReadInt32();
+            RoomInfo.FacesID = ReadInt32();
+            RoomInfo.RoomID = ReadInt16();
+            roomNameOfst = ReadInt16();
+            pictNameOfst = ReadInt16();
+            artistNameOfst = ReadInt16();
+            passwordOfst = ReadInt16();
+            nbrHotspots = ReadInt16();
+            hotspotOfst = ReadInt16();
+            nbrPictures = ReadInt16();
+            pictureOfst = ReadInt16();
+            nbrDrawCmds = ReadInt16();
+            firstDrawCmd = ReadInt16();
+            nbrPeople = ReadInt16();
+            nbrLProps = ReadInt16();
+            firstLProp = ReadInt16();
+            reserved = ReadInt16();
+            lenVars = ReadInt16();
 
             // Get the strings
-            this.Name = this.PeekPString(32, 1, roomNameOfst);
-            this.Picture = this.PeekPString(32, 1, pictNameOfst);
-            this.Artist = this.PeekPString(32, 1, artistNameOfst);
-            this.Password = this.PeekPString(32, 1, passwordOfst);
+            Name = PeekPString(32, 1, roomNameOfst);
+            Picture = PeekPString(32, 1, pictNameOfst);
+            Artist = PeekPString(32, 1, artistNameOfst);
+            Password = PeekPString(32, 1, passwordOfst);
         }
         catch (Exception ex)
         {
@@ -68,77 +67,78 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             for (var i = 0; i < nbrHotspots; i++)
             {
-                this.Seek(hotspotOfst + Exts.AttributeExts.GetByteSize<HotspotRec>() * i);
+                Seek(hotspotOfst + AttributeExts.GetByteSize<HotspotRec>() * i);
 
-                position = this._stream.Position;
+                position = _stream.Position;
 
                 var h = new HotspotDesc
                 {
-                    Vortexes = new(),
-                    States = new(),
+                    Vortexes = new List<Point>(),
+                    States = new List<HotspotStateDesc>()
                 };
-                this.PeekSInt32(position += 4); //scriptEventMask
-                h.SpotInfo.Flags = (HotspotFlags)this.PeekSInt32(position += 4);
-                this.PeekSInt32(position += 4); //secureInfo
-                this.PeekSInt32(position += 4); //refCon
+                PeekSInt32(position += 4); //scriptEventMask
+                h.SpotInfo.Flags = (HotspotFlags)PeekSInt32(position += 4);
+                PeekSInt32(position += 4); //secureInfo
+                PeekSInt32(position += 4); //refCon
 
-                var vAxis = this.PeekSInt16(position += 2);
-                var hAxis = this.PeekSInt16(position += 2);
-                h.SpotInfo.Loc = new Types.Point(vAxis, hAxis);
+                var vAxis = PeekSInt16(position += 2);
+                var hAxis = PeekSInt16(position += 2);
+                h.SpotInfo.Loc = new Point(vAxis, hAxis);
 
-                h.SpotInfo.HotspotID = this.PeekSInt16(position += 2);
-                h.SpotInfo.Dest = this.PeekSInt16(position += 2);
-                h.SpotInfo.NbrPts = this.PeekSInt16(position += 2);
-                h.SpotInfo.PtsOfst = this.PeekSInt16(position += 2);
-                h.SpotInfo.Type = (HotspotTypes)this.PeekSInt16(position += 2);
-                this.PeekSInt16(position += 2); //groupID
-                this.PeekSInt16(position += 2); //nbrScripts
-                this.PeekSInt16(position += 2); //scriptRecOfst
-                h.SpotInfo.State = this.PeekSInt16(position += 2);
-                h.SpotInfo.NbrStates = this.PeekSInt16(position += 2);
-                h.SpotInfo.StateRecOfst = this.PeekSInt16(position += 2);
-                h.SpotInfo.NameOfst = this.PeekSInt16(position += 2);
-                h.SpotInfo.ScriptTextOfst = this.PeekSInt16(position += 2);
-                this.PeekSInt16(position += 2); //alignReserved
+                h.SpotInfo.HotspotID = PeekSInt16(position += 2);
+                h.SpotInfo.Dest = PeekSInt16(position += 2);
+                h.SpotInfo.NbrPts = PeekSInt16(position += 2);
+                h.SpotInfo.PtsOfst = PeekSInt16(position += 2);
+                h.SpotInfo.Type = (HotspotTypes)PeekSInt16(position += 2);
+                PeekSInt16(position += 2); //groupID
+                PeekSInt16(position += 2); //nbrScripts
+                PeekSInt16(position += 2); //scriptRecOfst
+                h.SpotInfo.State = PeekSInt16(position += 2);
+                h.SpotInfo.NbrStates = PeekSInt16(position += 2);
+                h.SpotInfo.StateRecOfst = PeekSInt16(position += 2);
+                h.SpotInfo.NameOfst = PeekSInt16(position += 2);
+                h.SpotInfo.ScriptTextOfst = PeekSInt16(position += 2);
+                PeekSInt16(position += 2); //alignReserved
 
-                if (h.SpotInfo.NameOfst > 0 && h.SpotInfo.NameOfst < this.Count)
-                    h.Name = this.PeekPString(32, 1, h.SpotInfo.NameOfst);
+                if (h.SpotInfo.NameOfst > 0 && h.SpotInfo.NameOfst < Count)
+                    h.Name = PeekPString(32, 1, h.SpotInfo.NameOfst);
 
-                if (h.SpotInfo.ScriptTextOfst > 0 && h.SpotInfo.ScriptTextOfst < this.Count)
-                    h.Script = this.ReadCString(h.SpotInfo.ScriptTextOfst);
+                if (h.SpotInfo.ScriptTextOfst > 0 && h.SpotInfo.ScriptTextOfst < Count)
+                    h.Script = ReadCString(h.SpotInfo.ScriptTextOfst);
 
-                if (h.SpotInfo.NbrPts > 0 && h.SpotInfo.PtsOfst > 0 && h.SpotInfo.PtsOfst < this.Count - Exts.AttributeExts.GetByteSize<Types.Point?>() * h.SpotInfo.NbrPts)
+                if (h.SpotInfo.NbrPts > 0 && h.SpotInfo.PtsOfst > 0 && h.SpotInfo.PtsOfst <
+                    Count - AttributeExts.GetByteSize<Point?>() * h.SpotInfo.NbrPts)
                     for (var s = 0; s < h.SpotInfo.NbrPts; s++)
                     {
-                        this.Seek(h.SpotInfo.PtsOfst + s * Exts.AttributeExts.GetByteSize<Types.Point?>());
+                        Seek(h.SpotInfo.PtsOfst + s * AttributeExts.GetByteSize<Point?>());
 
-                        position = this._stream.Position;
+                        position = _stream.Position;
 
-                        vAxis = this.PeekSInt16(position += 2);
-                        hAxis = this.PeekSInt16(position += 2);
-                        var p = new Types.Point(vAxis, hAxis);
+                        vAxis = PeekSInt16(position += 2);
+                        hAxis = PeekSInt16(position += 2);
+                        var p = new Point(vAxis, hAxis);
 
                         h.Vortexes.Add(p);
                     }
 
                 for (var s = 0; s < h.SpotInfo.NbrStates; s++)
                 {
-                    this.Seek(h.SpotInfo.StateRecOfst + s * Exts.AttributeExts.GetByteSize<HotspotStateRec>());
+                    Seek(h.SpotInfo.StateRecOfst + s * AttributeExts.GetByteSize<HotspotStateRec>());
 
-                    position = this._stream.Position;
+                    position = _stream.Position;
 
                     var hs = new HotspotStateDesc();
-                    hs.StateInfo.PictID = this.PeekSInt16(position += 2);
-                    this.PeekSInt16(position += 2); //reserved
+                    hs.StateInfo.PictID = PeekSInt16(position += 2);
+                    PeekSInt16(position += 2); //reserved
 
-                    vAxis = this.PeekSInt16(position += 2);
-                    hAxis = this.PeekSInt16(position += 2);
-                    hs.StateInfo.PicLoc = new Types.Point(vAxis, hAxis);
+                    vAxis = PeekSInt16(position += 2);
+                    hAxis = PeekSInt16(position += 2);
+                    hs.StateInfo.PicLoc = new Point(vAxis, hAxis);
 
                     h.States.Add(hs);
                 }
 
-                this.HotSpots.Add(h);
+                HotSpots.Add(h);
             }
         }
         catch (Exception ex)
@@ -156,23 +156,23 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             for (var i = 0; i < nbrPictures; i++)
             {
-                this.Seek(pictureOfst + Exts.AttributeExts.GetByteSize<PictureRec>() * i);
+                Seek(pictureOfst + AttributeExts.GetByteSize<PictureRec>() * i);
 
-                position = this._stream.Position;
+                position = _stream.Position;
 
                 var pict = new PictureRec();
-                pict.RefCon = this.PeekSInt32(position += 4);
-                pict.PicID = this.PeekSInt16(position += 2);
-                pict.PicNameOfst = this.PeekSInt16(position += 2);
-                pict.TransColor = this.PeekSInt16(position += 2);
-                this.PeekSInt16(); //reserved
+                pict.RefCon = PeekSInt32(position += 4);
+                pict.PicID = PeekSInt16(position += 2);
+                pict.PicNameOfst = PeekSInt16(position += 2);
+                pict.TransColor = PeekSInt16(position += 2);
+                PeekSInt16(); //reserved
 
                 if (pict.PicNameOfst > 0 &&
-                    pict.PicNameOfst < this.Count)
+                    pict.PicNameOfst < Count)
                 {
-                    pict.Name = this.PeekPString(32, 1, pict.PicNameOfst);
+                    pict.Name = PeekPString(32, 1, pict.PicNameOfst);
 
-                    this.Pictures.Add(pict);
+                    Pictures.Add(pict);
                 }
             }
         }
@@ -192,23 +192,23 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             for (var i = 0; i < nbrDrawCmds; i++)
             {
-                this.Seek(ofst);
+                Seek(ofst);
 
-                position = this._stream.Position;
+                position = _stream.Position;
 
                 var drawCmd = new DrawCmdDesc();
-                ofst = drawCmd.DrawCmdInfo.NextOfst = this.PeekSInt16(position += 2);
-                this.PeekSInt16(); //reserved
-                drawCmd.DrawCmdInfo.DrawCmd = this.PeekSInt16(position += 2);
-                drawCmd.DrawCmdInfo.CmdLength = this.PeekUInt16(position += 2);
-                drawCmd.DrawCmdInfo.DataOfst = this.PeekSInt16(position += 2);
-                drawCmd.Data = this.Data
+                ofst = drawCmd.DrawCmdInfo.NextOfst = PeekSInt16(position += 2);
+                PeekSInt16(); //reserved
+                drawCmd.DrawCmdInfo.DrawCmd = PeekSInt16(position += 2);
+                drawCmd.DrawCmdInfo.CmdLength = PeekUInt16(position += 2);
+                drawCmd.DrawCmdInfo.DataOfst = PeekSInt16(position += 2);
+                drawCmd.Data = Data
                     .Skip(drawCmd.DrawCmdInfo.DataOfst)
                     .Take(drawCmd.DrawCmdInfo.CmdLength)
                     .ToArray();
                 //drawCmd.DeserializeData();
 
-                this.DrawCmds.Add(drawCmd);
+                DrawCmds.Add(drawCmd);
             }
         }
         catch (Exception ex)
@@ -227,26 +227,26 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             for (var i = 0; i < nbrLProps; i++)
             {
-                this.Seek(ofst);
+                Seek(ofst);
 
-                position = this._stream.Position;
+                position = _stream.Position;
 
                 var prop = new LoosePropRec();
-                ofst = prop.NextOfst = this.PeekSInt16(position += 2);
-                this.PeekSInt16(position += 2); //reserved
+                ofst = prop.NextOfst = PeekSInt16(position += 2);
+                PeekSInt16(position += 2); //reserved
 
-                var id = this.PeekSInt32(position += 4);
-                var crc = (uint)this.PeekSInt32(position += 4);
+                var id = PeekSInt32(position += 4);
+                var crc = (uint)PeekSInt32(position += 4);
                 prop.AssetSpec = new AssetSpec(id, crc);
 
-                prop.Flags = this.PeekSInt32(position += 4);
-                this.PeekSInt32(position += 4); //refCon
+                prop.Flags = PeekSInt32(position += 4);
+                PeekSInt32(position += 4); //refCon
 
-                var vAxis = this.PeekSInt16(position += 2);
-                var hAxis = this.PeekSInt16(position += 2);
-                prop.Loc = new Types.Point(hAxis, vAxis);
+                var vAxis = PeekSInt16(position += 2);
+                var hAxis = PeekSInt16(position += 2);
+                prop.Loc = new Point(hAxis, vAxis);
 
-                this.LooseProps.Add(prop);
+                LooseProps.Add(prop);
             }
         }
         catch (Exception ex)
@@ -255,8 +255,6 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
 
         #endregion
-
-        return;
     }
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
@@ -269,37 +267,37 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             // Room Name
             var roomNameOfst = (short)_blobData.Count;
-            _blobData.WritePString(this.Name ?? $"Room {this.RoomInfo.RoomID}", 32, 1);
+            _blobData.WritePString(Name ?? $"Room {RoomInfo.RoomID}", 32, 1);
 
             // Artist Name
             var artistNameOfst = (short)_blobData.Count;
-            _blobData.WritePString(this.Artist ?? string.Empty, 32, 1);
+            _blobData.WritePString(Artist ?? string.Empty, 32, 1);
 
             var pictNameOfst = (short)_blobData.Count;
-            _blobData.WritePString(this.Picture ?? "clouds.gif", 32, 1);
+            _blobData.WritePString(Picture ?? "clouds.gif", 32, 1);
 
             // Password
             var passwordOfst = (short)_blobData.Count;
-            _blobData.WritePString(this.Password ?? string.Empty, 32, 1);
+            _blobData.WritePString(Password ?? string.Empty, 32, 1);
 
             //Start Spots
             var hotspotOfst = (short)0;
 
             using (var tmp = new MemoryStream())
             {
-                if ((this.HotSpots?.Count ?? 0) > 0)
-                {
-                    foreach (var spot in this.HotSpots)
+                if ((HotSpots?.Count ?? 0) > 0)
+                    foreach (var spot in HotSpots)
                     {
                         // Buffer spot scripts
-
                         if (!string.IsNullOrEmpty(spot.Script))
                         {
                             spot.SpotInfo.ScriptTextOfst = (short)_blobData.Count;
                             _blobData.WriteCString(spot.Script);
                         }
                         else
+                        {
                             spot.SpotInfo.ScriptTextOfst = 0;
+                        }
 
                         //Buffer spot states
                         spot.SpotInfo.NbrStates = (short)(spot.States?.Count ?? 0);
@@ -310,20 +308,17 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                             using (var ms = new MemoryStream())
                             {
-                                foreach (var state in spot.States)
-                                {
-                                    state.Serialize(ms, opts);
-
-                                    //_blobData.WriteInt16(state.PictID);
-                                    //_blobData.WriteInt16(0); //reserved
-                                    //_blobData.WriteBytes(MessagePackSerializer.Serialize(state.PicLoc));
-                                }
-
+                                foreach (var state in spot.States) state.Serialize(ms, opts);
+                                //_blobData.WriteInt16(state.PictID);
+                                //_blobData.WriteInt16(0); //reserved
+                                //_blobData.WriteBytes(MessagePackSerializer.Serialize(state.PicLoc));
                                 _blobData.WriteBytes(ms.GetBuffer());
                             }
                         }
                         else
+                        {
                             spot.SpotInfo.StateRecOfst = 0;
+                        }
 
                         spot.SpotInfo.PtsOfst = 0;
 
@@ -332,16 +327,16 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                             spot.SpotInfo.PtsOfst = (short)_blobData.Count;
 
                             if ((spot.Vortexes?.Count ?? 0) > 0)
-                            {
                                 foreach (var point in spot.Vortexes)
                                 {
                                     _blobData.WriteInt16(point.HAxis);
                                     _blobData.WriteInt16(point.VAxis);
                                 }
-                            }
                         }
                         else
+                        {
                             spot.SpotInfo.PtsOfst = 0;
+                        }
 
                         if (!string.IsNullOrEmpty(spot.Name))
                         {
@@ -349,7 +344,9 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                             _blobData.WritePString(spot.Name, 32, 1);
                         }
                         else
+                        {
                             spot.SpotInfo.NameOfst = 0;
+                        }
 
                         //Buffer spotrecs
                         tmp.WriteInt32((int)spot.SpotInfo.ScriptEventMask);
@@ -375,11 +372,10 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                         tmp.WriteInt16(spot.SpotInfo.ScriptTextOfst);
                         tmp.WriteInt16(0); //alignReserved
                     }
-                }
 
                 _blobData.PadBytes(4);
 
-                hotspotOfst = (short)(this.HotSpots.Count > 0 ? _blobData.Count : 0);
+                hotspotOfst = (short)(HotSpots.Count > 0 ? _blobData.Count : 0);
 
                 _blobData.WriteBytes(tmp.GetBuffer());
             }
@@ -389,9 +385,8 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
             using (var tmp = new MemoryStream())
             {
-                if ((this.Pictures?.Count ?? 0) > 0)
-                {
-                    foreach (var pict in this.Pictures)
+                if ((Pictures?.Count ?? 0) > 0)
+                    foreach (var pict in Pictures)
                     {
                         pict.PicNameOfst = (short)_blobData.Count;
                         _blobData.WritePString(pict.Name, 32, 1);
@@ -402,9 +397,8 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                         tmp.WriteInt16(pict.TransColor);
                         tmp.WriteInt16(0); //reserved
                     }
-                }
 
-                pictureOfst = (short)(this.Pictures.Count > 0 ? _blobData.Count : 0);
+                pictureOfst = (short)(Pictures.Count > 0 ? _blobData.Count : 0);
 
                 _blobData.WriteBytes(tmp.GetBuffer());
             }
@@ -417,22 +411,26 @@ public partial class RoomDesc : IDisposable, IStructSerializer
             {
                 _blobData.PadBytes(4);
 
-                firstDrawCmd = (short)((this.DrawCmds?.Count ?? 0) > 0 ? _blobData.Count : 0);
+                firstDrawCmd = (short)((DrawCmds?.Count ?? 0) > 0 ? _blobData.Count : 0);
 
                 using (var tmp2 = new MemoryStream())
                 {
-                    for (var i = 0; i < (this.DrawCmds?.Count ?? 0); i++)
+                    for (var i = 0; i < (DrawCmds?.Count ?? 0); i++)
                     {
-                        this.DrawCmds[i].DrawCmdInfo.CmdLength = (ushort)this.DrawCmds[i].Data.Length;
-                        this.DrawCmds[i].DrawCmdInfo.DataOfst = (short)(firstDrawCmd + tmp2.Length + Exts.AttributeExts.GetByteSize<DrawCmdRec>() * this.DrawCmds.Count);
-                        this.DrawCmds[i].DrawCmdInfo.NextOfst = (short)(i == this.DrawCmds.Count - 1 ? 0 : firstDrawCmd + tmp1.Length + Exts.AttributeExts.GetByteSize<DrawCmdRec>());
+                        DrawCmds[i].DrawCmdInfo.CmdLength = (ushort)DrawCmds[i].Data.Length;
+                        DrawCmds[i].DrawCmdInfo.DataOfst = (short)(firstDrawCmd + tmp2.Length +
+                                                                   AttributeExts.GetByteSize<DrawCmdRec>() *
+                                                                   DrawCmds.Count);
+                        DrawCmds[i].DrawCmdInfo.NextOfst = (short)(i == DrawCmds.Count - 1
+                            ? 0
+                            : firstDrawCmd + tmp1.Length + AttributeExts.GetByteSize<DrawCmdRec>());
 
-                        tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.NextOfst);
+                        tmp1.WriteInt16(DrawCmds[i].DrawCmdInfo.NextOfst);
                         tmp1.WriteInt16(0); //reserved
-                        tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.DrawCmd);
-                        tmp1.WriteUInt16(this.DrawCmds[i].DrawCmdInfo.CmdLength);
-                        tmp1.WriteInt16(this.DrawCmds[i].DrawCmdInfo.DataOfst);
-                        tmp2.Write(this.DrawCmds[i].Data);
+                        tmp1.WriteInt16(DrawCmds[i].DrawCmdInfo.DrawCmd);
+                        tmp1.WriteUInt16(DrawCmds[i].DrawCmdInfo.CmdLength);
+                        tmp1.WriteInt16(DrawCmds[i].DrawCmdInfo.DataOfst);
+                        tmp2.Write(DrawCmds[i].Data);
                     }
 
                     tmp1.Write(tmp2.GetBuffer());
@@ -442,15 +440,17 @@ public partial class RoomDesc : IDisposable, IStructSerializer
             }
 
             // Start Loose Props
-            var firstLProp = (short)((this.LooseProps?.Count ?? 0) > 0 ? _blobData.Count : 0);
+            var firstLProp = (short)((LooseProps?.Count ?? 0) > 0 ? _blobData.Count : 0);
 
-            for (var i = 0; i < (this.LooseProps?.Count ?? 0); i++)
+            for (var i = 0; i < (LooseProps?.Count ?? 0); i++)
             {
-                this.LooseProps[i].NextOfst = (short)(i == this.LooseProps.Count - 1 ? 0 : firstLProp + (i + 1) * Exts.AttributeExts.GetByteSize<LoosePropRec>());
+                LooseProps[i].NextOfst = (short)(i == LooseProps.Count - 1
+                    ? 0
+                    : firstLProp + (i + 1) * AttributeExts.GetByteSize<LoosePropRec>());
 
                 using (var ms = new MemoryStream())
                 {
-                    this.LooseProps[i].Serialize(ms, opts);
+                    LooseProps[i].Serialize(ms, opts);
 
                     _blobData.WriteBytes(ms.GetBuffer());
                 }
@@ -460,29 +460,29 @@ public partial class RoomDesc : IDisposable, IStructSerializer
             {
                 var lenVars = (short)_blobData.Count;
 
-                this.WriteInt32((int)this.RoomInfo.RoomFlags);                // Room Flags
-                this.WriteInt32(this.RoomInfo.FacesID);                  // Default Face ID
-                this.WriteInt16(this.RoomInfo.RoomID);                   // The Rooms ID
-                this.WriteInt16(roomNameOfst);      // Room Name
-                this.WriteInt16(pictNameOfst);      // Background Image Offset
-                this.WriteInt16(artistNameOfst);    // Artist
-                this.WriteInt16(passwordOfst);      // Password
-                this.WriteInt16((short)this.HotSpots.Count);    // Number of Hotspots
-                this.WriteInt16(hotspotOfst);       // Hotspot Offset
-                this.WriteInt16((short)this.HotSpots.Count);    // Number of Pictures
-                this.WriteInt16(pictureOfst);       // Pictures Offset
-                this.WriteInt16((short)this.HotSpots.Count);    // Number of Draw Commands
-                this.WriteInt16(firstDrawCmd);      // Draw Command Offset
-                this.WriteInt16(0);                        // Number of People ( Obsolete )
-                this.WriteInt16((short)this.LooseProps.Count);  // Number of Props
-                this.WriteInt16(firstLProp);        // Loose Props Offset
-                this.WriteInt16(0);                        // Reserved Padding
-                this.WriteInt16(lenVars);                  // Length of Data Blob
+                WriteInt32((int)RoomInfo.RoomFlags); // Room Flags
+                WriteInt32(RoomInfo.FacesID); // Default Face ID
+                WriteInt16(RoomInfo.RoomID); // The Rooms ID
+                WriteInt16(roomNameOfst); // Room Name
+                WriteInt16(pictNameOfst); // Background Image Offset
+                WriteInt16(artistNameOfst); // Artist
+                WriteInt16(passwordOfst); // Password
+                WriteInt16((short)HotSpots.Count); // Number of Hotspots
+                WriteInt16(hotspotOfst); // Hotspot Offset
+                WriteInt16((short)HotSpots.Count); // Number of Pictures
+                WriteInt16(pictureOfst); // Pictures Offset
+                WriteInt16((short)HotSpots.Count); // Number of Draw Commands
+                WriteInt16(firstDrawCmd); // Draw Command Offset
+                WriteInt16(0); // Number of People ( Obsolete )
+                WriteInt16((short)LooseProps.Count); // Number of Props
+                WriteInt16(firstLProp); // Loose Props Offset
+                WriteInt16(0); // Reserved Padding
+                WriteInt16(lenVars); // Length of Data Blob
             }
 
-            this._stream.Write(_blobData.Stream.GetBuffer());
+            _stream.Write(_blobData.Stream.GetBuffer());
 
-            writer.Write(this.Stream.GetBuffer());
+            writer.Write(Stream.GetBuffer());
         }
     }
 }

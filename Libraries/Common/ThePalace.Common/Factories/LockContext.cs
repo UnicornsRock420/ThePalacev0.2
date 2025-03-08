@@ -1,22 +1,21 @@
 ﻿namespace ThePalace.Common.Factories;
 
-public partial class LockContext : IDisposable
+public class LockContext : IDisposable
 {
-    protected object? _lockObj;
     protected bool _hasLock;
-
-    public bool HasLock => _hasLock;
+    protected object? _lockObj;
 
     private LockContext()
     {
         _hasLock = false;
     }
+
     public LockContext(object? obj = null) : this()
     {
-        _lockObj = obj ?? new();
+        _lockObj = obj ?? new object();
     }
 
-    ~LockContext() => this.Dispose();
+    public bool HasLock => _hasLock;
 
     public void Dispose()
     {
@@ -27,27 +26,24 @@ public partial class LockContext : IDisposable
         GC.SuppressFinalize(this);
     }
 
+    ~LockContext()
+    {
+        Dispose();
+    }
+
     public static LockContext GetLock(object? obj = null, bool tryLock = false)
     {
         var result = (LockContext?)null;
 
         if (obj is LockContext _lockContext)
-        {
             result = _lockContext;
-        }
         else
-        {
             result = new LockContext(obj);
-        }
 
         if (tryLock)
-        {
             result.TryLock();
-        }
         else
-        {
             result.Lock();
-        }
 
         return result;
     }
@@ -68,13 +64,9 @@ public partial class LockContext : IDisposable
             _hasLock) return false;
 
         if (millisecondsTimeout > 0)
-        {
             Monitor.TryEnter(_lockObj, millisecondsTimeout, ref _hasLock);
-        }
         else
-        {
             Monitor.TryEnter(_lockObj, ref _hasLock);
-        }
 
         return _hasLock;
     }

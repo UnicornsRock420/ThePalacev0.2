@@ -7,14 +7,23 @@ using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Factories;
 
-public static partial class AsyncTcpSocket
+public static class AsyncTcpSocket
 {
+    private static readonly AsyncCallback _acceptCallback;
+    private static readonly AsyncCallback _receiveCallback;
+    private static readonly AsyncCallback _sendCallback;
+
+    private static volatile ManualResetEvent _acceptResetEvent = new(false);
+
     static AsyncTcpSocket()
     {
-        _acceptCallback = new AsyncCallback(AcceptCallback);
-        _receiveCallback = new AsyncCallback(ReceiveCallback);
-        _sendCallback = new AsyncCallback(SendCallback);
+        _acceptCallback = AcceptCallback;
+        _receiveCallback = ReceiveCallback;
+        _sendCallback = SendCallback;
     }
+
+    public static CancellationTokenSource CancellationTokenSource { get; } = new();
+    public static CancellationToken CancellationToken => CancellationTokenSource.Token;
 
     public static void Dispose()
     {
@@ -27,14 +36,6 @@ public static partial class AsyncTcpSocket
 
         Dispose();
     }
-
-    private static AsyncCallback _acceptCallback;
-    private static AsyncCallback _receiveCallback;
-    private static AsyncCallback _sendCallback;
-
-    private static volatile ManualResetEvent _acceptResetEvent = new(false);
-    public static CancellationTokenSource CancellationTokenSource { get; } = new();
-    public static CancellationToken CancellationToken => CancellationTokenSource.Token;
 
     public static event EventHandler ConnectionEstablished;
     public static event EventHandler ConnectionDisconnected;
@@ -70,10 +71,7 @@ public static partial class AsyncTcpSocket
         {
             LoggerHub.Current.Error(ex);
 
-            if (disconnectOnError)
-            {
-                connectionState?.Disconnect();
-            }
+            if (disconnectOnError) connectionState?.Disconnect();
 
             return false;
         }
@@ -88,7 +86,8 @@ public static partial class AsyncTcpSocket
         {
             ConnectionManager.Connect(connectionState, hostAddr);
 
-            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
+            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length,
+                _receiveCallback, connectionState);
 
             ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
@@ -107,7 +106,7 @@ public static partial class AsyncTcpSocket
 
         try
         {
-            var listener = ConnectionManager.CreateSocket(hostAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            var listener = ConnectionManager.CreateSocket(hostAddr.AddressFamily);
             listener.Bind(hostAddr);
             listener.Listen(listenBacklog);
 
@@ -139,7 +138,6 @@ public static partial class AsyncTcpSocket
         }
         catch (TaskCanceledException ex)
         {
-            return;
         }
         catch (SocketException ex)
         {
@@ -188,7 +186,8 @@ public static partial class AsyncTcpSocket
 
         connectionState.Do(() =>
         {
-            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
+            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length,
+                _receiveCallback, connectionState);
         });
 
         ConnectionReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
@@ -206,10 +205,7 @@ public static partial class AsyncTcpSocket
             connectionState.Do(() =>
             {
                 bytesReceived = connectionState.Socket.EndReceive(ar);
-                if (bytesReceived < 1)
-                {
-                    connectionState?.Disconnect();
-                }
+                if (bytesReceived < 1) connectionState?.Disconnect();
             });
 
             if (!connectionState.IsConnected())
@@ -229,13 +225,12 @@ public static partial class AsyncTcpSocket
 
         connectionState.Do(() =>
         {
-            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0,
+                _receiveCallback, connectionState);
         });
 
         if (connectionState.NetworkStream.DataAvailable)
-        {
             DataReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
-        }
     }
 
     public static void Send(this IConnectionState connectionState, byte[]? data)
@@ -277,7 +272,7 @@ public static partial class AsyncTcpSocket
             if (connectionState.LastReceived.HasValue &&
                 DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
             {
-                var result = (!connectionState.Socket?.Poll(1, SelectMode.SelectRead)) ?? false;
+                var result = !connectionState.Socket?.Poll(1, SelectMode.SelectRead) ?? false;
 
                 connectionState.LastReceived = DateTime.UtcNow;
 

@@ -12,37 +12,42 @@ public enum GHDrawCmds
     DrawPolygon,
     DrawPath,
     DrawRectangle,
-    FillPolygon,
+    FillPolygon
 }
 
-public partial class GHDrawCmd
+public class GHDrawCmd
 {
-    public GHDrawCmds Type;
-    public string Text;
+    public List<float> Angles = new();
+    public Brush Brush;
     public Font Font;
     public Pen Pen;
-    public Brush Brush;
+
+    public List<Point> Points = new();
+
     //public GraphicsPath Path;
     public Rectangle? Rect;
-    public List<float> Angles = new();
-    public List<Point> Points = new();
+    public string Text;
+    public GHDrawCmds Type;
 }
 
-public partial class GraphicsHelper
+public class GraphicsHelper
 {
-    private Graphics _g;
+    private readonly List<GHDrawCmd> _drawCmds = new();
+    private readonly Graphics _g;
+    private readonly List<Point> _points = new();
 
-    private Point _location;
+    private readonly StringFormat _stringFormat = new(StringFormatFlags.NoWrap);
     private Brush _brush;
     private Font _font;
+    private GraphicsPath _graphicsPath;
+
+    private Point _location;
     private Pen _pen;
 
-    private StringFormat _stringFormat = new StringFormat(StringFormatFlags.NoWrap);
-    private GraphicsPath _graphicsPath = null;
-    private List<GHDrawCmd> _drawCmds = new();
-    private List<Point> _points = new();
+    private GraphicsHelper()
+    {
+    }
 
-    private GraphicsHelper() { }
     public GraphicsHelper(Graphics g)
     {
         _location = new Point(0, 0);
@@ -83,8 +88,10 @@ public partial class GraphicsHelper
         _brush = brush;
     }
 
-    public GraphicsPath BeginPath() =>
-        _graphicsPath = new GraphicsPath();
+    public GraphicsPath BeginPath()
+    {
+        return _graphicsPath = new GraphicsPath();
+    }
 
     public void MoveTo(int x, int y)
     {
@@ -110,14 +117,13 @@ public partial class GraphicsHelper
                 Points = new List<Point>
                 {
                     _location,
-                    new Point(cpx, cpy),
-                    new Point(cpx, cpy),
-                    new Point(x, y),
+                    new(cpx, cpy),
+                    new(cpx, cpy),
+                    new(x, y)
                 },
-                Pen = _pen,
+                Pen = _pen
             });
         else
-        {
             using (var path = new GraphicsPath())
             {
                 path.AddBeziers(
@@ -130,7 +136,6 @@ public partial class GraphicsHelper
                     path,
                     true);
             }
-        }
 
         MoveTo(x, y);
     }
@@ -141,6 +146,7 @@ public partial class GraphicsHelper
 
         DrawLine(x1, y1, x2, y2);
     }
+
     public void DrawLine(int x1, int y1, int x2, int y2)
     {
         if (_graphicsPath == null)
@@ -150,21 +156,23 @@ public partial class GraphicsHelper
                 Pen = _pen,
                 Points = new List<Point>
                 {
-                    new Point(x1, y1),
-                    new Point(x2, y2),
-                },
+                    new(x1, y1),
+                    new(x2, y2)
+                }
             });
         else
             _graphicsPath.AddLine(
                 new Point(x1, y1),
                 new Point(x2, y2));
     }
+
     public void DrawLine(Pen pen, int x, int y)
     {
         _pen = pen;
 
         DrawLine(x, y);
     }
+
     public void DrawLine(int x, int y)
     {
         if (_graphicsPath == null)
@@ -174,18 +182,15 @@ public partial class GraphicsHelper
                 Points = new List<Point>
                 {
                     _location,
-                    new Point(x, y),
+                    new(x, y)
                 },
-                Pen = _pen,
+                Pen = _pen
             });
         else
-        {
             //_points.Add(new Point(x, y));
-
             _graphicsPath.AddLine(
                 _location,
                 new Point(x, y));
-        }
     }
 
     public void DrawArc(Pen pen, Rectangle rect, float startAngle, float sweepAngle)
@@ -194,6 +199,7 @@ public partial class GraphicsHelper
 
         DrawArc(rect, startAngle, sweepAngle);
     }
+
     public void DrawArc(Rectangle rect, float startAngle, float sweepAngle)
     {
         if (_graphicsPath == null)
@@ -205,8 +211,8 @@ public partial class GraphicsHelper
                 Angles = new List<float>
                 {
                     startAngle,
-                    sweepAngle,
-                },
+                    sweepAngle
+                }
             });
         else
             _graphicsPath.AddArc(
@@ -221,6 +227,7 @@ public partial class GraphicsHelper
 
         DrawPie(rect, startAngle, sweepAngle);
     }
+
     public void DrawPie(Rectangle rect, float startAngle, float sweepAngle)
     {
         if (_graphicsPath == null)
@@ -232,8 +239,8 @@ public partial class GraphicsHelper
                 Angles = new List<float>
                 {
                     startAngle,
-                    sweepAngle,
-                },
+                    sweepAngle
+                }
             });
         else
             _graphicsPath.AddPie(
@@ -248,6 +255,7 @@ public partial class GraphicsHelper
 
         DrawRectangle(rect);
     }
+
     public void DrawRectangle(Rectangle rect)
     {
         if (_graphicsPath == null)
@@ -255,14 +263,11 @@ public partial class GraphicsHelper
             {
                 Type = GHDrawCmds.DrawRectangle,
                 Rect = rect,
-                Pen = _pen,
+                Pen = _pen
             });
         else
-        {
             //_points.Add(new Point(x, y));
-
             _graphicsPath.AddRectangle(rect);
-        }
     }
 
     public void DrawEllipse(Pen pen, Rectangle rect)
@@ -271,6 +276,7 @@ public partial class GraphicsHelper
 
         DrawEllipse(rect);
     }
+
     public void DrawEllipse(Rectangle rect)
     {
         if (_graphicsPath == null)
@@ -278,7 +284,7 @@ public partial class GraphicsHelper
             {
                 Type = GHDrawCmds.DrawEllipse,
                 Rect = rect,
-                Pen = _pen,
+                Pen = _pen
             });
         else
             _graphicsPath.AddEllipse(rect);
@@ -290,6 +296,7 @@ public partial class GraphicsHelper
 
         DrawPolygon(points);
     }
+
     public void DrawPolygon(params Point[] points)
     {
         if (_graphicsPath == null)
@@ -297,7 +304,7 @@ public partial class GraphicsHelper
             {
                 Type = GHDrawCmds.DrawPolygon,
                 Points = points.ToList(),
-                Pen = _pen,
+                Pen = _pen
             });
         else
             _graphicsPath.AddPolygon(points);
@@ -310,6 +317,7 @@ public partial class GraphicsHelper
 
         DrawText(text, x, y);
     }
+
     public void DrawText(string text, int x, int y)
     {
         if (_graphicsPath == null)
@@ -321,8 +329,8 @@ public partial class GraphicsHelper
                 Text = text,
                 Points = new List<Point>
                 {
-                    new Point(x, y),
-                },
+                    new(x, y)
+                }
             });
         else
             _graphicsPath.AddString(
@@ -333,6 +341,7 @@ public partial class GraphicsHelper
                 new Point(x, y),
                 _stringFormat);
     }
+
     public void DrawText(string text)
     {
         if (_graphicsPath == null)
@@ -344,8 +353,8 @@ public partial class GraphicsHelper
                 Text = text,
                 Points = new List<Point>
                 {
-                    _location,
-                },
+                    _location
+                }
             });
         else
             _graphicsPath.AddString(
@@ -363,20 +372,19 @@ public partial class GraphicsHelper
 
         Fill();
     }
+
     public void Fill()
     {
         if (_points.Count > 0)
         {
             if (_graphicsPath != null)
-            {
                 _graphicsPath.AddBeziers(_points.ToArray());
-            }
             else
                 _drawCmds.Add(new GHDrawCmd
                 {
                     Type = GHDrawCmds.FillPolygon,
                     Points = _points.ToList(),
-                    Brush = _brush,
+                    Brush = _brush
                 });
 
             _points.Clear();
@@ -405,7 +413,7 @@ public partial class GraphicsHelper
             {
                 Type = GHDrawCmds.DrawPath,
                 Points = _points.ToList(),
-                Pen = _pen,
+                Pen = _pen
             });
 
             _points.Clear();
@@ -413,7 +421,6 @@ public partial class GraphicsHelper
 
         if (_drawCmds.Count > 0)
             foreach (var drawCmd in _drawCmds)
-            {
                 switch (drawCmd.Type)
                 {
                     case GHDrawCmds.DrawLine:
@@ -451,7 +458,7 @@ public partial class GraphicsHelper
                         _g.FillPolygon(drawCmd.Brush, drawCmd.Points.ToArray());
                         break;
                 }
-            }
+
         _drawCmds.Clear();
 
         _g.Flush();

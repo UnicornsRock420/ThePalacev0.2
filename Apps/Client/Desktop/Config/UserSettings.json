@@ -1,0 +1,169 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Trace",
+      "System": "Information",
+      "Microsoft": "None"
+    }
+  },
+  "UserProfiles": [
+    {
+      "Name": "Janus",
+      "Version": "PC4237",
+      "Crc": "CANADA"
+    }
+  ],
+  "GUI": {
+    "Connection": {
+      "Addresses": [
+        "Janus (Testing Client)"
+      ],
+      "Usernames": [
+        "alluringhistoria.epalaces.com:9998",
+        "animanic.epalaces.com:9998"
+      ]
+    }
+  },
+  "Options": {
+    "GUI": {
+      "General": {
+        "InterpolationMode": "NearestNeighbor",
+        "PixelOffsetMode": "Half",
+        "SmoothingMode": "NearestNeighbor",
+        "SysTrayIcon": false
+      },
+      "Notifications": {
+        "Toast": {
+          "Enabled": true
+        }
+      }
+    },
+    "Scripting": {
+      "Iptscrae": {
+        "Cyborgs": {
+          "Enabled": true
+        }
+      },
+      "JavaScript": {
+        "Cyborgs": {
+          "Enabled": false
+        }
+      },
+      "Python": {
+        "Cyborgs": {
+          "Enabled": false
+        }
+      }
+    }
+  },
+  "Macros": [
+    {
+      "Values": [
+        -2028848857,
+        -510298500
+      ]
+    }
+  ],
+  "HotKeys": [
+    {
+      "Keys": [
+        "CTRL",
+        "F"
+      ],
+      "Binding": "ShowUserListForm"
+    },
+    {
+      "Keys": [
+        "CTRL",
+        "G"
+      ],
+      "Binding": "ShowRoomListForm"
+    },
+    {
+      "Keys": [
+        "CTRL",
+        "L"
+      ],
+      "Binding": "ShowLogForm"
+    },
+    {
+      "Keys": [
+        "CTRL",
+        "R"
+      ],
+      "Binding": "ClearLogForm"
+    }
+  ],
+  "Ribbon": [
+    {
+      "Bookmarks": null
+    },
+    {
+      "Connection": null
+    },
+    {
+      "LiveDirectory": null
+    },
+    {
+      "Separator": null
+    },
+    {
+      "GoBack": {
+        "Style": "ddl"
+      }
+    },
+    {
+      "GoForward": {
+        "Style": "ddl"
+      }
+    },
+    {
+      "Separator": null
+    },
+    {
+      "UsersList": {
+        "Style": "ddl"
+      }
+    },
+    {
+      "RoomsList": {
+        "Style": "ddl"
+      }
+    },
+    {
+      "Sounds": {
+        "Style": "ddl"
+      }
+    },
+    {
+      "Draw": null
+    },
+    {
+      "Separator": null
+    },
+    {
+      "DoorOutlines": null
+    },
+    {
+      "UserNametags": null
+    },
+    {
+      "Chatlog": null
+    },
+    {
+      "Separator": null
+    },
+    {
+      "Tabs": null
+    },
+    {
+      "Terminal": null
+    },
+    {
+      "SuperUser": null
+    }
+  ],
+  "ConnectionStrings": {
+    "LoggingDB": "Data Source=Logging.db;Version=3;"
+  }
+}

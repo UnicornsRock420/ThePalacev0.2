@@ -1,10 +1,8 @@
-﻿using sint32 = System.Int32;
+﻿using sint32 = int;
 
 namespace ThePalace.Core.Attributes.Serialization;
 
 public class ByteSizeAttribute(int byteSize) : Attribute
 {
-    private readonly sint32 _byteSize = byteSize;
-
-    public sint32 ByteSize => _byteSize;
+    public sint32 ByteSize { get; } = byteSize;
 }

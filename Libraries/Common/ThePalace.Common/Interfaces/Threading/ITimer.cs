@@ -1,14 +1,12 @@
-﻿namespace ThePalace.Common.Interfaces.Threading
+﻿namespace ThePalace.Common.Interfaces.Threading;
+
+public interface ITimer
 {
-    public interface ITimer
-    {
-        event EventHandler Tick;
+    object? Tag { get; set; }
+    bool Enabled { get; set; }
+    int Interval { get; set; }
+    event EventHandler Tick;
 
-        object? Tag { get; set; }
-        bool Enabled { get; set; }
-        int Interval { get; set; }
-
-        void Start();
-        void Stop();
-    }
+    void Start();
+    void Stop();
 }

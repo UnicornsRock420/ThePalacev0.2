@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Shared.Communications;
 
 [Mnemonic("whis")]
-public partial class BO_WHISPER : IEventHandler<MSG_WHISPER>
+public class BO_WHISPER : IEventHandler<MSG_WHISPER>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

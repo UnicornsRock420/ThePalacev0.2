@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Common.Enums.App;
 
-public enum AudioCommandTypes : int
+public enum AudioCommandTypes
 {
     PAUSE,
     PLAY,
@@ -8,5 +8,5 @@ public enum AudioCommandTypes : int
     BEEP,
     EXCLAMATION,
     HAND,
-    QUESTION,
+    QUESTION
 }

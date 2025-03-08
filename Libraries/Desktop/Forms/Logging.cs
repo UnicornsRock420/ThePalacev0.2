@@ -4,7 +4,13 @@ namespace ThePalace.Common.Desktop.Forms;
 
 public partial class Logging : FormBase
 {
-    public Logging() =>
+    public Logging()
+    {
         InitializeComponent();
-    ~Logging() => this.Dispose(false);
+    }
+
+    ~Logging()
+    {
+        this.Dispose(false);
+    }
 }

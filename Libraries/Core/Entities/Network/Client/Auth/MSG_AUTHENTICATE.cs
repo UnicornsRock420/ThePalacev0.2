@@ -5,6 +5,6 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.Auth;
 
 [Mnemonic("auth")]
-public partial class MSG_AUTHENTICATE : EventParams, IProtocolC2S
+public class MSG_AUTHENTICATE : EventParams, IProtocolC2S
 {
 }

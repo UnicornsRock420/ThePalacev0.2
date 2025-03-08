@@ -12,6 +12,4 @@ public class FormDialog : FormBase, IFormDialog
             !Focused) Activate();
         base.WndProc(ref m);
     }
-
-    public FormDialog() { }
 }

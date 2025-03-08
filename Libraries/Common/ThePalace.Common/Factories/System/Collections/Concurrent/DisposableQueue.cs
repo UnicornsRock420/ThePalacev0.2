@@ -5,17 +5,7 @@ public class DisposableQueue<TValue> : ConcurrentQueue<TValue>, IDisposable
 {
     // https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1063
 
-    protected bool IsDisposed { get; private set; } = false;
-    //protected List<IDisposable> _managedResources { get; private set; } = new();
-
-    // NOTE: Leave out the finalizer altogether if this class doesn't
-    // own unmanaged resources, but leave the other methods
-    // exactly as they are.
-    ~DisposableQueue()
-    {
-        // Finalizer calls Dispose(false)
-        Dispose(false);
-    }
+    protected bool IsDisposed { get; private set; }
 
     // Dispose() calls Dispose(true)
     public virtual void Dispose()
@@ -25,6 +15,16 @@ public class DisposableQueue<TValue> : ConcurrentQueue<TValue>, IDisposable
         Clear();
 
         GC.SuppressFinalize(this);
+    }
+    //protected List<IDisposable> _managedResources { get; private set; } = new();
+
+    // NOTE: Leave out the finalizer altogether if this class doesn't
+    // own unmanaged resources, but leave the other methods
+    // exactly as they are.
+    ~DisposableQueue()
+    {
+        // Finalizer calls Dispose(false)
+        Dispose(false);
     }
 
     // The bulk of the clean-up code is implemented in Dispose(bool)
@@ -47,13 +47,26 @@ public class DisposableQueue<TValue> : ConcurrentQueue<TValue>, IDisposable
         IsDisposed = true;
     }
 
-    public virtual new void Clear()
+    public new virtual void Clear()
     {
         TValue item = default;
         while (Count > 0)
         {
-            try { TryDequeue(out item); } catch { }
-            try { item?.Dispose(); } catch { }
+            try
+            {
+                TryDequeue(out item);
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                item?.Dispose();
+            }
+            catch
+            {
+            }
         }
 
         base.Clear();

@@ -5,17 +5,7 @@ public class DisposableDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TVa
 {
     // https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1063
 
-    protected bool IsDisposed { get; private set; } = false;
-    //protected List<IDisposable> _managedResources { get; private set; } = new();
-
-    // NOTE: Leave out the finalizer altogether if this class doesn't
-    // own unmanaged resources, but leave the other methods
-    // exactly as they are.
-    ~DisposableDictionary()
-    {
-        // Finalizer calls Dispose(false)
-        Dispose(false);
-    }
+    protected bool IsDisposed { get; private set; }
 
     // Dispose() calls Dispose(true)
     public virtual void Dispose()
@@ -25,6 +15,16 @@ public class DisposableDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TVa
         Clear();
 
         GC.SuppressFinalize(this);
+    }
+    //protected List<IDisposable> _managedResources { get; private set; } = new();
+
+    // NOTE: Leave out the finalizer altogether if this class doesn't
+    // own unmanaged resources, but leave the other methods
+    // exactly as they are.
+    ~DisposableDictionary()
+    {
+        // Finalizer calls Dispose(false)
+        Dispose(false);
     }
 
     // The bulk of the clean-up code is implemented in Dispose(bool)
@@ -47,10 +47,16 @@ public class DisposableDictionary<TKey, TValue> : ConcurrentDictionary<TKey, TVa
         IsDisposed = true;
     }
 
-    public virtual new void Clear()
+    public new virtual void Clear()
     {
         foreach (var value in Values)
-            try { value?.Dispose(); } catch { }
+            try
+            {
+                value?.Dispose();
+            }
+            catch
+            {
+            }
 
         base.Clear();
     }

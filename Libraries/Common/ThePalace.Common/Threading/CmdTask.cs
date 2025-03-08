@@ -4,17 +4,18 @@ using ThePalace.Common.Interfaces.Plugins;
 
 namespace ThePalace.Common.Threading;
 
-public partial class CmdTask : Disposable
+public class CmdTask : Disposable
 {
-    public Task Task;
-    public List<IProvider> Providers = new();
     public List<IConsumer> Consumers = new();
+    public List<IProvider> Providers = new();
     public ConcurrentQueue<ActionCmd> Queue = new();
     public ManualResetEvent SignalEvent = new(false);
+    public Task Task;
 
-    public CmdTask() { }
-    ~CmdTask() =>
+    ~CmdTask()
+    {
         Dispose(false);
+    }
 
     public override void Dispose()
     {
@@ -26,23 +27,53 @@ public partial class CmdTask : Disposable
         {
             Queue
                 .ToList()
-                .ForEach(c => { try { c.Dispose(); } catch { } });
+                .ForEach(c =>
+                {
+                    try
+                    {
+                        c.Dispose();
+                    }
+                    catch
+                    {
+                    }
+                });
             Queue.Clear();
         }
+
         Queue = null;
 
         if ((Providers?.Count ?? 0) > 0)
         {
-            Providers.ForEach(p => { try { p.Dispose(); } catch { } });
+            Providers.ForEach(p =>
+            {
+                try
+                {
+                    p.Dispose();
+                }
+                catch
+                {
+                }
+            });
             Providers.Clear();
         }
+
         Providers = null;
 
         if ((Consumers?.Count ?? 0) > 0)
         {
-            Consumers.ForEach(c => { try { c.Dispose(); } catch { } });
+            Consumers.ForEach(c =>
+            {
+                try
+                {
+                    c.Dispose();
+                }
+                catch
+                {
+                }
+            });
             Consumers.Clear();
         }
+
         Consumers = null;
 
         SignalEvent?.Set();

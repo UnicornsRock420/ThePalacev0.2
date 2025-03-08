@@ -1,23 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWindowsForms>true</UseWindowsForms>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Documentation\Media\ThePalace.Media.csproj" />
-    <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj" />
-    <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj" />
-    <ProjectReference Include="..\..\..\Libraries\Network\ThePalace.Network.csproj" />
-    <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Documentation\Media\ThePalace.Media.csproj"/>
+        <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj"/>
+        <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj"/>
+        <ProjectReference Include="..\..\..\Libraries\Network\ThePalace.Network.csproj"/>
+        <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
+    </ItemGroup>
 
 </Project>

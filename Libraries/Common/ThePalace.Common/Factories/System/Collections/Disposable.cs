@@ -4,8 +4,16 @@ public class Disposable : IDisposable
 {
     // https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1063
 
-    protected bool IsDisposed { get; private set; } = false;
+    protected bool IsDisposed { get; private set; }
     protected List<IDisposable> _managedResources { get; private set; } = [];
+
+    // Dispose() calls Dispose(true)
+    public virtual void Dispose()
+    {
+        Dispose(true);
+
+        GC.SuppressFinalize(this);
+    }
 
     // NOTE: Leave out the finalizer altogether if this class doesn't
     // own unmanaged resources, but leave the other methods
@@ -14,14 +22,6 @@ public class Disposable : IDisposable
     {
         // Finalizer calls Dispose(false)
         Dispose(false);
-    }
-
-    // Dispose() calls Dispose(true)
-    public virtual void Dispose()
-    {
-        Dispose(true);
-
-        GC.SuppressFinalize(this);
     }
 
     // The bulk of the clean-up code is implemented in Dispose(bool)
@@ -35,9 +35,19 @@ public class Disposable : IDisposable
             if ((_managedResources?.Count ?? 0) > 0)
             {
                 _managedResources
-                    ?.ForEach(r => { try { r?.Dispose(); } catch { } });
+                    ?.ForEach(r =>
+                    {
+                        try
+                        {
+                            r?.Dispose();
+                        }
+                        catch
+                        {
+                        }
+                    });
                 _managedResources?.Clear();
             }
+
             _managedResources = null;
         }
 

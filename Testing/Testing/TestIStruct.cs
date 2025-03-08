@@ -2,20 +2,21 @@
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Users;
+using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Helpers;
-using sint16 = System.Int16;
+using sint16 = short;
 
 namespace ThePalace.Testing;
 
 public static class TestIStruct
 {
     public static MSG_LISTOFALLROOMS MSG_LISTOFALLROOMS =>
-        new MSG_LISTOFALLROOMS
+        new()
         {
-            Rooms = new()
+            Rooms = new List<ListRec>
             {
                 new()
                 {
@@ -23,7 +24,7 @@ public static class TestIStruct
                     Flags = (sint16)RoomFlags.NoPainting,
                     RefNum = 12,
 
-                    Name = "Testing 123",
+                    Name = "Testing 123"
                 },
                 new()
                 {
@@ -31,8 +32,8 @@ public static class TestIStruct
                     Flags = (sint16)RoomFlags.WizardsOnly,
                     RefNum = 24,
 
-                    Name = "Testing 456",
-                },
+                    Name = "Testing 456"
+                }
             }
         };
 
@@ -59,14 +60,14 @@ public static class TestIStruct
                     Counter = ctr,
 
                     PuidCRC = crc,
-                    PuidCtr = ctr,
+                    PuidCtr = ctr
                 }
             };
         }
     }
 
     public static MSG_USERDESC MSG_USERDESC =>
-        new MSG_USERDESC
+        new()
         {
             FaceNbr = 1,
             ColorNbr = 2,
@@ -74,7 +75,7 @@ public static class TestIStruct
             [
                 new AssetSpec(12345),
                 new AssetSpec(54321),
-                new AssetSpec(918284),
-            ],
+                new AssetSpec(918284)
+            ]
         };
 }

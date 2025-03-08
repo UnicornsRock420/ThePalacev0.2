@@ -5,11 +5,10 @@ namespace ThePalace.Core.Entities.EventsBus.EventArgs;
 
 public class ProtocolEventParams : EventParams
 {
-    public int SourceID;
+    public CancellationToken CancellationToken;
+    public IConnectionState ConnectionState;
     public int RefNum;
 
     public IProtocol? Request;
-    public IConnectionState ConnectionState;
-
-    public CancellationToken CancellationToken;
+    public int SourceID;
 }

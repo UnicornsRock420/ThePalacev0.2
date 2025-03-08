@@ -1,11 +1,9 @@
 ﻿namespace ThePalace.Common.Factories;
 
-public abstract partial class Singleton<T>
+public abstract class Singleton<T>
     where T : class, new()
 {
-    protected Singleton() { }
-
-    private static Lazy<T> _current = new Lazy<T>();
+    private static readonly Lazy<T> _current = new();
 
     public static T Current => _current.Value;
 }

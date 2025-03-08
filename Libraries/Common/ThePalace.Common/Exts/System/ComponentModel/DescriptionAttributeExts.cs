@@ -1,15 +1,7 @@
-﻿using System.Linq;
-
-namespace System.ComponentModel;
+﻿namespace System.ComponentModel;
 
 public static class DescriptionAttributeExts
 {
-    public static class Types
-    {
-        public static readonly Type DescriptionAttribute = typeof(DescriptionAttribute);
-        public static readonly Type DescriptionAttributeArray = typeof(DescriptionAttribute[]);
-    }
-
     //static DescriptionAttributeExts() { }
 
     public static string GetDescription<T>(this T value)
@@ -17,8 +9,10 @@ public static class DescriptionAttributeExts
         var type = typeof(T);
         var _value = value?.ToString()?.Trim();
         return
-            string.IsNullOrWhiteSpace(_value) ? null
-                : (!(type?.IsEnum ?? false) ? null
+            string.IsNullOrWhiteSpace(_value)
+                ? null
+                : (!(type?.IsEnum ?? false)
+                      ? null
                       : type?.GetField(_value)?.GetCustomAttributes(Types.DescriptionAttribute, true)
                         ?? ((object)value as Type)?.GetCustomAttributes(Types.DescriptionAttribute, true)
                         ?? type?.GetCustomAttributes(Types.DescriptionAttribute, true))
@@ -27,5 +21,11 @@ public static class DescriptionAttributeExts
                   ?.Where(s => s != null)
                   ?.FirstOrDefault()
                   ?? _value;
+    }
+
+    public static class Types
+    {
+        public static readonly Type DescriptionAttribute = typeof(DescriptionAttribute);
+        public static readonly Type DescriptionAttributeArray = typeof(DescriptionAttribute[]);
     }
 }

@@ -2,14 +2,6 @@
 
 public static class CancellationTokenExts
 {
-    public static class Types
-    {
-        public static readonly Type CancellationToken = typeof(CancellationToken);
-        public static readonly Type CancellationTokenList = typeof(List<CancellationToken>);
-        public static readonly Type CancellationTokenSource = typeof(CancellationTokenSource);
-        public static readonly Type CancellationTokenSourceList = typeof(List<CancellationTokenSource>);
-    }
-
     //static CancellationTokenExts() { }
 
     public static void ForceCancel(ref this CancellationToken cancellationToken, Func<bool>? condition = null)
@@ -20,5 +12,13 @@ public static class CancellationTokenExts
             cancellationToken = cts.Token;
             cts.Cancel();
         }
+    }
+
+    public static class Types
+    {
+        public static readonly Type CancellationToken = typeof(CancellationToken);
+        public static readonly Type CancellationTokenList = typeof(List<CancellationToken>);
+        public static readonly Type CancellationTokenSource = typeof(CancellationTokenSource);
+        public static readonly Type CancellationTokenSourceList = typeof(List<CancellationTokenSource>);
     }
 }

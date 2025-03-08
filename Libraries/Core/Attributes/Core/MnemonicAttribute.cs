@@ -1,14 +1,12 @@
-﻿using uint32 = System.UInt32;
+﻿using uint32 = uint;
 
 namespace ThePalace.Core.Attributes.Core;
 
 public class MnemonicAttribute(
     string mnemonic) : Attribute
 {
-    private readonly string _mnemonic = mnemonic;
-    private readonly uint32 _hexValue = BitConverter.ToUInt32(
-        mnemonic.GetBytes(4).ToArray());
+    public string Mnemonic { get; } = mnemonic;
 
-    public string Mnemonic => _mnemonic;
-    public uint32 HexValue => _hexValue;
+    public uint32 HexValue { get; } = BitConverter.ToUInt32(
+        mnemonic.GetBytes(4).ToArray());
 }

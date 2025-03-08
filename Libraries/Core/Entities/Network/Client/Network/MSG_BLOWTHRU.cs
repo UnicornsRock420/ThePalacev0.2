@@ -4,21 +4,21 @@ using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 using ThePalace.Core.Interfaces.Network;
-using uint32 = System.UInt32;
-using uint8 = System.Byte;
-using UserID = System.Int32;
+using uint32 = uint;
+using uint8 = byte;
+using UserID = int;
 
 namespace ThePalace.Core.Entities.Network.Client.Network;
 
 [DynamicSize]
 [Mnemonic("blow")]
-public partial class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
+public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
 {
+    public uint8[] Embedded;
     public uint32 Flags;
     public uint32 NbrUsers;
-    public UserID[] UserIDs; /* iff nbrUsers >= 0 */
     public uint32 PluginTag;
-    public uint8[] Embedded;
+    public UserID[] UserIDs; /* iff nbrUsers >= 0 */
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
@@ -26,10 +26,7 @@ public partial class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
         NbrUsers = reader.ReadUInt32();
 
         UserIDs = new UserID[NbrUsers];
-        for (var j = 0; j < NbrUsers; j++)
-        {
-            UserIDs[j] = reader.ReadInt32();
-        }
+        for (var j = 0; j < NbrUsers; j++) UserIDs[j] = reader.ReadInt32();
 
         PluginTag = reader.ReadUInt32();
 
@@ -45,10 +42,7 @@ public partial class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
         writer.WriteUInt32(Flags);
         writer.WriteUInt32((uint)UserIDs.Length);
 
-        foreach (var id in UserIDs)
-        {
-            writer.WriteInt32(id);
-        }
+        foreach (var id in UserIDs) writer.WriteInt32(id);
 
         writer.WriteUInt32(PluginTag);
 

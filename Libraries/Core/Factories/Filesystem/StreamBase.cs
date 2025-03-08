@@ -4,9 +4,8 @@ namespace ThePalace.Core.Factories.Filesystem;
 
 public abstract class StreamBase : Disposable, IDisposable
 {
-    public StreamBase() { }
-    ~StreamBase() =>
-        Dispose();
+    protected FileStream _fileStream;
+    protected string _pathToFile;
 
     public override void Dispose()
     {
@@ -15,8 +14,10 @@ public abstract class StreamBase : Disposable, IDisposable
         base.Dispose();
     }
 
-    protected FileStream _fileStream;
-    protected string _pathToFile;
+    ~StreamBase()
+    {
+        Dispose();
+    }
 
     public bool Open(string pathToFile, bool write = false)
     {
@@ -27,20 +28,13 @@ public abstract class StreamBase : Disposable, IDisposable
         if (write)
         {
             if (File.Exists(_pathToFile))
-            {
                 _fileStream = new FileStream(_pathToFile, FileMode.Truncate, FileAccess.Write);
-            }
             else
-            {
                 _fileStream = new FileStream(_pathToFile, FileMode.OpenOrCreate, FileAccess.Write);
-            }
         }
         else
         {
-            if (!File.Exists(_pathToFile))
-            {
-                return false;
-            }
+            if (!File.Exists(_pathToFile)) return false;
 
             _fileStream = File.Open(_pathToFile, FileMode.Open, FileAccess.Read);
         }

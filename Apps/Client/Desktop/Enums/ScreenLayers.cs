@@ -14,5 +14,5 @@ public enum ScreenLayers : short
     SpotBorder,
     TopPaint,
     Messages,
-    DimRoom,
+    DimRoom
 }

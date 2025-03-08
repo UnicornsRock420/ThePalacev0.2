@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Server.Auth;
 
 [Mnemonic("autr")]
-public partial class BO_AUTHRESPONSE : IEventHandler<MSG_AUTHRESPONSE>
+public class BO_AUTHRESPONSE : IEventHandler<MSG_AUTHRESPONSE>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

@@ -16,7 +16,7 @@ public enum ServerExtInfoTypes : uint
     SI_INF_FLAG = 0x464C414,
     SI_INF_NUM_USERS = 0x4E55535,
     SI_INF_NAME = 0x4E414D4,
-    SI_INF_HURL = 0x4855524,
+    SI_INF_HURL = 0x4855524
 }
 
 [ByteSize(4)]
@@ -29,7 +29,7 @@ public enum ServerExtInfoInFlags : uint
     SI_NUM_USERS = 0x00000010,
     SI_SERVER_NAME = 0x00000020,
     SI_HTTP_URL = 0x00000040
-};
+}
 
 [ByteSize(2)]
 public enum ServerExtInfoOutFlags : short
@@ -39,8 +39,8 @@ public enum ServerExtInfoOutFlags : short
     FF_GuestsAreMembers = 0x0004,
     FF_Unused1 = 0x0008,
     FF_InstantPalace = 0x0010,
-    FF_PalacePresents = 0x0020,
-};
+    FF_PalacePresents = 0x0020
+}
 
 [ByteSize(1)]
 public enum ServerExtInfoPlatform : byte
@@ -48,5 +48,5 @@ public enum ServerExtInfoPlatform : byte
     PLAT_Macintosh = 0,
     PLAT_Windows95 = 1,
     PLAT_WindowsNT = 2,
-    PLAT_Unix = 3,
-};
+    PLAT_Unix = 3
+}

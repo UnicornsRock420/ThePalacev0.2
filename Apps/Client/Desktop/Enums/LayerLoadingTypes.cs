@@ -3,5 +3,5 @@
 public enum LayerLoadingTypes
 {
     Filesystem,
-    Resource,
+    Resource
 }

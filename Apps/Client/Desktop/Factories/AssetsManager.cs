@@ -12,26 +12,30 @@ using ThePalace.Core.Factories.Core;
 
 namespace ThePalace.Client.Desktop.Factories;
 
-public partial class AssetsManager : SingletonDisposable<AssetsManager>
+public class AssetsManager : SingletonDisposable<AssetsManager>
 {
-    public Type ResourceType { get; set; }
-
-    public DisposableDictionary<uint, Bitmap> SmileyFaces { get; private set; } = new();
-    public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
-    public List<AssetSpec[]> Macros { get; private set; } = new();
-
     public AssetsManager()
     {
         _managedResources.AddRange(
             new IDisposable[]
             {
                 SmileyFaces,
-                Assets,
+                Assets
             });
 
-        ApiManager.Current.RegisterApi(nameof(this.ExecuteMacro), this.ExecuteMacro);
+        ApiManager.Current.RegisterApi(nameof(ExecuteMacro), ExecuteMacro);
     }
-    ~AssetsManager() => Dispose(false);
+
+    public Type ResourceType { get; set; }
+
+    public DisposableDictionary<uint, Bitmap> SmileyFaces { get; private set; } = new();
+    public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
+    public List<AssetSpec[]> Macros { get; private set; } = new();
+
+    ~AssetsManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
@@ -45,11 +49,9 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
-        var sessionState = sender as IUISessionState;
-        if (sessionState == null) return;
+        if (sender is not IUISessionState sessionState) return;
 
-        var apiEvent = e as ApiEvent;
-        if (apiEvent == null) return;
+        if (e is not ApiEvent apiEvent) return;
 
         var list = new List<AssetSpec>();
 
@@ -89,7 +91,13 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
             if (SmileyFaces.Count > 0)
             {
                 foreach (var smileyFace in SmileyFaces.Values)
-                    try { smileyFace.Dispose(); } catch { }
+                    try
+                    {
+                        smileyFace.Dispose();
+                    }
+                    catch
+                    {
+                    }
 
                 SmileyFaces.Clear();
             }
@@ -101,7 +109,8 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
         for (var x = (uint)0; x < imgSmileyFaces.Width; x += deltaX)
         for (var y = (uint)0; y < imgSmileyFaces.Height; y += deltaY)
         {
-            var result = new Bitmap((int)AssetConstants.Values.DefaultPropWidth, (int)AssetConstants.Values.DefaultPropHeight);
+            var result = new Bitmap((int)AssetConstants.Values.DefaultPropWidth,
+                (int)AssetConstants.Values.DefaultPropHeight);
 
             using (var canvas = Graphics.FromImage(result))
             {
@@ -126,7 +135,7 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
 
             var index = (uint)0;
             index += x / deltaX % DesktopConstants.MaxNbrFaces;
-            index += y / deltaY % DesktopConstants.MaxNbrColors << 8;
+            index += (y / deltaY % DesktopConstants.MaxNbrColors) << 8;
 
             SmileyFaces.TryAdd(index, result);
         }
@@ -138,7 +147,9 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
     public void RegisterAsset(AssetDesc assetRec)
     {
         lock (Current.Assets)
+        {
             Current.Assets.TryAdd(assetRec.AssetInfo.AssetSpec.Id, assetRec);
+        }
     }
 
     public void FreeAssets(bool purge = false, params int[] propIDs)
@@ -161,7 +172,7 @@ public partial class AssetsManager : SingletonDisposable<AssetsManager>
                     .Select(p => p?.Id ?? 0)
                     ?.Distinct()
                     ?.Where(id => id != 0))
-                ?.ToList() ?? new();
+                ?.ToList() ?? new List<int>();
 
             var iQuery = Current.Assets.Values
                 .Select(a => a.AssetInfo.AssetSpec.Id)

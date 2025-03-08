@@ -1,13 +1,13 @@
 ﻿namespace ThePalace.Common.Factories;
 
-sealed public class TCF : IDisposable
+public sealed class TCF : IDisposable
 {
-    private bool BreakOnException = false;
+    private readonly bool BreakOnException;
+    private Action<IReadOnlyList<Exception>> CatchBlock;
+    private Action<TCFResults> FinallyBlock;
+    private TCFResults Results;
 
-    private List<Action> TryBlocks = null;
-    private Action<IReadOnlyList<Exception>> CatchBlock = null;
-    private Action<TCFResults> FinallyBlock = null;
-    private TCFResults Results = null;
+    private List<Action> TryBlocks;
 
     //public static class Types
     //{
@@ -21,7 +21,42 @@ sealed public class TCF : IDisposable
         Results = new TCFResults();
     }
 
-    ~TCF() => Dispose();
+    public TCF(bool breakOnException = true)
+        : this()
+    {
+        BreakOnException = breakOnException;
+    }
+
+    public TCF(params Action[] tryBlocks)
+        : this()
+    {
+        Try(tryBlocks);
+    }
+
+    public TCF(IEnumerable<Action> tryBlocks)
+        : this()
+    {
+        Try(tryBlocks);
+    }
+
+    public TCF(params Func<object>[] tryBlocks)
+        : this()
+    {
+        Try(tryBlocks);
+    }
+
+    public TCF(IEnumerable<Func<object>> tryBlocks)
+        : this()
+    {
+        Try(tryBlocks);
+    }
+
+    public TCF(params IDisposable[] tryObjects)
+        : this()
+    {
+        TryDispose(tryObjects);
+    }
+
     public void Dispose()
     {
         TryBlocks?.Clear();
@@ -31,40 +66,40 @@ sealed public class TCF : IDisposable
         Results = null;
     }
 
-    public TCF(bool breakOnException = true)
-        : this() =>
-        BreakOnException = breakOnException;
-    public static TCF Options(bool breakOnException = true) =>
-        new TCF(breakOnException);
+    ~TCF()
+    {
+        Dispose();
+    }
 
-    public TCF(params Action[] tryBlocks)
-        : this() =>
-        Try(tryBlocks);
-    public TCF(IEnumerable<Action> tryBlocks)
-        : this() =>
-        Try(tryBlocks);
-    public TCF(params Func<object>[] tryBlocks)
-        : this() =>
-        Try(tryBlocks);
-    public TCF(IEnumerable<Func<object>> tryBlocks)
-        : this() =>
-        Try(tryBlocks);
+    public static TCF Options(bool breakOnException = true)
+    {
+        return new TCF(breakOnException);
+    }
 
-    public TCF(params IDisposable[] tryObjects)
-        : this() =>
-        TryDispose(tryObjects);
+    public static TCF _Try(params Action[] tryBlocks)
+    {
+        return new TCF(tryBlocks);
+    }
 
-    public static TCF _Try(params Action[] tryBlocks) =>
-        new TCF(tryBlocks);
-    public static TCF _Try(IEnumerable<Action> tryBlocks) =>
-        new TCF(tryBlocks);
-    public static TCF _Try(params Func<object>[] tryBlocks) =>
-        new TCF(tryBlocks);
-    public static TCF _Try(IEnumerable<Func<object>> tryBlocks) =>
-        new TCF(tryBlocks);
+    public static TCF _Try(IEnumerable<Action> tryBlocks)
+    {
+        return new TCF(tryBlocks);
+    }
 
-    public static TCF _TryDispose(params IDisposable[] tryObjects) =>
-        new TCF(tryObjects);
+    public static TCF _Try(params Func<object>[] tryBlocks)
+    {
+        return new TCF(tryBlocks);
+    }
+
+    public static TCF _Try(IEnumerable<Func<object>> tryBlocks)
+    {
+        return new TCF(tryBlocks);
+    }
+
+    public static TCF _TryDispose(params IDisposable[] tryObjects)
+    {
+        return new TCF(tryObjects);
+    }
 
     public TCF Try(params Action[] tryBlocks)
     {
@@ -74,6 +109,7 @@ sealed public class TCF : IDisposable
 
         return this;
     }
+
     public TCF Try(IEnumerable<Action> tryBlocks)
     {
         if (tryBlocks != null)
@@ -82,6 +118,7 @@ sealed public class TCF : IDisposable
 
         return this;
     }
+
     public TCF Try(params Func<object>[] tryBlocks)
     {
         if (tryBlocks != null)
@@ -91,6 +128,7 @@ sealed public class TCF : IDisposable
 
         return this;
     }
+
     public TCF Try(IEnumerable<Func<object>> tryBlocks)
     {
         if (tryBlocks != null)
@@ -119,10 +157,11 @@ sealed public class TCF : IDisposable
 
     public TCF Finally(Action finallyBlock)
     {
-        FinallyBlock ??= (results) => finallyBlock();
+        FinallyBlock ??= results => finallyBlock();
 
         return this;
     }
+
     public TCF Finally(Action<TCFResults> finallyBlock)
     {
         FinallyBlock ??= finallyBlock;
@@ -183,12 +222,14 @@ sealed public class TCF : IDisposable
     }
 }
 
-sealed public class TCFResults
+public sealed class TCFResults
 {
     internal List<Exception> IExceptions = [];
     internal List<object> IResults = [];
+
     public IReadOnlyList<Exception> Exceptions =>
         IExceptions.AsReadOnly();
+
     public IReadOnlyList<object> Results =>
         IResults.AsReadOnly();
 }

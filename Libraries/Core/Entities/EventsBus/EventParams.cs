@@ -3,14 +3,13 @@ using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Core.Entities.EventsBus;
 
-public abstract class EventParams : System.EventArgs, IEventParams
+public partial class EventParams : System.EventArgs, IEventParams
 {
-    protected EventParams()
+    public EventParams()
     {
-        Id = Guid.NewGuid();
-        OccurredOn = DateTime.UtcNow;
     }
-    protected EventParams(
+
+    public EventParams(
         Guid id,
         DateTime occurredOn)
     {
@@ -18,9 +17,7 @@ public abstract class EventParams : System.EventArgs, IEventParams
         OccurredOn = occurredOn;
     }
 
-    [IgnoreDataMember]
-    public Guid Id { get; protected set; }
+    [IgnoreDataMember] public Guid Id { get; } = Guid.NewGuid();
 
-    [IgnoreDataMember]
-    public DateTime OccurredOn { get; protected set; }
+    [IgnoreDataMember] public DateTime OccurredOn { get; } = DateTime.UtcNow;
 }

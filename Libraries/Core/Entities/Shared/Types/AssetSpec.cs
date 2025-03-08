@@ -1,38 +1,46 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
-using sint32 = System.Int32;
-using uint32 = System.UInt32;
+using sint32 = int;
+using uint32 = uint;
 
 namespace ThePalace.Core.Entities.Shared.Types;
 
 [ByteSize(8)]
-public partial class AssetSpec : IStructSerializer
+public class AssetSpec : IStructSerializer
 {
+    public uint32 Crc;
+
+    public sint32 Id;
+
     public AssetSpec()
     {
         Id = 0;
         Crc = 0;
     }
+
     public AssetSpec(sint32 Id)
     {
         this.Id = Id;
         Crc = 0;
     }
+
     public AssetSpec(sint32 Id, uint32 Crc)
     {
         this.Id = Id;
         this.Crc = Crc;
     }
-    public AssetSpec(Stream reader, SerializerOptions opts = SerializerOptions.None) => Deserialize(reader, opts);
+
+    public AssetSpec(Stream reader, SerializerOptions opts = SerializerOptions.None)
+    {
+        Deserialize(reader, opts);
+    }
+
     public AssetSpec(AssetSpec assetSpec)
     {
         Id = assetSpec.Id;
         Crc = assetSpec.Crc;
     }
-
-    public sint32 Id;
-    public uint32 Crc;
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {

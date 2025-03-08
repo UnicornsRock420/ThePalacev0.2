@@ -3,7 +3,7 @@ using ThePalace.Core.Entities.Shared.Rooms;
 
 namespace ThePalace.Common.Server;
 
-public partial class ServerBase
+public class ServerBase
 {
     public DisposableList<RoomDesc> Rooms { get; set; } = new();
     public DisposableList<IServerSessionState> Users { get; set; } = new();

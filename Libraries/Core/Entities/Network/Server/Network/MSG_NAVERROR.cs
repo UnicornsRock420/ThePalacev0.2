@@ -5,6 +5,6 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Network;
 
 [Mnemonic("sErr")]
-public partial class MSG_NAVERROR : EventParams, IProtocolS2C
+public class MSG_NAVERROR : EventParams, IProtocolS2C
 {
 }

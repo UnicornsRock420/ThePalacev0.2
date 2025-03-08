@@ -5,32 +5,60 @@ namespace ThePalace.Common.Desktop.Entities.Ribbon;
 
 public abstract class ItemBase : IDisposable
 {
-    public string Title { get; set; } = null;
-    public virtual string Type { get; set; } = null;
+    private int _hoverFrameIndex;
+    public string Title { get; set; }
+    public virtual string Type { get; set; }
     public ApiBinding Binding { get; set; } = null;
     public bool Checked { get; set; } = false;
     public virtual bool Checkable { get; } = false;
 
-    public string HoverIcon { get; set; } = null;
-    public Bitmap[] HoverFrames { get; set; } = null;
-    private int _hoverFrameIndex = 0;
+    public string HoverIcon { get; set; }
+    public Bitmap[] HoverFrames { get; set; }
 
-    public void Dispose() => Unload();
+    public void Dispose()
+    {
+        Unload();
+    }
 
     public void Unload()
     {
         if ((HoverFrames?.Length ?? 0) > 0)
             foreach (var frame in HoverFrames)
-                try { frame?.Dispose(); } catch { }
+                try
+                {
+                    frame?.Dispose();
+                }
+                catch
+                {
+                }
 
         if (this is StandardItem _standardItem)
         {
-            try { _standardItem.Image?.Dispose(); } catch { }
+            try
+            {
+                _standardItem.Image?.Dispose();
+            }
+            catch
+            {
+            }
         }
         else if (this is BooleanItem _booleanItem)
         {
-            try { _booleanItem.OnImage?.Dispose(); } catch { }
-            try { _booleanItem.OffImage?.Dispose(); } catch { }
+            try
+            {
+                _booleanItem.OnImage?.Dispose();
+            }
+            catch
+            {
+            }
+
+            try
+            {
+                _booleanItem.OffImage?.Dispose();
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -64,6 +92,7 @@ public abstract class ItemBase : IDisposable
 
                         g.Save();
                     }
+
                     hoverFrames.Add(frame);
                 }
 
@@ -108,15 +137,20 @@ public abstract class ItemBase : IDisposable
             var stream = assembly.GetManifestResourceStream(resourcePath);
             if (stream == null) return null;
 
-            else return new Bitmap(stream);
+            return new Bitmap(stream);
         }
-        catch { }
+        catch
+        {
+        }
 
         return null;
     }
 
-    public static Type Parse<T>() =>
-        Parse(typeof(T).Name);
+    public static Type Parse<T>()
+    {
+        return Parse(typeof(T).Name);
+    }
+
     public static Type Parse(string nodeType)
     {
         return AppDomain.CurrentDomain
@@ -128,10 +162,16 @@ public abstract class ItemBase : IDisposable
             .FirstOrDefault();
     }
 
-    public static ItemBase Instance<T>() =>
-        Instance(typeof(T).Name);
-    public static ItemBase Instance(string nodeType) =>
-        (ItemBase)Parse(nodeType).GetInstance();
+    public static ItemBase Instance<T>()
+    {
+        return Instance(typeof(T).Name);
+    }
+
+    public static ItemBase Instance(string nodeType)
+    {
+        return (ItemBase)Parse(nodeType).GetInstance();
+    }
+
     public static ItemBase Instance(string nodeType, string buttonType)
     {
         var result = Instance(nodeType);
@@ -159,8 +199,11 @@ public abstract class ItemBase : IDisposable
         return result;
     }
 
-    public static ItemBase Clone(ItemBase instance) =>
-        Clone(instance, instance.Type);
+    public static ItemBase Clone(ItemBase instance)
+    {
+        return Clone(instance, instance.Type);
+    }
+
     public static ItemBase Clone(ItemBase instance, string buttonType)
     {
         var result = Instance(instance.GetType().Name, buttonType);
@@ -182,6 +225,7 @@ public abstract class ItemBase : IDisposable
             _booleanItem1.OffIcon = _booleanItem2.OffIcon;
             _booleanItem1.OffImage = _booleanItem2.OffImage;
         }
+
         return result;
     }
 }

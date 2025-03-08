@@ -4,14 +4,6 @@ namespace System;
 
 public static class AttributeExts
 {
-    public static class Types
-    {
-        public static readonly Type Attribute = typeof(Attribute);
-        public static readonly Type AttributeArray = typeof(Attribute[]);
-        public static readonly Type AttributeList = typeof(List<Attribute>);
-        public static readonly Type DescriptionAttribute = typeof(DescriptionAttribute);
-    }
-
     public static string? GetDescriptio<T>(this T? value)
     {
         var type = value?.GetType() ?? typeof(T);
@@ -36,6 +28,14 @@ public static class AttributeExts
         }
 
         return null;
+    }
+
+    public static class Types
+    {
+        public static readonly Type Attribute = typeof(Attribute);
+        public static readonly Type AttributeArray = typeof(Attribute[]);
+        public static readonly Type AttributeList = typeof(List<Attribute>);
+        public static readonly Type DescriptionAttribute = typeof(DescriptionAttribute);
     }
 
     //static AttributeExts() { }

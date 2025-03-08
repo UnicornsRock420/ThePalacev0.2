@@ -1,4 +1,5 @@
 ﻿using ThePalace.Core.Entities.Core;
+using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums.Palace;
 using ThePalace.Core.Interfaces.Data;
 
@@ -10,7 +11,7 @@ public partial class AssetRec : RawStream, IStructSerializer
     {
         Type = (LegacyAssetTypes)reader.ReadInt32();
 
-        AssetSpec = new(reader);
+        AssetSpec = new AssetSpec(reader);
 
         BlockOffset = reader.ReadInt32();
         BlockSize = reader.ReadUInt32();
@@ -34,10 +35,7 @@ public partial class AssetRec : RawStream, IStructSerializer
         writer.WriteUInt16(BlockNbr);
         writer.WriteUInt16(NbrBlocks);
 
-        if (BlockNbr == 0)
-        {
-            AssetDesc.Serialize(writer, opts);
-        }
+        if (BlockNbr == 0) AssetDesc.Serialize(writer, opts);
 
         // TODO: Data
     }

@@ -1,4 +1,6 @@
-﻿namespace ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Common.Constants;
+
+namespace ThePalace.Core.Attributes.Core;
 
 public class VersionAttribute : Attribute
 {
@@ -8,7 +10,7 @@ public class VersionAttribute : Attribute
         ushort revision = 0,
         ushort build = 0)
     {
-        _version = string.Join('.', major, minor, revision, build);
+        Version = string.Join('.', major, minor, revision, build);
     }
 
     public VersionAttribute(
@@ -20,16 +22,14 @@ public class VersionAttribute : Attribute
         uint seconds = 0,
         uint milliseconds = 0)
     {
-        _version = string.Join('.', year, month, day, hours, minutes, seconds, milliseconds);
+        Version = string.Join('.', year, month, day, hours, minutes, seconds, milliseconds);
     }
 
     public VersionAttribute(
         string? version)
     {
-        _version = Common.Constants.RegexConstants.REGEX_NONNUMERIC_FILTER.Replace(version, string.Empty);
+        Version = RegexConstants.REGEX_NONNUMERIC_FILTER.Replace(version, string.Empty);
     }
 
-    private readonly string _version = string.Empty;
-
-    public string Version => _version;
+    public string Version { get; } = string.Empty;
 }

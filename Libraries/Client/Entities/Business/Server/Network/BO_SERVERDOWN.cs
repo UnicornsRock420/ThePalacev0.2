@@ -7,7 +7,7 @@ namespace ThePalace.Common.Client.Entities.Business.Server.Network;
 
 [ByteSize(4)]
 [Mnemonic("down")]
-public partial class BO_SERVERDOWN : IEventHandler<MSG_SERVERDOWN>
+public class BO_SERVERDOWN : IEventHandler<MSG_SERVERDOWN>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

@@ -5,13 +5,6 @@ namespace ThePalace.Core.Exts;
 
 public static class AttributeExts
 {
-    public static class Types
-    {
-        public static readonly Type MnemonicAttribute = typeof(MnemonicAttribute);
-        public static readonly Type BitSizeAttribute = typeof(BitSizeAttribute);
-        public static readonly Type ByteSizeAttribute = typeof(ByteSizeAttribute);
-    }
-
     public static string? GetMnemonic<T>()
     {
         var attribs = new List<MnemonicAttribute>();
@@ -107,14 +100,17 @@ public static class AttributeExts
                 break;
         }
 
-        if ((byteAttribs.Count + bitAttribs.Count) < 1) return 0;
+        if (byteAttribs.Count + bitAttribs.Count < 1) return 0;
 
         return byteAttribs.Select(a => a.ByteSize * 8)
             .Union(bitAttribs.Select(a => a.BitSize))
             .FirstOrDefault();
     }
 
-    public static int GetByteSize<T>() => GetByteSize(typeof(T));
+    public static int GetByteSize<T>()
+    {
+        return GetByteSize(typeof(T));
+    }
 
     public static int GetByteSize(this Type type)
     {
@@ -142,6 +138,13 @@ public static class AttributeExts
         return attribs
             .Select(a => a.ByteSize)
             .FirstOrDefault();
+    }
+
+    public static class Types
+    {
+        public static readonly Type MnemonicAttribute = typeof(MnemonicAttribute);
+        public static readonly Type BitSizeAttribute = typeof(BitSizeAttribute);
+        public static readonly Type ByteSizeAttribute = typeof(ByteSizeAttribute);
     }
 
     //static AttributeExts() { }

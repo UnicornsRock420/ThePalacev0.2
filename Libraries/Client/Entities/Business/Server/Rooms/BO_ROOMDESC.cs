@@ -7,7 +7,7 @@ namespace ThePalace.Common.Client.Entities.Business.Server.Rooms;
 
 [DynamicSize]
 [Mnemonic("room")]
-public partial class BO_ROOMDESC : IEventHandler<MSG_ROOMDESC>
+public class BO_ROOMDESC : IEventHandler<MSG_ROOMDESC>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

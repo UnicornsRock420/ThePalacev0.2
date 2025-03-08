@@ -6,18 +6,12 @@ namespace System;
 
 public static class ObjectExts
 {
-    public static class Types
-    {
-        public static readonly Type Object = typeof(Object);
-        public static readonly Type ObjectArray = typeof(Object[]);
-        public static readonly Type ObjectList = typeof(List<Object>);
-        public static readonly Type ExpandoObject = typeof(ExpandoObject);
-    }
-
     //static ObjectExts() { }
 
-    public static int SizeOf(this object obj) =>
-        Marshal.SizeOf(obj);
+    public static int SizeOf(this object obj)
+    {
+        return Marshal.SizeOf(obj);
+    }
 
     public static IntPtr ToIntPtr<T>(this T obj)
     {
@@ -64,16 +58,20 @@ public static class ObjectExts
                     Marshal.FreeHGlobal(handle);
             }
         }
+
         return result;
     }
 
-    public static T FromIntPtr<T>(this IntPtr obj) =>
-        (T)GCHandle.FromIntPtr(obj).Target;
+    public static T FromIntPtr<T>(this IntPtr obj)
+    {
+        return (T)GCHandle.FromIntPtr(obj).Target;
+    }
 
     public static void ClearEvents(this object obj, string eventName)
     {
         if (obj == null) throw new ArgumentNullException(nameof(obj), nameof(obj) + " cannot be null");
-        else if (string.IsNullOrWhiteSpace(eventName)) throw new ArgumentNullException(nameof(eventName), nameof(eventName) + " cannot be null");
+        if (string.IsNullOrWhiteSpace(eventName))
+            throw new ArgumentNullException(nameof(eventName), nameof(eventName) + " cannot be null");
 
         var fi = obj.GetType()?.GetEventField(eventName);
         if (fi == null) throw new NullReferenceException($"Event field {eventName} was not found");
@@ -81,32 +79,31 @@ public static class ObjectExts
         fi.SetValue(obj, null);
     }
 
-    public static T TryParse<T>(this object? value, T? defaultValue = default(T?), string? format = null) =>
-        StringExts.TryParse(value?.ToString(), defaultValue, format);
+    public static T TryParse<T>(this object? value, T? defaultValue = default, string? format = null)
+    {
+        return (value?.ToString()).TryParse(defaultValue, format);
+    }
 
     public static bool Is<TCompare>(this object obj)
     {
         var type = typeof(TCompare);
         if (type.IsInterface &&
             obj.GetType().GetInterfaces().Contains(type))
-        {
             return true;
-        }
 
         return obj is TCompare;
     }
-    public static bool Is<TCompare>(this object obj, out TCompare result, TCompare defaultValue = default(TCompare))
+
+    public static bool Is<TCompare>(this object obj, out TCompare result, TCompare defaultValue = default)
     {
         var type = typeof(TCompare);
         if (type.IsInterface)
-        {
             if (obj.GetType().GetInterfaces().Contains(type))
             {
                 result = (TCompare)obj;
 
                 return true;
             }
-        }
 
         if (obj is TCompare)
         {
@@ -120,8 +117,10 @@ public static class ObjectExts
         return false;
     }
 
-    public static bool Is(this object obj, Type type) =>
-        IsAny(obj, type);
+    public static bool Is(this object obj, Type type)
+    {
+        return IsAny(obj, type);
+    }
 
     public static bool IsAny(this object obj, params Type[] types)
     {
@@ -146,12 +145,10 @@ public static class ObjectExts
         var type = obj.GetType();
         var interfaces = type.GetInterfaces();
         foreach (var t in types)
-        {
             if (!types.Contains(type) &&
                 !(type.IsAssignableFrom(t) || type.IsAssignableTo(t)) &&
                 !(!t.IsInterface || interfaces.Contains(t)))
                 return false;
-        }
 
         return true;
     }
@@ -166,13 +163,18 @@ public static class ObjectExts
     {
         var mapsterConfig = TypeAdapterConfig.GlobalSettings.Clone();
         if ((ignorePropertyNames?.Length ?? 0) > 0)
-        {
             foreach (var name in ignorePropertyNames)
-            {
                 mapsterConfig.Default.Ignore(name);
-            }
-        }
+
         var entity = obj.Adapt<T>(mapsterConfig);
         return (T)entity;
+    }
+
+    public static class Types
+    {
+        public static readonly Type Object = typeof(object);
+        public static readonly Type ObjectArray = typeof(object[]);
+        public static readonly Type ObjectList = typeof(List<object>);
+        public static readonly Type ExpandoObject = typeof(ExpandoObject);
     }
 }

@@ -7,13 +7,15 @@ namespace ThePalace.Core.Entities.Shared;
 
 public partial class UserDesc : IDisposable, IStruct
 {
+    [IgnoreDataMember] public ConcurrentDictionary<string, object> Extended;
+
+    public UserRec UserInfo;
+
     public UserDesc()
     {
-        this.UserInfo = new();
-        this.Extended = new();
+        UserInfo = new UserRec();
+        Extended = new ConcurrentDictionary<string, object>();
     }
-
-    ~UserDesc() => this.Dispose();
 
     public void Dispose()
     {
@@ -34,8 +36,8 @@ public partial class UserDesc : IDisposable, IStruct
         GC.SuppressFinalize(this);
     }
 
-    public UserRec UserInfo;
-
-    [IgnoreDataMember]
-    public ConcurrentDictionary<string, object> Extended;
+    ~UserDesc()
+    {
+        Dispose();
+    }
 }

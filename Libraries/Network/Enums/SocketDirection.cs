@@ -3,5 +3,5 @@
 public enum SocketDirection
 {
     Outbound = 0,
-    Inbound = 1,
+    Inbound = 1
 }

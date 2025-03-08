@@ -1,17 +1,16 @@
 ﻿namespace ThePalace.Common.Desktop.Entities.UI;
 
-public partial class FormCfg : ControlCfg
+public class FormCfg : ControlCfg
 {
+    public EventHandler Activated;
     public SizeF AutoScaleDimensions;
     public AutoScaleMode AutoScaleMode;
+    public bool Focus;
+    public FormClosedEventHandler FormClosed;
+    public EventHandler GotFocus;
+    public EventHandler Load;
+    public MouseEventHandler MouseMove;
+    public EventHandler Shown;
     public FormStartPosition StartPosition;
     public FormWindowState WindowState;
-    public bool Focus;
-
-    public EventHandler Activated;
-    public EventHandler Load;
-    public EventHandler Shown;
-    public EventHandler GotFocus;
-    public MouseEventHandler MouseMove;
-    public FormClosedEventHandler FormClosed;
 }

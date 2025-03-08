@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Timers;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
@@ -29,50 +28,60 @@ using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
+using Point = System.Drawing.Point;
+using RegexConstants = ThePalace.Common.Constants.RegexConstants;
+using Timer = System.Timers.Timer;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public partial class DesktopSessionState : Disposable, IDesktopSessionState
+public class DesktopSessionState : Disposable, IDesktopSessionState
 {
+    private static readonly IReadOnlyList<ScreenLayers> _layerTypes = Enum.GetValues<ScreenLayers>().AsReadOnly();
+
+    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
+
+    private readonly DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
+
+    public Timer _refreshTimer = new(350);
+
     public DesktopSessionState()
     {
-        this._managedResources.AddRange(
-            [
-                this._refreshTimer,
-                this._uiControls,
-                this._uiLayers,
-            ]);
+        _managedResources.AddRange(
+        [
+            _refreshTimer,
+            _uiControls,
+            _uiLayers
+        ]);
 
         FormsManager.Current.FormClosed += _FormClosed;
         AsyncTcpSocket.ConnectionEstablished += _ConnectionEstablished;
         AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
 
-        this._refreshTimer.Elapsed += new ElapsedEventHandler((s, e) =>
+        _refreshTimer.Elapsed += (s, e) =>
         {
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
             {
                 CmdFnc = a =>
                 {
-                    var sessionState = a[0] as IDesktopSessionState;
-                    if (sessionState == null) return null;
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
 
                     sessionState.RefreshScreen(ScreenLayers.Messages);
 
                     return null;
                 },
-                Values = [s],
+                Values = [s]
             });
-        });
-        this._refreshTimer.AutoReset = true;
+        };
+        _refreshTimer.AutoReset = true;
 
         foreach (var layer in _layerTypes)
-            this._uiLayers.TryAdd(layer, new ScreenLayer(layer)
+            _uiLayers.TryAdd(layer, new ScreenLayer(layer)
             {
-                ResourceType = typeof(FormsManager),
+                ResourceType = typeof(FormsManager)
             });
 
         var iptTracking = new IptTracking();
-        this.ScriptState = iptTracking;
+        ScriptState = iptTracking;
         var iptVar = new IptMetaVariable
         {
             IsSpecial = true,
@@ -80,28 +89,27 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
             Value = new IptVariable
             {
                 Type = IptVariableTypes.Shadow,
-                Value = this,
-            },
+                Value = this
+            }
         };
         iptVar.IsReadOnly = true;
         iptTracking.Variables.TryAdd("SESSIONSTATE", iptVar);
 
-        this.UserDesc.Extended.TryAdd(@"MessageQueue", new DisposableQueue<MsgBubble>());
-        this.UserDesc.Extended.TryAdd(@"CurrentMessage", null);
+        UserDesc.Extended.TryAdd(@"MessageQueue", new DisposableQueue<MsgBubble>());
+        UserDesc.Extended.TryAdd(@"CurrentMessage", null);
 
         var seed = (uint)Cipher.WizKeytoSeed(ClientConstants.RegCodeSeed);
-        this.RegInfo.Crc = Cipher.ComputeLicenseCrc(seed);
-        this.RegInfo.Counter = (uint)Cipher.GetSeedFromReg(seed, this.RegInfo.Crc);
-        this.RegInfo.PuidCRC = this.RegInfo.Crc;
-        this.RegInfo.PuidCtr = this.RegInfo.Counter;
+        RegInfo.Crc = Cipher.ComputeLicenseCrc(seed);
+        RegInfo.Counter = (uint)Cipher.GetSeedFromReg(seed, RegInfo.Crc);
+        RegInfo.PuidCRC = RegInfo.Crc;
+        RegInfo.PuidCtr = RegInfo.Counter;
 
-        this.RegInfo.Reserved = ClientConstants.ClientAgent;
-        this.RegInfo.UlUploadCaps = (UploadCapabilities)0x41;
-        this.RegInfo.UlDownloadCaps = (DownloadCapabilities)0x0151;
-        this.RegInfo.Ul2DEngineCaps = (Upload2DEngineCaps)0x01;
-        this.RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
+        RegInfo.Reserved = ClientConstants.ClientAgent;
+        RegInfo.UlUploadCaps = (UploadCapabilities)0x41;
+        RegInfo.UlDownloadCaps = (DownloadCapabilities)0x0151;
+        RegInfo.Ul2DEngineCaps = (Upload2DEngineCaps)0x01;
+        RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
     }
-    ~DesktopSessionState() => this.Dispose(false);
 
     public void Dispose()
     {
@@ -110,85 +118,13 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
         base.Dispose();
     }
 
-    private void _FormClosed(object sender, EventArgs e)
-    {
-        if (this.IsDisposed) return;
-
-        var form = sender as Form;
-        if (form == null) return;
-
-        var key = this._uiControls
-            .Where(c => c.Value == form)
-            .Select(c => c.Key)
-            .FirstOrDefault();
-        if (key != null)
-            this._uiControls.TryRemove(key, out var _);
-    }
-
-    private void _ConnectionEstablished(object sender, EventArgs e)
-    {
-        if (this.IsDisposed) return;
-
-        this._refreshTimer?.Start();
-
-        if (this == sender)
-        {
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
-            {
-                CmdFnc = a =>
-                {
-                    var sessionState = a[0] as IDesktopSessionState;
-                    if (sessionState == null) return null;
-
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender],
-            });
-        }
-    }
-
-    private void _ConnectionDisconnected(object sender, EventArgs e)
-    {
-        if (this.IsDisposed) return;
-
-        this._refreshTimer?.Stop();
-
-        if (this == sender)
-        {
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new()
-            {
-                CmdFnc = a =>
-                {
-                    var sessionState = a[0] as IDesktopSessionState;
-                    if (sessionState == null) return null;
-
-                    sessionState.RefreshScreen();
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender],
-            });
-        }
-    }
-
-    private static readonly IReadOnlyList<ScreenLayers> _layerTypes = Enum.GetValues<ScreenLayers>().AsReadOnly();
-
-    private DisposableDictionary<ScreenLayers, ScreenLayer> _uiLayers = new();
     public IReadOnlyDictionary<ScreenLayers, ScreenLayer> UILayers => _uiLayers.AsReadOnly();
-
-    private DisposableDictionary<string, IDisposable> _uiControls = new();
     public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
-
-    public System.Timers.Timer _refreshTimer = new(350);
 
     // UI Info
     public bool Visible { get; set; } = true;
-    public DateTime? LastActivity { get; set; } = null;
-    public HistoryManager History { get; private set; } = new();
+    public DateTime? LastActivity { get; set; }
+    public HistoryManager History { get; } = new();
     public TabPage TabPage { get; set; } = null;
     public double Scale { get; set; } = 1.0D;
     public int ScreenWidth { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
@@ -203,7 +139,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
 
-    public object? ScriptState { get; set; } = null;
+    public object? ScriptState { get; set; }
 
     public Guid Id { get; } = Guid.NewGuid();
 
@@ -226,11 +162,9 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
         var form = GetForm("Program");
         if (form == null) return;
 
-        var toolStrip = GetControl("toolStrip") as ToolStrip;
-        if (toolStrip == null) return;
+        if (GetControl("toolStrip") is not ToolStrip toolStrip) return;
 
-        var labelInfo = GetControl("labelInfo") as Label;
-        if (labelInfo == null) return;
+        if (GetControl("labelInfo") is not Label labelInfo) return;
 
         if (!isConnected)
         {
@@ -242,11 +176,10 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
             labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
         }
 
-        var imgScreen = GetControl("imgScreen") as PictureBox;
-        if (imgScreen != null)
+        if (GetControl("imgScreen") is PictureBox imgScreen)
         {
             toolStrip.Size = new Size(form.Width, form.Height);
-            toolStrip.Location = new System.Drawing.Point(0, 0);
+            toolStrip.Location = new Point(0, 0);
 
             var width = ScreenWidth;
             var height = ScreenHeight;
@@ -257,27 +190,26 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
             imgScreen.Size = new Size(width, height);
             if (toolStrip.Visible &&
                 toolStrip.Dock == DockStyle.Top)
-                imgScreen.Location = new System.Drawing.Point(0, toolStrip.Location.Y + toolStrip.Height);
+                imgScreen.Location = new Point(0, toolStrip.Location.Y + toolStrip.Height);
             else
-                imgScreen.Location = new System.Drawing.Point(0, 0);
+                imgScreen.Location = new Point(0, 0);
 
             labelInfo.Size = new Size(width, 20);
-            labelInfo.Location = new System.Drawing.Point(0, imgScreen.Location.Y + imgScreen.Height);
+            labelInfo.Location = new Point(0, imgScreen.Location.Y + imgScreen.Height);
 
-            var txtInput = GetControl("txtInput") as TextBox;
-            if (txtInput != null)
+            if (GetControl("txtInput") is TextBox txtInput)
             {
                 txtInput.Size = new Size(width, 50);
-                txtInput.Location = new System.Drawing.Point(0, labelInfo.Location.Y + labelInfo.Height);
+                txtInput.Location = new Point(0, labelInfo.Location.Y + labelInfo.Height);
             }
         }
     }
+
     public void RefreshRibbon()
     {
         var isConnected = ConnectionState.IsConnected();
 
-        var toolStrip = GetControl("toolStrip") as ToolStrip;
-        if (toolStrip == null) return;
+        if (GetControl("toolStrip") is not ToolStrip toolStrip) return;
 
         toolStrip.Items.Clear();
 
@@ -290,7 +222,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     toolStrip.Items.Add(new ToolStripSeparator
                     {
                         AutoSize = false,
-                        Height = toolStrip.Height,
+                        Height = toolStrip.Height
                     });
                     break;
                 default:
@@ -366,6 +298,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
         return null;
     }
+
     public T GetForm<T>(string friendlyName)
         where T : FormBase
     {
@@ -386,7 +319,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
-            _uiControls?.TryRemove(friendlyName, out var _);
+            _uiControls?.TryRemove(friendlyName, out _);
     }
 
     public Control GetControl(string friendlyName)
@@ -415,14 +348,14 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryRemove(friendlyName, out var _);
+            _uiControls?.TryRemove(friendlyName, out _);
     }
 
     public void UnregisterForm(string friendlyName, IDisposable control)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryRemove(friendlyName, out var _);
+            _uiControls?.TryRemove(friendlyName, out _);
     }
 
     public void RefreshScreen(params ScreenLayers[] layers)
@@ -442,7 +375,8 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     _uiLayers[layer].Unload();
                 }
 
-                _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
+                _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource,
+                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
             }
             else if (layers.Contains(ScreenLayers.Base))
             {
@@ -452,12 +386,12 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     !string.IsNullOrWhiteSpace(ServerName) &&
                     !string.IsNullOrWhiteSpace(RoomInfo.Picture))
                 {
-                    var fileName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(RoomInfo.Picture, @"_");
+                    var fileName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(RoomInfo.Picture, @"_");
                     filePath = Path.Combine(Environment.CurrentDirectory, "Media", fileName);
 
                     if (!File.Exists(filePath))
                     {
-                        var _serverName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
+                        var _serverName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
                         filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, fileName);
                     }
 
@@ -467,7 +401,8 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
                 if (RoomInfo.Picture !=
                     _uiLayers[ScreenLayers.Base].Image?.Tag?.ToString())
-                    _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource, "ThePalace.Media.Resources.backgrounds.clouds.jpg");
+                    _uiLayers[ScreenLayers.Base].Load(this, LayerLoadingTypes.Resource,
+                        "ThePalace.Media.Resources.backgrounds.clouds.jpg");
             }
         }
         catch (Exception ex)
@@ -475,8 +410,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
             LoggerHub.Current.Error(ex);
         }
 
-        var imgScreen = GetControl("imgScreen") as PictureBox;
-        if (imgScreen != null)
+        if (GetControl("imgScreen") is PictureBox imgScreen)
             try
             {
                 var img = null as Bitmap;
@@ -484,16 +418,27 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     imgScreen.Image.Width != ScreenWidth ||
                     imgScreen.Image.Height != ScreenHeight)
                 {
-                    try { imgScreen.Image?.Dispose(); } catch { }
+                    try
+                    {
+                        imgScreen.Image?.Dispose();
+                    }
+                    catch
+                    {
+                    }
+
                     img = new Bitmap(ScreenWidth, ScreenHeight);
                     img.MakeTransparent(Color.Transparent);
                 }
 
                 using (var g = Graphics.FromImage(img))
                 {
-                    g.InterpolationMode = SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
-                    g.PixelOffsetMode = SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
-                    g.SmoothingMode = SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+                    g.InterpolationMode =
+                        SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" +
+                                                                             nameof(InterpolationMode));
+                    g.PixelOffsetMode =
+                        SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
+                    g.SmoothingMode =
+                        SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
 
                     g.Clear(Color.Transparent);
 
@@ -511,10 +456,10 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                             {
                                 var matrix = new ColorMatrix
                                 {
-                                    Matrix33 = _uiLayers[layer].Opacity,
+                                    Matrix33 = _uiLayers[layer].Opacity
                                 };
 
-                                imgAttributes = new();
+                                imgAttributes = new ImageAttributes();
                                 imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                             }
 
@@ -564,6 +509,69 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
         }
     }
 
+    ~DesktopSessionState()
+    {
+        Dispose(false);
+    }
+
+    private void _FormClosed(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (sender is not Form form) return;
+
+        var key = _uiControls
+            .Where(c => c.Value == form)
+            .Select(c => c.Key)
+            .FirstOrDefault();
+        if (key != null)
+            _uiControls.TryRemove(key, out _);
+    }
+
+    private void _ConnectionEstablished(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        _refreshTimer?.Start();
+
+        if (this == sender)
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
+    private void _ConnectionDisconnected(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        _refreshTimer?.Stop();
+
+        if (this == sender)
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                    sessionState.RefreshScreen();
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
     private void RefreshLayers(params ScreenLayers[] layers)
     {
         if (!Visible ||
@@ -573,7 +581,6 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
         try
         {
             foreach (var layer in layers)
-            {
                 lock (_uiLayers[layer])
                 {
                     if (layer == ScreenLayers.Base) continue;
@@ -587,7 +594,8 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
                                 break;
                             }
-                            else if (_uiLayers[layer].Image != null) break;
+
+                            if (_uiLayers[layer].Image != null) break;
 
                             goto default;
                         default:
@@ -595,9 +603,15 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                             {
                                 if (!_uiLayers[layer].Visible) continue;
 
-                                g.InterpolationMode = SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
-                                g.PixelOffsetMode = SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
-                                g.SmoothingMode = SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+                                g.InterpolationMode =
+                                    SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" +
+                                        nameof(InterpolationMode));
+                                g.PixelOffsetMode =
+                                    SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" +
+                                        nameof(PixelOffsetMode));
+                                g.SmoothingMode =
+                                    SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" +
+                                        nameof(SmoothingMode));
 
                                 switch (layer)
                                 {
@@ -621,13 +635,13 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                             break;
                     }
                 }
-            }
         }
         catch (Exception ex)
         {
             LoggerHub.Current.Error(ex);
         }
     }
+
     private void ScreenLayer_LooseProp(Graphics g)
     {
         var looseProps = RoomInfo?.LooseProps
@@ -674,6 +688,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                         GraphicsUnit.Pixel);
             }
     }
+
     private void ScreenLayer_SpotImage(Graphics g)
     {
         if ((RoomInfo?.HotSpots?.Count ?? 0) > 0)
@@ -694,18 +709,19 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     ?.FirstOrDefault();
                 if (pictName == null) continue;
 
-                var _pictName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(pictName, @"_");
+                var _pictName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(pictName, @"_");
                 var filePath = Path.Combine(Environment.CurrentDirectory, "Media", _pictName);
 
                 if (!File.Exists(filePath))
                 {
-                    var _serverName = Common.Constants.RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
+                    var _serverName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
                     filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, _pictName);
                 }
 
                 if (!File.Exists(filePath)) continue;
 
                 using (var pict = new Bitmap(filePath))
+                {
                     g.DrawImage(
                         pict,
                         new Rectangle(
@@ -717,15 +733,20 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                         pict.Width,
                         pict.Height,
                         GraphicsUnit.Pixel);
+                }
             }
     }
-    private void ScreenLayer_BottomPaint(Graphics g) =>
+
+    private void ScreenLayer_BottomPaint(Graphics g)
+    {
         ScreenLayer_Paint(g, false);
+    }
+
     private void ScreenLayer_SpotNametag(Graphics g)
     {
         var spots = RoomInfo?.HotSpots
             ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
-            ?.ToList() ?? new();
+            ?.ToList() ?? new List<HotspotDesc>();
         if (spots.Count > 0)
         {
             var padding = 2;
@@ -763,6 +784,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
             }
         }
     }
+
     private void ScreenLayer_UserProp(Graphics g)
     {
         var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
@@ -770,11 +792,14 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
         var users = null as List<UserDesc>;
         lock (RoomUsers)
+        {
             users = RoomUsers.Values
                 .Where(u =>
                     !(u.UserInfo.UserId < 1 ||
                       u.UserInfo.RoomPos == null))
                 .ToList();
+        }
+
         if (users.Count > 0)
             foreach (var u in users)
             {
@@ -854,10 +879,10 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                         {
                             var matrix = new ColorMatrix
                             {
-                                Matrix33 = 0.5F,
+                                Matrix33 = 0.5F
                             };
 
-                            imgAttributes = new();
+                            imgAttributes = new ImageAttributes();
                             imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                         }
 
@@ -876,6 +901,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                     }
             }
     }
+
     private void ScreenLayer_UserNametag(Graphics g)
     {
         var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
@@ -886,7 +912,9 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
         var users = null as List<UserDesc>;
         lock (RoomUsers)
+        {
             users = RoomUsers.Values.ToList();
+        }
 
         if ((users?.Count ?? 0) > 0)
             foreach (var u in users)
@@ -929,12 +957,15 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                 }
             }
     }
+
     private void ScreenLayer_ScriptedImage(Graphics g)
     {
     }
+
     private void ScreenLayer_ScriptedText(Graphics g)
     {
     }
+
     private void ScreenLayer_SpotBorder(Graphics g)
     {
         var spots = RoomInfo?.HotSpots
@@ -948,45 +979,49 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
 
             foreach (var h in spots)
                 g.DrawPolygon(pen, h.Vortexes
-                    .Select(v => new System.Drawing.Point(v.HAxis, v.VAxis))
+                    .Select(v => new Point(v.HAxis, v.VAxis))
                     .ToArray());
         }
     }
-    private void ScreenLayer_TopPaint(Graphics g) =>
+
+    private void ScreenLayer_TopPaint(Graphics g)
+    {
         ScreenLayer_Paint(g, true);
+    }
+
     private void ScreenLayer_DimRoom(Graphics g)
     {
         g.FillRectangle(Brushes.Black, 0, 0, ScreenWidth, ScreenHeight);
     }
+
     private void ScreenLayer_Messages(Graphics g)
     {
         var users = null as List<UserDesc>;
         lock (RoomUsers)
+        {
             users = RoomUsers.Values.ToList();
+        }
 
         if ((users?.Count ?? 0) > 0)
             foreach (var u in users)
             {
                 if (u.UserInfo.RoomPos == null) continue;
 
-                var queue = u.Extended["MessageQueue"] as DisposableQueue<MsgBubble>;
-                if (queue == null) continue;
+                if (u.Extended["MessageQueue"] is not DisposableQueue<MsgBubble> queue) continue;
 
                 var msg = u.Extended["CurrentMessage"] as MsgBubble;
                 if (msg != null)
-                {
                     if ((msg.Type != BubbleTypes.Sticky || queue.Count > 0) &&
                         DateTime.Now.Subtract(msg.Accessed).TotalMilliseconds >= msg.Duration)
                     {
                         u.Extended["CurrentMessage"] = null;
                         msg.Dispose();
                     }
-                }
 
                 if (msg == null)
                 {
                     if (queue.Count < 1) continue;
-                    else queue.TryDequeue(out msg);
+                    queue.TryDequeue(out msg);
 
                     if (msg == null) continue;
 
@@ -994,7 +1029,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                 }
 
                 if (msg == null) continue;
-                else if (!msg.Visible) continue;
+                if (!msg.Visible) continue;
 
                 var loc = msg.Origin;
 
@@ -1015,6 +1050,7 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                 // TODO:
             }
     }
+
     private void ScreenLayer_Paint(Graphics g, bool layer)
     {
         var helper = new GraphicsHelper(g);
@@ -1028,117 +1064,117 @@ public partial class DesktopSessionState : Disposable, IDesktopSessionState
                 switch (dc.Type)
                 {
                     case DrawCmdTypes.DC_Path:
+                    {
+                        var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
+                        using (var penColour = new Pen(colour, dc.PenSize))
+                        using (var brushColour = new SolidBrush(colour))
                         {
-                            var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
-                            using (var penColour = new Pen(colour, dc.PenSize))
-                            using (var brushColour = new SolidBrush(colour))
+                            penColour.StartCap = LineCap.Round;
+                            penColour.EndCap = LineCap.Round;
+
+                            helper.SetBrush(brushColour);
+                            helper.SetPen(penColour);
+
+                            if (dc.Filled)
+                                helper.BeginPath();
+
+                            var x = dc.Pos.HAxis;
+                            var y = dc.Pos.VAxis;
+
+                            helper.MoveTo(x, y);
+
+                            foreach (var p in dc.Points)
                             {
-                                penColour.StartCap = LineCap.Round;
-                                penColour.EndCap = LineCap.Round;
+                                x += p.HAxis;
+                                y += p.VAxis;
 
-                                helper.SetBrush(brushColour);
-                                helper.SetPen(penColour);
-
-                                if (dc.Filled)
-                                    helper.BeginPath();
-
-                                var x = dc.Pos.HAxis;
-                                var y = dc.Pos.VAxis;
-
-                                helper.MoveTo(x, y);
-
-                                foreach (var p in dc.Points)
-                                {
-                                    x += p.HAxis;
-                                    y += p.VAxis;
-
-                                    helper.LineTo(x, y);
-                                }
-
-                                if (dc.Filled)
-                                    helper.Fill();
-
-                                helper.Stroke();
+                                helper.LineTo(x, y);
                             }
+
+                            if (dc.Filled)
+                                helper.Fill();
+
+                            helper.Stroke();
                         }
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Ellipse:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    helper.DrawEllipse(dc.Rect);
+                        //    helper.DrawEllipse(dc.Rect);
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Text:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
+                        //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Shape:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    // TODO:
+                        //    // TODO:
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
+                    }
 
                         break;
                 }

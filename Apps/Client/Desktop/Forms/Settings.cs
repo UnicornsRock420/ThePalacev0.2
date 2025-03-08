@@ -4,6 +4,13 @@ namespace ThePalace.Client.Desktop.Forms;
 
 public partial class Settings : FormBase
 {
-    public Settings() => InitializeComponent();
-    ~Settings() => this.Dispose(false);
+    public Settings()
+    {
+        InitializeComponent();
+    }
+
+    ~Settings()
+    {
+        this.Dispose(false);
+    }
 }

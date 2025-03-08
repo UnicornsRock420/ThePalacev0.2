@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Server.Users;
 
 [Mnemonic("uSta")]
-public partial class BO_USERSTATUS : IEventHandler<MSG_USERSTATUS>
+public class BO_USERSTATUS : IEventHandler<MSG_USERSTATUS>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

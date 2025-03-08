@@ -2,6 +2,6 @@
 
 namespace ThePalace.Client.Desktop.Entities.Ribbon;
 
-public partial class Tabs : BooleanItem
+public class Tabs : BooleanItem
 {
 }

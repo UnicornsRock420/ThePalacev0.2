@@ -19,14 +19,25 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         foreach (var type in _eventTypes)
             _events[type] = new List<EventHandler>();
     }
-    ~ScriptEvents() => Dispose(false);
+
+    ~ScriptEvents()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
         if (IsDisposed) return;
 
         foreach (var @event in _events.Values)
-            try { @event?.Clear(); } catch { }
+            try
+            {
+                @event?.Clear();
+            }
+            catch
+            {
+            }
+
         _events.Clear();
         _events = null;
 
@@ -35,17 +46,17 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         GC.SuppressFinalize(this);
     }
 
-    public void Invoke(IptEventTypes eventType, IDesktopSessionState sessionState, IProtocol packet, object scriptState = null)
+    public void Invoke(IptEventTypes eventType, IDesktopSessionState sessionState, IProtocol packet,
+        object scriptState = null)
     {
         var scriptEvent = new ScriptEvent
         {
             EventType = eventType,
             Packet = packet,
-            ScriptState = scriptState,
+            ScriptState = scriptState
         };
 
         foreach (var handler in _events[eventType])
-        {
             try
             {
                 handler(sessionState, scriptEvent);
@@ -55,9 +66,8 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
                 LoggerHub.Current.Error(ex);
 
                 if (eventType != IptEventTypes.UnhandledError)
-                    this.Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptState);
+                    Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptState);
             }
-        }
     }
 
     public void RegisterEvent(IptEventTypes eventType, EventHandler handler)

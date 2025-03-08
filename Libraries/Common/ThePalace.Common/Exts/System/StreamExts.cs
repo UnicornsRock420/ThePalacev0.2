@@ -15,10 +15,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[1];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -32,10 +29,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[2];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -49,10 +43,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[4];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -66,10 +57,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[8];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -83,10 +71,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[1];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -100,10 +85,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[2];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -117,10 +99,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[4];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -134,10 +113,7 @@ public static class StreamExts
     {
         if (stream == null) throw new ArgumentNullException(nameof(stream));
 
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         var buffer = new byte[8];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -148,60 +124,42 @@ public static class StreamExts
 
     public static void WriteInt16(this Stream stream, short value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
 
     public static void WriteInt32(this Stream stream, int value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
 
     public static void WriteInt64(this Stream stream, long value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
 
     public static void WriteUInt16(this Stream stream, ushort value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
 
     public static void WriteUInt32(this Stream stream, uint value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
 
     public static void WriteUInt64(this Stream stream, ulong value, int offset = 0)
     {
-        if (offset > 0)
-        {
-            stream.Seek(offset, SeekOrigin.Begin);
-        }
+        if (offset > 0) stream.Seek(offset, SeekOrigin.Begin);
 
         stream.Write(BitConverter.GetBytes(value));
     }
@@ -209,7 +167,9 @@ public static class StreamExts
     public static void Clear(this MemoryStream stream, int offset = 0, bool clearBytes = true)
     {
         if (stream == null)
-            stream = new();
+        {
+            stream = new MemoryStream();
+        }
         else
         {
             if (clearBytes)

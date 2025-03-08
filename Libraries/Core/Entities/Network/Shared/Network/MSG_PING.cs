@@ -5,6 +5,6 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Shared.Network;
 
 [Mnemonic("ping")]
-public partial class MSG_PING : EventParams, IProtocolC2S, IProtocolS2C
+public class MSG_PING : EventParams, IProtocolC2S, IProtocolS2C
 {
 }

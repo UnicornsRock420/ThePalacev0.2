@@ -7,7 +7,7 @@ namespace ThePalace.Common.Server.Entities.Business.Client.Users;
 
 [ByteSize(4)]
 [Mnemonic("kill")]
-public partial class BO_KILLUSER : IEventHandler<MSG_KILLUSER>
+public class BO_KILLUSER : IEventHandler<MSG_KILLUSER>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

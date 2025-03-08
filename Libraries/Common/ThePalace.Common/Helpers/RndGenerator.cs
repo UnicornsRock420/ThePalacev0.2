@@ -9,7 +9,6 @@ public static class RndGenerator
     private static void CheckTTL()
     {
         if (_RndGenerator == null || DateTime.UtcNow.Subtract(_UpdateDate).Minutes > _KvTtl)
-        {
             try
             {
                 _RndGenerator = new Random();
@@ -18,15 +17,11 @@ public static class RndGenerator
             catch
             {
             }
-        }
     }
 
     public static int Next(int minValue, int maxValue)
     {
-        if (maxValue < 1)
-        {
-            return 0;
-        }
+        if (maxValue < 1) return 0;
 
         CheckTTL();
 
@@ -35,10 +30,7 @@ public static class RndGenerator
 
     public static int Next(int maxValue)
     {
-        if (maxValue < 1)
-        {
-            return 0;
-        }
+        if (maxValue < 1) return 0;
 
         CheckTTL();
 
@@ -54,10 +46,7 @@ public static class RndGenerator
 
     public static uint Next(uint minValue, uint maxValue)
     {
-        if (maxValue < 1)
-        {
-            return 0;
-        }
+        if (maxValue < 1) return 0;
 
         CheckTTL();
 
@@ -66,10 +55,7 @@ public static class RndGenerator
 
     public static uint Next(uint maxValue)
     {
-        if (maxValue < 1)
-        {
-            return 0;
-        }
+        if (maxValue < 1) return 0;
 
         CheckTTL();
 
@@ -78,10 +64,7 @@ public static class RndGenerator
 
     public static byte[] NextBytes(int size)
     {
-        if (size < 1)
-        {
-            size = 1;
-        }
+        if (size < 1) size = 1;
 
         CheckTTL();
 

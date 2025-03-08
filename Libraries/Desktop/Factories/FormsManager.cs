@@ -9,18 +9,19 @@ using ThePalace.Core.Client.Core;
 
 namespace ThePalace.Common.Desktop.Factories;
 
-public partial class FormsManager : SingletonApplicationContext<FormsManager>, IDisposable
+public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposable
 {
-    protected bool IsDisposed = false;
+    private static readonly string CONST_TypeFullName = typeof(FormBase).FullName;
 
     private readonly DisposableDictionary<string, FormBase> _forms = new();
+    protected bool IsDisposed;
+
+    public FormsManager()
+    {
+        ThreadExit += (sender, e) => { TaskManager.Current?.Dispose(); };
+    }
+
     public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
-
-    public event EventHandler FormClosed;
-
-    public FormsManager() =>
-        ThreadExit += new EventHandler((sender, e) => { TaskManager.Current?.Dispose(); });
-    ~FormsManager() => Dispose(false);
 
     public new void Dispose()
     {
@@ -36,8 +37,15 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
                 .Cast<Control>()
                 .ToList();
             foreach (var control in controls)
-                try { control?.Dispose(); } catch { }
+                try
+                {
+                    control?.Dispose();
+                }
+                catch
+                {
+                }
         }
+
         _forms?.Dispose();
 
         HotKeyManager.Current.Dispose();
@@ -49,18 +57,28 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
         ExitThread();
     }
 
+    public event EventHandler FormClosed;
+
+    ~FormsManager()
+    {
+        Dispose(false);
+    }
+
     private void _FormClosed(object sender, EventArgs e)
     {
         if (IsDisposed) return;
 
-        else if (sender is FormBase _sender &&
-                 UnregisterForm(_sender))
+        if (sender is FormBase _sender &&
+            UnregisterForm(_sender))
         {
             FormClosed?.Invoke(_sender, e);
 
             var forms = null as List<FormBase>;
             using (var @lock = LockContext.GetLock(_forms))
-                forms = _forms?.Values?.ToList() ?? new();
+            {
+                forms = _forms?.Values?.ToList() ?? new List<FormBase>();
+            }
+
             var app = forms
                 .Where(f => f.GetType().Name == "Program")
                 .FirstOrDefault();
@@ -87,6 +105,7 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
         if (IsDisposed) return false;
 
         using (var @lock = LockContext.GetLock(_forms))
+        {
             if (!_forms.ContainsKey(form.Name))
             {
                 if (assignFormClosedHandler)
@@ -99,14 +118,17 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
 
                 return true;
             }
+        }
 
         return false;
     }
+
     public bool UnregisterForm(FormBase form)
     {
         if (IsDisposed) return false;
 
         using (var @lock = LockContext.GetLock(_forms))
+        {
             try
             {
                 var key = _forms
@@ -116,7 +138,7 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
 
                 if (key == null) return false;
 
-                _forms.TryRemove(key, out var _);
+                _forms.TryRemove(key, out _);
 
                 return true;
             }
@@ -126,10 +148,11 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
                 Debug.WriteLine(ex.Message);
 #endif
             }
+        }
 
         return false;
     }
-    private static readonly string CONST_TypeFullName = typeof(FormBase).FullName;
+
     public T CreateForm<T>(FormCfg cfg, bool assignFormClosedHandler = true)
         where T : FormBase, new()
     {
@@ -140,7 +163,7 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
             Name = $"{CONST_TypeFullName}_{Guid.NewGuid()}",
             AutoScaleDimensions = cfg.AutoScaleDimensions,
             AutoScaleMode = cfg.AutoScaleMode,
-            StartPosition = cfg.StartPosition,
+            StartPosition = cfg.StartPosition
         };
 
         if (cfg.Activated != null)
@@ -161,15 +184,17 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
 
         return form;
     }
+
     public T GetForm<T>(string name = null)
         where T : FormBase
     {
         if (IsDisposed) return null;
 
         if (name == null) return null;
-        else if (_forms.TryGetValue(name, out var value)) return value as T;
-        else return null;
+        if (_forms.TryGetValue(name, out var value)) return value as T;
+        return null;
     }
+
     public static void UpdateForm<T>(T form, FormCfg cfg)
         where T : FormBase
     {
@@ -194,8 +219,11 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
         if (cfg.Focus) form.Focus();
     }
 
-    public static void RegisterControl(FormBase parent, Control control) =>
+    public static void RegisterControl(FormBase parent, Control control)
+    {
         parent.Controls.Add(control);
+    }
+
     public TControl[] CreateControl<TForm, TControl>(TForm parent, bool visible = true, params ControlCfg[] cfgs)
         where TForm : FormBase
         where TControl : Control, new()
@@ -269,6 +297,7 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
 
         return results.ToArray();
     }
+
     public static void UpdateControl(Control control, ControlCfg cfg)
     {
         control.Visible = cfg.Visible;
@@ -280,8 +309,11 @@ public partial class FormsManager : SingletonApplicationContext<FormsManager>, I
         control.Size = cfg.Size;
         control.Text = cfg.Title;
     }
-    public void DestroyControl(FormBase parent, Control control) =>
+
+    public static void DestroyControl(FormBase parent, Control control)
+    {
         parent.Controls.Remove(control);
+    }
 
     public static TResult ShowModal<TForm, TResult>(IUISessionState sessionState)
         where TForm : ModalDialog<TResult>, IFormResult<TResult>, new()

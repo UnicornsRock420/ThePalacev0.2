@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Server.Network;
 
 [Mnemonic("rep2")]
-public partial class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
+public class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

@@ -2,85 +2,86 @@
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Interfaces.Data;
-using sint16 = System.Int16;
-using uint8 = System.Byte;
+using sint16 = short;
+using uint8 = byte;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
 
 public partial class RoomDesc : RawStream, IStruct
 {
-    public RoomDesc() : base()
-    {
-        this.RoomInfo = new();
+    [IgnoreDataMember] public string? Artist;
 
-        this.HotSpots = new();
-        this.Pictures = new();
-        this.DrawCmds = new();
-        this.LooseProps = new();
-    }
-    public RoomDesc(RoomRec room) : base()
-    {
-        this.RoomInfo = room;
+    [IgnoreDataMember] public List<DrawCmdDesc>? DrawCmds;
 
-        this.HotSpots = new();
-        this.Pictures = new();
-        this.DrawCmds = new();
-        this.LooseProps = new();
+    [IgnoreDataMember] public List<HotspotDesc>? HotSpots;
+
+    [IgnoreDataMember] public DateTime? LastModified;
+
+    [IgnoreDataMember] public List<LoosePropRec>? LooseProps;
+
+    [IgnoreDataMember] public sint16 MaxOccupancy;
+
+    [IgnoreDataMember] public string? Name;
+
+    [IgnoreDataMember] [EncryptedString()] public string? Password;
+
+    [IgnoreDataMember] public string? Picture;
+
+    [IgnoreDataMember] public List<PictureRec>? Pictures;
+
+    public RoomRec RoomInfo;
+
+    public RoomDesc()
+    {
+        RoomInfo = new RoomRec();
+
+        HotSpots = new List<HotspotDesc>();
+        Pictures = new List<PictureRec>();
+        DrawCmds = new List<DrawCmdDesc>();
+        LooseProps = new List<LoosePropRec>();
     }
+
+    public RoomDesc(RoomRec room)
+    {
+        RoomInfo = room;
+
+        HotSpots = new List<HotspotDesc>();
+        Pictures = new List<PictureRec>();
+        DrawCmds = new List<DrawCmdDesc>();
+        LooseProps = new List<LoosePropRec>();
+    }
+
     public RoomDesc(uint8[]? data = null) : base(data)
     {
-        this.RoomInfo = new();
+        RoomInfo = new RoomRec();
 
-        this.HotSpots = new();
-        this.Pictures = new();
-        this.DrawCmds = new();
-        this.LooseProps = new();
+        HotSpots = new List<HotspotDesc>();
+        Pictures = new List<PictureRec>();
+        DrawCmds = new List<DrawCmdDesc>();
+        LooseProps = new List<LoosePropRec>();
     }
-
-    ~RoomDesc() => this.Dispose();
 
     public override void Dispose()
     {
-        this.HotSpots?.Clear();
-        this.HotSpots = null;
+        HotSpots?.Clear();
+        HotSpots = null;
 
-        this.Pictures?.Clear();
-        this.Pictures = null;
+        Pictures?.Clear();
+        Pictures = null;
 
-        this.DrawCmds?.Clear();
-        this.DrawCmds = null;
+        DrawCmds?.Clear();
+        DrawCmds = null;
 
-        this.LooseProps?.Clear();
-        this.LooseProps = null;
+        LooseProps?.Clear();
+        LooseProps = null;
 
         base.Dispose();
 
         GC.SuppressFinalize(this);
     }
 
-    public RoomRec RoomInfo;
-
-    [IgnoreDataMember]
-    public DateTime? LastModified;
-    [IgnoreDataMember]
-    public sint16 MaxOccupancy;
-    [IgnoreDataMember]
-    public string? Name;
-    [IgnoreDataMember]
-    public string? Picture;
-    [IgnoreDataMember]
-    public string? Artist;
-
-    [IgnoreDataMember]
-    [EncryptedString(1, 255)]
-    public string? Password;
-
-    [IgnoreDataMember]
-    public List<HotspotDesc>? HotSpots;
-    [IgnoreDataMember]
-    public List<PictureRec>? Pictures;
-    [IgnoreDataMember]
-    public List<DrawCmdDesc>? DrawCmds;
-    [IgnoreDataMember]
-    public List<LoosePropRec>? LooseProps;
+    ~RoomDesc()
+    {
+        Dispose();
+    }
 }

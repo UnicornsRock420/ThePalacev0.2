@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Common.Desktop.Entities.Core;
 
-public partial class ApiEvent : EventArgs
+public class ApiEvent : EventArgs
 {
     public Keys Keys { get; set; }
     public object Sender { get; set; }

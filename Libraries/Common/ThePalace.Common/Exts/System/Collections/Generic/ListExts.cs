@@ -1,27 +1,28 @@
-﻿using System.Linq;
-
-namespace System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
 public static class ListExts
 {
-    public static class Types
-    {
-        public static readonly Type ListGeneric = typeof(List<>);
-    }
-
     //static ListExts() { }
 
-    public static T PeekF<T>(this List<T> source) =>
-        source.FirstOrDefault();
+    public static T PeekF<T>(this List<T> source)
+    {
+        return source.FirstOrDefault();
+    }
 
-    public static T PeekL<T>(this List<T> source) =>
-        source.LastOrDefault();
+    public static T PeekL<T>(this List<T> source)
+    {
+        return source.LastOrDefault();
+    }
 
-    public static void Push<T>(this List<T> source, T item) =>
+    public static void Push<T>(this List<T> source, T item)
+    {
         source.Add(item);
+    }
 
-    public static void Push<T>(this List<T> source, T[] item) =>
+    public static void Push<T>(this List<T> source, T[] item)
+    {
         source.AddRange(item);
+    }
 
     public static T Pop<T>(this List<T> source)
     {
@@ -32,11 +33,15 @@ public static class ListExts
         return last;
     }
 
-    public static void Enqueue<T>(this List<T> source, T item) =>
+    public static void Enqueue<T>(this List<T> source, T item)
+    {
         source.Add(item);
+    }
 
-    public static void Enqueue<T>(this List<T> source, T[] item) =>
+    public static void Enqueue<T>(this List<T> source, T[] item)
+    {
         source.AddRange(item);
+    }
 
     public static T Dequeue<T>(this List<T> source)
     {
@@ -65,5 +70,10 @@ public static class ListExts
             list.AddRange(additionalItems);
 
         return list.ToArray().Join(separator);
+    }
+
+    public static class Types
+    {
+        public static readonly Type ListGeneric = typeof(List<>);
     }
 }

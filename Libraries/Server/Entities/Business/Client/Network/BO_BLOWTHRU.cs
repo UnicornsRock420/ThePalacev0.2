@@ -7,7 +7,7 @@ namespace ThePalace.Common.Server.Entities.Business.Client.Network;
 
 [DynamicSize]
 [Mnemonic("blow")]
-public partial class BO_BLOWTHRU : IEventHandler<MSG_BLOWTHRU>
+public class BO_BLOWTHRU : IEventHandler<MSG_BLOWTHRU>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

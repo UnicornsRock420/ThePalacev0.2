@@ -1,4 +1,4 @@
-﻿using sint32 = System.Int32;
+﻿using sint32 = int;
 
 namespace ThePalace.Core.Interfaces.Data;
 

@@ -2,279 +2,13 @@
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Exts;
+using RegexConstants = ThePalace.Common.Constants.RegexConstants;
 
 namespace ThePalace.Core.Helpers;
 
 public static class Cipher
 {
     private static readonly byte[] _gEncryptTable = new byte[512];
-
-    private enum Rs : long
-    {
-        R_A = 16807,
-        R_M = 2147483647,
-        R_Q = 127773,
-        R_R = 2836,
-    }
-
-    static Cipher()
-    {
-        var gSeed = 666666L;
-
-        Func<double> LongRandom = () =>
-        {
-            var hi = gSeed / (long)Rs.R_Q;
-            var lo = gSeed % (long)Rs.R_Q;
-            var test = (long)Rs.R_A * lo - (long)Rs.R_R * hi;
-
-            if (test > 0)
-            {
-                gSeed = test;
-            }
-            else
-            {
-                gSeed = test + (long)Rs.R_M;
-            }
-
-            return gSeed / (double)Rs.R_M;
-        };
-
-        Func<short, byte> MyRandom = (max) =>
-        {
-            return (byte)(LongRandom() * max);
-        };
-
-        for (var j = 0; j < _gEncryptTable.Length; j++)
-        {
-            _gEncryptTable[j] = MyRandom(256);
-        }
-    }
-
-    public static byte[] EncryptString(this string value)
-    {
-        var inStr = value.GetBytes();
-        return EncryptBytes(inStr);
-    }
-    public static byte[] EncryptBytes(this byte[] inStr)
-    {
-        var outBytes = new byte[inStr.Length];
-
-        int rc = 0;
-        byte lastChar = 0;
-
-        for (var i = inStr.Length - 1; i >= 0; --i)
-        {
-            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
-            lastChar = (byte)(outBytes[i] ^ _gEncryptTable[rc++]);
-        }
-
-        return outBytes;
-    }
-
-    public static string DecryptString(this string value)
-    {
-        var inStr = value.GetBytes();
-        var outBytes = new byte[inStr.Length];
-
-        var lastChar = (byte)0;
-        var rc = 0;
-
-        for (var i = inStr.Length - 1; i >= 0; --i)
-        {
-            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
-            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
-        }
-
-        return outBytes.GetString();
-    }
-    public static string DecryptString(this byte[] inStr)
-    {
-        var outBytes = new byte[inStr.Length];
-
-        var lastChar = (byte)0;
-        var rc = 0;
-
-        for (var i = inStr.Length - 1; i >= 0; --i)
-        {
-            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
-            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
-        }
-
-        return outBytes.GetString();
-    }
-    public static byte[] DecryptBytes(this byte[] inStr)
-    {
-        var outBytes = new byte[inStr.Length];
-
-        var lastChar = (byte)0;
-        var rc = 0;
-
-        for (var i = inStr.Length - 1; i >= 0; --i)
-        {
-            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
-            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
-        }
-
-        return outBytes;
-    }
-
-    public static int GetSeedFromReg(uint counter, uint crc) =>
-        (int)(counter ^ (uint)RegConstants.MAGIC_LONG ^ crc);
-
-    public static int GetSeedFromPUID(uint counter, uint crc) =>
-        (int)(counter ^ crc);
-
-    public static uint ComputeLicenseCrc(uint seed) =>
-        ComputeCrc(
-            seed.SwapUInt32()
-                .WriteUInt32());
-
-    private static uint GetCrc(uint crc, uint ptr) =>
-        (crc << 1 | (uint)((crc & 0x80000000) != 0 ? 1 : 0)) ^ ptr;
-    public static uint ComputeCrc(byte[] ptr, uint offset = 0, bool isAsset = false)
-    {
-        if (ptr == null ||
-            ptr.Length == 0) return 0;
-
-        var len = ptr.Length - offset;
-        var crc = (uint)0;
-        var j = offset;
-
-        if (isAsset)
-        {
-            crc = (uint)AssetConstants.Values.CRC_MAGIC;
-        }
-        else
-        {
-            crc = (uint)RegConstants.CRC_MAGIC;
-        }
-
-        while (len-- > 0)
-        {
-            if (isAsset)
-            {
-                crc = GetCrc(crc, ptr[j++]);
-            }
-            else
-            {
-                crc = GetCrc(crc, Cipher.gCrcMask[ptr[j++]]);
-            }
-        }
-
-        return crc;
-    }
-
-    public static bool ValidUserSerialNumber(uint crc, uint counter)
-    {
-        var seed = counter ^ (uint)RegConstants.MAGIC_LONG ^ crc;
-        return crc == ComputeLicenseCrc(seed);
-    }
-
-    public static byte[] ReadPalaceEscapedString(this string source)
-    {
-        var srcBytes = source.GetBytes();
-        var destBytes = new List<byte>();
-
-        for (var j = 0; j < srcBytes.Length; j++)
-        {
-            if (srcBytes[j] == (byte)'\\')
-            {
-                var halfByte1 = (char)srcBytes[++j];
-                var halfByte2 = (char)srcBytes[++j];
-
-                destBytes.Add(Convert.ToByte($"0x{halfByte1}{halfByte2}", 16));
-            }
-            else
-            {
-                destBytes.Add(srcBytes[j]);
-            }
-        }
-
-        return destBytes.ToArray();
-    }
-
-    public static string WritePalaceEscapedString(this byte[] source)
-    {
-        var dest = new StringBuilder();
-
-        for (var j = 0; j < source.Length; j++)
-        {
-            if (Common.Constants.RegexConstants.REGEX_ALPHANUMERIC_SINGLECHARACTER.IsMatch(source[j].ToString()))
-            {
-                dest.Append(source[j]);
-            }
-            else
-            {
-                dest.AppendFormat(@"\{0:X2}", source[j]);
-            }
-        }
-
-        return dest.ToString();
-    }
-
-    public static string RegRectoSeed(RegistrationRec regInfo, bool puid = false)
-    {
-        var seedCounter = (uint)0;
-
-        if (puid)
-        {
-            seedCounter = regInfo.PuidCtr ^ regInfo.PuidCRC;
-        }
-        else
-        {
-            seedCounter = regInfo.Counter ^ (uint)RegConstants.MAGIC_LONG ^ regInfo.Crc;
-        }
-
-        return SeedToWizKey(seedCounter, puid);
-    }
-
-    public static string SeedToWizKey(uint seedCounter, bool puid = false)
-    {
-        var sb = new StringBuilder();
-
-        sb.Append('{');
-
-        if (puid)
-        {
-            sb.Append('Z');
-        }
-
-        while (seedCounter > 0)
-        {
-            sb.Append((char)((byte)'A' + (seedCounter % 13 ^ 4)));
-            seedCounter /= 13;
-        }
-
-        sb.Append('}');
-
-        return sb.ToString();
-    }
-
-    public static int WizKeytoSeed(string wizKey)
-    {
-        var str = wizKey.GetBytes();
-        int ctr = 0, mag = 1;
-
-        for (var j = 0; j < str.Length; j++)
-        {
-            if (str[j] == (byte)'{' || str[j] == (byte)'Z') continue;
-            else if (str[j] == (byte)'}') break;
-            else if (str[j] < (byte)'A' || str[j] > (byte)'Q')
-                return -1;
-
-            ctr += (str[j] - (byte)'A' ^ 4) * mag;
-            mag *= 13;
-        }
-
-        return ctr;
-    }
-
-
-    private enum RegConstants : uint
-    {
-        MAGIC_LONG = 0x9602C9BF,
-        CRC_MAGIC = 0xA95ADE76,
-    }
 
     private static readonly uint[] gCrcMask =
     {
@@ -309,6 +43,250 @@ public static class Cipher
         0xF746729F, 0xFF6F7D47, 0x8022EA34, 0xB24B0BCD, 0xF687A7CC, 0x7E95BAB3, 0x8DC1583D, 0x0B443FE9,
         0xE6E45618, 0x224D746F, 0xF30624BB, 0xB7427258, 0xC78E19BF, 0xD1EE98A6, 0x66BE7D3A, 0x791E342F,
         0x68CBAAB0, 0xBBB5355D, 0x8DDA9081, 0xDC2736DC, 0x573355AD, 0xC3FFEC65, 0xE97F0270, 0xC6A265E8,
-        0xD9D49152, 0x4BB35BDB, 0xA1C7BBE6, 0x15A3699A, 0xE69E1EB5, 0x7CDDA410, 0x488609DF, 0xD19678D3,
+        0xD9D49152, 0x4BB35BDB, 0xA1C7BBE6, 0x15A3699A, 0xE69E1EB5, 0x7CDDA410, 0x488609DF, 0xD19678D3
     };
+
+    static Cipher()
+    {
+        var gSeed = 666666L;
+
+        var LongRandom = () =>
+        {
+            var hi = gSeed / (long)Rs.R_Q;
+            var lo = gSeed % (long)Rs.R_Q;
+            var test = (long)Rs.R_A * lo - (long)Rs.R_R * hi;
+
+            if (test > 0)
+                gSeed = test;
+            else
+                gSeed = test + (long)Rs.R_M;
+
+            return gSeed / (double)Rs.R_M;
+        };
+
+        Func<short, byte> MyRandom = max => { return (byte)(LongRandom() * max); };
+
+        for (var j = 0; j < _gEncryptTable.Length; j++) _gEncryptTable[j] = MyRandom(256);
+    }
+
+    public static byte[] EncryptString(this string value)
+    {
+        var inStr = value.GetBytes();
+        return EncryptBytes(inStr);
+    }
+
+    public static byte[] EncryptBytes(this byte[] inStr)
+    {
+        var outBytes = new byte[inStr.Length];
+
+        var rc = 0;
+        byte lastChar = 0;
+
+        for (var i = inStr.Length - 1; i >= 0; --i)
+        {
+            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+            lastChar = (byte)(outBytes[i] ^ _gEncryptTable[rc++]);
+        }
+
+        return outBytes;
+    }
+
+    public static string DecryptString(this string value)
+    {
+        var inStr = value.GetBytes();
+        var outBytes = new byte[inStr.Length];
+
+        var lastChar = (byte)0;
+        var rc = 0;
+
+        for (var i = inStr.Length - 1; i >= 0; --i)
+        {
+            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
+        }
+
+        return outBytes.GetString();
+    }
+
+    public static string DecryptString(this byte[] inStr)
+    {
+        var outBytes = new byte[inStr.Length];
+
+        var lastChar = (byte)0;
+        var rc = 0;
+
+        for (var i = inStr.Length - 1; i >= 0; --i)
+        {
+            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
+        }
+
+        return outBytes.GetString();
+    }
+
+    public static byte[] DecryptBytes(this byte[] inStr)
+    {
+        var outBytes = new byte[inStr.Length];
+
+        var lastChar = (byte)0;
+        var rc = 0;
+
+        for (var i = inStr.Length - 1; i >= 0; --i)
+        {
+            outBytes[i] = (byte)(inStr[i] ^ _gEncryptTable[rc++] ^ lastChar);
+            lastChar = (byte)(inStr[i] ^ _gEncryptTable[rc++]);
+        }
+
+        return outBytes;
+    }
+
+    public static int GetSeedFromReg(uint counter, uint crc)
+    {
+        return (int)(counter ^ (uint)RegConstants.MAGIC_LONG ^ crc);
+    }
+
+    public static int GetSeedFromPUID(uint counter, uint crc)
+    {
+        return (int)(counter ^ crc);
+    }
+
+    public static uint ComputeLicenseCrc(uint seed)
+    {
+        return ComputeCrc(
+            seed.SwapUInt32()
+                .WriteUInt32());
+    }
+
+    private static uint GetCrc(uint crc, uint ptr)
+    {
+        return (crc << 1 | (uint)((crc & 0x80000000) != 0 ? 1 : 0)) ^ ptr;
+    }
+
+    public static uint ComputeCrc(byte[] ptr, uint offset = 0, bool isAsset = false)
+    {
+        if (ptr == null ||
+            ptr.Length == 0) return 0;
+
+        var len = ptr.Length - offset;
+        var crc = (uint)0;
+        var j = offset;
+
+        if (isAsset)
+            crc = (uint)AssetConstants.Values.CRC_MAGIC;
+        else
+            crc = (uint)RegConstants.CRC_MAGIC;
+
+        while (len-- > 0)
+            if (isAsset)
+                crc = GetCrc(crc, ptr[j++]);
+            else
+                crc = GetCrc(crc, gCrcMask[ptr[j++]]);
+
+        return crc;
+    }
+
+    public static bool ValidUserSerialNumber(uint crc, uint counter)
+    {
+        var seed = counter ^ (uint)RegConstants.MAGIC_LONG ^ crc;
+        return crc == ComputeLicenseCrc(seed);
+    }
+
+    public static byte[] ReadPalaceEscapedString(this string source)
+    {
+        var srcBytes = source.GetBytes();
+        var destBytes = new List<byte>();
+
+        for (var j = 0; j < srcBytes.Length; j++)
+            if (srcBytes[j] == (byte)'\\')
+            {
+                var halfByte1 = (char)srcBytes[++j];
+                var halfByte2 = (char)srcBytes[++j];
+
+                destBytes.Add(Convert.ToByte($"0x{halfByte1}{halfByte2}", 16));
+            }
+            else
+            {
+                destBytes.Add(srcBytes[j]);
+            }
+
+        return destBytes.ToArray();
+    }
+
+    public static string WritePalaceEscapedString(this byte[] source)
+    {
+        var dest = new StringBuilder();
+
+        for (var j = 0; j < source.Length; j++)
+            if (RegexConstants.REGEX_ALPHANUMERIC_SINGLECHARACTER.IsMatch(source[j].ToString()))
+                dest.Append(source[j]);
+            else
+                dest.AppendFormat(@"\{0:X2}", source[j]);
+
+        return dest.ToString();
+    }
+
+    public static string RegRectoSeed(RegistrationRec regInfo, bool puid = false)
+    {
+        var seedCounter = (uint)0;
+
+        if (puid)
+            seedCounter = regInfo.PuidCtr ^ regInfo.PuidCRC;
+        else
+            seedCounter = regInfo.Counter ^ (uint)RegConstants.MAGIC_LONG ^ regInfo.Crc;
+
+        return SeedToWizKey(seedCounter, puid);
+    }
+
+    public static string SeedToWizKey(uint seedCounter, bool puid = false)
+    {
+        var sb = new StringBuilder();
+
+        sb.Append('{');
+
+        if (puid) sb.Append('Z');
+
+        while (seedCounter > 0)
+        {
+            sb.Append((char)((byte)'A' + ((seedCounter % 13) ^ 4)));
+            seedCounter /= 13;
+        }
+
+        sb.Append('}');
+
+        return sb.ToString();
+    }
+
+    public static int WizKeytoSeed(string wizKey)
+    {
+        var str = wizKey.GetBytes();
+        int ctr = 0, mag = 1;
+
+        for (var j = 0; j < str.Length; j++)
+        {
+            if (str[j] == (byte)'{' || str[j] == (byte)'Z') continue;
+            if (str[j] == (byte)'}') break;
+            if (str[j] < (byte)'A' || str[j] > (byte)'Q')
+                return -1;
+
+            ctr += ((str[j] - (byte)'A') ^ 4) * mag;
+            mag *= 13;
+        }
+
+        return ctr;
+    }
+
+    private enum Rs : long
+    {
+        R_A = 16807,
+        R_M = 2147483647,
+        R_Q = 127773,
+        R_R = 2836
+    }
+
+
+    private enum RegConstants : uint
+    {
+        MAGIC_LONG = 0x9602C9BF,
+        CRC_MAGIC = 0xA95ADE76
+    }
 }

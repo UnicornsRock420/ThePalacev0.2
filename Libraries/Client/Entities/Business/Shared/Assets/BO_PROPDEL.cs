@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Assets;
 
 [Mnemonic("dPrp")]
-public partial class BO_PROPDEL : IEventHandler<MSG_PROPDEL>
+public class BO_PROPDEL : IEventHandler<MSG_PROPDEL>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

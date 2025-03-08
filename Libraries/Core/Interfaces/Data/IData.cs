@@ -1,4 +1,4 @@
-﻿using uint8 = System.Byte;
+﻿using uint8 = byte;
 
 namespace ThePalace.Core.Interfaces.Data;
 

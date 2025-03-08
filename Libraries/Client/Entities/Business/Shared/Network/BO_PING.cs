@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Network;
 
 [Mnemonic("ping")]
-public partial class BO_PING : IEventHandler<MSG_PING>
+public class BO_PING : IEventHandler<MSG_PING>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

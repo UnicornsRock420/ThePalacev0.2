@@ -6,11 +6,11 @@ using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Core.Entities.Network.Shared.Core;
 
-public partial class SessionState : Disposable, ISessionState
+public class SessionState : Disposable, ISessionState
 {
     public Guid Id { get; } = Guid.NewGuid();
     public uint UserId { get; set; }
-    public DateTime? LastActivity {  get; set; }
+    public DateTime? LastActivity { get; set; }
 
     public IConnectionState? ConnectionState { get; set; } = null;
     public UserDesc? UserDesc { get; set; } = null;

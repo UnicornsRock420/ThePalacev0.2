@@ -8,8 +8,7 @@ namespace ThePalace.Core.Entities.Network.Shared.Communications;
 
 [DynamicSize(258, 256)]
 [Mnemonic("xtlk")]
-public partial class MSG_XTALK : EventParams, IProtocolC2S, IProtocolS2C, IProtocolEcho, ICommunications
+public class MSG_XTALK : EventParams, IProtocolC2S, IProtocolS2C, IProtocolEcho, ICommunications
 {
-    [EncryptedString(2, 255)]
-    public string? Text { get; set; }
+    [EncryptedString(2)] public string? Text { get; set; }
 }

@@ -7,9 +7,42 @@ using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Core.Entities.Core;
 
-public partial class DIContainer
+public class DIContainer
 {
+    public IContainer? Build()
+    {
+        try
+        {
+            Container?.Dispose();
+        }
+        catch
+        {
+            Container = null;
+        }
+
+        try
+        {
+            Container = Builder.Build();
+        }
+        catch
+        {
+            Container = null;
+        }
+
+
+        return Container;
+    }
+
+    public TType? Resolve<TType>()
+        where TType : Type
+    {
+        if (Container == null) Build();
+
+        return Container?.Resolve<TType>();
+    }
+
     #region cStr
+
     public DIContainer()
     {
         _configuration = new ConfigurationBuilder()
@@ -21,30 +54,37 @@ public partial class DIContainer
 
         Builder = new ContainerBuilder();
     }
+
     public DIContainer(ContainerBuilder builder) : this()
     {
         Builder = builder;
     }
+
     public DIContainer(IConfiguration configuration) : this()
     {
         _configuration = configuration;
     }
+
     public DIContainer(ContainerBuilder builder, IConfiguration configuration) : this()
     {
         _configuration = configuration;
 
         Builder = builder;
     }
+
     #endregion
 
     #region Fields & Properties
+
     private readonly IConfiguration _configuration;
     private static ILogger _logger;
-    public ContainerBuilder Builder { get; private set; }
+    public ContainerBuilder Builder { get; }
     public IContainer? Container { get; private set; }
+
     #endregion
 
     #region Register Methods
+
     public DIContainer RegisterModules<TModule>(IEnumerable<TModule> modules)
         where TModule : Module
     {
@@ -169,47 +209,14 @@ public partial class DIContainer
         return this;
     }
 
-    public DIContainer RegisterServices<TService>(IEnumerable<TService> services, IResolveMiddleware middleware, MiddlewareInsertionMode insertionMode = MiddlewareInsertionMode.EndOfPhase)
+    public DIContainer RegisterServices<TService>(IEnumerable<TService> services, IResolveMiddleware middleware,
+        MiddlewareInsertionMode insertionMode = MiddlewareInsertionMode.EndOfPhase)
         where TService : Service
     {
         foreach (var service in services)
             Builder.RegisterServiceMiddleware(service, middleware, insertionMode);
         return this;
     }
+
     #endregion
-
-    public IContainer? Build()
-    {
-        try
-        {
-            Container?.Dispose();
-        }
-        catch
-        {
-            Container = null;
-        }
-
-        try
-        {
-            Container = Builder.Build();
-        }
-        catch
-        {
-            Container = null;
-        }
-
-
-        return Container;
-    }
-
-    public TType? Resolve<TType>()
-        where TType : Type
-    {
-        if (Container == null)
-        {
-            Build();
-        }
-
-        return Container?.Resolve<TType>();
-    }
 }

@@ -4,6 +4,13 @@ namespace ThePalace.Client.Desktop.Forms;
 
 public partial class Connection : FormBase
 {
-    public Connection() => InitializeComponent();
-    ~Connection() => this.Dispose(false);
+    public Connection()
+    {
+        InitializeComponent();
+    }
+
+    ~Connection()
+    {
+        this.Dispose(false);
+    }
 }

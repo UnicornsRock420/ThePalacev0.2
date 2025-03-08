@@ -1,5 +1,4 @@
-﻿using System.Buffers;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Reflection;
 using System.Runtime.Serialization;
 using ThePalace.Core.Attributes.Serialization;
@@ -15,45 +14,51 @@ namespace ThePalace.Core.Exts;
 public static class BinaryOpsExts
 {
     #region Byte Operations/Helpers
-    public static short SwapInt16(this short value) =>
-        value.WriteInt16().Reverse().ReadSInt16();
-    public static ushort SwapUInt16(this ushort value) =>
-        value.WriteUInt16().Reverse().ReadUInt16();
 
-    public static int SwapInt32(this int value) =>
-        value.WriteInt32().Reverse().ReadSInt32();
-    public static uint SwapUInt32(this uint value) =>
-        value.WriteUInt32().Reverse().ReadUInt32();
+    public static short SwapInt16(this short value)
+    {
+        return value.WriteInt16().Reverse().ReadSInt16();
+    }
 
-    public static long SwapInt64(this long value) =>
-        value.WriteInt64().Reverse().ReadSInt64();
-    public static ulong SwapUInt64(this ulong value) =>
-        value.WriteUInt64().Reverse().ReadUInt64();
+    public static ushort SwapUInt16(this ushort value)
+    {
+        return value.WriteUInt16().Reverse().ReadUInt16();
+    }
+
+    public static int SwapInt32(this int value)
+    {
+        return value.WriteInt32().Reverse().ReadSInt32();
+    }
+
+    public static uint SwapUInt32(this uint value)
+    {
+        return value.WriteUInt32().Reverse().ReadUInt32();
+    }
+
+    public static long SwapInt64(this long value)
+    {
+        return value.WriteInt64().Reverse().ReadSInt64();
+    }
+
+    public static ulong SwapUInt64(this ulong value)
+    {
+        return value.WriteUInt64().Reverse().ReadUInt64();
+    }
 
     public static short ReadSInt16(this IEnumerable<byte> value, int offset = 0)
     {
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (offset < 1) offset = 0;
 
-        if (offset + 1 > value.Count())
-        {
-            return 0;
-        }
+        if (offset + 1 > value.Count()) return 0;
 
         return BitConverter.ToInt16(value.Skip(offset).Take(2).ToArray());
     }
+
     public static short ReadSInt16(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 1 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 1 > value.Length) return 0;
 
         return BitConverter.ToInt16(value.Skip(offset).Take(2).ToArray());
     }
@@ -61,26 +66,17 @@ public static class BinaryOpsExts
     public static int ReadSInt32(this IEnumerable<byte> value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Count())
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Count()) return 0;
 
         return BitConverter.ToInt32(value.Skip(offset).Take(4).ToArray());
     }
+
     public static int ReadSInt32(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Length) return 0;
 
         return BitConverter.ToInt32(value.Skip(offset).Take(4).ToArray());
     }
@@ -88,26 +84,17 @@ public static class BinaryOpsExts
     public static long ReadSInt64(this IEnumerable<byte> value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Count())
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Count()) return 0;
 
         return BitConverter.ToInt64(value.Skip(offset).Take(8).ToArray());
     }
+
     public static long ReadSInt64(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Length) return 0;
 
         return BitConverter.ToInt64(value.Skip(offset).Take(8).ToArray());
     }
@@ -115,26 +102,17 @@ public static class BinaryOpsExts
     public static ushort ReadUInt16(this IEnumerable<byte> value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 1 > value.Count())
-        {
-            return 0;
-        }
+        else if (offset + 1 > value.Count()) return 0;
 
         return BitConverter.ToUInt16(value.Skip(offset).Take(2).ToArray());
     }
+
     public static ushort ReadUInt16(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 1 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 1 > value.Length) return 0;
 
         return BitConverter.ToUInt16(value.Skip(offset).Take(2).ToArray());
     }
@@ -142,26 +120,17 @@ public static class BinaryOpsExts
     public static uint ReadUInt32(this IEnumerable<byte> value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Count())
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Count()) return 0;
 
         return BitConverter.ToUInt32(value.Skip(offset).Take(4).ToArray());
     }
+
     public static uint ReadUInt32(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Length) return 0;
 
         return BitConverter.ToUInt32(value.Skip(offset).Take(4).ToArray());
     }
@@ -169,56 +138,56 @@ public static class BinaryOpsExts
     public static ulong ReadUInt64(this IEnumerable<byte> value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Count())
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Count()) return 0;
 
         return BitConverter.ToUInt64(value.Skip(offset).Take(8).ToArray());
     }
+
     public static ulong ReadUInt64(this byte[] value, int offset = 0)
     {
         if (offset < 1)
-        {
             offset = 0;
-        }
-        else if (offset + 3 > value.Length)
-        {
-            return 0;
-        }
+        else if (offset + 3 > value.Length) return 0;
 
         return BitConverter.ToUInt64(value.Skip(offset).Take(8).ToArray());
     }
 
-    public static byte[] WriteInt16(this short value) =>
-        BitConverter.GetBytes(value);
-    public static byte[] WriteUInt16(this ushort value) =>
-        BitConverter.GetBytes(value);
+    public static byte[] WriteInt16(this short value)
+    {
+        return BitConverter.GetBytes(value);
+    }
 
-    public static byte[] WriteInt32(this int value) =>
-        BitConverter.GetBytes(value);
-    public static byte[] WriteUInt32(this uint value) =>
-        BitConverter.GetBytes(value);
+    public static byte[] WriteUInt16(this ushort value)
+    {
+        return BitConverter.GetBytes(value);
+    }
 
-    public static byte[] WriteInt64(this long value) =>
-        BitConverter.GetBytes(value);
-    public static byte[] WriteUInt64(this ulong value) =>
-        BitConverter.GetBytes(value);
+    public static byte[] WriteInt32(this int value)
+    {
+        return BitConverter.GetBytes(value);
+    }
+
+    public static byte[] WriteUInt32(this uint value)
+    {
+        return BitConverter.GetBytes(value);
+    }
+
+    public static byte[] WriteInt64(this long value)
+    {
+        return BitConverter.GetBytes(value);
+    }
+
+    public static byte[] WriteUInt64(this ulong value)
+    {
+        return BitConverter.GetBytes(value);
+    }
 
     public static string ReadPString(this byte[] value, int max, int offset = 0, int size = 0)
     {
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (offset < 1) offset = 0;
 
-        if (size < 1)
-        {
-            size = 1;
-        }
+        if (size < 1) size = 1;
 
         var length = 0;
         switch (size)
@@ -238,10 +207,7 @@ public static class BinaryOpsExts
                 break;
         }
 
-        if (length > max)
-        {
-            length = max;
-        }
+        if (length > max) length = max;
 
         return value
             .ToList()
@@ -255,15 +221,9 @@ public static class BinaryOpsExts
     {
         if (stream == null) return null;
 
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (offset < 1) offset = 0;
 
-        if (size < 1)
-        {
-            size = 1;
-        }
+        if (size < 1) size = 1;
 
         var length = 0;
         switch (size)
@@ -283,10 +243,7 @@ public static class BinaryOpsExts
                 break;
         }
 
-        if (length > max)
-        {
-            length = max;
-        }
+        if (length > max) length = max;
 
         var buffer = new byte[length];
         var readCount = stream.Read(buffer, 0, buffer.Length);
@@ -296,7 +253,7 @@ public static class BinaryOpsExts
 
         if (modulo > 0 && (length + size) % modulo > 0)
         {
-            buffer = new byte[(modulo - ((length + size) % modulo))];
+            buffer = new byte[modulo - (length + size) % modulo];
             readCount = stream.Read(buffer, 0, buffer.Length);
             if (readCount < 1) throw new EndOfStreamException();
         }
@@ -306,10 +263,7 @@ public static class BinaryOpsExts
 
     public static string ReadCString(this byte[] value, int offset = 0)
     {
-        if (offset < 1)
-        {
-            offset = 0;
-        }
+        if (offset < 1) offset = 0;
 
         var length = value
             .Skip(offset)
@@ -328,16 +282,10 @@ public static class BinaryOpsExts
     {
         var data = new List<byte>();
 
-        if (size < 1)
-        {
-            size = 1;
-        }
+        if (size < 1) size = 1;
 
         var length = value.Length;
-        if (length >= max - size)
-        {
-            length = max - size;
-        }
+        if (length >= max - size) length = max - size;
 
         switch (size)
         {
@@ -358,27 +306,19 @@ public static class BinaryOpsExts
 
         data.AddRange(value.GetBytes());
 
-        if (modulo > 0 && (length + size) % modulo > 0)
-        {
-            data.AddRange(new byte[(modulo - ((length + size) % modulo))]);
-        }
+        if (modulo > 0 && (length + size) % modulo > 0) data.AddRange(new byte[modulo - (length + size) % modulo]);
 
         return data.ToArray();
     }
+
     public static void WritePString(this Stream writer, string value, int max, int size, int modulo = 0)
     {
         var _value = value.GetBytes();
 
-        if (size < 1)
-        {
-            size = 1;
-        }
+        if (size < 1) size = 1;
 
         var length = _value.Length;
-        if (length >= max - size)
-        {
-            length = max - size;
-        }
+        if (length >= max - size) length = max - size;
 
         switch (size)
         {
@@ -399,10 +339,7 @@ public static class BinaryOpsExts
 
         writer.Write(_value);
 
-        if (modulo > 0 && (length + size) % modulo > 0)
-        {
-            writer.Write(new byte[(modulo - ((length + size) % modulo))]);
-        }
+        if (modulo > 0 && (length + size) % modulo > 0) writer.Write(new byte[modulo - (length + size) % modulo]);
     }
 
     public static byte[] WriteCString(this string value)
@@ -414,11 +351,16 @@ public static class BinaryOpsExts
 
         return data.ToArray();
     }
+
     #endregion
 
     #region Point-In-Polygon & Bounding Box Methods
-    public static bool IsPointInPolygon(this PointF point, List<PointF> polygon) =>
-        point.IsPointInPolygon(polygon.ToArray());
+
+    public static bool IsPointInPolygon(this PointF point, List<PointF> polygon)
+    {
+        return point.IsPointInPolygon(polygon.ToArray());
+    }
+
     public static bool IsPointInPolygon(this PointF point, params PointF[] polygon)
     {
         if (polygon.Length < 3) return false;
@@ -429,14 +371,18 @@ public static class BinaryOpsExts
         var result = false;
         for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
             if (polygon[i].Y > point.Y != polygon[j].Y > point.Y &&
-                point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) +
+                polygon[i].X)
                 result = !result;
         return result;
     }
 
-    public static bool IsPointInPolygon(this System.Drawing.Point point, List<System.Drawing.Point> polygon) =>
-        point.IsPointInPolygon(polygon.ToArray());
-    public static bool IsPointInPolygon(this System.Drawing.Point point, params System.Drawing.Point[] polygon)
+    public static bool IsPointInPolygon(this Point point, List<Point> polygon)
+    {
+        return point.IsPointInPolygon(polygon.ToArray());
+    }
+
+    public static bool IsPointInPolygon(this Point point, params Point[] polygon)
     {
         if (polygon.Length < 3) return false;
 
@@ -446,14 +392,20 @@ public static class BinaryOpsExts
         var result = false;
         for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
             if (polygon[i].Y > point.Y != polygon[j].Y > point.Y &&
-                point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) + polygon[i].X)
+                point.X < (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / (polygon[j].Y - polygon[i].Y) +
+                polygon[i].X)
                 result = !result;
         return result;
     }
 
-    public static bool IsPointInPolygon(this Entities.Shared.Types.Point point, List<Entities.Shared.Types.Point> polygon) =>
-        point.IsPointInPolygon(polygon.ToArray());
-    public static bool IsPointInPolygon(this Entities.Shared.Types.Point point, params Entities.Shared.Types.Point[] polygon)
+    public static bool IsPointInPolygon(this Entities.Shared.Types.Point point,
+        List<Entities.Shared.Types.Point> polygon)
+    {
+        return point.IsPointInPolygon(polygon.ToArray());
+    }
+
+    public static bool IsPointInPolygon(this Entities.Shared.Types.Point point,
+        params Entities.Shared.Types.Point[] polygon)
     {
         if (polygon.Length < 3) return false;
 
@@ -463,14 +415,21 @@ public static class BinaryOpsExts
         var result = false;
         for (i = 0, j = polygon.Length - 1; i < polygon.Length; j = i++)
             if (polygon[i].VAxis > point.VAxis != polygon[j].VAxis > point.VAxis &&
-                point.HAxis < (polygon[j].HAxis - polygon[i].HAxis) * (point.VAxis - polygon[i].VAxis) / (polygon[j].VAxis - polygon[i].VAxis) + polygon[i].HAxis)
+                point.HAxis <
+                (polygon[j].HAxis - polygon[i].HAxis) * (point.VAxis - polygon[i].VAxis) /
+                (polygon[j].VAxis - polygon[i].VAxis) + polygon[i].HAxis)
                 result = !result;
         return result;
     }
 
-    public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, int width, int height, bool centered = false) =>
-        point.GetBoundingBox(new Size(width, height), centered);
-    public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, Size size, bool centered = false)
+    public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, int width,
+        int height, bool centered = false)
+    {
+        return point.GetBoundingBox(new Size(width, height), centered);
+    }
+
+    public static Entities.Shared.Types.Point[] GetBoundingBox(this Entities.Shared.Types.Point point, Size size,
+        bool centered = false)
     {
         var results = new List<Entities.Shared.Types.Point>();
         var w = (short)(centered ? size.Width / 2 : size.Width);
@@ -495,20 +454,26 @@ public static class BinaryOpsExts
 
         return results.ToArray();
     }
+
     #endregion
 
     #region Serialization/Deserialization Methods
+
     private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStruct);
-    private static List<MemberInfo> GetMembers(this Type type, BindingFlags flags = BindingFlags.Public | BindingFlags.Instance) =>
-        type
+
+    private static List<MemberInfo> GetMembers(this Type type,
+        BindingFlags flags = BindingFlags.Public | BindingFlags.Instance)
+    {
+        return type
             .GetProperties(flags)
-            .Cast<MemberInfo>()
             .Union(type
                 .GetFields(flags)
                 .Cast<MemberInfo>())
             .ToList();
+    }
 
-    public static void PalaceDeserialize(this Stream reader, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+    public static void PalaceDeserialize(this Stream reader, object? obj, Type? objType,
+        SerializerOptions opts = SerializerOptions.None)
     {
         if (obj == null ||
             objType == null ||
@@ -541,10 +506,7 @@ public static class BinaryOpsExts
 
                 _cb = (o, v) =>
                 {
-                    if (o is FieldInfo _fieldNfo)
-                    {
-                        _fieldNfo.SetValue(obj, v);
-                    }
+                    if (o is FieldInfo _fieldNfo) _fieldNfo.SetValue(obj, v);
                 };
 
                 _attrs.AddRange(_fieldNfo.GetCustomAttributes());
@@ -556,10 +518,7 @@ public static class BinaryOpsExts
 
                 _cb = (o, v) =>
                 {
-                    if (o is PropertyInfo _propNfo)
-                    {
-                        _propNfo.SetValue(obj, v);
-                    }
+                    if (o is PropertyInfo _propNfo) _propNfo.SetValue(obj, v);
                 };
 
                 _attrs.AddRange(_propNfo.GetCustomAttributes());
@@ -618,14 +577,17 @@ public static class BinaryOpsExts
                         switch (pString.LengthByteSize)
                         {
                             case 1: byteSize = reader.ReadByte(); break;
-                            case 2: byteSize = doSwap ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16() : reader.ReadInt16(); break;
-                            case 4: byteSize = doSwap ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32() : reader.ReadInt32(); break;
+                            case 2:
+                                byteSize = doSwap
+                                    ? (short)reader.ReadInt16().GetBytes().Reverse().ReadUInt16()
+                                    : reader.ReadInt16(); break;
+                            case 4:
+                                byteSize = doSwap
+                                    ? (int)reader.ReadInt32().GetBytes().Reverse().ReadUInt32()
+                                    : reader.ReadInt32(); break;
                         }
 
-                        if (byteSize > pString.MaxStringLength)
-                        {
-                            byteSize = pString.MaxStringLength;
-                        }
+                        if (byteSize > pString.MaxStringLength) byteSize = pString.MaxStringLength;
 
                         if (byteSize > 0)
                         {
@@ -635,33 +597,27 @@ public static class BinaryOpsExts
 
                             if (pString is EncryptedStringAttribute encryptedString)
                             {
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
-                                {
-                                    buffer = buffer.GetString().FromHex();
-                                }
+                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.FromHex)) buffer = buffer.GetString().FromHex();
 
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
-                                {
+                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.DecryptString))
                                     buffer = buffer.DecryptBytes();
-                                }
-                                else if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
-                                {
-                                    buffer = buffer.EncryptBytes();
-                                }
+                                else if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                             EncryptedStringOptions.EncryptString)) buffer = buffer.EncryptBytes();
 
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
-                                {
-                                    buffer = buffer.ToHex().GetBytes();
-                                }
+                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.ToHex)) buffer = buffer.ToHex().GetBytes();
                             }
 
                             _cb(member, buffer.GetString());
                         }
 
                         if (pString.PaddingModulo > 0 &&
-                            ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
+                            (pString.LengthByteSize + byteSize) % pString.PaddingModulo != 0)
                         {
-                            buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
+                            buffer = new byte[pString.PaddingModulo -
+                                              (pString.LengthByteSize + byteSize) % pString.PaddingModulo];
                             var readCount = reader.Read(buffer, 0, buffer.Length);
                             if (readCount < 1) return;
                         }
@@ -684,13 +640,9 @@ public static class BinaryOpsExts
                             if (buffer[0] == 0) break;
 
                             stringBytes.Add(buffer[0]);
-
                         } while (stringBytes.Count <= cString.MaxStringLength);
 
-                        if (stringBytes.Count > 0)
-                        {
-                            _cb(member, stringBytes.GetString());
-                        }
+                        if (stringBytes.Count > 0) _cb(member, stringBytes.GetString());
                     }
                     else if (byteSize > 0)
                     {
@@ -721,13 +673,9 @@ public static class BinaryOpsExts
                         result = _type.GetInstance();
 
                         if (result.Is<IStructSerializer>(out serializer))
-                        {
                             serializer.Deserialize(reader, opts);
-                        }
                         else
-                        {
                             reader.PalaceDeserialize(result, _type, opts);
-                        }
 
                         _cb(member, result);
 
@@ -738,7 +686,6 @@ public static class BinaryOpsExts
             }
 
             if (result == null)
-            {
                 switch (byteSize)
                 {
                     case 1:
@@ -770,16 +717,13 @@ public static class BinaryOpsExts
                             result = doSwap ? reader.ReadInt64().SwapInt64() : reader.ReadInt64();
                         break;
                 }
-            }
 
-            if (result != null)
-            {
-                _cb(member, result);
-            }
+            if (result != null) _cb(member, result);
         }
     }
 
-    public static void PalaceSerialize(this Stream writer, object? obj, Type? objType, SerializerOptions opts = SerializerOptions.None)
+    public static void PalaceSerialize(this Stream writer, object? obj, Type? objType,
+        SerializerOptions opts = SerializerOptions.None)
     {
         if (obj == null ||
             objType == null ||
@@ -798,7 +742,6 @@ public static class BinaryOpsExts
         {
             var _attrs = objType
                 .GetCustomAttributes()
-                .Cast<Attribute>()
                 .ToList();
             var _type = (Type?)null;
             var _name = (string?)null;
@@ -809,7 +752,14 @@ public static class BinaryOpsExts
                 _type = _fieldNfo.FieldType;
                 _name = _fieldNfo.Name;
 
-                try { _value = _fieldNfo.GetValue(obj); } catch { _value = null; }
+                try
+                {
+                    _value = _fieldNfo.GetValue(obj);
+                }
+                catch
+                {
+                    _value = null;
+                }
 
                 _attrs.AddRange(_fieldNfo.GetCustomAttributes());
             }
@@ -818,7 +768,14 @@ public static class BinaryOpsExts
                 _type = _propNfo.PropertyType;
                 _name = _propNfo.Name;
 
-                try { _value = _propNfo.GetValue(obj); } catch { _value = null; }
+                try
+                {
+                    _value = _propNfo.GetValue(obj);
+                }
+                catch
+                {
+                    _value = null;
+                }
 
                 _attrs.AddRange(_propNfo.GetCustomAttributes());
             }
@@ -873,7 +830,7 @@ public static class BinaryOpsExts
                 case Type _t when _t == Int64Exts.Types.Int64 || _t == UInt64Exts.Types.UInt64: byteSize = 8; break;
 
                 case Type _t when _t == StringExts.Types.String:
-                    var _str = ((string?)_value) ?? string.Empty;
+                    var _str = (string?)_value ?? string.Empty;
 
                     if (_attrs.Any(a => a is PStringAttribute))
                     {
@@ -884,10 +841,7 @@ public static class BinaryOpsExts
 
                         byteSize = _str.Length;
 
-                        if (byteSize > pString.MaxStringLength)
-                        {
-                            byteSize = pString.MaxStringLength;
-                        }
+                        if (byteSize > pString.MaxStringLength) byteSize = pString.MaxStringLength;
 
                         switch (pString.LengthByteSize)
                         {
@@ -912,33 +866,27 @@ public static class BinaryOpsExts
 
                             if (pString is EncryptedStringAttribute encryptedString)
                             {
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.FromHex))
-                                {
-                                    buffer = buffer.GetString().FromHex();
-                                }
+                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.FromHex)) buffer = buffer.GetString().FromHex();
 
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.DecryptString))
-                                {
+                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.DecryptString))
                                     buffer = buffer.DecryptBytes();
-                                }
-                                else if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.EncryptString))
-                                {
-                                    buffer = buffer.EncryptBytes();
-                                }
+                                else if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                             EncryptedStringOptions.EncryptString)) buffer = buffer.EncryptBytes();
 
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(EncryptedStringOptions.ToHex))
-                                {
-                                    buffer = buffer.ToHex().GetBytes();
-                                }
+                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                        EncryptedStringOptions.ToHex)) buffer = buffer.ToHex().GetBytes();
                             }
 
                             writer.Write(buffer, 0, buffer.Length);
                         }
 
                         if (pString.PaddingModulo > 0 &&
-                            ((pString.LengthByteSize + byteSize) % pString.PaddingModulo) != 0)
+                            (pString.LengthByteSize + byteSize) % pString.PaddingModulo != 0)
                         {
-                            buffer = new byte[pString.PaddingModulo - ((pString.LengthByteSize + byteSize) % pString.PaddingModulo)];
+                            buffer = new byte[pString.PaddingModulo -
+                                              (pString.LengthByteSize + byteSize) % pString.PaddingModulo];
                             writer.Write(buffer, 0, buffer.Length);
                         }
                     }
@@ -951,7 +899,7 @@ public static class BinaryOpsExts
 
                         buffer = _str.GetBytes();
                         writer.Write(buffer, 0, buffer.Length);
-                        writer.Write([(byte)0]);
+                        writer.Write([0]);
                     }
                     else if (byteSize > 0)
                     {
@@ -965,7 +913,7 @@ public static class BinaryOpsExts
                 case Type _t when _t == ByteExts.Types.ByteArray:
                     if (byteSize < 1)
                     {
-                        buffer = ((byte[]?)(object?)_value) ?? [];
+                        buffer = (byte[]?)(object?)_value ?? [];
                         byteSize = buffer.Length;
                     }
 
@@ -975,13 +923,9 @@ public static class BinaryOpsExts
                     if (_type.GetInterfaces().Contains(CONST_TYPE_ISTRUCT))
                     {
                         if (_value.Is<IStructSerializer>(out var serializer))
-                        {
                             serializer.Serialize(writer, opts);
-                        }
                         else
-                        {
                             writer.PalaceSerialize(_value, _type, opts);
-                        }
 
                         continue;
                     }
@@ -992,9 +936,18 @@ public static class BinaryOpsExts
             switch (byteSize)
             {
                 case 1: buffer = [(byte)_value]; break;
-                case 2: buffer = doSwap ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt16(_value).GetBytes(); break;
-                case 4: buffer = doSwap ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt32(_value).GetBytes(); break;
-                case 8: buffer = doSwap ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray() : Convert.ToUInt64(_value).GetBytes(); break;
+                case 2:
+                    buffer = doSwap
+                        ? Convert.ToUInt16(_value).GetBytes().Reverse().ToArray()
+                        : Convert.ToUInt16(_value).GetBytes(); break;
+                case 4:
+                    buffer = doSwap
+                        ? Convert.ToUInt32(_value).GetBytes().Reverse().ToArray()
+                        : Convert.ToUInt32(_value).GetBytes(); break;
+                case 8:
+                    buffer = doSwap
+                        ? Convert.ToUInt64(_value).GetBytes().Reverse().ToArray()
+                        : Convert.ToUInt64(_value).GetBytes(); break;
             }
 
             if ((buffer?.Length ?? 0) > 0)
@@ -1002,10 +955,11 @@ public static class BinaryOpsExts
         }
 
         if (minByteSize > 0 &&
-            (writer.Position - streamPosition) < minByteSize) throw new EndOfStreamException(nameof(writer));
+            writer.Position - streamPosition < minByteSize) throw new EndOfStreamException(nameof(writer));
     }
 
-    public static void PalaceSerialize<TStruct>(this Stream writer, int refNum, TStruct? obj, SerializerOptions opts = SerializerOptions.None)
+    public static void PalaceSerialize<TStruct>(this Stream writer, int refNum, TStruct? obj,
+        SerializerOptions opts = SerializerOptions.None)
         where TStruct : IStruct
     {
         if (obj == null) return;
@@ -1016,16 +970,13 @@ public static class BinaryOpsExts
         using (var ms = new MemoryStream())
         {
             if (obj.Is<IStructSerializer>(out var serializer))
-            {
                 serializer.Serialize(ms, opts);
-            }
             else
-            {
                 ms.PalaceSerialize(obj, objType, opts);
-            }
 
             msgBytes = ms.GetBuffer();
         }
+
         if ((msgBytes?.Length ?? 0) < 1) msgBytes = null;
 
         if (opts.IsSet<SerializerOptions, byte>(SerializerOptions.IncludeHeader))
@@ -1033,17 +984,13 @@ public static class BinaryOpsExts
             var hdr = new MSG_Header
             {
                 EventType = Enum.Parse<EventTypes>(objType.Name),
-                Length = (uint)(msgBytes?.Length ?? 0),
+                Length = (uint)(msgBytes?.Length ?? 0)
             };
 
             if (obj.Is<IStructRefNum>(out var _refNum))
-            {
                 hdr.RefNum = _refNum.RefNum;
-            }
             else
-            {
                 hdr.RefNum = refNum;
-            }
 
             var hdrBytes = (byte[]?)null;
             using (var ms = new MemoryStream())
@@ -1052,6 +999,7 @@ public static class BinaryOpsExts
 
                 hdrBytes = ms.GetBuffer();
             }
+
             if ((hdrBytes?.Length ?? 0) < 1) throw new Exception("Unable to serialize " + nameof(MSG_Header));
 
             writer.Write(hdrBytes);
@@ -1060,5 +1008,6 @@ public static class BinaryOpsExts
         if ((msgBytes?.Length ?? 0) > 0)
             writer.Write(msgBytes);
     }
+
     #endregion
 }

@@ -4,19 +4,21 @@ using ThePalace.Common.Factories;
 
 namespace ThePalace.Client.Desktop.Factories;
 
-public partial class HistoryManager : SingletonDisposable<HistoryManager>
+public class HistoryManager : SingletonDisposable<HistoryManager>
 {
     private ConcurrentDictionary<DateTime, HistoryRecord> _history = new();
+
+    public DateTime? Position;
     public IReadOnlyDictionary<DateTime, HistoryRecord> History => _history.AsReadOnly();
 
-    public DateTime? Position = null;
-
-    public HistoryManager() { }
-    ~HistoryManager() => this.Dispose(false);
+    ~HistoryManager()
+    {
+        Dispose(false);
+    }
 
     public override void Dispose()
     {
-        if (this.IsDisposed) return;
+        if (IsDisposed) return;
 
         base.Dispose();
 
@@ -37,7 +39,7 @@ public partial class HistoryManager : SingletonDisposable<HistoryManager>
                     .Where(k => k > Position.Value)
                     .ToList();
                 foreach (var key in keys)
-                    _history.TryRemove(key, out var _);
+                    _history.TryRemove(key, out _);
 
                 Position = null;
             }
@@ -45,7 +47,7 @@ public partial class HistoryManager : SingletonDisposable<HistoryManager>
             if (_history.Count >= 20)
             {
                 var oldestKey = _history.Keys.Min();
-                _history.TryRemove(oldestKey, out var _);
+                _history.TryRemove(oldestKey, out _);
             }
 
             Position = DateTime.Now;

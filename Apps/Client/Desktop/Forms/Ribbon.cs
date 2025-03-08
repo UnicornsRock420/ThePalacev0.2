@@ -4,7 +4,10 @@ namespace ThePalace.Client.Desktop.Forms;
 
 public partial class Ribbon : FormBase
 {
-    public Ribbon() => InitializeComponent();
+    public Ribbon()
+    {
+        InitializeComponent();
+    }
 
     private void toolStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
     {

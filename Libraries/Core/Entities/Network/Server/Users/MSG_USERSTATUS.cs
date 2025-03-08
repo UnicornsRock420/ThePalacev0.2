@@ -7,9 +7,9 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Server.Users;
 
 [Mnemonic("uSta")]
-public partial class MSG_USERSTATUS : EventParams, IProtocolS2C
+public class MSG_USERSTATUS : EventParams, IProtocolS2C
 {
     public UserFlags Flags;
-    [IgnoreDataMember]
-    public Guid Hash;
+
+    [IgnoreDataMember] public Guid Hash;
 }

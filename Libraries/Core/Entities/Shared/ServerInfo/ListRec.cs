@@ -1,25 +1,25 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Attributes.Strings;
 using ThePalace.Core.Interfaces.Data;
-using sint16 = System.Int16;
-using sint32 = System.Int32;
+using sint16 = short;
+using sint32 = int;
 
 namespace ThePalace.Core.Entities.Shared.ServerInfo;
 
 [DynamicSize(40, 12)]
-public partial class ListRec : IStruct
+public class ListRec : IStruct
 {
+    public sint16 Flags;
+
+    [PString(1, 31, 4)] public string Name;
+
+    public sint32 PrimaryID;
+    public sint16 RefNum;
+
     public ListRec()
     {
         Name = string.Empty;
     }
-
-    public sint32 PrimaryID;
-    public sint16 Flags;
-    public sint16 RefNum;
-
-    [PString(1, 31, 4)]
-    public string Name;
 }
 
 //[MessagePackObject(true, AllowPrivate = true)]

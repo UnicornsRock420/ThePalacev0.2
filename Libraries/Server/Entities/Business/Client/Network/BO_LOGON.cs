@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Client.Network;
 
 [Mnemonic("regi")]
-public partial class BO_LOGON : IEventHandler<MSG_LOGON>
+public class BO_LOGON : IEventHandler<MSG_LOGON>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

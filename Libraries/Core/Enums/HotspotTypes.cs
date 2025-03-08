@@ -4,7 +4,7 @@ using ThePalace.Core.Attributes.Serialization;
 namespace ThePalace.Core.Enums.Palace;
 
 [ByteSize(4)]
-public enum HotSpotEventMask : int
+public enum HotSpotEventMask
 {
     PE_Select = 0x00000001,
     PE_Lock = 0x00000002,
@@ -30,56 +30,40 @@ public enum HotSpotEventMask : int
     PE_Macro6 = 0x00200000,
     PE_Macro7 = 0x00400000,
     PE_Macro8 = 0x00800000,
-    PE_Macro9 = 0x01000000,
-};
+    PE_Macro9 = 0x01000000
+}
 
 [Flags]
 [ByteSize(4)]
-public enum HotspotFlags : int
+public enum HotspotFlags
 {
     None = 0,
-    [Description("DRAGGABLE")]
-    HS_Draggable = 0x0001,
-    [Description("DONTMOVEHERE")]
-    HS_DontMoveHere = 0x0002,
-    [Description("INVISIBLE")]
-    HS_Invisible = 0x0004,
-    [Description("SHOWNAME")]
-    HS_ShowName = 0x0008,
-    [Description("SHOWFRAME")]
-    HS_ShowFrame = 0x0010,
-    [Description("SHADOW")]
-    HS_Shadow = 0x0020,
-    [Description("FILL")]
-    HS_Fill = 0x0040,
-    [Description("FORBIDDEN")]
-    HS_Forbidden = 0x0080,
-    [Description("MANDATORY")]
-    HS_Mandatory = 0x0100,
-    [Description("LANDINGPAD")]
-    HS_LandingPad = 0x0200,
-};
+    [Description("DRAGGABLE")] HS_Draggable = 0x0001,
+    [Description("DONTMOVEHERE")] HS_DontMoveHere = 0x0002,
+    [Description("INVISIBLE")] HS_Invisible = 0x0004,
+    [Description("SHOWNAME")] HS_ShowName = 0x0008,
+    [Description("SHOWFRAME")] HS_ShowFrame = 0x0010,
+    [Description("SHADOW")] HS_Shadow = 0x0020,
+    [Description("FILL")] HS_Fill = 0x0040,
+    [Description("FORBIDDEN")] HS_Forbidden = 0x0080,
+    [Description("MANDATORY")] HS_Mandatory = 0x0100,
+    [Description("LANDINGPAD")] HS_LandingPad = 0x0200
+}
 
 [ByteSize(2)]
 public enum HotspotTypes : short
 {
-    [Description("SPOT")]
-    HS_Normal = 0,
-    [Description("DOOR")]
-    HS_Door = 1,
-    [Description("DOOR")]
-    HS_ShutableDoor = 2,
-    [Description("DOOR")]
-    HS_LockableDoor = 3,
-    [Description("BOLT")]
-    HS_Bolt = 4,
-    [Description("NAVAREA")]
-    HS_NavArea = 5
-};
+    [Description("SPOT")] HS_Normal = 0,
+    [Description("DOOR")] HS_Door = 1,
+    [Description("DOOR")] HS_ShutableDoor = 2,
+    [Description("DOOR")] HS_LockableDoor = 3,
+    [Description("BOLT")] HS_Bolt = 4,
+    [Description("NAVAREA")] HS_NavArea = 5
+}
 
 [ByteSize(2)]
 public enum HotspotStates : short
 {
     HS_Unlock = 0,
-    HS_Lock = 1,
-};
+    HS_Lock = 1
+}

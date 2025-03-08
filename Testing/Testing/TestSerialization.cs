@@ -11,7 +11,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Testing;
 
 [TestClass]
-public partial class TestSerialization
+public class TestSerialization
 {
     private static readonly Type CONST_TYPE_IProtocolS2C = typeof(IProtocolS2C);
     private static readonly Type CONST_TYPE_AssetSpec = typeof(AssetSpec);
@@ -46,7 +46,7 @@ public partial class TestSerialization
 
             ms.PalaceDeserialize(dstHdr, CONST_TYPE_MSG_Header);
 
-            if ((ms.Length - ms.Position) != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
+            if (ms.Length - ms.Position != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
 
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
@@ -109,7 +109,7 @@ public partial class TestSerialization
 
             ms.PalaceDeserialize(dstHdr, CONST_TYPE_MSG_Header);
 
-            if ((ms.Length - ms.Position) != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
+            if (ms.Length - ms.Position != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
 
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
@@ -132,7 +132,7 @@ public partial class TestSerialization
 
         Assert.IsNotNull(dstMsg as MSG_LOGON);
 
-        Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + dstMsgType.GetByteSize()));
+        Assert.IsTrue(packetBytes.Length == CONST_TYPE_MSG_Header.GetByteSize() + dstMsgType.GetByteSize());
 
         if (dstMsg is MSG_LOGON _msg)
         {
@@ -170,7 +170,7 @@ public partial class TestSerialization
 
             ms.PalaceDeserialize(dstHdr, CONST_TYPE_MSG_Header);
 
-            if ((ms.Length - ms.Position) != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
+            if (ms.Length - ms.Position != dstHdr.Length) throw new InvalidDataException(nameof(dstHdr));
 
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
@@ -195,7 +195,8 @@ public partial class TestSerialization
 
         if (dstMsg is MSG_USERDESC _msg)
         {
-            Assert.IsTrue(packetBytes.Length == (CONST_TYPE_MSG_Header.GetByteSize() + 8 + (CONST_TYPE_AssetSpec.GetByteSize() * _msg.NbrProps)));
+            Assert.IsTrue(packetBytes.Length == CONST_TYPE_MSG_Header.GetByteSize() + 8 +
+                CONST_TYPE_AssetSpec.GetByteSize() * _msg.NbrProps);
 
             Assert.IsTrue(_msg.ColorNbr == srcMsg.ColorNbr);
             Assert.IsTrue(_msg.FaceNbr == srcMsg.FaceNbr);

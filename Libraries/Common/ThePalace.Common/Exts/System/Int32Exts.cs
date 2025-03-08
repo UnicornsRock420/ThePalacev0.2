@@ -2,24 +2,21 @@
 
 public static class Int32Exts
 {
-    public static class Types
-    {
-        public static readonly Type Int32 = typeof(Int32);
-        public static readonly Type Int32Array = typeof(Int32[]);
-        public static readonly Type Int32List = typeof(List<Int32>);
-    }
-
     //static Int32Exts() { }
 
-    public static byte[] GetBytes(this Int32 value) =>
-        BitConverter.GetBytes(value);
+    public static byte[] GetBytes(this int value)
+    {
+        return BitConverter.GetBytes(value);
+    }
 
-    public static Int32 SwapInt(this Int32 value) =>
-        (int)BitConverter.ToUInt32(
+    public static int SwapInt(this int value)
+    {
+        return (int)BitConverter.ToUInt32(
             BitConverter
                 .GetBytes(value)
                 .Reverse()
                 .ToArray());
+    }
 
     public static byte[] To24Bit(this int value, bool? isLittleEndian = null)
     {
@@ -33,5 +30,12 @@ public static class Int32Exts
         data[3] = EnumExts.SetBit<byte, byte>(7, data[3], false);
 
         return data;
+    }
+
+    public static class Types
+    {
+        public static readonly Type Int32 = typeof(int);
+        public static readonly Type Int32Array = typeof(int[]);
+        public static readonly Type Int32List = typeof(List<int>);
     }
 }

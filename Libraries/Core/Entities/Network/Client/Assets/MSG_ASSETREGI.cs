@@ -6,7 +6,7 @@ using ThePalace.Core.Interfaces.Network;
 namespace ThePalace.Core.Entities.Network.Client.Assets;
 
 [Mnemonic("rAst")]
-public partial class MSG_ASSETREGI : EventParams, IProtocolC2S
+public class MSG_ASSETREGI : EventParams, IProtocolC2S
 {
     public AssetRec? AssetInfo;
 }

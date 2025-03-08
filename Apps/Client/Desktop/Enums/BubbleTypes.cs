@@ -5,5 +5,5 @@ public enum BubbleTypes
     Normal,
     Shout,
     Sticky,
-    Thought,
+    Thought
 }

@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Server.Entities.Business.Shared.Users;
 
 [Mnemonic("usrD")]
-public partial class BO_USERDESC : IEventHandler<MSG_USERDESC>
+public class BO_USERDESC : IEventHandler<MSG_USERDESC>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

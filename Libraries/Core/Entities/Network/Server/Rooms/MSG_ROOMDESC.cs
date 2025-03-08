@@ -10,13 +10,17 @@ namespace ThePalace.Core.Entities.Network.Server.Rooms;
 
 [DynamicSize]
 [Mnemonic("room")]
-public partial class MSG_ROOMDESC : EventParams, IStructSerializer, IProtocolS2C
+public class MSG_ROOMDESC : EventParams, IStructSerializer, IProtocolS2C
 {
     public RoomDesc? RoomInfo;
 
-    public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None) =>
+    public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
+    {
         RoomInfo.Deserialize(reader, opts);
+    }
 
-    public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None) =>
+    public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
+    {
         RoomInfo.Serialize(writer, opts);
+    }
 }

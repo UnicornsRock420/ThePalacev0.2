@@ -5,7 +5,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 namespace ThePalace.Common.Client.Entities.Business.Shared.Users;
 
 [Mnemonic("usrC")]
-public partial class BO_USERCOLOR : IEventHandler<MSG_USERCOLOR>
+public class BO_USERCOLOR : IEventHandler<MSG_USERCOLOR>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
