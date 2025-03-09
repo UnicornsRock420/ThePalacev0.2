@@ -41,5 +41,5 @@ public interface IJob<TCmd> : IJob, IDisposable
 
     ConcurrentQueue<TCmd> Queue { get; }
     void Build(Action<ConcurrentQueue<TCmd>>? cmd = null, CancellationToken? token = null);
-    void Enqueue(TCmd cmd);
+    void Enqueue(TCmd cmd, bool clear);
 }

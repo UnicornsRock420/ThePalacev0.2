@@ -200,11 +200,11 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         Timer = null;
         JobState = null;
 
-        base.Dispose();
-
         ResetEvent = null;
         TokenSource = null;
         Task = null;
+
+        base.Dispose();
     }
 
     ~Job()
@@ -278,6 +278,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
     public void Build(Action<ConcurrentQueue<TCmd>>? cmd = null, CancellationToken? token = null)
     {
+        if (IsDisposed) return;
+
         if (Task != null)
         {
             try
@@ -302,6 +304,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
     protected int TimerRun()
     {
+        if (IsDisposed) return 0;
+
         var doUseTimer = (Options & RunOptions.UseTimer) == RunOptions.UseTimer;
         if (!doUseTimer) return -1;
 
@@ -328,6 +332,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
     public async Task<int> Run()
     {
+        if (IsDisposed) return 0;
+
         if (Task == null) throw new NullReferenceException(nameof(Job<TCmd>) + "." + nameof(Task));
 
         if ((Options & RunOptions.UseTimer) == RunOptions.UseTimer)
@@ -420,8 +426,15 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         return Failures > 0 ? -1 : 0;
     }
 
-    public void Enqueue(TCmd cmd)
+    public void Enqueue(TCmd cmd, bool clear = false)
     {
+        if (IsDisposed) return;
+        
+        if (clear)
+        {
+            Queue.Clear();
+        }
+        
         Queue.Enqueue(cmd);
     }
 }

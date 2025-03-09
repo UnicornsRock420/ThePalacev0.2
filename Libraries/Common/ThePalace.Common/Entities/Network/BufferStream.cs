@@ -176,8 +176,14 @@ public class BufferStream : Stream
         throw new NotSupportedException(string.Format("{0} length can not be changed", GetType().Name));
     }
 
+    public void Clear()
+    {
+        _chunks.Clear();
+    }
+
     public override void Flush()
     {
+        _chunks.Clear();
     }
 
     /// <summary>

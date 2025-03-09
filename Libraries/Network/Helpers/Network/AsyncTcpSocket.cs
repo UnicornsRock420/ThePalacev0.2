@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using ThePalace.Common.Exts.System;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
@@ -99,6 +100,10 @@ public static class AsyncTcpSocket
         ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
 
         connectionState?.Disconnect();
+        //connectionState?.NetworkStream?.Dispose();
+
+        connectionState?.BytesReceived?.Clear();
+        connectionState?.BytesSend?.Clear();
     }
 
     public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)

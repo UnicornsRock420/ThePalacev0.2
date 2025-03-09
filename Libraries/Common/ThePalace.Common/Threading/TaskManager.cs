@@ -78,7 +78,7 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public static CancellationToken GlobalToken => _globalToken.Token;
 
-    public IJob CreateTask(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState,
+    public IJob CreateJob(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
     {
         if (_globalToken.IsCancellationRequested) return null;
@@ -101,7 +101,7 @@ public class TaskManager : SingletonDisposable<TaskManager>
         return job;
     }
 
-    public Job<TCmd> CreateTask<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState,
+    public Job<TCmd> CreateJob<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
         where TCmd : ICmd
     {
@@ -125,7 +125,23 @@ public class TaskManager : SingletonDisposable<TaskManager>
         return job;
     }
 
-    public async Task Fork(IJob<ICmd> parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
+    public static Task[] StartNew(CancellationToken? token, params Action[] actions)
+    {
+        if (_globalToken.IsCancellationRequested) return [];
+
+        var tasks = new Task[actions.Length];
+
+        for (var j = 0; j < actions.Length; j++)
+        {
+            tasks[j] = token.HasValue
+                ? Task.Factory.StartNew(actions[j], token.Value)
+                : Task.Factory.StartNew(actions[j]);
+        }
+
+        return tasks;
+    }
+
+    public void Fork(IJob<ICmd> parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
     {
         if (_globalToken.IsCancellationRequested ||
             threadCount < 1 ||

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Reflection;
+using System.Security.Policy;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.UI;
@@ -11,12 +12,14 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
+using ThePalace.Common.Enums.App;
 using ThePalace.Common.Exts.System;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Exts.System.Collections.Generic;
 using ThePalace.Common.Exts.System.ComponentModel;
 using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Factories.System.Collections.Concurrent;
+using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
@@ -42,7 +45,6 @@ using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
-
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -134,10 +136,8 @@ public class Program : Disposable
 
         #region Jobs
 
-        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
+        job = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
-                // TODO: GUI
-
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var cmd)) return;
 
@@ -167,24 +167,71 @@ public class Program : Disposable
             });
         }
 
-        job = TaskManager.Current.CreateTask<ActionCmd>(q =>
+        job = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
-                if (!q.IsEmpty &&
-                    q.TryDequeue(out var cmd))
-                {
-                    if (cmd.Values != null)
-                        cmd.CmdFnc(cmd.Values);
-                    else
-                        cmd.CmdFnc();
-                }
+                var cancellationToken = CancellationTokenFactory.NewToken();
 
-                while ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                while ((app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
+                       !q.IsEmpty)
                 {
-                    // TODO: Network
+                    Task.WaitAll(
+                        TaskManager.StartNew(
+                            cancellationToken.Token,
+                            () =>
+                            {
+                                while (!cancellationToken.IsCancellationRequested &&
+                                       q.TryDequeue(out var cmd))
+                                {
+                                    switch ((NetworkCommandTypes)cmd.Flags)
+                                    {
+                                        case NetworkCommandTypes.DISCONNECT:
+                                            app.SessionState.ConnectionState.Disconnect();
+                                            break;
+                                        case NetworkCommandTypes.CONNECT:
+                                            var target = (IPEndPoint?)null;
+
+                                            if (IPEndPoint.TryParse(string.Concat(cmd.Values), out var _ip))
+                                            {
+                                                target = _ip;
+                                            }
+
+                                            if (target != null)
+                                                app.SessionState.ConnectionState.Connect(target);
+                                            break;
+                                    }
+                                }
+                            },
+                            async () =>
+                            {
+                                while (!cancellationToken.IsCancellationRequested &&
+                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
+                                       (app?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                {
+                                    var msgPacket = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+
+                                    app.SessionState.ConnectionState.Send(msgPacket);
+
+                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                }
+                            },
+                            async () =>
+                            {
+                                while (!cancellationToken.IsCancellationRequested &&
+                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
+                                       (app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                {
+                                    var msgPacket = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
+
+                                    // TODO
+
+                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                }
+                            }));
                 }
             },
             null,
-            RunOptions.UseResetEvent);
+            RunOptions.UseSleepInterval,
+            TimeSpan.FromMilliseconds(500));
         if (job != null)
         {
             _jobs[ThreadQueues.Network] = job;
@@ -192,7 +239,7 @@ public class Program : Disposable
             AsyncTcpSocket.DataReceived += (o, a) => _jobs[ThreadQueues.Network].ResetEvent.Set();
         }
 
-        job = TaskManager.Current.CreateTask<MediaCmd>(q =>
+        job = TaskManager.Current.CreateJob<MediaCmd>(q =>
             {
                 if (!q.IsEmpty &&
                     q.TryDequeue(out var mediaCmd))
@@ -204,26 +251,28 @@ public class Program : Disposable
             RunOptions.UseResetEvent);
         if (job != null) _jobs[ThreadQueues.Media] = job;
 
-        job = TaskManager.Current.CreateTask<AssetCmd>(q =>
+        job = TaskManager.Current.CreateJob<AssetCmd>(q =>
             {
                 if (!q.IsEmpty &&
                     q.TryDequeue(out var assetCmd))
+                {
                     if (!AssetsManager.Current.Assets.ContainsKey(assetCmd.AssetInfo.AssetInfo.AssetSpec.Id))
                     {
                         // TODO: Assets
                     }
+                }
             },
             null,
             RunOptions.UseResetEvent);
         if (job != null) _jobs[ThreadQueues.Assets] = job;
 
-        job = TaskManager.Current.CreateTask(q => TaskManager.Current.Run(resources: FormsManager.Current),
+        job = TaskManager.Current.CreateJob(q => TaskManager.Current.Run(resources: FormsManager.Current),
             null,
             RunOptions.UseSleepInterval | RunOptions.RunNow);
         if (job != null) _jobs[ThreadQueues.Core] = job;
 
 
-        job = TaskManager.Current.CreateTask<ToastCfg>(q =>
+        job = TaskManager.Current.CreateJob<ToastCfg>(q =>
             {
                 if (!q.IsEmpty &&
                     q.TryDequeue(out var toastArgs))

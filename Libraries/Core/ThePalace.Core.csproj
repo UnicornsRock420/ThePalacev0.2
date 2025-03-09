@@ -129,8 +129,4 @@
         <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Factories\Scripting\" />
-    </ItemGroup>
-
 </Project>

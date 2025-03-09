@@ -79,6 +79,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public DateTime? LastReceived { get; set; }
     public DateTime? LastSent { get; set; }
     public BufferStream BytesReceived { get; set; } = new();
+    public BufferStream BytesSend { get; set; } = new();
     public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 
     public Socket? Socket { get; set; }

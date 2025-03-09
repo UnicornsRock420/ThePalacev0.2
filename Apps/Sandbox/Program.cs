@@ -35,7 +35,6 @@ public partial class Program : Form
         //Experiment4();
         //Experiment5();
         //Experiment6();
-        //Experiment7();
     }
 
     private static void Experiment4()
@@ -58,15 +57,6 @@ public partial class Program : Form
     }
 
     private static void Experiment6()
-    {
-        var taskManager = new TaskManager();
-        var job = taskManager.CreateTask(q => { Console.WriteLine("Test123"); }, null,
-            RunOptions.RunNow | RunOptions.RunOnce);
-
-        taskManager.Run();
-    }
-
-    private static void Experiment7()
     {
         SoundManager.Current.Play(@"Media\Yes.mp3");
         SoundManager.Current.PlaySound(@"Media\Boing.wav",

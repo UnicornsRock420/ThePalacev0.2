@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Common.Enums.App;
 
-public enum NetworkCommandTypes
+public enum NetworkCommandTypes : uint
 {
     DISCONNECT,
     LISTEN,
