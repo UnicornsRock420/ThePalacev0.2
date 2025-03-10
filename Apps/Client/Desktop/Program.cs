@@ -40,7 +40,6 @@ using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Helpers.Scripting;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
@@ -57,56 +56,10 @@ namespace ThePalace.Client.Desktop;
 
 public class Program : Disposable
 {
-    private static readonly ScreenLayerTypes[] CONST_allLayers = Enum.GetValues<ScreenLayerTypes>()
-        .Where(v => !new[] { ScreenLayerTypes.Base, ScreenLayerTypes.DimRoom }.Contains(v))
-        .ToArray();
-
     private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
         .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
         .ToList()
         .AsReadOnly();
-
-    private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
-        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
-        .ToList()
-        .AsReadOnly();
-
-    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayerTypes[]> CONST_EventLayerMappings =
-        new Dictionary<IptEventTypes[], ScreenLayerTypes[]>
-        {
-            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayerTypes.Base] },
-            { [IptEventTypes.InChat], [ScreenLayerTypes.Messages] },
-            { [IptEventTypes.NameChange], [ScreenLayerTypes.UserNametag] },
-            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayerTypes.UserProp] },
-            {
-                [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
-                [ScreenLayerTypes.LooseProp]
-            },
-            {
-                [
-                    IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
-                    IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
-                ],
-                [ScreenLayerTypes.SpotImage]
-            },
-            {
-                [
-                    IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
-                    IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
-                ],
-                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag]
-            },
-            { [IptEventTypes.MsgAssetSend], [ScreenLayerTypes.UserProp, ScreenLayerTypes.LooseProp] },
-            {
-                [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
-                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag, ScreenLayerTypes.Messages]
-            },
-            { [IptEventTypes.MsgDraw], [ScreenLayerTypes.BottomPaint, ScreenLayerTypes.TopPaint] },
-            {
-                [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
-                [ScreenLayerTypes.SpotBorder, ScreenLayerTypes.SpotNametag, ScreenLayerTypes.SpotImage]
-            }
-        }.AsReadOnly();
 
     public Program()
     {
@@ -121,6 +74,7 @@ public class Program : Disposable
         SessionManager.Current.CreateSession<DesktopSessionState>();
 
     private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+
     public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
 
     /// <summary>
@@ -414,7 +368,7 @@ public class Program : Disposable
 
                     ShowAppForm();
 
-                    var form = sessionState.GetForm(nameof(Program));
+                    var form = sessionState.GetForm();
                     if (form == null) return null;
 
                     if (sessionState.UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon) return null;
@@ -441,53 +395,21 @@ public class Program : Disposable
 
         if (e is not ScriptEvent scriptEvent) return;
 
-        var uiRefresh = CONST_uiRefreshEvents.Contains(scriptEvent.EventType);
-
-        var screenLayers = null as ScreenLayerTypes[];
-        foreach (var layer in CONST_EventLayerMappings)
-            if (CONST_EventLayerMappings.Keys.Contains(scriptEvent.EventType))
-            {
-                screenLayers = layer.Value;
-
-                break;
-            }
-
         ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
         {
             CmdFnc = a =>
             {
-                if (screenLayers.Contains(ScreenLayerTypes.Base))
-                    sessionState.RefreshScreen(ScreenLayerTypes.Base);
+                var sessionState = a[0] as IDesktopSessionState;
+                if (sessionState == null) return null;
 
-                if (uiRefresh)
-                {
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-                }
+                var scriptEvent = a[1] as ScriptEvent;
+                if (scriptEvent == null) return null;
 
-                if (!screenLayers.Contains(ScreenLayerTypes.Base))
-                    sessionState.RefreshScreen(screenLayers);
-                else
-                    sessionState.RefreshScreen(CONST_allLayers);
-
-                switch (scriptEvent.EventType)
-                {
-                    case IptEventTypes.RoomLoad:
-                        sessionState.History.RegisterHistory(
-                            $"{sessionState.ServerName} - {sessionState.RoomInfo.Name}",
-                            $"palace://{sessionState.ConnectionState.HostAddr.Address}:{sessionState.ConnectionState.HostAddr.Port}/{sessionState.RoomInfo.RoomInfo.RoomID}");
-
-                        sessionState.RefreshRibbon();
-
-                        ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, sessionState, null,
-                            sessionState.ScriptState);
-                        ScriptEvents.Current.Invoke(IptEventTypes.Enter, sessionState, null, sessionState.ScriptState);
-
-                        break;
-                }
+                sessionState.Refresh(scriptEvent);
 
                 return null;
-            }
+            },
+            Values = [sessionState, scriptEvent],
         });
     }
 

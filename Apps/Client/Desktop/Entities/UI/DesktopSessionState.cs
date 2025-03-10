@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Reflection;
+using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
@@ -17,6 +19,7 @@ using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
+using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Rooms;
@@ -31,7 +34,6 @@ using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
-using Timer = System.Timers.Timer;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
@@ -149,6 +151,96 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public List<ListRec> ServerUsers { get; set; } = [];
 
     #endregion
+
+    #region Screen Layer Consts
+
+    private static readonly ScreenLayerTypes[] CONST_allLayers = Enum.GetValues<ScreenLayerTypes>()
+        .Where(v => !new[] { ScreenLayerTypes.Base, ScreenLayerTypes.DimRoom }.Contains(v))
+        .ToArray();
+
+    private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
+        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
+        .ToList()
+        .AsReadOnly();
+
+    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayerTypes[]> CONST_EventLayerMappings =
+        new Dictionary<IptEventTypes[], ScreenLayerTypes[]>
+        {
+            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayerTypes.Base] },
+            { [IptEventTypes.InChat], [ScreenLayerTypes.Messages] },
+            { [IptEventTypes.NameChange], [ScreenLayerTypes.UserNametag] },
+            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayerTypes.UserProp] },
+            {
+                [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
+                [ScreenLayerTypes.LooseProp]
+            },
+            {
+                [
+                    IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
+                    IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
+                ],
+                [ScreenLayerTypes.SpotImage]
+            },
+            {
+                [
+                    IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
+                    IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
+                ],
+                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag]
+            },
+            { [IptEventTypes.MsgAssetSend], [ScreenLayerTypes.UserProp, ScreenLayerTypes.LooseProp] },
+            {
+                [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
+                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag, ScreenLayerTypes.Messages]
+            },
+            { [IptEventTypes.MsgDraw], [ScreenLayerTypes.BottomPaint, ScreenLayerTypes.TopPaint] },
+            {
+                [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
+                [ScreenLayerTypes.SpotBorder, ScreenLayerTypes.SpotNametag, ScreenLayerTypes.SpotImage]
+            }
+        }.AsReadOnly();
+
+    #endregion
+
+    public void Refresh(ScriptEvent scriptEvent)
+    {
+        var uiRefresh = CONST_uiRefreshEvents.Contains(scriptEvent.EventType);
+        var screenLayers =
+            (from layer
+                    in CONST_EventLayerMappings
+                where layer.Key.Contains(scriptEvent.EventType)
+                select layer.Value)
+            .FirstOrDefault();
+
+        if (screenLayers.Contains(ScreenLayerTypes.Base))
+            RefreshScreen(ScreenLayerTypes.Base);
+
+        if (uiRefresh)
+        {
+            RefreshUI();
+            RefreshRibbon();
+        }
+
+        RefreshScreen(
+            !screenLayers.Contains(ScreenLayerTypes.Base)
+                ? screenLayers
+                : CONST_allLayers);
+
+        switch (scriptEvent.EventType)
+        {
+            case IptEventTypes.RoomLoad:
+                History.RegisterHistory(
+                    $"{ServerName} - {RoomInfo.Name}",
+                    $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomInfo.RoomID}");
+
+                RefreshRibbon();
+
+                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptState);
+
+                break;
+        }
+    }
 
     public void RefreshUI()
     {
