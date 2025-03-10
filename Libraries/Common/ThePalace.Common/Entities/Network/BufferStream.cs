@@ -8,8 +8,8 @@ namespace ThePalace.Common.Entities.Network;
 /// </summary>
 public class BufferStream : Stream
 {
-    //Maintains the streams data.The Queue object provides an easy and efficient way to add and remove data
-    //Each item in the queue represents each write to the stream.Every call to write translates to an item in the queue
+    //Maintains the streams' data. The Queue object provides an easy and efficient way to add and remove data
+    //Each item in the queue represents each write to the stream. Every call to write translates to an item in the queue
     private readonly ConcurrentQueue<Chunk> _chunks;
 
     public BufferStream()
@@ -61,7 +61,7 @@ public class BufferStream : Stream
 
         var count = chunk.Length - chunk.Position;
         var result = new byte[count];
-        Buffer.BlockCopy(chunk.Data, chunk.Position, result, 0, count);
+        Buffer.BlockCopy(chunk.Data, (int)chunk.Position, result, 0, (int)count);
 
         return result;
     }
@@ -77,12 +77,13 @@ public class BufferStream : Stream
     {
         var iRemainingBytesToRead = count;
         var iTotalBytesRead = 0;
-        var chunk = (Chunk?)null;
 
-        //Read until we hit the requested count, or until we hav nothing left to read
+        //Read until we hit the requested count, or until we have nothing left to read
         while (iTotalBytesRead <= count &&
                _chunks.Count > 0)
         {
+            var chunk = (Chunk?)null;
+
             //Get first chunk from the queue
             using (var @lock = LockContext.GetLock(_chunks))
             {
@@ -90,16 +91,16 @@ public class BufferStream : Stream
             }
 
             //Determine how much of the chunk there is left to read
-            var iUnreadChunkLength = chunk.Length - chunk.Position;
+            var iUnreadChunkLength = (int)(chunk.Length - chunk.Position);
 
             //Determine how much of the unread part of the chunk we can actually read
             var iBytesToRead = Math.Min(iUnreadChunkLength, iRemainingBytesToRead);
 
             if (iBytesToRead > 0)
             {
-                if (buffer != null)
+                if ((buffer?.Length ?? 0) > 0)
                     //Read from the chunk into the buffer
-                    Buffer.BlockCopy(chunk.Data, chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
+                    Buffer.BlockCopy(chunk.Data, (int)chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
 
                 iTotalBytesRead += iBytesToRead;
                 iRemainingBytesToRead -= iBytesToRead;
@@ -148,60 +149,80 @@ public class BufferStream : Stream
     /// <summary>
     ///     Writes data to the stream
     /// </summary>
-    /// <param name="buffer">Data to copy into the stream</param>
+    /// <param name="srcBuffer">Data to copy into the stream</param>
     /// <param name="offset"></param>
     /// <param name="count"></param>
-    public override void Write(byte[] buffer, int offset, int count)
+    public override void Write(byte[] srcBuffer, int offset, int count)
     {
-        ValidateBufferArgs(buffer, offset, count);
+        ValidateBufferArgs(srcBuffer, offset, count);
 
         //We don't want to use the buffer passed in, as it could be altered by the caller
-        var bufSave = new byte[count];
-        Buffer.BlockCopy(buffer, offset, bufSave, 0, count);
+        var destBuffer = new byte[count];
+        Buffer.BlockCopy(srcBuffer, offset, destBuffer, 0, count);
 
         //Add the data to the queue
         using (var @lock = LockContext.GetLock(_chunks))
         {
-            _chunks.Enqueue(new Chunk(bufSave));
+            _chunks.Enqueue(new Chunk(destBuffer));
         }
     }
 
     public override long Seek(long offset, SeekOrigin origin)
     {
-        return Position = offset;
+        if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name));
+
+        return origin switch
+        {
+            SeekOrigin.Begin or SeekOrigin.Current => _read(null, 0, (int)offset),
+            SeekOrigin.End => throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name)),
+            _ => 0
+        };
     }
 
     public override void SetLength(long value)
     {
-        throw new NotSupportedException(string.Format("{0} length can not be changed", GetType().Name));
+        if (!CanSeek) throw new NotSupportedException(string.Format("{0} length can not be changed", GetType().Name));
+        if (value < 1) return;
+
+        using (var @lock = LockContext.GetLock(_chunks))
+        {
+            _chunks.TryDequeue(out var chunk);
+            _chunks.Clear();
+
+            chunk.SetLength(value);
+
+            _chunks.Enqueue(chunk);
+        }
     }
 
     public void Clear()
     {
-        _chunks.Clear();
+        using (var @lock = LockContext.GetLock(_chunks))
+        {
+            _chunks.Clear();
+        }
     }
 
     public override void Flush()
     {
-        _chunks.Clear();
+        using (var @lock = LockContext.GetLock(_chunks))
+        {
+            _chunks.Clear();
+        }
     }
 
     /// <summary>
-    ///     Represents a single write into the BufferStream. Each write is a seperate chunk
+    ///     Represents a single write into the BufferStream. Each write is a separate chunk
     /// </summary>
-    private class Chunk(byte[]? data = null, int position = 0)
+    private class Chunk : MemoryStream
     {
-        /// <summary>
-        ///     As we read through the chunk, the start index will increment.When we get to the end of the chunk,
-        ///     we will remove the chunk
-        /// </summary>
-        public int Position { get; set; } = position;
+        public Chunk(byte[] buffer, int position = 0, int length = 0) : base(buffer, position, length > 0 ? length : buffer.Length, false)
+        {
+        }
 
         /// <summary>
         ///     Actual Data
         /// </summary>
-        public byte[] Data { get; } = data;
-
-        public int Length => Data?.Length ?? 0;
+        public byte[] Data => GetBuffer();
     }
 }
