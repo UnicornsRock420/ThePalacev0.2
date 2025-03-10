@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -37,7 +38,6 @@ using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
@@ -185,7 +185,8 @@ public class Program : Disposable
                                             app.SessionState.ConnectionState.Disconnect();
                                             break;
                                         case NetworkCommandTypes.CONNECT:
-                                            ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
+                                            ConnectionManager.Connect(app.SessionState.ConnectionState,
+                                                cmd.Values[0] as Uri);
                                             break;
                                     }
                                 }

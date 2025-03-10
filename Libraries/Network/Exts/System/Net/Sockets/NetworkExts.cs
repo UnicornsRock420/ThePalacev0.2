@@ -1,8 +1,6 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
-namespace ThePalace.Network.Exts.System.Net.Sockets;
+namespace System.Net.Sockets;
 
 public static class NetworkExts
 {

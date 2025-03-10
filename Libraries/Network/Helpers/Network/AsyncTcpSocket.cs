@@ -2,11 +2,10 @@
 using System.Net.Sockets;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Logging.Entities;
+using ThePalace.Network.Entities;
 using ThePalace.Network.Enums;
-using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
-using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 
 namespace ThePalace.Network.Helpers.Network;
 
