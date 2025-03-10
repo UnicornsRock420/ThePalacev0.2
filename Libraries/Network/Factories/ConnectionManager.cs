@@ -44,6 +44,8 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         }
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     ~ConnectionManager()

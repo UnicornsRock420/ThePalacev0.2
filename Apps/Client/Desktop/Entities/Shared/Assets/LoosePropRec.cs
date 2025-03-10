@@ -18,6 +18,8 @@ public class LoosePropDesc : Disposable
         Unload();
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public LoosePropRec PropInfo { get; set; }

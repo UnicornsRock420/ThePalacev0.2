@@ -7,5 +7,5 @@ namespace ThePalace.Core.Entities.Shared.Assets;
 [ByteSize(40)]
 public class AssetDesc : RawStream, IStruct
 {
-    public AssetRec AssetInfo { get; set; }
+    public AssetRec AssetRec { get; set; }
 }

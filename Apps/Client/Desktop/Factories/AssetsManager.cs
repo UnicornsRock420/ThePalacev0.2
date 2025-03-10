@@ -1,14 +1,22 @@
 ﻿using System.Drawing.Drawing2D;
-using ThePalace.Client.Desktop.Entities.Shared.Assets;
+using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Interfaces;
+using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Factories.System.Collections.Concurrent;
+using ThePalace.Common.Threading;
 using ThePalace.Core.Constants;
+using ThePalace.Core.Entities.Network.Shared.Assets;
+using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Shared.Types;
+using ThePalace.Core.Entities.Threading;
+using ThePalace.Core.Enums;
+using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
+using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;
 
 namespace ThePalace.Client.Desktop.Factories;
 
@@ -19,7 +27,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         _managedResources.AddRange(
         [
             SmileyFaces,
-                Assets
+            Assets
         ]);
 
         ApiManager.Current.RegisterApi(nameof(ExecuteMacro), ExecuteMacro);
@@ -59,17 +67,16 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         if (apiEvent.EventState is AssetSpec[] _assetSpecs2)
             list.AddRange(_assetSpecs2);
 
-        //if (list.Count > 0)
-        //    ConnectionManager.Current.Send(sessionState, new MSG_Header
-        //    {
-        //        EventType = EventTypes.MSG_USERPROP,
-        //        protocolSend = new MSG_USERPROP
-        //        {
-        //            AssetSpec = list
-        //                .Take(9)
-        //                .ToList(),
-        //        },
-        //    });
+        if (list.Count > 0)
+            sessionState.ConnectionState.BytesSend.PalaceSerialize(
+                (int)sessionState.UserId,
+                new MSG_USERPROP
+                {
+                    AssetSpec = list
+                        .Take(9)
+                        .ToArray(),
+                },
+                opts: SerializerOptions.IncludeHeader);
     }
 
     public void LoadSmilies(string resourceName)
@@ -145,15 +152,15 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     public void RegisterAsset(AssetDesc assetRec)
     {
-        lock (Current.Assets)
+        using (var @lock = LockContext.GetLock(Assets))
         {
-            Current.Assets.TryAdd(assetRec.AssetInfo.AssetSpec.Id, assetRec);
+            Current.Assets.TryAdd(assetRec.AssetRec.AssetSpec.Id, assetRec);
         }
     }
 
     public void FreeAssets(bool purge = false, params int[] propIDs)
     {
-        lock (Current.Assets)
+        using (var @lock = LockContext.GetLock(Assets))
         {
             var sessions = SessionManager.Current.Sessions.Values
                 .Cast<IDesktopSessionState>()
@@ -174,7 +181,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 ?.ToList() ?? [];
 
             var iQuery = Current.Assets.Values
-                .Select(a => a.AssetInfo.AssetSpec.Id)
+                .Select(a => a.AssetRec.AssetSpec.Id)
                 .AsQueryable();
 
             if (propIDs.Length > 0)
@@ -190,7 +197,14 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 if (purge)
                     Assets.TryRemove(propID, out prop);
 
-                //try { prop.Image?.Dispose(); prop.Image = null; } catch { }
+                try
+                {
+                    prop.Image?.Dispose();
+                }
+                finally
+                {
+                    prop.Image = null;
+                }
             }
         }
     }
@@ -199,12 +213,35 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     {
         var assetID = assetSpec.Id;
 
-        lock (Current.Assets)
+        using (var @lock = LockContext.GetLock(Assets))
         {
-            //if (Current.Assets.ContainsKey(assetID))
-            //    return Current.Assets[assetID];
-            //else if (downloadAsset)
-            //    TaskManager.Current.DownloadAsset(sessionState, assetSpec);
+            if (Current.Assets.TryGetValue(assetID, out var value))
+            {
+                if (value.Image != null) return value;
+
+                var job = (Job<AssetCmd>)Program.Jobs[ThreadQueues.Assets];
+
+                if (job.Queue?.ToList()?.Any(i =>
+                        i.AssetDesc?.AssetRec?.AssetSpec?.Id ==
+                        value?.AssetRec?.AssetSpec?.Id) ?? false) return value;
+
+                job.Enqueue(new AssetCmd
+                {
+                    AssetDesc = value,
+                });
+
+                return value;
+            }
+
+            if (downloadAsset)
+                sessionState.ConnectionState.BytesSend.PalaceSerialize(
+                    (int)sessionState.UserId,
+                    new MSG_ASSETQUERY
+                    {
+                        AssetType = LegacyAssetTypes.RT_PROP,
+                        AssetSpec = assetSpec,
+                    },
+                    opts: SerializerOptions.IncludeHeader);
         }
 
         return null;

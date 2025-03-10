@@ -39,19 +39,21 @@ public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
         }
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
-    public static Bitmap Render(AssetDesc asset)
+    public static async Task<Bitmap> Render(AssetDesc asset)
     {
-        if (asset.AssetInfo.IsCustom32Bit)
+        if (asset.AssetRec.IsCustom32Bit)
             return RenderCustom32bit(asset);
-        if (asset.AssetInfo.IsLegacy32Bit)
+        if (asset.AssetRec.IsLegacy32Bit)
             return RenderLegacy32bit(asset);
-        if (asset.AssetInfo.IsLegacy16Bit)
+        if (asset.AssetRec.IsLegacy16Bit)
             return RenderLegacy16bit(asset);
-        if (asset.AssetInfo.IsLegacyS20Bit)
+        if (asset.AssetRec.IsLegacyS20Bit)
             return RenderLegacyS20bit(asset);
-        if (asset.AssetInfo.IsLegacy20Bit)
+        if (asset.AssetRec.IsLegacy20Bit)
             return RenderLegacy20bit(asset);
         return RenderLegacy8bit(asset);
     }
@@ -290,12 +292,12 @@ public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
 
     private static Bitmap RenderByteArray(byte[] data)
     {
-        using (var memInput = new MemoryStream(data))
+        using (var ms = new MemoryStream(data))
         {
             try
             {
-                var result = new Bitmap(memInput);
-                if (result == null) throw new OutOfMemoryException();
+                var result = new Bitmap(ms);
+                if (result == null) throw new OutOfMemoryException(nameof(AssetDesc) + "." + nameof(RenderByteArray));
 
                 return result;
             }

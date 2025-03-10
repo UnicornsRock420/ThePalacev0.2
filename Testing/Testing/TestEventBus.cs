@@ -3,7 +3,6 @@ using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Interfaces.EventsBus;
-using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Testing;
 
@@ -11,7 +10,7 @@ namespace ThePalace.Testing;
 public class TestEventBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
-    private static readonly EventBus CONST_EventBus = EventBus.Instance;
+    private static readonly EventBus CONST_EventBus = EventBus.Current;
 
     [TestInitialize]
     public void TestInitialize()

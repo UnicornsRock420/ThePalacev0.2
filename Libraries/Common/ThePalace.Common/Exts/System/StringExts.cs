@@ -88,8 +88,8 @@ public static class StringExts
                 goto default;
             default:
                 var typeID = type.TypeID();
-                if (IREADONLYDICTIONARY_CONVERT_DELEGATES.ContainsKey(typeID))
-                    foreach (var func in IREADONLYDICTIONARY_CONVERT_DELEGATES[typeID])
+                if (IREADONLYDICTIONARY_CONVERT_DELEGATES.TryGetValue(typeID, out var funcs))
+                    foreach (var func in funcs)
                         try
                         {
                             return (T)(object)func(value);

@@ -15,14 +15,14 @@ public static class ConcurrentDictionaryExts
 
     public static TValue GetValue<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> values, TKey key)
     {
-        return values != null && values.ContainsKey(key) ? values[key] : default;
+        return values?.TryGetValue(key, out var value) == true ? value : default;
     }
 
     public static TValue GetValueLocked<TKey, TValue>(this ConcurrentDictionary<TKey, TValue> values, TKey key)
     {
         using (var @lock = LockContext.GetLock(values))
         {
-            return values != null && values.ContainsKey(key) ? values[key] : default;
+            return values?.TryGetValue(key, out var value) == true ? value : default;
         }
     }
 

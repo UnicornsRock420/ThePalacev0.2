@@ -28,6 +28,8 @@ public class ScreenLayer : Disposable, IScreenLayer
         Unload();
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public Type ResourceType { get; set; }

@@ -30,11 +30,11 @@ public static class Cache
     public static T GetCache<T>(string key)
     {
         if (string.IsNullOrWhiteSpace(key) ||
-            !_memory.ContainsKey(key)) return default(T);
+            !_memory.TryGetValue(key, out var value)) return default(T);
 
         using (var @lock = LockContext.GetLock(_memory))
         {
-            return (T)_memory[key] ?? default(T);
+            return (T)value ?? default(T);
         }
     }
 

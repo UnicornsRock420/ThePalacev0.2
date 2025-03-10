@@ -16,14 +16,14 @@ public static class DictionaryExts
 
     public static TValue GetValue<TKey, TValue>(this Dictionary<TKey, TValue> values, TKey key)
     {
-        return values.ContainsKey(key) ? values[key] : default;
+        return values.TryGetValue(key, out var value) ? value : default;
     }
 
     public static TValue GetValueLocked<TKey, TValue>(this Dictionary<TKey, TValue> values, TKey key)
     {
         using (var @lock = LockContext.GetLock(values))
         {
-            return values.ContainsKey(key) ? values[key] : default;
+            return values.TryGetValue(key, out var value) ? value : default;
         }
     }
 

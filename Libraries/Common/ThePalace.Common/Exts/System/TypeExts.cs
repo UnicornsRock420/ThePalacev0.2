@@ -136,12 +136,12 @@ public static class TypeExts
 
     public static T[] GetArray<T>(this T value, params T[] values)
     {
-        return (new[] { value }).Union(values).ToArray();
+        return new[] { value }.Union(values).ToArray();
     }
 
     public static T[] GetArray<T>(this T value, IEnumerable<T> values)
     {
-        return (new[] { value }).Union(values).ToArray();
+        return new[] { value }.Union(values).ToArray();
     }
 
     public static T[] GetArray<T>(this T[] values1, IEnumerable<T> values2)

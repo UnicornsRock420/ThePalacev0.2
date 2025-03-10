@@ -3,8 +3,8 @@
 public enum NetworkCommandTypes : uint
 {
     DISCONNECT,
-    LISTEN,
     CONNECT,
+    LISTEN,
     RECEIVE,
     SEND
 }

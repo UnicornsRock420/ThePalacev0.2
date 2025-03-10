@@ -19,10 +19,12 @@ public class HistoryManager : SingletonDisposable<HistoryManager>
     {
         if (IsDisposed) return;
 
-        base.Dispose();
-
         _history?.Clear();
         _history = null;
+
+        base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public void RegisterHistory(string title, string url)

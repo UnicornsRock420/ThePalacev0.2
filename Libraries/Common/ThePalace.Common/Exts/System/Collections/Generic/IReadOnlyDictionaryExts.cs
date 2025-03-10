@@ -6,7 +6,7 @@ public static class IReadOnlyDictionaryExts
 
     public static TValue GetValue<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> values, TKey key)
     {
-        return values != null && values.ContainsKey(key) ? values[key] : default;
+        return values?.TryGetValue(key, out var value) == true ? value : default;
     }
 
     public static class Types
