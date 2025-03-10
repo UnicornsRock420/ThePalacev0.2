@@ -176,12 +176,16 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
     public static void Connect(IConnectionState connectionState, IPAddress ipAddress, int port)
     {
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
+
         Connect(connectionState, new IPEndPoint(ipAddress, port));
     }
 
     public static void Connect(IConnectionState connectionState, string hostname, int port)
     {
-        var ipAddr = Dns.GetHostAddresses(hostname).FirstOrDefault(addr => addr.AddressFamily == AddressFamily.InterNetwork);
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
+
+        var ipAddr = hostname.Resolve();
         if (ipAddr != null)
         {
             Connect(connectionState, ipAddr, port);
@@ -190,6 +194,8 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
     public static void Connect(IConnectionState connectionState, Uri url)
     {
+        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
+
         Connect(connectionState, url.Host, url.Port);
     }
 

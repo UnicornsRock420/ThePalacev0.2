@@ -320,4 +320,10 @@ public static class AsyncTcpSocket
 
         return connectionState.Socket?.Connected ?? false;
     }
+    
+    
+    public static IPAddress Resolve(this string hostname)
+    {
+        return Dns.GetHostAddresses(hostname).FirstOrDefault(addr => addr.AddressFamily == AddressFamily.InterNetwork);
+    }
 }
