@@ -7,6 +7,7 @@ using ThePalace.Common.Exts.System;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
+using ThePalace.Logging.Entities;
 
 namespace ThePalace.Common.Desktop.Factories;
 
@@ -144,9 +145,7 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
             }
             catch (Exception ex)
             {
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-#endif
+                LoggerHub.Current.Error(ex);
             }
         }
 

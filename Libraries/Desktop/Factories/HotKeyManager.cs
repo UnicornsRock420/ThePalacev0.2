@@ -3,6 +3,7 @@ using System.Diagnostics;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Core.Interfaces.Core;
+using ThePalace.Logging.Entities;
 
 namespace ThePalace.Common.Desktop.Factories;
 
@@ -64,9 +65,7 @@ public class HotKeyManager : SingletonDisposable<HotKeyManager>
             }
             catch (Exception ex)
             {
-#if DEBUG
-                Debug.WriteLine(ex.Message);
-#endif
+                LoggerHub.Current.Error(ex);
             }
 
         return false;
