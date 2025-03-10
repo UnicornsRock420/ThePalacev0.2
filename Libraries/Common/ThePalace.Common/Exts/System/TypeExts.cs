@@ -58,7 +58,7 @@ public static class TypeExts
         {
             /* Find events defined as field */
             fieldInfo = type.GetField(eventName, _bindingFlags1);
-            fieldTypes = new[] { fieldInfo?.FieldType, fieldInfo?.FieldType?.BaseType };
+            fieldTypes = [fieldInfo?.FieldType, fieldInfo?.FieldType?.BaseType];
             if (fieldTypes.Contains(DelegateExts.Types.MulticastDelegate)) return fieldInfo;
 
             /* Find events defined as property { add; remove; } */
@@ -131,7 +131,7 @@ public static class TypeExts
 
     public static T[] GetArray<T>(this T value)
     {
-        return new[] { value };
+        return [value];
     }
 
     public static T[] GetArray<T>(this T value, params T[] values)

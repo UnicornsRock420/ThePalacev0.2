@@ -43,8 +43,8 @@ public class IptTracking : IDisposable
     };
 
     public IptTrackingFlags Flags { get; internal set; } = IptTrackingFlags.None;
-    public IptAtomList Stack { get; internal set; } = new();
-    public IptAlarms Alarms { get; internal set; } = new();
+    public IptAtomList Stack { get; internal set; } = [];
+    public IptAlarms Alarms { get; internal set; } = [];
     public IptEvents Events { get; internal set; } = new();
     public IptVariables Variables { get; internal set; } = new();
     public Match[] Grep { get; internal set; } = null;

@@ -17,12 +17,12 @@ public enum GHDrawCmds
 
 public class GHDrawCmd
 {
-    public List<float> Angles = new();
+    public List<float> Angles = [];
     public Brush Brush;
     public Font Font;
     public Pen Pen;
 
-    public List<Point> Points = new();
+    public List<Point> Points = [];
 
     //public GraphicsPath Path;
     public Rectangle? Rect;
@@ -32,9 +32,9 @@ public class GHDrawCmd
 
 public class GraphicsHelper
 {
-    private readonly List<GHDrawCmd> _drawCmds = new();
+    private readonly List<GHDrawCmd> _drawCmds = [];
     private readonly Graphics _g;
-    private readonly List<Point> _points = new();
+    private readonly List<Point> _points = [];
 
     private readonly StringFormat _stringFormat = new(StringFormatFlags.NoWrap);
     private Brush _brush;
@@ -114,13 +114,13 @@ public class GraphicsHelper
             _drawCmds.Add(new GHDrawCmd
             {
                 Type = GHDrawCmds.DrawPath,
-                Points = new List<Point>
-                {
+                Points =
+                [
                     _location,
                     new(cpx, cpy),
                     new(cpx, cpy),
                     new(x, y)
-                },
+                ],
                 Pen = _pen
             });
         else
@@ -154,11 +154,11 @@ public class GraphicsHelper
             {
                 Type = GHDrawCmds.DrawLine,
                 Pen = _pen,
-                Points = new List<Point>
-                {
+                Points =
+                [
                     new(x1, y1),
                     new(x2, y2)
-                }
+                ]
             });
         else
             _graphicsPath.AddLine(
@@ -179,11 +179,11 @@ public class GraphicsHelper
             _drawCmds.Add(new GHDrawCmd
             {
                 Type = GHDrawCmds.DrawLine,
-                Points = new List<Point>
-                {
+                Points =
+                [
                     _location,
                     new(x, y)
-                },
+                ],
                 Pen = _pen
             });
         else
@@ -208,11 +208,11 @@ public class GraphicsHelper
                 Type = GHDrawCmds.DrawArc,
                 Rect = rect,
                 Pen = _pen,
-                Angles = new List<float>
-                {
+                Angles =
+                [
                     startAngle,
                     sweepAngle
-                }
+                ]
             });
         else
             _graphicsPath.AddArc(
@@ -236,11 +236,11 @@ public class GraphicsHelper
                 Type = GHDrawCmds.DrawPie,
                 Rect = rect,
                 Pen = _pen,
-                Angles = new List<float>
-                {
+                Angles =
+                [
                     startAngle,
                     sweepAngle
-                }
+                ]
             });
         else
             _graphicsPath.AddPie(
@@ -327,10 +327,7 @@ public class GraphicsHelper
                 Brush = _brush,
                 Font = _font,
                 Text = text,
-                Points = new List<Point>
-                {
-                    new(x, y)
-                }
+                Points = [new(x, y)]
             });
         else
             _graphicsPath.AddString(
@@ -351,10 +348,7 @@ public class GraphicsHelper
                 Brush = _brush,
                 Font = _font,
                 Text = text,
-                Points = new List<Point>
-                {
-                    _location
-                }
+                Points = [_location]
             });
         else
             _graphicsPath.AddString(

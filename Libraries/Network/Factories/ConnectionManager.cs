@@ -171,17 +171,29 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
 
-        connectionState.Socket?.DropConnection();
-
-        connectionState.Direction = SocketDirection.Outbound;
-
-        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork);
-        connectionState.Socket.Connect(hostAddr);
-
-        connectionState.HostAddr = hostAddr;
+        connectionState.Connect(hostAddr);
     }
 
-    public static void DropConnection(IConnectionState connectionState)
+    public static void Connect(IConnectionState connectionState, IPAddress ipAddress, int port)
+    {
+        Connect(connectionState, new IPEndPoint(ipAddress, port));
+    }
+
+    public static void Connect(IConnectionState connectionState, string hostname, int port)
+    {
+        var ipAddr = Dns.GetHostAddresses(hostname).FirstOrDefault(addr => addr.AddressFamily == AddressFamily.InterNetwork);
+        if (ipAddr != null)
+        {
+            Connect(connectionState, ipAddr, port);
+        }
+    }
+
+    public static void Connect(IConnectionState connectionState, Uri url)
+    {
+        Connect(connectionState, url.Host, url.Port);
+    }
+
+    public static void Disconnect(IConnectionState connectionState)
     {
         connectionState?.Socket?.DropConnection();
     }

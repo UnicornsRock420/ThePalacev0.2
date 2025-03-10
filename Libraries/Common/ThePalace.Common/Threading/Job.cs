@@ -75,7 +75,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
         TokenSource = CancellationTokenFactory.NewToken();
         SubJobs = new();
-        Errors = new();
+        Errors = [];
         Queue = new();
 
         JobState = null;
@@ -100,7 +100,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
         if ((opts & RunOptions.DoRunLog) == RunOptions.DoRunLog)
         {
-            RunLogs = new();
+            RunLogs = [];
         }
 
         sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);

@@ -150,8 +150,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
 
-    public List<ListRec> ServerRooms { get; set; } = new();
-    public List<ListRec> ServerUsers { get; set; } = new();
+    public List<ListRec> ServerRooms { get; set; } = [];
+    public List<ListRec> ServerUsers { get; set; } = [];
     #endregion
 
     public void RefreshUI()
@@ -731,7 +731,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     {
         var spots = RoomInfo?.HotSpots
             ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
-            ?.ToList() ?? new List<HotspotDesc>();
+            ?.ToList() ?? [];
         if (spots.Count > 0)
         {
             var padding = 2;

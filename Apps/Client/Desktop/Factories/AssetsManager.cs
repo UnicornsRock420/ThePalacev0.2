@@ -17,11 +17,10 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     public AssetsManager()
     {
         _managedResources.AddRange(
-            new IDisposable[]
-            {
-                SmileyFaces,
+        [
+            SmileyFaces,
                 Assets
-            });
+        ]);
 
         ApiManager.Current.RegisterApi(nameof(ExecuteMacro), ExecuteMacro);
     }
@@ -30,7 +29,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     public DisposableDictionary<uint, Bitmap> SmileyFaces { get; private set; } = new();
     public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
-    public List<AssetSpec[]> Macros { get; private set; } = new();
+    public List<AssetSpec[]> Macros { get; private set; } = [];
 
     ~AssetsManager()
     {
@@ -172,7 +171,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                     .Select(p => p?.Id ?? 0)
                     ?.Distinct()
                     ?.Where(id => id != 0))
-                ?.ToList() ?? new List<int>();
+                ?.ToList() ?? [];
 
             var iQuery = Current.Assets.Values
                 .Select(a => a.AssetInfo.AssetSpec.Id)

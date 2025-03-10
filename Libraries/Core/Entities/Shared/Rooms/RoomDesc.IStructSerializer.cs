@@ -74,8 +74,8 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                 var h = new HotspotDesc
                 {
-                    Vortexes = new List<Point>(),
-                    States = new List<HotspotStateDesc>()
+                    Vortexes = [],
+                    States = []
                 };
                 PeekSInt32(position += 4); //scriptEventMask
                 h.SpotInfo.Flags = (HotspotFlags)PeekSInt32(position += 4);

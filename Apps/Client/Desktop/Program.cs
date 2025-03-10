@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Net;
 using System.Reflection;
-using System.Security.Policy;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.UI;
@@ -36,7 +34,6 @@ using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
@@ -175,7 +172,7 @@ public class Program : Disposable
                        !q.IsEmpty)
                 {
                     Task.WaitAll(
-                        TaskManager.StartNew(
+                        TaskManager.StartMany(
                             cancellationToken.Token,
                             () =>
                             {
@@ -188,15 +185,7 @@ public class Program : Disposable
                                             app.SessionState.ConnectionState.Disconnect();
                                             break;
                                         case NetworkCommandTypes.CONNECT:
-                                            var target = (IPEndPoint?)null;
-
-                                            if (IPEndPoint.TryParse(string.Concat(cmd.Values), out var _ip))
-                                            {
-                                                target = _ip;
-                                            }
-
-                                            if (target != null)
-                                                app.SessionState.ConnectionState.Connect(target);
+                                            ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
                                             break;
                                     }
                                 }
@@ -617,23 +606,12 @@ public class Program : Disposable
                                         ScreenLayerTypes.UserNametag,
                                         ScreenLayerTypes.Messages);
 
-                                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                                    {
-                                        CmdFnc = a =>
+                                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                                        (int)SessionState.UserId,
+                                        new MSG_USERMOVE
                                         {
-                                            if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                                            if (a[1] is not Core.Entities.Shared.Types.Point point) return null;
-
-                                            sessionState.Send(new MSG_USERMOVE
-                                            {
-                                                Pos = point
-                                            });
-
-                                            return null;
-                                        },
-                                        Values = [SessionState, point]
-                                    });
+                                            Pos = point
+                                        });
                                 }
 
                                 break;
@@ -677,92 +655,91 @@ public class Program : Disposable
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
-                                            if (SessionState.UserDesc.IsModerator ||
-                                                SessionState.UserDesc.IsAdministrator)
+                                            if (!SessionState.UserDesc.IsModerator &&
+                                                !SessionState.UserDesc.IsAdministrator) continue;
+
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
                                             {
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_PIN,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_PIN,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Unpin User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Unpin User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_UNPIN,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_UNPIN,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Gag User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Gag User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_GAG,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_GAG,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Ungag User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Ungag User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_UNGAG,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_UNGAG,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Propgag User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Propgag User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_PROPGAG,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_PROPGAG,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.CMD_UNPROPGAG,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.CMD_UNPROPGAG,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
+                                            }
 
-                                                toolStripItem =
-                                                    _contextMenu.Items.Add($"Kill User: {roomUser.UserInfo.Name}");
-                                                if (toolStripItem != null)
+                                            toolStripItem =
+                                                _contextMenu.Items.Add($"Kill User: {roomUser.UserInfo.Name}");
+                                            if (toolStripItem != null)
+                                            {
+                                                toolStripItem.Tag = new object[]
                                                 {
-                                                    toolStripItem.Tag = new object[]
-                                                    {
-                                                        ContextMenuCommandTypes.MSG_KILLUSER,
-                                                        roomUser.UserInfo.UserId
-                                                    };
-                                                    toolStripItem.Click += contextMenuItem_Click;
-                                                }
+                                                    ContextMenuCommandTypes.MSG_KILLUSER,
+                                                    roomUser.UserInfo.UserId
+                                                };
+                                                toolStripItem.Click += contextMenuItem_Click;
                                             }
                                         }
 
@@ -1029,20 +1006,9 @@ public class Program : Disposable
                                         xTalk.Text = iptTracking.Variables["CHATSTR"].Variable.Value.ToString();
 
                                     if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                        ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                                        {
-                                            CmdFnc = a =>
-                                            {
-                                                if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                                                if (a[1] is not MSG_XTALK xTalk) return null;
-
-                                                sessionState?.Send(xTalk);
-
-                                                return null;
-                                            },
-                                            Values = [SessionState, xTalk]
-                                        });
+                                        SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                                            (int)SessionState.UserId,
+                                            xTalk);
                                 }
                             }
                         }
@@ -1162,18 +1128,8 @@ public class Program : Disposable
                                 !string.IsNullOrWhiteSpace(comboBoxAddresses.Text))
                                 ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
-                                    CmdFnc = a =>
-                                    {
-                                        if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                                        if (a[1] is not string url) return null;
-
-                                        if (IPEndPoint.TryParse(url, out var result))
-                                            sessionState.ConnectionState.Connect(result);
-
-                                        return null;
-                                    },
-                                    Values = [SessionState, $"palace://{comboBoxAddresses.Text}"]
+                                    Flags = (int)NetworkCommandTypes.CONNECT,
+                                    Values = [new Uri($"palace://{comboBoxAddresses.Text}")]
                                 });
 
                             connectionForm.Close();
@@ -1292,38 +1248,17 @@ public class Program : Disposable
                                 SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                                {
-                                    CmdFnc = a =>
+                                SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                                    (int)SessionState.UserId,
+                                    new MSG_ROOMGOTO
                                     {
-                                        if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                                        if (a[1] is not short roomID) return null;
-
-                                        sessionState?.Send(new MSG_ROOMGOTO
-                                        {
-                                            Dest = roomID
-                                        });
-
-                                        return null;
-                                    },
-                                    Values = [SessionState, roomID]
-                                });
+                                        Dest = roomID
+                                    });
                             else
                                 ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
-                                    CmdFnc = a =>
-                                    {
-                                        if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                                        if (a[1] is not string url) return null;
-
-                                        if (IPEndPoint.TryParse(url, out var result))
-                                            ConnectionManager.Connect(sessionState.ConnectionState, result);
-
-                                        return null;
-                                    },
-                                    Values = [SessionState, url]
+                                    Flags = (int)NetworkCommandTypes.CONNECT,
+                                    Values = [new Uri(url)]
                                 });
                         }
                     }
@@ -1383,26 +1318,13 @@ public class Program : Disposable
                 {
                     var value = (int)values[1];
 
-                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                    {
-                        CmdFnc = a =>
+                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                        (int)SessionState.UserId,
+                        new MSG_WHISPER
                         {
-                            if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                            if (a[1] is not int value) return null;
-
-                            if (a[2] is not ContextMenuCommandTypes cmd) return null;
-
-                            sessionState.Send(new MSG_WHISPER
-                            {
-                                TargetID = value,
-                                Text = $"`{cmd.GetDescription()}"
-                            });
-
-                            return null;
-                        },
-                        Values = [SessionState, value, cmd]
-                    });
+                            TargetID = value,
+                            Text = $"`{cmd.GetDescription()}"
+                        });
                 }
 
                     break;
@@ -1410,23 +1332,12 @@ public class Program : Disposable
                 {
                     var value = (uint)values[1];
 
-                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                    {
-                        CmdFnc = a =>
+                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                        (int)SessionState.UserId,
+                        new MSG_KILLUSER
                         {
-                            if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                            if (a[1] is not uint value) return null;
-
-                            sessionState.Send(new MSG_KILLUSER
-                            {
-                                TargetID = value
-                            });
-
-                            return null;
-                        },
-                        Values = [SessionState, value]
-                    });
+                            TargetID = value
+                        });
                 }
 
                     break;
@@ -1434,23 +1345,12 @@ public class Program : Disposable
                 {
                     var value = (short)values[1];
 
-                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                    {
-                        CmdFnc = a =>
+                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                        (int)SessionState.UserId,
+                        new MSG_SPOTDEL
                         {
-                            if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                            if (a[1] is not short value) return null;
-
-                            sessionState.Send(new MSG_SPOTDEL
-                            {
-                                SpotID = value
-                            });
-
-                            return null;
-                        },
-                        Values = [SessionState, value]
-                    });
+                            SpotID = value
+                        });
                 }
 
                     break;
@@ -1491,23 +1391,12 @@ public class Program : Disposable
             {
                 var value = (int)values[1];
 
-                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                {
-                    CmdFnc = a =>
+                SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                    (int)SessionState.UserId,
+                    new MSG_PROPDEL
                     {
-                        if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                        if (a[1] is not int value) return null;
-
-                        sessionState.Send(new MSG_PROPDEL
-                        {
-                            PropNum = value
-                        });
-
-                        return null;
-                    },
-                    Values = [SessionState, value]
-                });
+                        PropNum = value
+                    });
             }
 
                 break;
@@ -1531,23 +1420,12 @@ public class Program : Disposable
                         ScreenLayerTypes.UserNametag,
                         ScreenLayerTypes.Messages);
 
-                    ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                    {
-                        CmdFnc = a =>
+                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
+                        (int)SessionState.UserId,
+                        new MSG_USERMOVE
                         {
-                            if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                            if (a[1] is not Core.Entities.Shared.Types.Point value) return null;
-
-                            sessionState.Send(new MSG_USERMOVE
-                            {
-                                Pos = value
-                            });
-
-                            return null;
-                        },
-                        Values = [SessionState, value]
-                    });
+                            Pos = value
+                        });
                 }
             }
 

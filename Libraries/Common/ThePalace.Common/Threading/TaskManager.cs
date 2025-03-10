@@ -125,9 +125,10 @@ public class TaskManager : SingletonDisposable<TaskManager>
         return job;
     }
 
-    public static Task[] StartNew(CancellationToken? token, params Action[] actions)
+    public static Task[] StartMany(CancellationToken? token = null, params Action[] actions)
     {
-        if (_globalToken.IsCancellationRequested) return [];
+        if (_globalToken.IsCancellationRequested ||
+            token?.IsCancellationRequested == true) return [];
 
         var tasks = new Task[actions.Length];
 
