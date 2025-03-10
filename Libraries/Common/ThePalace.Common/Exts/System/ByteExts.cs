@@ -51,7 +51,7 @@ public static class ByteExts
         {
             zipInput.CopyTo(memOutput);
 
-            return memOutput.GetBuffer().GetString();
+            return memOutput.ToArray().GetString();
         }
     }
 

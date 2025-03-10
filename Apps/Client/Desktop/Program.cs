@@ -23,11 +23,13 @@ using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
+using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Client.Rooms;
 using ThePalace.Core.Entities.Network.Client.Users;
 using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Entities.Network.Shared.Communications;
+using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Users;
@@ -37,6 +39,8 @@ using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
+using ThePalace.Core.Interfaces.EventsBus;
+using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
@@ -128,6 +132,15 @@ public class Program : Disposable
         //// see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
 
+        EventBus.Current.Subscribe(AppDomain.CurrentDomain
+            .GetAssemblies()
+            .Where(a => a.FullName?.StartsWith("ThePalace.Common.Client") == true)
+            .SelectMany(a => a.GetTypes())
+            .Where(t =>
+                t.GetInterfaces().Contains(typeof(IEventHandler)) &&
+                t.Namespace?.StartsWith("ThePalace.Common.Client.Entities.Business") == true)
+            .ToArray());
+
         var app = (Program?)null;
         var job = (IJob?)null;
 
@@ -143,8 +156,7 @@ public class Program : Disposable
                 else
                     cmd.CmdFnc();
             },
-            null,
-            RunOptions.UseTimer,
+            opts: RunOptions.UseTimer,
             timer: new UITimer
             {
                 Enabled = true
@@ -197,9 +209,9 @@ public class Program : Disposable
                                        (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
                                        (app?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                 {
-                                    var msgPacket = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                    var msgBytes = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
 
-                                    app.SessionState.ConnectionState.Send(msgPacket);
+                                    app.SessionState.ConnectionState.Send(msgBytes);
 
                                     await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
                                 }
@@ -210,9 +222,44 @@ public class Program : Disposable
                                        (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
                                        (app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                                 {
-                                    var msgPacket = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
+                                    var msgBytes = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
 
-                                    // TODO
+                                    var msgHeader = new MSG_Header();
+                                    var msgObj = (IProtocol?)null;
+                                    var msgType = (Type?)null;
+
+                                    using (var ms = new MemoryStream(msgBytes))
+                                    {
+                                        ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
+                                        
+                                        var eventType = msgHeader.EventType.ToString();
+                                        msgType = AppDomain.CurrentDomain
+                                            .GetAssemblies()
+                                            .Where(a => a.FullName.StartsWith("ThePalace"))
+                                            .SelectMany(t => t.GetTypes())
+                                            .Where(t => t.Name == eventType)
+                                            .FirstOrDefault();
+                                        if (msgType != null)
+                                        {
+                                            msgObj = (IProtocol?)msgType.GetInstance();
+
+                                            ms.PalaceDeserialize(
+                                                msgObj,
+                                                msgType);
+                                        }
+                                    }
+
+                                    var boType = EventBus.Current.GetType(msgObj);
+                                    
+                                    EventBus.Current.Publish(
+                                        null,
+                                        boType,
+                                        new ProtocolEventParams
+                                        {
+                                            SourceID = (int)(app?.SessionState?.UserId ?? 0),
+                                            RefNum = (int)(app?.SessionState?.UserId ?? 0),
+                                            Request = msgObj
+                                        });
 
                                     await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
                                 }

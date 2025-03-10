@@ -61,7 +61,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
     public virtual uint8[]? Data
     {
-        get => _stream?.GetBuffer() ?? [];
+        get => _stream?.ToArray() ?? [];
         set => _stream = new MemoryStream(value ?? []);
     }
 
@@ -615,7 +615,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
         {
             if (clearBytes)
             {
-                var buffer = _stream.GetBuffer();
+                var buffer = _stream.ToArray();
                 Array.Clear(buffer, offset, buffer.Length - offset);
             }
 

@@ -23,7 +23,7 @@ public static class AsyncPalaceSocket
                 ms.PalaceSerialize((int)sessionState.UserId, obj, SerializerOptions.IncludeHeader);
 
                 if (ms.Length > 0)
-                    sessionState.ConnectionState.Send(ms.GetBuffer());
+                    sessionState.ConnectionState.Send(ms.ToArray());
             }
     }
 }

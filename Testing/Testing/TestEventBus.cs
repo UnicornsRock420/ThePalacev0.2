@@ -13,36 +13,6 @@ public class TestEventBus
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
     private static readonly EventBus CONST_EventBus = EventBus.Instance;
 
-    public Type? GetBOType(IProtocol msg)
-    {
-        var msgType = msg.GetType();
-
-        return AppDomain.CurrentDomain
-            .GetAssemblies()
-            .SelectMany(t => t.GetTypes())
-            .Where(t =>
-            {
-                if (t.IsInterface) return false;
-
-                var itrfs = t.GetInterfaces();
-
-                if (!itrfs.Contains(CONST_TYPE_IEventHandler)) return false;
-
-                if (!itrfs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(msgType))) return false;
-
-                return true;
-            })
-            .Select(t =>
-            {
-                foreach (var i in t.GetInterfaces() ?? [])
-                    if (i == CONST_TYPE_IEventHandler)
-                        return t;
-
-                return null;
-            })
-            .FirstOrDefault();
-    }
-
     [TestInitialize]
     public void TestInitialize()
     {
@@ -58,19 +28,17 @@ public class TestEventBus
                     t.GetInterfaces().Contains(typeof(IEventHandler)) &&
                     t.Namespace?.StartsWith("ThePalace.Common.Server.Entities.Business") == true;
             })
-            .ToList();
+            .ToArray();
 
-        var eventBus = EventBus.Instance;
-        foreach (var type in types) eventBus.Subscribe(type);
+        CONST_EventBus.Subscribe(types);
     }
 
     [TestMethod]
     public void MSG_LISTOFALLROOMS()
     {
         var srcMsg = TestIStruct.MSG_LISTOFALLROOMS;
-        var srcMsgType = (Type?)TestIStruct.MSG_LISTOFALLROOMS.GetType();
 
-        var boType = GetBOType(srcMsg);
+        var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,
@@ -88,9 +56,8 @@ public class TestEventBus
     public void MSG_LOGON()
     {
         var srcMsg = TestIStruct.MSG_LOGON;
-        var srcMsgType = (Type?)TestIStruct.MSG_LOGON.GetType();
 
-        var boType = GetBOType(srcMsg);
+        var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,
@@ -108,9 +75,8 @@ public class TestEventBus
     public void MSG_USERDESC()
     {
         var srcMsg = TestIStruct.MSG_USERDESC;
-        var srcMsgType = (Type?)TestIStruct.MSG_USERDESC.GetType();
 
-        var boType = GetBOType(srcMsg);
+        var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,

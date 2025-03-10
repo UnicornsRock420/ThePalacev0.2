@@ -171,7 +171,7 @@ public static class StringExts
 
             memOutput.Position = 0;
 
-            return memOutput.GetBuffer();
+            return memOutput.ToArray();
         }
     }
 

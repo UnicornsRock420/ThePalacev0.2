@@ -4,22 +4,60 @@ using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Core.Factories.Core;
 
-public class EventBus : IEventsBus
+public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 {
-    private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary;
-
-    private EventBus()
-    {
-        _handlersDictionary = new ConcurrentDictionary<string, List<IEventHandler>>();
-    }
+    private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
+    
+    private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary = new();
 
     public static EventBus Instance { get; } = new();
 
-    public void Dispose()
+    ~EventBus()
+    {
+        Dispose();
+    }
+
+    public override void Dispose()
     {
         _handlersDictionary?.Clear();
 
-        GC.SuppressFinalize(this);
+        base.Dispose();
+    }
+
+    public Type? GetType(IEventParams @params)
+    {
+        var paramsType = @params.GetType();
+
+        return AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(t => t.GetTypes())
+            .Where(t =>
+            {
+                if (t.IsInterface) return false;
+
+                var ntrs = t.GetInterfaces();
+
+                return ntrs.Contains(CONST_TYPE_IEventHandler) &&
+                       ntrs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(paramsType));
+            })
+            .Select(t => t.GetInterfaces().Contains(CONST_TYPE_IEventHandler) ? t : null)
+            .FirstOrDefault();
+    }
+
+    public void Subscribe(params IEventHandler[] handlers)
+    {
+        if ((handlers?.Length ?? 0) > 0) return;
+        
+        foreach (var handler in handlers)
+            Subscribe(handler);
+    }
+
+    public void Subscribe(IEnumerable<IEventHandler> handlers)
+    {
+        if ((handlers?.Count() ?? 0) > 0) return;
+        
+        foreach (var handler in handlers)
+            Subscribe(handler);
     }
 
     public void Subscribe(IEventHandler handler)
@@ -40,17 +78,22 @@ public class EventBus : IEventsBus
         if (!_handlersDictionary.TryAdd(eventTypeName, [handler])) _handlersDictionary[eventTypeName].Add(handler);
     }
 
-    public async Task Publish(object? sender, IEventParams @event)
+    public void Subscribe<TEventParams>(params IEventHandler<TEventParams>[] handlers)
+        where TEventParams : IEventParams
     {
-        var eventType = @event.GetType();
-        if (eventType == null) return;
-
-        await Publish(sender, eventType, @event);
+        if ((handlers?.Length ?? 0) > 0) return;
+        
+        foreach (var handler in handlers)
+            Subscribe(handler);
     }
 
-    ~EventBus()
+    public void Subscribe<TEventParams>(IEnumerable<IEventHandler<TEventParams>> handlers)
+        where TEventParams : IEventParams
     {
-        Dispose();
+        if ((handlers?.Count() ?? 0) > 0) return;
+        
+        foreach (var handler in handlers)
+            Subscribe(handler);
     }
 
     public void Subscribe<TEventParams>(IEventHandler<TEventParams> handler)
@@ -81,6 +124,22 @@ public class EventBus : IEventsBus
         if (!_handlersDictionary.TryAdd(eventTypeName, [handler])) _handlersDictionary[eventTypeName].Add(handler);
     }
 
+    public void Subscribe(params Type[] eventTypes)
+    {
+        if ((eventTypes?.Length ?? 0) > 0) return;
+        
+        foreach (var eventType in eventTypes)
+            Subscribe(eventType);
+    }
+
+    public void Subscribe(IEnumerable<Type> eventTypes)
+    {
+        if ((eventTypes?.Count() ?? 0) > 0) return;
+        
+        foreach (var eventType in eventTypes)
+            Subscribe(eventType);
+    }
+
     public void Subscribe(Type eventType)
     {
         if (eventType == null) return;
@@ -109,6 +168,14 @@ public class EventBus : IEventsBus
         if (eventType.GetInstance() is not IEventHandler handler) return;
 
         if (!_handlersDictionary.TryAdd(eventTypeName, [handler])) _handlersDictionary[eventTypeName].Add(handler);
+    }
+
+    public async Task Publish(object? sender, IEventParams @event)
+    {
+        var eventType = @event.GetType();
+        if (eventType == null) return;
+
+        await Publish(sender, eventType, @event);
     }
 
     public async Task Publish<TEventType, TEventParams>(object? sender, TEventParams @event)

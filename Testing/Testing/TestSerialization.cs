@@ -41,7 +41,7 @@ public class TestSerialization
                 srcMsg,
                 SerializerOptions.IncludeHeader);
 
-            packetBytes = ms.GetBuffer();
+            packetBytes = ms.ToArray();
 
             ms.Seek(0, SeekOrigin.Begin);
 
@@ -104,7 +104,7 @@ public class TestSerialization
                 srcMsg,
                 SerializerOptions.IncludeHeader);
 
-            packetBytes = ms.GetBuffer();
+            packetBytes = ms.ToArray();
 
             ms.Seek(0, SeekOrigin.Begin);
 
@@ -165,7 +165,7 @@ public class TestSerialization
                 srcMsg,
                 SerializerOptions.IncludeHeader);
 
-            packetBytes = ms.GetBuffer();
+            packetBytes = ms.ToArray();
 
             ms.Seek(0, SeekOrigin.Begin);
 

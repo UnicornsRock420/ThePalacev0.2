@@ -174,7 +174,7 @@ public static class StreamExts
         {
             if (clearBytes)
             {
-                var buffer = stream.GetBuffer();
+                var buffer = stream.ToArray();
                 Array.Clear(buffer, 0, buffer.Length);
             }
 

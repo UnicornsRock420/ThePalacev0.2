@@ -43,8 +43,9 @@ public class MSG_LISTOFALLUSERS : EventParams, IStructRefNum, IStructSerializer,
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
     {
-        if ((Users?.Count ?? 0) > 0)
-            foreach (var user in Users)
-                writer.PalaceSerialize(user, typeof(ListRec), opts);
+        if ((Users?.Count ?? 0) < 1) return;
+
+        foreach (var user in Users)
+            writer.PalaceSerialize(user, typeof(ListRec), opts);
     }
 }

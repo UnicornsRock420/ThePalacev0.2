@@ -43,8 +43,9 @@ public class MSG_LISTOFALLROOMS : EventParams, IStructRefNum, IStructSerializer,
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
     {
-        if ((Rooms?.Count ?? 0) > 0)
-            foreach (var room in Rooms)
-                writer.PalaceSerialize(room, typeof(ListRec), opts);
+        if ((Rooms?.Count ?? 0) < 1) return;
+
+        foreach (var room in Rooms)
+            writer.PalaceSerialize(room, typeof(ListRec), opts);
     }
 }

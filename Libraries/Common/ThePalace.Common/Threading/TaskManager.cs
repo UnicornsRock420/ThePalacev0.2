@@ -78,7 +78,7 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public static CancellationToken GlobalToken => _globalToken.Token;
 
-    public IJob CreateJob(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState,
+    public IJob CreateJob(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState = null,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
     {
         if (_globalToken.IsCancellationRequested) return null;
@@ -101,7 +101,7 @@ public class TaskManager : SingletonDisposable<TaskManager>
         return job;
     }
 
-    public Job<TCmd> CreateJob<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState,
+    public Job<TCmd> CreateJob<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState = null,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
         where TCmd : ICmd
     {

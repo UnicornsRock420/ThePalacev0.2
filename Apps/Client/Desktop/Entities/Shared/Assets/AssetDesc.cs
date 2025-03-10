@@ -328,7 +328,7 @@ public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
                         zipInput.CopyTo(memOutput);
                     }
 
-                    return memOutput.GetBuffer();
+                    return memOutput.ToArray();
                 }
             }
             catch (Exception ex)

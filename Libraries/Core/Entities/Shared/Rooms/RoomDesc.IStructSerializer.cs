@@ -313,7 +313,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                                 //_blobData.WriteInt16(state.PictID);
                                 //_blobData.WriteInt16(0); //reserved
                                 //_blobData.WriteBytes(MessagePackSerializer.Serialize(state.PicLoc));
-                                _blobData.WriteBytes(ms.GetBuffer());
+                                _blobData.WriteBytes(ms.ToArray());
                             }
                         }
                         else
@@ -378,7 +378,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                 hotspotOfst = (short)(HotSpots.Count > 0 ? _blobData.Count : 0);
 
-                _blobData.WriteBytes(tmp.GetBuffer());
+                _blobData.WriteBytes(tmp.ToArray());
             }
 
             //Start Pictures
@@ -401,7 +401,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
                 pictureOfst = (short)(Pictures.Count > 0 ? _blobData.Count : 0);
 
-                _blobData.WriteBytes(tmp.GetBuffer());
+                _blobData.WriteBytes(tmp.ToArray());
             }
 
 
@@ -434,10 +434,10 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                         tmp2.Write(DrawCmds[i].Data);
                     }
 
-                    tmp1.Write(tmp2.GetBuffer());
+                    tmp1.Write(tmp2.ToArray());
                 }
 
-                _blobData.WriteBytes(tmp1.GetBuffer());
+                _blobData.WriteBytes(tmp1.ToArray());
             }
 
             // Start Loose Props
@@ -453,7 +453,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                 {
                     LooseProps[i].Serialize(ms, opts);
 
-                    _blobData.WriteBytes(ms.GetBuffer());
+                    _blobData.WriteBytes(ms.ToArray());
                 }
             }
 
@@ -481,9 +481,9 @@ public partial class RoomDesc : IDisposable, IStructSerializer
                 WriteInt16(lenVars); // Length of Data Blob
             }
 
-            _stream.Write(_blobData.Stream.GetBuffer());
+            _stream.Write(_blobData.Stream.ToArray());
 
-            writer.Write(Stream.GetBuffer());
+            writer.Write(Stream.ToArray());
         }
     }
 }
