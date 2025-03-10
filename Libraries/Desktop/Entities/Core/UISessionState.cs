@@ -19,5 +19,5 @@ public class UISessionState : SessionState, IUISessionState
     public UserDesc UserDesc { get; set; } = new();
     public RegistrationRec RegInfo { get; set; } = new();
 
-    public object? ScriptState { get; set; }
+    public object? ScriptTag { get; set; }
 }

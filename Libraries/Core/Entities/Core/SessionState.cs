@@ -17,10 +17,10 @@ public class SessionState : Disposable, ISessionState
     public uint UserId { get; set; } = 0;
     public UserDesc? UserDesc { get; set; } = null;
     public RegistrationRec? RegInfo { get; set; } = null;
-    public object? State { get; set; } = null;
+    public object? SessionTag { get; set; } = null;
 
     public ConcurrentDictionary<string, object> Extended { get; set; }
-    public object? ScriptState { get; set; } = null;
+    public object? ScriptTag { get; set; } = null;
 
     public RoomDesc RoomInfo { get; set; } = new();
     public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();

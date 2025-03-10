@@ -52,7 +52,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         {
             EventType = eventType,
             Packet = packet,
-            ScriptState = scriptState
+            ScriptTag = scriptState
         };
 
         foreach (var handler in _events[eventType])
@@ -65,7 +65,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
                 LoggerHub.Current.Error(ex);
 
                 if (eventType != IptEventTypes.UnhandledError)
-                    Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptState);
+                    Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptTag);
             }
     }
 

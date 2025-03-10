@@ -62,7 +62,7 @@ public class ConnectionState : EventArgs, IConnectionState
         HostAddr = null;
         RemoteAddr = null;
         Buffer = null;
-        State = null;
+        Tag = null;
 
         LastReceived = null;
         LastSent = null;
@@ -84,7 +84,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public Socket? Socket { get; set; }
     public NetworkStream? NetworkStream { get; set; }
 
-    public object? State { get; set; }
+    public object? Tag { get; set; }
 
     ~ConnectionState()
     {

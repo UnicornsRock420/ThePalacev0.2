@@ -22,5 +22,5 @@ public interface IConnectionState : IDisposable
     Socket? Socket { get; set; }
     NetworkStream? NetworkStream { get; set; }
 
-    object State { get; set; }
+    object? Tag { get; set; }
 }

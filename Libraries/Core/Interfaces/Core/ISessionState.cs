@@ -15,10 +15,10 @@ public interface ISessionState
     uint UserId { get; set; }
     UserDesc? UserDesc { get; set; }
     RegistrationRec? RegInfo { get; set; }
-    object? State { get; set; }
+    object? SessionTag { get; set; }
     
     ConcurrentDictionary<string, object> Extended { get; }
-    object? ScriptState { get; set; }
+    object? ScriptTag { get; set; }
 
     RoomDesc RoomInfo { get; set; }
     ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; }

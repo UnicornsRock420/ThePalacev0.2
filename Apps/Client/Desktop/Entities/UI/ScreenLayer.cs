@@ -51,51 +51,50 @@ public class ScreenLayer : Disposable, IScreenLayer
     {
         ArgumentNullException.ThrowIfNull(xPath, nameof(xPath));
 
+        var backgroundImage = (Bitmap?)null;
+
+        try
+        {
+            switch (srcType)
+            {
+                case LayerSourceTypes.Filesystem:
+                    if (File.Exists(xPath))
+                        backgroundImage = new Bitmap(xPath);
+
+                    break;
+                case LayerSourceTypes.Resource:
+                    using (var stream = ResourceType
+                               ?.Assembly
+                               ?.GetManifestResourceStream(xPath))
+                    {
+                        if (stream == null) return;
+
+                        backgroundImage = new Bitmap(stream);
+                    }
+
+                    break;
+                default: throw new ArgumentOutOfRangeException(nameof(srcType), srcType, null);
+            }
+        }
+        catch
+        {
+        }
+
+        if (backgroundImage == null) return;
+
         using (var @lock = LockContext.GetLock(this))
         {
-            var backgroundImage = null as Bitmap;
-
-            try
-            {
-                switch (srcType)
-                {
-                    case LayerSourceTypes.Filesystem:
-                        if (File.Exists(xPath))
-                            backgroundImage = new Bitmap(xPath);
-
-                        break;
-                    case LayerSourceTypes.Resource:
-                        using (var stream = ResourceType
-                                   ?.Assembly
-                                   ?.GetManifestResourceStream(xPath))
-                        {
-                            if (stream == null) return;
-
-                            backgroundImage = new Bitmap(stream);
-                        }
-
-                        break;
-                }
-            }
-            catch
-            {
-            }
-
-            if (backgroundImage == null) return;
-
             Unload();
 
             Image = backgroundImage;
             Image.Tag = Path.GetFileName(xPath);
-
-            if (LayerLayerType != ScreenLayerTypes.Base &&
-                (!width.HasValue || !height.HasValue)) return;
-
-            if (sessionState == null) return;
-
-            sessionState.ScreenWidth = width ?? backgroundImage.Width;
-            sessionState.ScreenHeight = height ?? backgroundImage.Height;
         }
+
+        if (LayerLayerType != ScreenLayerTypes.Base ||
+            sessionState == null) return;
+
+        sessionState.ScreenWidth = width ?? backgroundImage.Width;
+        sessionState.ScreenHeight = height ?? backgroundImage.Height;
     }
 
     public void Unload()
@@ -108,7 +107,7 @@ public class ScreenLayer : Disposable, IScreenLayer
         catch
         {
         }
-        
+
         try
         {
             Graphics?.Dispose();

@@ -61,7 +61,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             });
 
         var iptTracking = new IptTracking();
-        ScriptState = iptTracking;
+        ScriptTag = iptTracking;
         iptTracking.Variables.TryAdd("SESSIONSTATE", new IptMetaVariable
         {
             Flags = IptMetaVariableFlags.All,
@@ -84,6 +84,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
     }
 
+    ~DesktopSessionState()
+    {
+        Dispose();
+    }
+
     public override void Dispose()
     {
         LastActivity = null;
@@ -92,6 +97,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         GC.SuppressFinalize(this);
     }
+
+    #region Properties
 
     #region Object Info
 
@@ -127,10 +134,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
-    public object? State { get; set; } = null;
+    public object? SessionTag { get; set; } = null;
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
-    public object? ScriptState { get; set; } = null;
+    public object? ScriptTag { get; set; } = null;
 
     #endregion
 
@@ -202,6 +209,65 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #endregion
 
+    #endregion
+
+    #region UI Methods
+    
+    private void _FormClosed(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (sender is not Form form) return;
+
+        var key = _uiControls
+            .Where(c => c.Value == form)
+            .Select(c => c.Key)
+            .FirstOrDefault();
+        if (key != null)
+            _uiControls.TryRemove(key, out _);
+    }
+
+    private void _ConnectionEstablished(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (this == sender)
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
+    private void _ConnectionDisconnected(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (this == sender)
+            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                    sessionState.RefreshScreen();
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
     public void RefreshScriptEvent(ScriptEvent scriptEvent)
     {
         var screenLayers =
@@ -234,8 +300,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                 RefreshRibbon();
 
-                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptState);
-                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptState);
+                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptTag);
+                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptTag);
 
                 break;
         }
@@ -248,9 +314,9 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         var form = GetForm();
         if (form == null) return;
 
-        if (GetControl("toolStrip") is not ToolStrip toolStrip) return;
+        if (GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
 
-        if (GetControl("labelInfo") is not Label labelInfo) return;
+        if (GetControl<Label>("labelInfo") is not Label labelInfo) return;
 
         if (!isConnected)
         {
@@ -262,7 +328,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
         }
 
-        if (GetControl("imgScreen") is PictureBox imgScreen)
+        if (GetControl<PictureBox>("imgScreen") is PictureBox imgScreen)
         {
             toolStrip.Size = new Size(form.Width, form.Height);
             toolStrip.Location = new Point(0, 0);
@@ -283,7 +349,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             labelInfo.Size = new Size(width, 20);
             labelInfo.Location = new Point(0, imgScreen.Location.Y + imgScreen.Height);
 
-            if (GetControl("txtInput") is TextBox txtInput)
+            if (GetControl<TextBox>("txtInput") is TextBox txtInput)
             {
                 txtInput.Size = new Size(width, 50);
                 txtInput.Location = new Point(0, labelInfo.Location.Y + labelInfo.Height);
@@ -295,7 +361,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     {
         var isConnected = ConnectionState.IsConnected();
 
-        if (GetControl("toolStrip") is not ToolStrip toolStrip) return;
+        if (GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
 
         toolStrip.Items.Clear();
 
@@ -362,6 +428,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             }
         }
     }
+    
+    #endregion
+
+    #region Form/Control Methods
 
     public FormBase GetForm(string? friendlyName = null)
     {
@@ -406,6 +476,17 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         return _uiControls.Values
             ?.Where(c => c is Control)
             ?.FirstOrDefault() as Control;
+    }
+
+    public Control GetControl<T>(string? friendlyName = null)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as T;
+
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
     }
 
     public void RegisterControl(string friendlyName, Control control)
@@ -495,7 +576,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             LoggerHub.Current.Error(ex);
         }
 
-        if (GetControl("imgScreen") is not PictureBox imgScreen) return;
+        if (GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
 
         try
         {
@@ -594,65 +675,9 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         }
     }
 
-    ~DesktopSessionState()
-    {
-        Dispose();
-    }
+    #endregion
 
-    private void _FormClosed(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (sender is not Form form) return;
-
-        var key = _uiControls
-            .Where(c => c.Value == form)
-            .Select(c => c.Key)
-            .FirstOrDefault();
-        if (key != null)
-            _uiControls.TryRemove(key, out _);
-    }
-
-    private void _ConnectionEstablished(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (this == sender)
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-            {
-                CmdFnc = a =>
-                {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender]
-            });
-    }
-
-    private void _ConnectionDisconnected(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (this == sender)
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-            {
-                CmdFnc = a =>
-                {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                    sessionState.RefreshScreen();
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender]
-            });
-    }
+    #region ScreenLayer Methods
 
     private void RefreshLayers(params ScreenLayerTypes[] layers)
     {
@@ -1233,4 +1258,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         break;
                 }
     }
+
+    #endregion
 }

@@ -399,11 +399,9 @@ public class Program : Disposable
         {
             CmdFnc = a =>
             {
-                var sessionState = a[0] as IDesktopSessionState;
-                if (sessionState == null) return null;
+                if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                var scriptEvent = a[1] as ScriptEvent;
-                if (scriptEvent == null) return null;
+                if (a[1] is not ScriptEvent scriptEvent) return null;
 
                 sessionState.RefreshScriptEvent(scriptEvent);
 
@@ -438,37 +436,37 @@ public class Program : Disposable
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, SessionState, null, SessionState.ScriptTag);
         };
         form.MouseUp += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, SessionState, null, SessionState.ScriptTag);
         };
         form.MouseDown += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, SessionState, null, SessionState.ScriptTag);
         };
         form.DragEnter += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.DragLeave += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.DragOver += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptState);
+            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.Resize += (sender, e) =>
         {
@@ -916,7 +914,7 @@ public class Program : Disposable
                         return;
                     }
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, SessionState, null, SessionState.ScriptState);
+                    ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, SessionState, null, SessionState.ScriptTag);
 
                     if (e.KeyCode == Keys.Enter)
                     {
@@ -940,10 +938,10 @@ public class Program : Disposable
                                         try
                                         {
                                             var atomlist = IptscraeEngine.Parse(
-                                                sessionState.ScriptState as IptTracking,
+                                                sessionState.ScriptTag as IptTracking,
                                                 text,
                                                 false);
-                                            IptscraeEngine.Executor(atomlist, sessionState.ScriptState as IptTracking);
+                                            IptscraeEngine.Executor(atomlist, sessionState.ScriptTag as IptTracking);
                                         }
                                         catch (Exception ex)
                                         {
@@ -962,10 +960,10 @@ public class Program : Disposable
                                     Text = text
                                 };
 
-                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptState);
-                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptTag);
+                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptTag);
 
-                                if (SessionState.ScriptState is not IptTracking iptTracking) return;
+                                if (SessionState.ScriptTag is not IptTracking iptTracking) return;
 
                                 if (iptTracking.Variables?.TryGetValue("CHATSTR", out var variable) is true)
                                     xTalk.Text = variable.Variable.Value.ToString();
@@ -989,7 +987,7 @@ public class Program : Disposable
 
                     if (!SessionState?.ConnectionState?.IsConnected() ?? false) return;
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, SessionState, null, SessionState.ScriptState);
+                    ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, SessionState, null, SessionState.ScriptTag);
                 };
 
                 SessionState.RegisterControl(nameof(txtInput), txtInput);
