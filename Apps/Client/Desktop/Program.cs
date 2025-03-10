@@ -1188,9 +1188,9 @@ public class Program : Disposable
                         .Where(c => c.Name == "comboBoxUsernames")
                         .FirstOrDefault() is ComboBox comboBoxUsernames)
                 {
-                    if (SettingsManager.Current.Settings[@"\GUI\Connection\Usernames"] is ISettingList usernamesList)
+                    if (SettingsManager.Current.Get<List<string>>(@"\GUI\Connection\Usernames") is List<string> usernamesList)
                     {
-                        comboBoxUsernames.Items.AddRange(usernamesList.Text
+                        comboBoxUsernames.Items.AddRange(usernamesList
                             .Select(v => new ComboboxItem
                             {
                                 Text = v,
@@ -1198,7 +1198,7 @@ public class Program : Disposable
                             })
                             .ToArray());
 
-                        comboBoxUsernames.Text = usernamesList.Text?.FirstOrDefault();
+                        comboBoxUsernames.Text = usernamesList?.FirstOrDefault();
                     }
                 }
 
@@ -1207,9 +1207,9 @@ public class Program : Disposable
                         .Where(c => c.Name == "comboBoxAddresses")
                         .FirstOrDefault() is ComboBox comboBoxAddresses)
                 {
-                    if (SettingsManager.Current.Settings[@"\GUI\Connection\Addresses"] is ISettingList addressesList)
+                    if (SettingsManager.Current.Get<List<string>>(@"\GUI\Connection\Addresses") is List<string> addressesList)
                     {
-                        comboBoxAddresses.Items.AddRange(addressesList.Text
+                        comboBoxAddresses.Items.AddRange(addressesList
                             .Select(v => new ComboboxItem
                             {
                                 Text = v,
@@ -1217,7 +1217,7 @@ public class Program : Disposable
                             })
                             .ToArray());
 
-                        comboBoxAddresses.Text = addressesList.Text?.FirstOrDefault();
+                        comboBoxAddresses.Text = addressesList?.FirstOrDefault();
                     }
                 }
             }

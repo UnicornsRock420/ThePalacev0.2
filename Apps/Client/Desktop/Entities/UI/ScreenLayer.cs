@@ -35,39 +35,21 @@ public class ScreenLayer : Disposable, IScreenLayer
     public Type ResourceType { get; set; }
     public bool Visible { get; set; } = true;
     public float Opacity { get; set; } = 1.0F;
-    public Bitmap Image { get; set; }
+    public Bitmap Image { get; protected set; }
+    public Graphics Graphics { get; protected set; }
 
     public ScreenLayerTypes LayerLayerType { get; }
     public int Width => Image?.Width ?? 0;
     public int Height => Image?.Height ?? 0;
 
-    public Graphics Initialize(int width, int height)
-    {
-        if (Image != null &&
-            (Image.Width != width ||
-             Image.Height != height))
-            Unload();
-
-        if (Image == null)
-        {
-            Image = new Bitmap(width, height);
-            Image.MakeTransparent(Color.Transparent);
-        }
-
-        var g = Graphics.FromImage(Image);
-        g.Clear(Color.Transparent);
-
-        return g;
-    }
-
     public void Load(
-        IDesktopSessionState sessionState,
-        LayerLoadingTypes layerType,
-        string srcPath,
+        LayerSourceTypes srcType,
+        string xPath,
+        IDesktopSessionState? sessionState = null,
         int? width = null,
         int? height = null)
     {
-        ArgumentNullException.ThrowIfNull(srcPath, nameof(srcPath));
+        ArgumentNullException.ThrowIfNull(xPath, nameof(xPath));
 
         using (var @lock = LockContext.GetLock(this))
         {
@@ -75,17 +57,17 @@ public class ScreenLayer : Disposable, IScreenLayer
 
             try
             {
-                switch (layerType)
+                switch (srcType)
                 {
-                    case LayerLoadingTypes.Filesystem:
-                        if (File.Exists(srcPath))
-                            backgroundImage = new Bitmap(srcPath);
+                    case LayerSourceTypes.Filesystem:
+                        if (File.Exists(xPath))
+                            backgroundImage = new Bitmap(xPath);
 
                         break;
-                    case LayerLoadingTypes.Resource:
+                    case LayerSourceTypes.Resource:
                         using (var stream = ResourceType
                                    ?.Assembly
-                                   ?.GetManifestResourceStream(srcPath))
+                                   ?.GetManifestResourceStream(xPath))
                         {
                             if (stream == null) return;
 
@@ -104,10 +86,12 @@ public class ScreenLayer : Disposable, IScreenLayer
             Unload();
 
             Image = backgroundImage;
-            Image.Tag = Path.GetFileName(srcPath);
+            Image.Tag = Path.GetFileName(xPath);
 
             if (LayerLayerType != ScreenLayerTypes.Base &&
                 (!width.HasValue || !height.HasValue)) return;
+
+            if (sessionState == null) return;
 
             sessionState.ScreenWidth = width ?? backgroundImage.Width;
             sessionState.ScreenHeight = height ?? backgroundImage.Height;
@@ -124,5 +108,29 @@ public class ScreenLayer : Disposable, IScreenLayer
         catch
         {
         }
+        
+        try
+        {
+            Graphics?.Dispose();
+            Graphics = null;
+        }
+        catch
+        {
+        }
+    }
+
+    public Graphics Clear(int width, int height)
+    {
+        if (Image?.Width != width ||
+            Image?.Height != height)
+            Unload();
+
+        Image ??= new Bitmap(width, height);
+        Image.MakeTransparent(Color.Transparent);
+
+        Graphics ??= Graphics.FromImage(Image);
+        Graphics.Clear(Color.Transparent);
+
+        return Graphics;
     }
 }

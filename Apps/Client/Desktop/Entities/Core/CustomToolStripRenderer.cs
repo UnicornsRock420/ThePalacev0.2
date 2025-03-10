@@ -34,7 +34,7 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
     {
         base.OnRenderButtonBackground(e);
 
-        var ribbonItem = SettingsManager.SystemSettings.Ribbon[e.Item.Name];
+        var ribbonItem = SettingsManager.Ribbon[e.Item.Name];
         if (ribbonItem?.HoverFrames != null)
         {
             if (!e.Item.Selected)

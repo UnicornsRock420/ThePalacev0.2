@@ -168,9 +168,9 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public bool Cancel(Guid jobId, CancelOptions opts = CancelOptions.Cascade)
     {
-        if (!Jobs.ContainsKey(jobId)) return false;
+        if (!Jobs.TryGetValue(jobId, out var value)) return false;
 
-        Jobs[jobId].Cancel(opts);
+        value.Cancel(opts);
 
         return true;
     }
@@ -181,11 +181,10 @@ public class TaskManager : SingletonDisposable<TaskManager>
             .SelectMany(j => j.SubJobs)
             .ToList();
 
-        foreach (var job in jobs)
+        foreach (var job in jobs.Where(job =>
+                     _expiredStates.Contains(job.Task.Status) &&
+                     (job.Options & RunOptions.UseTimer) != RunOptions.UseTimer))
         {
-            if (!_expiredStates.Contains(job.Task.Status) ||
-                (job.Options & RunOptions.UseTimer) == RunOptions.UseTimer) continue;
-
             try
             {
                 job.Cancel();
@@ -227,16 +226,16 @@ public class TaskManager : SingletonDisposable<TaskManager>
                 .Union(Jobs.Values
                     .SelectMany(j => j.SubJobs))
                 .ToList();
-            foreach (var job in jobs)
-                if (!_expiredStates.Contains(job.Task.Status) &&
-                    job.Task.Status != TaskStatus.Running)
-                    try
-                    {
-                        job.Run();
-                    }
-                    catch
-                    {
-                    }
+            foreach (var job in jobs.Where(job =>
+                         !_expiredStates.Contains(job.Task.Status) &&
+                         job.Task.Status != TaskStatus.Running))
+                try
+                {
+                    job.Run();
+                }
+                catch
+                {
+                }
 
             Task.WaitAny(jobs.Select(j => j.Task).ToArray());
 

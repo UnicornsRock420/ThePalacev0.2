@@ -7,18 +7,18 @@ public interface IScreenLayer : IDisposable
     Type ResourceType { get; set; }
     bool Visible { get; set; }
     float Opacity { get; set; }
-    Bitmap Image { get; set; }
+    Bitmap Image { get; }
 
     ScreenLayerTypes LayerLayerType { get; }
     int Width { get; }
     int Height { get; }
 
-    Graphics Initialize(int width, int height);
+    Graphics Clear(int width, int height);
 
     void Load(
-        IDesktopSessionState sessionState,
-        LayerLoadingTypes layerType,
-        string srcPath,
+        LayerSourceTypes srcType,
+        string xPath,
+        IDesktopSessionState? sessionState = null,
         int? width = null,
         int? height = null);
 

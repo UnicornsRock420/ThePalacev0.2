@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Client.Desktop.Enums;
 
-public enum LayerLoadingTypes
+public enum LayerSourceTypes
 {
     Filesystem,
     Resource

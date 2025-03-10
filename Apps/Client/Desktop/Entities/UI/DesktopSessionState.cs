@@ -37,11 +37,13 @@ namespace ThePalace.Client.Desktop.Entities.UI;
 
 public class DesktopSessionState : Disposable, IDesktopSessionState
 {
+    private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
+    private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
+
     public DesktopSessionState()
     {
         _managedResources.AddRange(
         [
-            _refreshTimer,
             _uiControls,
             _uiLayers
         ]);
@@ -49,23 +51,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         FormsManager.Current.FormClosed += _FormClosed;
         AsyncTcpSocket.ConnectionEstablished += _ConnectionEstablished;
         AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
-
-        _refreshTimer.Elapsed += (s, e) =>
-        {
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-            {
-                CmdFnc = a =>
-                {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                    sessionState.RefreshScreen(ScreenLayerTypes.Messages);
-
-                    return null;
-                },
-                Values = [s]
-            });
-        };
-        _refreshTimer.AutoReset = true;
 
         foreach (var layer in _layerTypes)
             _uiLayers.TryAdd(layer, new ScreenLayer(layer)
@@ -107,10 +92,13 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     }
 
     #region Object Info
+
     public Guid Id { get; } = Guid.NewGuid();
+
     #endregion
 
     #region GUI Info
+
     public bool Visible { get; set; } = true;
     public DateTime? LastActivity { get; set; }
     public HistoryManager History { get; } = new();
@@ -128,10 +116,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers => _uiLayers.AsReadOnly();
     private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
     public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
-    private readonly Timer _refreshTimer = new(350);
+
     #endregion
 
     #region User Info
+
     public uint UserId { get; set; } = 0;
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
@@ -140,20 +129,25 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
     public object? ScriptState { get; set; } = null;
+
     #endregion
 
     #region Room Info
+
     public RoomDesc RoomInfo { get; set; } = null;
     public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
+
     #endregion
 
     #region Server Info
+
     public string? MediaUrl { get; set; } = string.Empty;
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
 
     public List<ListRec> ServerRooms { get; set; } = [];
     public List<ListRec> ServerUsers { get; set; } = [];
+
     #endregion
 
     public void RefreshUI()
@@ -235,7 +229,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                     if (ribbonItem.Checkable)
                     {
-                        var ribbonItem2 = SettingsManager.SystemSettings.Ribbon.GetValue(nodeType);
+                        var ribbonItem2 = SettingsManager.Ribbon.GetValue(nodeType);
                         if (ribbonItem2 != null)
                             item.Checked = ribbonItem2.Checked;
                     }
@@ -362,8 +356,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     _uiLayers[layer].Unload();
                 }
 
-                _uiLayers[ScreenLayerTypes.Base].Load(this, LayerLoadingTypes.Resource,
-                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
+                _uiLayers[ScreenLayerTypes.Base].Load(
+                    LayerSourceTypes.Resource,
+                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png",
+                    this);
             }
             else if (layers.Contains(ScreenLayerTypes.Base))
             {
@@ -383,13 +379,18 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     }
 
                     if (File.Exists(filePath))
-                        _uiLayers[ScreenLayerTypes.Base].Load(this, LayerLoadingTypes.Filesystem, filePath);
+                        _uiLayers[ScreenLayerTypes.Base].Load(
+                            LayerSourceTypes.Filesystem,
+                            filePath,
+                            this);
                 }
 
                 if (RoomInfo.Picture !=
                     _uiLayers[ScreenLayerTypes.Base].Image?.Tag?.ToString())
-                    _uiLayers[ScreenLayerTypes.Base].Load(this, LayerLoadingTypes.Resource,
-                        "ThePalace.Media.Resources.backgrounds.clouds.jpg");
+                    _uiLayers[ScreenLayerTypes.Base].Load(
+                        LayerSourceTypes.Resource,
+                        "ThePalace.Media.Resources.backgrounds.clouds.jpg",
+                        this);
             }
         }
         catch (Exception ex)
@@ -397,82 +398,82 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             LoggerHub.Current.Error(ex);
         }
 
-        if (GetControl("imgScreen") is PictureBox imgScreen)
-            try
-            {
-                var img = null as Bitmap;
-                if (imgScreen.Image == null ||
-                    imgScreen.Image.Width != ScreenWidth ||
-                    imgScreen.Image.Height != ScreenHeight)
-                {
-                    try
-                    {
-                        imgScreen.Image?.Dispose();
-                    }
-                    catch
-                    {
-                    }
+        if (GetControl("imgScreen") is not PictureBox imgScreen) return;
 
-                    img = new Bitmap(ScreenWidth, ScreenHeight);
-                    img.MakeTransparent(Color.Transparent);
+        try
+        {
+            var img = null as Bitmap;
+            if (imgScreen.Image == null ||
+                imgScreen.Image.Width != ScreenWidth ||
+                imgScreen.Image.Height != ScreenHeight)
+            {
+                try
+                {
+                    imgScreen.Image?.Dispose();
+                }
+                catch
+                {
                 }
 
-                using (var g = Graphics.FromImage(img))
+                img = new Bitmap(ScreenWidth, ScreenHeight);
+                img.MakeTransparent(Color.Transparent);
+            }
+
+            using (var g = Graphics.FromImage(img))
+            {
+                g.InterpolationMode =
+                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
+                g.PixelOffsetMode =
+                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
+                g.SmoothingMode =
+                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+
+                g.Clear(Color.Transparent);
+
+                foreach (var layer in _layerTypes)
                 {
-                    g.InterpolationMode =
-                        SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" +
-                                                                             nameof(InterpolationMode));
-                    g.PixelOffsetMode =
-                        SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
-                    g.SmoothingMode =
-                        SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+                    if (!_uiLayers[layer].Visible ||
+                        _uiLayers[layer].Opacity == 0F ||
+                        _uiLayers[layer].Image == null) continue;
 
-                    g.Clear(Color.Transparent);
-
-                    foreach (var layer in _layerTypes)
+                    using (var @lock = LockContext.GetLock(_uiLayers[layer]))
                     {
-                        if (!_uiLayers[layer].Visible ||
-                            _uiLayers[layer].Opacity == 0F ||
-                            _uiLayers[layer].Image == null) continue;
+                        var imgAttributes = null as ImageAttributes;
 
-                        using (var @lock = LockContext.GetLock(_uiLayers[layer]))
+                        if (_uiLayers[layer].Opacity < 1.0F)
                         {
-                            var imgAttributes = null as ImageAttributes;
-
-                            if (_uiLayers[layer].Opacity < 1.0F)
+                            var matrix = new ColorMatrix
                             {
-                                var matrix = new ColorMatrix
-                                {
-                                    Matrix33 = _uiLayers[layer].Opacity
-                                };
+                                Matrix33 = _uiLayers[layer].Opacity
+                            };
 
-                                imgAttributes = new ImageAttributes();
-                                imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                            }
-
-                            g.DrawImage(
-                                _uiLayers[layer].Image,
-                                new Rectangle(
-                                    0, 0,
-                                    img.Width,
-                                    img.Height),
-                                0, 0,
-                                _uiLayers[layer].Image.Width,
-                                _uiLayers[layer].Image.Height,
-                                GraphicsUnit.Pixel,
-                                imgAttributes);
+                            imgAttributes = new ImageAttributes();
+                            imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
                         }
-                    }
 
-                    g.Save();
+                        g.DrawImage(
+                            _uiLayers[layer].Image,
+                            new Rectangle(
+                                0, 0,
+                                img.Width,
+                                img.Height),
+                            0, 0,
+                            _uiLayers[layer].Image.Width,
+                            _uiLayers[layer].Image.Height,
+                            GraphicsUnit.Pixel,
+                            imgAttributes);
+                    }
                 }
 
-                imgScreen.Image = img;
+                g.Save();
             }
-            catch (Exception ex)
-            {
-                LoggerHub.Current.Error(ex);
-            }
+
+            imgScreen.Image = img;
+        }
+        catch (Exception ex)
+        {
+            LoggerHub.Current.Error(ex);
+        }
     }
 
     public void LayerVisibility(bool visible, params ScreenLayerTypes[] layers)
@@ -519,8 +520,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     {
         if (IsDisposed) return;
 
-        _refreshTimer?.Start();
-
         if (this == sender)
             ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
             {
@@ -528,6 +527,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 {
                     if (a[0] is not IDesktopSessionState sessionState) return null;
 
+                    sessionState.RefreshUI();
                     sessionState.RefreshRibbon();
 
                     return null;
@@ -539,8 +539,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     private void _ConnectionDisconnected(object sender, EventArgs e)
     {
         if (IsDisposed) return;
-
-        _refreshTimer?.Stop();
 
         if (this == sender)
             ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
@@ -575,7 +573,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     switch (layer)
                     {
                         case ScreenLayerTypes.DimRoom:
-                            if (_uiLayers[layer].Opacity == 1F)
+                            if (_uiLayers[layer].Opacity >= 1F)
                             {
                                 _uiLayers[layer].Unload();
 
@@ -586,19 +584,16 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                             goto default;
                         default:
-                            using (var g = _uiLayers[layer].Initialize(ScreenWidth, ScreenHeight))
+                            using (var g = _uiLayers[layer].Clear(ScreenWidth, ScreenHeight))
                             {
                                 if (!_uiLayers[layer].Visible) continue;
 
                                 g.InterpolationMode =
-                                    SettingsManager.Current.GetOption<InterpolationMode>(@"\GUI\General\" +
-                                        nameof(InterpolationMode));
+                                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
                                 g.PixelOffsetMode =
-                                    SettingsManager.Current.GetOption<PixelOffsetMode>(@"\GUI\General\" +
-                                        nameof(PixelOffsetMode));
+                                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
                                 g.SmoothingMode =
-                                    SettingsManager.Current.GetOption<SmoothingMode>(@"\GUI\General\" +
-                                        nameof(SmoothingMode));
+                                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
 
                                 switch (layer)
                                 {
@@ -804,7 +799,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         hasPalindromeProp |= asset.AssetRec.IsPalindrome;
                         hasAnimatedProp |= asset.AssetRec.IsAnimate;
                         hasHeadProp |= asset.AssetRec.IsHead;
-                        
+
                         if (asset.Image == null) continue;
 
                         if (asset.AssetRec.IsAnimate)
@@ -995,17 +990,14 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                 var loc = msg.Origin;
 
-                var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
-                var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
-
                 var x = UserDesc.UserInfo.RoomPos.HAxis;
                 var y = UserDesc.UserInfo.RoomPos.VAxis;
 
-                if (x < -halfPropWidth) x = (short)-halfPropWidth;
-                else if (x > this.ScreenWidth + halfPropWidth) x = (short)(this.ScreenWidth + halfPropWidth);
+                if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
+                else if (x > this.ScreenWidth + CONST_INT_halfPropWidth) x = (short)(this.ScreenWidth + CONST_INT_halfPropWidth);
 
-                if (y < -halfPropHeight) y = (short)-halfPropHeight;
-                else if (y > this.ScreenHeight + halfPropHeight) y = (short)(this.ScreenHeight + halfPropHeight);
+                if (y < -CONST_INT_halfPropHeight) y = (short)-CONST_INT_halfPropHeight;
+                else if (y > this.ScreenHeight + CONST_INT_halfPropHeight) y = (short)(this.ScreenHeight + CONST_INT_halfPropHeight);
 
                 if (x < 0 ||
                     y < 0) continue;
@@ -1029,117 +1021,117 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 switch (dc.Type)
                 {
                     case DrawCmdTypes.DC_Path:
+                    {
+                        var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
+                        using (var penColour = new Pen(colour, dc.PenSize))
+                        using (var brushColour = new SolidBrush(colour))
                         {
-                            var colour = Color.FromArgb(255, dc.Red, dc.Green, dc.Blue);
-                            using (var penColour = new Pen(colour, dc.PenSize))
-                            using (var brushColour = new SolidBrush(colour))
+                            penColour.StartCap = LineCap.Round;
+                            penColour.EndCap = LineCap.Round;
+
+                            helper.SetBrush(brushColour);
+                            helper.SetPen(penColour);
+
+                            if (dc.Filled)
+                                helper.BeginPath();
+
+                            var x = dc.Pos.HAxis;
+                            var y = dc.Pos.VAxis;
+
+                            helper.MoveTo(x, y);
+
+                            foreach (var p in dc.Points)
                             {
-                                penColour.StartCap = LineCap.Round;
-                                penColour.EndCap = LineCap.Round;
+                                x += p.HAxis;
+                                y += p.VAxis;
 
-                                helper.SetBrush(brushColour);
-                                helper.SetPen(penColour);
-
-                                if (dc.Filled)
-                                    helper.BeginPath();
-
-                                var x = dc.Pos.HAxis;
-                                var y = dc.Pos.VAxis;
-
-                                helper.MoveTo(x, y);
-
-                                foreach (var p in dc.Points)
-                                {
-                                    x += p.HAxis;
-                                    y += p.VAxis;
-
-                                    helper.LineTo(x, y);
-                                }
-
-                                if (dc.Filled)
-                                    helper.Fill();
-
-                                helper.Stroke();
+                                helper.LineTo(x, y);
                             }
+
+                            if (dc.Filled)
+                                helper.Fill();
+
+                            helper.Stroke();
                         }
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Ellipse:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    helper.DrawEllipse(dc.Rect);
+                        //    helper.DrawEllipse(dc.Rect);
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Ellipse));
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Text:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
+                        //    helper.DrawText(dc.text, dc.pos.h, dc.pos.v);
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
+                    }
 
                         break;
                     case DrawCmdTypes.DC_Shape:
-                        {
-                            //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
-                            //using (var penColour = new Pen(colour, dc.penSize))
-                            //using (var brushColour = new SolidBrush(colour))
-                            //{
-                            //    penColour.StartCap = LineCap.Round;
-                            //    penColour.EndCap = LineCap.Round;
+                    {
+                        //var colour = Color.FromArgb(255, dc.red, dc.green, dc.blue);
+                        //using (var penColour = new Pen(colour, dc.penSize))
+                        //using (var brushColour = new SolidBrush(colour))
+                        //{
+                        //    penColour.StartCap = LineCap.Round;
+                        //    penColour.EndCap = LineCap.Round;
 
-                            //    helper.SetBrush(brushColour);
-                            //    helper.SetPen(penColour);
+                        //    helper.SetBrush(brushColour);
+                        //    helper.SetPen(penColour);
 
-                            //    helper.BeginPath();
+                        //    helper.BeginPath();
 
-                            //    // TODO:
+                        //    // TODO:
 
-                            //    if (dc.filled)
-                            //        helper.Fill();
+                        //    if (dc.filled)
+                        //        helper.Fill();
 
-                            //    helper.Stroke();
-                            //}
+                        //    helper.Stroke();
+                        //}
 
-                            throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
-                        }
+                        throw new NotImplementedException(nameof(DrawCmdTypes.DC_Shape));
+                    }
 
                         break;
                 }

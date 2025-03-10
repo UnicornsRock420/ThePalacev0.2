@@ -2923,9 +2923,7 @@ public static class IptscraeEngine
                     }
                     catch (Exception ex)
                     {
-#if DEBUG
-                        Debug.WriteLine(ex.Message);
-#endif
+                        LoggerHub.Current.Error(ex);
 
                         iptTracking.Variables["ERRORMSG"] = new IptMetaVariable
                         {
