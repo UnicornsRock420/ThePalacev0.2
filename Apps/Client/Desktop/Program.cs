@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
+using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
@@ -37,6 +38,7 @@ using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
+using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
@@ -106,10 +108,6 @@ public class Program : Disposable
             }
         }.AsReadOnly();
 
-    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
-
-    private readonly ContextMenuStrip _contextMenu = new();
-
     public Program()
     {
         _managedResources.Add(_contextMenu);
@@ -117,9 +115,12 @@ public class Program : Disposable
         Initialize();
     }
 
+    private readonly ContextMenuStrip _contextMenu = new();
+
     public IDesktopSessionState SessionState { get; protected set; } =
         SessionManager.Current.CreateSession<DesktopSessionState>();
 
+    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
     public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
 
     /// <summary>
@@ -188,17 +189,17 @@ public class Program : Disposable
                             cancellationToken.Token,
                             () =>
                             {
-                                while (!cancellationToken.IsCancellationRequested &&
-                                       q.TryDequeue(out var cmd))
+                                while (q.TryDequeue(out var cmd))
                                 {
                                     switch ((NetworkCommandTypes)cmd.Flags)
                                     {
-                                        case NetworkCommandTypes.DISCONNECT:
-                                            app.SessionState.ConnectionState.Disconnect();
-                                            break;
                                         case NetworkCommandTypes.CONNECT:
-                                            ConnectionManager.Connect(app.SessionState.ConnectionState,
-                                                cmd.Values[0] as Uri);
+                                            ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
+                                            break;
+                                        case NetworkCommandTypes.DISCONNECT:
+                                        default:
+                                            app.SessionState.ConnectionState.Disconnect();
+                                            cancellationToken.Cancel();
                                             break;
                                     }
                                 }
@@ -231,7 +232,7 @@ public class Program : Disposable
                                     using (var ms = new MemoryStream(msgBytes))
                                     {
                                         ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
-                                        
+
                                         var eventType = msgHeader.EventType.ToString();
                                         msgType = AppDomain.CurrentDomain
                                             .GetAssemblies()
@@ -250,20 +251,20 @@ public class Program : Disposable
                                     }
 
                                     var boType = EventBus.Current.GetType(msgObj);
-                                    
+
                                     EventBus.Current.Publish(
                                         null,
                                         boType,
                                         new ProtocolEventParams
                                         {
                                             SourceID = (int)(app?.SessionState?.UserId ?? 0),
-                                            RefNum = (int)(app?.SessionState?.UserId ?? 0),
+                                            RefNum = msgHeader.RefNum,
                                             Request = msgObj
                                         });
 
                                     await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
                                 }
-                            }));
+                            }), cancellationToken.Token);
                 }
             },
             null,
@@ -278,26 +279,24 @@ public class Program : Disposable
 
         job = TaskManager.Current.CreateJob<MediaCmd>(q =>
             {
-                if (!q.IsEmpty &&
-                    q.TryDequeue(out var mediaCmd))
-                {
-                    // TODO: Media
-                }
+                if (q.IsEmpty ||
+                    !q.TryDequeue(out var mediaCmd)) return;
+
+                // TODO: Media
             },
             null,
             RunOptions.UseResetEvent);
         if (job != null) _jobs[ThreadQueues.Media] = job;
 
-        job = TaskManager.Current.CreateJob<AssetCmd>(q =>
+        job = TaskManager.Current.CreateJob<AssetCmd>(async q =>
             {
-                if (!q.IsEmpty &&
-                    q.TryDequeue(out var assetCmd))
-                {
-                    if (!AssetsManager.Current.Assets.ContainsKey(assetCmd.AssetInfo.AssetInfo.AssetSpec.Id))
-                    {
-                        // TODO: Assets
-                    }
-                }
+                if (q.IsEmpty ||
+                    !q.TryDequeue(out var assetCmd)) return;
+
+                var assetDesc = AssetsManager.Current.GetAsset(app.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
+                if (assetDesc is not { Image: null }) return;
+
+                await AssetDesc.Render(assetDesc);
             },
             null,
             RunOptions.UseResetEvent);
@@ -356,8 +355,6 @@ public class Program : Disposable
     {
         if (IsDisposed) return;
 
-        base.Dispose();
-
         foreach (var type in CONST_eventTypes)
             ScriptEvents.Current.UnregisterEvent(type, RefreshScreen);
 
@@ -372,6 +369,10 @@ public class Program : Disposable
         catch
         {
         }
+
+        base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Initialize()
@@ -654,8 +655,7 @@ public class Program : Disposable
                                         ScreenLayerTypes.UserNametag,
                                         ScreenLayerTypes.Messages);
 
-                                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                                        (int)SessionState.UserId,
+                                    SessionState.Send(
                                         new MSG_USERMOVE
                                         {
                                             Pos = point
@@ -974,10 +974,7 @@ public class Program : Disposable
 
             if (txtInput != null)
             {
-                txtInput.LostFocus += (sender, e) =>
-                {
-                    txtInput.BackColor = Color.FromKnownColor(KnownColor.LightGray);
-                };
+                txtInput.LostFocus += (sender, e) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.LightGray); };
                 txtInput.GotFocus += (sender, e) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.White); };
                 txtInput.KeyUp += (sender, e) =>
                 {
@@ -1043,21 +1040,16 @@ public class Program : Disposable
                                     Text = text
                                 };
 
-                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk,
-                                    SessionState.ScriptState);
-                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk,
-                                    SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptState);
+                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptState);
 
-                                if (SessionState.ScriptState is IptTracking iptTracking)
-                                {
-                                    if (iptTracking.Variables?.ContainsKey("CHATSTR") == true)
-                                        xTalk.Text = iptTracking.Variables["CHATSTR"].Variable.Value.ToString();
+                                if (SessionState.ScriptState is not IptTracking iptTracking) return;
 
-                                    if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                        SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                                            (int)SessionState.UserId,
-                                            xTalk);
-                                }
+                                if (iptTracking.Variables?.TryGetValue("CHATSTR", out var variable) is true)
+                                    xTalk.Text = variable.Variable.Value.ToString();
+
+                                if (!string.IsNullOrWhiteSpace(xTalk.Text))
+                                    SessionState.Send(xTalk);
                             }
                         }
                     }
@@ -1109,10 +1101,7 @@ public class Program : Disposable
             if (connectionForm == null) return;
 
             connectionForm.SessionState = SessionState;
-            connectionForm.FormClosed += (sender, e) =>
-            {
-                SessionState.UnregisterForm(nameof(Connection), sender as FormBase);
-            };
+            connectionForm.FormClosed += (sender, e) => { SessionState.UnregisterForm(nameof(Connection), sender as FormBase); };
 
             if (connectionForm != null)
             {
@@ -1125,7 +1114,7 @@ public class Program : Disposable
                 {
                     buttonDisconnect.Click += (sender, e) =>
                     {
-                        if ((SessionState.ConnectionState?.IsConnected() ?? false))
+                        if (SessionState.ConnectionState?.IsConnected() ?? false)
                             SessionState.ConnectionState.Socket?.DropConnection();
 
                         var connectionForm = SessionState.GetForm(nameof(Connection));
@@ -1296,8 +1285,7 @@ public class Program : Disposable
                                 SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
-                                SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                                    (int)SessionState.UserId,
+                                SessionState.Send(
                                     new MSG_ROOMGOTO
                                     {
                                         Dest = roomID
@@ -1366,8 +1354,7 @@ public class Program : Disposable
                 {
                     var value = (int)values[1];
 
-                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                        (int)SessionState.UserId,
+                    SessionState.Send(
                         new MSG_WHISPER
                         {
                             TargetID = value,
@@ -1380,8 +1367,7 @@ public class Program : Disposable
                 {
                     var value = (uint)values[1];
 
-                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                        (int)SessionState.UserId,
+                    SessionState.Send(
                         new MSG_KILLUSER
                         {
                             TargetID = value
@@ -1393,8 +1379,7 @@ public class Program : Disposable
                 {
                     var value = (short)values[1];
 
-                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                        (int)SessionState.UserId,
+                    SessionState.Send(
                         new MSG_SPOTDEL
                         {
                             SpotID = value
@@ -1439,8 +1424,7 @@ public class Program : Disposable
             {
                 var value = (int)values[1];
 
-                SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                    (int)SessionState.UserId,
+                SessionState.Send(
                     new MSG_PROPDEL
                     {
                         PropNum = value
@@ -1468,8 +1452,7 @@ public class Program : Disposable
                         ScreenLayerTypes.UserNametag,
                         ScreenLayerTypes.Messages);
 
-                    SessionState.ConnectionState.BytesSend.PalaceSerialize(
-                        (int)SessionState.UserId,
+                    SessionState.Send(
                         new MSG_USERMOVE
                         {
                             Pos = value

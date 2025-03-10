@@ -41,6 +41,8 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         _events = null;
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Invoke(IptEventTypes eventType, IDesktopSessionState sessionState, IProtocol packet,

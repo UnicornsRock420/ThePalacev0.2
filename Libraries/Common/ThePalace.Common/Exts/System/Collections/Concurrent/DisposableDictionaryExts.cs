@@ -17,7 +17,7 @@ public static class DisposableDictionaryExts
     public static TValue GetValue<TKey, TValue>(this DisposableDictionary<TKey, TValue> values, TKey key)
         where TValue : IDisposable
     {
-        return values != null && values.ContainsKey(key) ? values[key] : default;
+        return values?.TryGetValue(key, out var value) == true ? value : default;
     }
 
     public static TValue GetValueLocked<TKey, TValue>(this DisposableDictionary<TKey, TValue> values, TKey key)
@@ -25,7 +25,7 @@ public static class DisposableDictionaryExts
     {
         using (var @lock = LockContext.GetLock(values))
         {
-            return values != null && values.ContainsKey(key) ? values[key] : default;
+            return values?.TryGetValue(key, out var value) == true ? value : default;
         }
     }
 

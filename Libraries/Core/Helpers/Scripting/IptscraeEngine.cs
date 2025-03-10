@@ -1414,8 +1414,8 @@ public static class IptscraeEngine
             {
                 "ME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    var index = iptTracking.Variables.ContainsKey("ME")
-                        ? (int)iptTracking.Variables["ME"].Variable.Value
+                    var index = iptTracking.Variables.TryGetValue("ME", out var variable)
+                        ? (int)variable.Variable.Value
                         : 0;
 
                     iptTracking.Stack.Push(new IptVariable
@@ -1433,8 +1433,8 @@ public static class IptscraeEngine
                     var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
                     if (sessionState == null) return;
 
-                    var index = iptTracking.Variables.ContainsKey("ME")
-                        ? (int)iptTracking.Variables["ME"].Variable.Value
+                    var index = iptTracking.Variables.TryGetValue("ME", out var variable)
+                        ? (int)variable.Variable.Value
                         : 0;
                     if (index < 0) throw new Exception("Index out of bounds...");
 
@@ -1618,7 +1618,7 @@ public static class IptscraeEngine
 
                     var key = register.Value?.ToString();
 
-                    if (!iptTracking.Variables.ContainsKey(key))
+                    if (!iptTracking.Variables.TryGetValue(key, out var value))
                     {
                         iptTracking.Variables[key] = new IptMetaVariable
                         {
@@ -1629,7 +1629,6 @@ public static class IptscraeEngine
                     }
                     else
                     {
-                        var value = iptTracking.Variables[key];
                         var flags = value.Flags;
 
                         if ((flags & IptMetaVariableFlags.IsReadOnly) == IptMetaVariableFlags.IsReadOnly ||
@@ -3603,7 +3602,7 @@ public static class IptscraeEngine
         register1 = getVariable(iptTracking, register1);
 
         if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math)) != 0 &&
-            (new[] { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register1.Type)))
+            new[] { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register1.Type))
             errorDataType1 = false;
         else if ((flags & IptOperatorFlags.Concate) == IptOperatorFlags.Concate &&
                  register1.Type == IptVariableTypes.String)
@@ -3616,17 +3615,17 @@ public static class IptscraeEngine
             register2 = getVariable(iptTracking, register2);
 
             if ((flags & (IptOperatorFlags.Boolean | IptOperatorFlags.Math)) != 0 &&
-                (new[]
-                    { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register2.Type)))
+                new[]
+                    { IptVariableTypes.Bool, IptVariableTypes.Integer }.Contains(register2.Type))
                 errorDataType2 = false;
             else if ((flags & IptOperatorFlags.Concate) == IptOperatorFlags.Concate &&
                      register2.Type == IptVariableTypes.String)
                 errorDataType2 = false;
             else if ((flags & IptOperatorFlags.Comparator) == IptOperatorFlags.Comparator &&
                      register1.Type == register2.Type &&
-                     (new[]
+                     new[]
                              { IptVariableTypes.Bool, IptVariableTypes.Integer, IptVariableTypes.String }
-                         .Contains(register1.Type)))
+                         .Contains(register1.Type))
             {
                 errorDataType1 = false;
                 errorDataType2 = false;
@@ -3702,8 +3701,8 @@ public static class IptscraeEngine
             var value = iptTracking.Variables[key];
             var flags = value.Flags;
 
-            if (((flags & IptMetaVariableFlags.IsGlobal) == 0) &&
-                ((flags & IptMetaVariableFlags.IsSpecial) == 0) &&
+            if ((flags & IptMetaVariableFlags.IsGlobal) == 0 &&
+                (flags & IptMetaVariableFlags.IsSpecial) == 0 &&
                 (recursionDepth == 0 || value.Depth >= recursionDepth))
                 iptTracking.Variables.Remove(key);
         }
@@ -3761,9 +3760,7 @@ public static class IptscraeEngine
                     .Trim()
                     .ToUpperInvariant();
 
-                if (!EventTypes.ContainsKey(eventName)) throw new Exception($"Unexpected event {eventName}...");
-
-                var eventType = EventTypes[eventName];
+                if (!EventTypes.TryGetValue(eventName, out var eventType)) throw new Exception($"Unexpected event {eventName}...");
 
                 tokenStart = j;
 

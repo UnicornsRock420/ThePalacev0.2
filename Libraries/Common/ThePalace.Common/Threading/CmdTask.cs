@@ -21,8 +21,6 @@ public class CmdTask : Disposable
     {
         if (IsDisposed) return;
 
-        base.Dispose();
-
         if ((Queue?.Count ?? 0) > 0)
         {
             Queue
@@ -78,5 +76,9 @@ public class CmdTask : Disposable
 
         SignalEvent?.Set();
         SignalEvent = null;
+
+        base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }

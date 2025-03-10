@@ -76,6 +76,8 @@ public partial class RoomDesc : RawStream, IStruct
         LooseProps = null;
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     ~RoomDesc()

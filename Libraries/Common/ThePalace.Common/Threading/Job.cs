@@ -205,6 +205,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         Task = null;
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     ~Job()

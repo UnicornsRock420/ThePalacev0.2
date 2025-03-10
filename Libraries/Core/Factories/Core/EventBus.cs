@@ -7,10 +7,8 @@ namespace ThePalace.Core.Factories.Core;
 public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
-    
-    private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary = new();
 
-    public static EventBus Instance { get; } = new();
+    private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary = new();
 
     ~EventBus()
     {
@@ -22,6 +20,8 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
         _handlersDictionary?.Clear();
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public Type? GetType(IEventParams @params)
@@ -46,18 +46,12 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 
     public void Subscribe(params IEventHandler[] handlers)
     {
-        if ((handlers?.Length ?? 0) > 0) return;
-        
-        foreach (var handler in handlers)
-            Subscribe(handler);
+        handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe(IEnumerable<IEventHandler> handlers)
     {
-        if ((handlers?.Count() ?? 0) > 0) return;
-        
-        foreach (var handler in handlers)
-            Subscribe(handler);
+        handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe(IEventHandler handler)
@@ -81,19 +75,13 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
     public void Subscribe<TEventParams>(params IEventHandler<TEventParams>[] handlers)
         where TEventParams : IEventParams
     {
-        if ((handlers?.Length ?? 0) > 0) return;
-        
-        foreach (var handler in handlers)
-            Subscribe(handler);
+        handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe<TEventParams>(IEnumerable<IEventHandler<TEventParams>> handlers)
         where TEventParams : IEventParams
     {
-        if ((handlers?.Count() ?? 0) > 0) return;
-        
-        foreach (var handler in handlers)
-            Subscribe(handler);
+        handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe<TEventParams>(IEventHandler<TEventParams> handler)
@@ -126,18 +114,12 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 
     public void Subscribe(params Type[] eventTypes)
     {
-        if ((eventTypes?.Length ?? 0) > 0) return;
-        
-        foreach (var eventType in eventTypes)
-            Subscribe(eventType);
+        eventTypes?.ToList()?.ForEach(t => Subscribe(t));
     }
 
     public void Subscribe(IEnumerable<Type> eventTypes)
     {
-        if ((eventTypes?.Count() ?? 0) > 0) return;
-        
-        foreach (var eventType in eventTypes)
-            Subscribe(eventType);
+        eventTypes?.ToList()?.ForEach(t => Subscribe(t));
     }
 
     public void Subscribe(Type eventType)
@@ -221,32 +203,51 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
         var eventTypeName = _eventType.FullName;
         if (string.IsNullOrWhiteSpace(eventTypeName)) return;
 
-        if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+        if (!_handlersDictionary.TryGetValue(eventTypeName, out var handlers)) return;
 
-        var handlers = _handlersDictionary[eventTypeName];
         if (handlers.Count < 1) return;
 
         foreach (var eventHandler in handlers) await eventHandler.Handle(sender, @event);
     }
 }
 
-public class EventBus<TEventParams> : IEventsBus<TEventParams>
+public class EventBus<TEventParams> : SingletonDisposable<EventBus<TEventParams>>, IEventsBus<TEventParams>
     where TEventParams : IEventParams
 {
-    private readonly ConcurrentDictionary<string, List<IEventHandler<TEventParams>>> _handlersDictionary;
+    private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
-    private EventBus()
+    private readonly ConcurrentDictionary<string, List<IEventHandler<TEventParams>>> _handlersDictionary = new();
+
+    ~EventBus()
     {
-        _handlersDictionary = new ConcurrentDictionary<string, List<IEventHandler<TEventParams>>>();
+        Dispose();
     }
 
-    public static EventBus<TEventParams> Instance { get; } = new();
-
-    public void Dispose()
+    public override void Dispose()
     {
         _handlersDictionary?.Clear();
 
-        GC.SuppressFinalize(this);
+        base.Dispose();
+    }
+
+    public Type? GetType(TEventParams @params)
+    {
+        var paramsType = @params.GetType();
+
+        return AppDomain.CurrentDomain
+            .GetAssemblies()
+            .SelectMany(t => t.GetTypes())
+            .Where(t =>
+            {
+                if (t.IsInterface) return false;
+
+                var ntrs = t.GetInterfaces();
+
+                return ntrs.Contains(CONST_TYPE_IEventHandler) &&
+                       ntrs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(paramsType));
+            })
+            .Select(t => t.GetInterfaces().Contains(CONST_TYPE_IEventHandler) ? t : null)
+            .FirstOrDefault();
     }
 
     public void Subscribe(IEventHandler<TEventParams> handler)
@@ -268,16 +269,10 @@ public class EventBus<TEventParams> : IEventsBus<TEventParams>
         var eventTypeName = eventType.FullName;
         if (string.IsNullOrWhiteSpace(eventTypeName)) return;
 
-        if (!_handlersDictionary.ContainsKey(eventTypeName)) return;
+        if (!_handlersDictionary.TryGetValue(eventTypeName, out var handlers)) return;
 
-        var handlers = _handlersDictionary[eventTypeName];
         if (handlers.Count < 1) return;
 
         foreach (var eventHandler in handlers) await eventHandler.Handle(sender, @event);
-    }
-
-    ~EventBus()
-    {
-        Dispose();
     }
 }

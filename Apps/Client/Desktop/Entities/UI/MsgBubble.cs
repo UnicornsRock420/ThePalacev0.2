@@ -68,6 +68,8 @@ public class MsgBubble : Disposable, IDisposable
         MediaFilenames = null;
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public Bitmap Image { get; private set; }

@@ -16,8 +16,8 @@ public interface IConnectionState : IDisposable
     DateTime? LastSent { get; set; }
 
     byte[] Buffer { get; set; }
-    BufferStream BytesReceived { get; set; }
-    BufferStream BytesSend { get; set; }
+    BufferStream? BytesReceived { get; set; }
+    BufferStream? BytesSend { get; set; }
 
     Socket? Socket { get; set; }
     NetworkStream? NetworkStream { get; set; }

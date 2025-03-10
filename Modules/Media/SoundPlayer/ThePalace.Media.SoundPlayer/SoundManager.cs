@@ -86,7 +86,7 @@ public class SoundManager : Singleton<SoundManager>, IDisposable
                     _libVlcMedia[filename].Path != _path)
                     using (var @lock = LockContext.GetLock(_libVlcMedia))
                     {
-                        if (_libVlcMedia.ContainsKey(filename)) _libVlcMedia[filename].Media.Dispose();
+                        if (_libVlcMedia.TryGetValue(filename, out var resource)) resource.Media.Dispose();
 
                         if (_libVlcMedia.Count >= CONST_INT_MaxPlayerCount)
                         {
@@ -115,10 +115,8 @@ public class SoundManager : Singleton<SoundManager>, IDisposable
         {
             var filename = Path.GetFileNameWithoutExtension(path).ToUpperInvariant();
 
-            if (_libVlcMedia.ContainsKey(filename))
+            if (_libVlcMedia.TryGetValue(filename, out var media))
             {
-                var media = _libVlcMedia[filename];
-
                 media.LastUsed = DateTime.UtcNow;
 
                 _libVlcPlayer.Play(media.Media);

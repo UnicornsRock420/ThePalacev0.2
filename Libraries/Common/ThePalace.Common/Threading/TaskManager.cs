@@ -72,6 +72,8 @@ public class TaskManager : SingletonDisposable<TaskManager>
         }
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     public Dictionary<Guid, IJob> Jobs { get; protected set; } = new();

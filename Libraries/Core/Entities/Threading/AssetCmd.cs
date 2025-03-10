@@ -5,5 +5,5 @@ namespace ThePalace.Core.Entities.Threading;
 
 public class AssetCmd : ICmd
 {
-    public AssetDesc AssetInfo { get; set; }
+    public AssetDesc AssetDesc { get; set; }
 }

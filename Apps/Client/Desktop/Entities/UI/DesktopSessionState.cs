@@ -102,6 +102,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         LastActivity = null;
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 
     #region Object Info
@@ -635,21 +637,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             foreach (var looseProp in looseProps)
             {
                 var prop = AssetsManager.Current.GetAsset(this, looseProp.AssetSpec);
-                if (prop == null) continue;
-
-                if (prop.Image == null)
-                    try
-                    {
-                        prop.Image = AssetDesc.Render(prop);
-                    }
-                    catch (Exception ex)
-                    {
-                        LoggerHub.Current.Error(ex);
-
-                        continue;
-                    }
-
-                if (prop.Image == null) continue;
+                if (prop?.Image == null) continue;
 
                 //var x = looseProp.loc.h - (prop.Image.Width / 2);
                 //var y = looseProp.loc.v - (prop.Image.Height / 2);
@@ -813,27 +801,16 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         var asset = AssetsManager.Current.GetAsset(this, assetSpec);
                         if (asset == null) continue;
 
-                        hasPalindromeProp |= asset.AssetInfo.IsPalindrome;
-                        hasAnimatedProp |= asset.AssetInfo.IsAnimate;
-                        hasHeadProp |= asset.AssetInfo.IsHead;
+                        hasPalindromeProp |= asset.AssetRec.IsPalindrome;
+                        hasAnimatedProp |= asset.AssetRec.IsAnimate;
+                        hasHeadProp |= asset.AssetRec.IsHead;
+                        
+                        if (asset.Image == null) continue;
 
-                        if (asset.Image == null)
-                            try
-                            {
-                                asset.Image = AssetDesc.Render(asset);
-                            }
-                            catch (Exception ex)
-                            {
-                                LoggerHub.Current.Error(ex);
-                            }
-
-                        if (asset.Image != null)
-                        {
-                            if (asset.AssetInfo.IsAnimate)
-                                animatedProps.Add(asset);
-                            else
-                                stillProps.Add(asset);
-                        }
+                        if (asset.AssetRec.IsAnimate)
+                            animatedProps.Add(asset);
+                        else
+                            stillProps.Add(asset);
                     }
 
                 if (!hasHeadProp)
@@ -860,7 +837,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     {
                         var imgAttributes = null as ImageAttributes;
 
-                        if (prop.AssetInfo.IsGhost)
+                        if (prop.AssetRec.IsGhost)
                         {
                             var matrix = new ColorMatrix
                             {
@@ -1025,10 +1002,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 var y = UserDesc.UserInfo.RoomPos.VAxis;
 
                 if (x < -halfPropWidth) x = (short)-halfPropWidth;
-                else if (x > (this.ScreenWidth + halfPropWidth)) x = (short)(this.ScreenWidth + halfPropWidth);
+                else if (x > this.ScreenWidth + halfPropWidth) x = (short)(this.ScreenWidth + halfPropWidth);
 
                 if (y < -halfPropHeight) y = (short)-halfPropHeight;
-                else if (y > (this.ScreenHeight + halfPropHeight)) y = (short)(this.ScreenHeight + halfPropHeight);
+                else if (y > this.ScreenHeight + halfPropHeight) y = (short)(this.ScreenHeight + halfPropHeight);
 
                 if (x < 0 ||
                     y < 0) continue;

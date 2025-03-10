@@ -39,7 +39,7 @@ public class TestSerialization
             ms.PalaceSerialize(
                 0,
                 srcMsg,
-                SerializerOptions.IncludeHeader);
+                opts: SerializerOptions.IncludeHeader);
 
             packetBytes = ms.ToArray();
 
@@ -102,7 +102,7 @@ public class TestSerialization
             ms.PalaceSerialize(
                 refNum,
                 srcMsg,
-                SerializerOptions.IncludeHeader);
+                opts: SerializerOptions.IncludeHeader);
 
             packetBytes = ms.ToArray();
 
@@ -163,7 +163,7 @@ public class TestSerialization
             ms.PalaceSerialize(
                 refNum,
                 srcMsg,
-                SerializerOptions.IncludeHeader);
+                opts: SerializerOptions.IncludeHeader);
 
             packetBytes = ms.ToArray();
 
