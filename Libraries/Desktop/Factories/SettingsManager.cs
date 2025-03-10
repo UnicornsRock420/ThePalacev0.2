@@ -14,14 +14,14 @@ namespace ThePalace.Common.Desktop.Factories;
 
 public class SettingsManager : Disposable
 {
-    private static readonly Keys[] _keyModifiers = new[]
-    {
+    private static readonly Keys[] _keyModifiers =
+    [
         Keys.Control,
         Keys.Shift,
         Keys.Alt,
         Keys.LWin,
         Keys.RWin
-    };
+    ];
 
     //private static readonly Keys[] _keyCharacters = new Keys[]
     //{

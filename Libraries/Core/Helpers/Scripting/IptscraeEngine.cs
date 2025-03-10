@@ -3733,7 +3733,7 @@ public static class IptscraeEngine
 #if DEBUG
         Debug.WriteLine($"PARSING: {str}");
 #endif
-        var chars = str?.ToCharArray() ?? Array.Empty<char>();
+        var chars = str?.ToCharArray() ?? [];
         var result = new IptAtomList();
 
         for (var j = 0; j < chars.Length;)

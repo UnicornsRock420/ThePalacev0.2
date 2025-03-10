@@ -2,7 +2,6 @@
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
@@ -16,8 +15,8 @@ public static class TestIStruct
     public static MSG_LISTOFALLROOMS MSG_LISTOFALLROOMS =>
         new()
         {
-            Rooms = new List<ListRec>
-            {
+            Rooms =
+            [
                 new()
                 {
                     PrimaryID = 1,
@@ -26,6 +25,7 @@ public static class TestIStruct
 
                     Name = "Testing 123"
                 },
+
                 new()
                 {
                     PrimaryID = 2,
@@ -34,7 +34,7 @@ public static class TestIStruct
 
                     Name = "Testing 456"
                 }
-            }
+            ]
         };
 
     public static MSG_LOGON MSG_LOGON

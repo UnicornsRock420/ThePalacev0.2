@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using ThePalace.Core.Enums;
+﻿using ThePalace.Core.Enums;
 
 namespace ThePalace.Core.Entities.Scripting;
 

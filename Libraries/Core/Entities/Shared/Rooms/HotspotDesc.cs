@@ -15,8 +15,8 @@ public class HotspotDesc : IDisposable
     public HotspotDesc()
     {
         SpotInfo = new HotspotRec();
-        States = new List<HotspotStateDesc>();
-        Vortexes = new List<Point>();
+        States = [];
+        Vortexes = [];
     }
 
     public void Dispose()

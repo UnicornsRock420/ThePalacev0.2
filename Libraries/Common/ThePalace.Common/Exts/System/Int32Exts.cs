@@ -21,7 +21,7 @@ public static class Int32Exts
     public static byte[] To24Bit(this int value, bool? isLittleEndian = null)
     {
         var b = BitConverter.GetBytes(value);
-        return isLittleEndian ?? BitConverter.IsLittleEndian ? new[] { b[2], b[1], b[0] } : new[] { b[0], b[1], b[2] };
+        return isLittleEndian ?? BitConverter.IsLittleEndian ? [b[2], b[1], b[0]] : [b[0], b[1], b[2]];
     }
 
     public static byte[] ToUInt31(this int value)

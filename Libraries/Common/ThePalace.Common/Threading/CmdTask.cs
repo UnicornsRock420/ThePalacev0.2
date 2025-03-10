@@ -6,8 +6,8 @@ namespace ThePalace.Common.Threading;
 
 public class CmdTask : Disposable
 {
-    public List<IConsumer> Consumers = new();
-    public List<IProvider> Providers = new();
+    public List<IConsumer> Consumers = [];
+    public List<IProvider> Providers = [];
     public ConcurrentQueue<ActionCmd> Queue = new();
     public ManualResetEvent SignalEvent = new(false);
     public Task Task;

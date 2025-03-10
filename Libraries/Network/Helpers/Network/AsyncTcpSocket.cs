@@ -1,8 +1,9 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Exts.System;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Logging.Entities;
+using ThePalace.Network.Enums;
+using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
@@ -84,9 +85,17 @@ public static class AsyncTcpSocket
         ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(AsyncTcpSocket) + "." + nameof(hostAddr));
 
+        connectionState.Do(() => connectionState.Disconnect());
+
         return connectionState.Do(() =>
         {
-            ConnectionManager.Connect(connectionState, hostAddr);
+            connectionState.Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
+            connectionState.Socket.Connect(hostAddr);
+
+            connectionState.NetworkStream = ConnectionManager.CreateNetworkStream(connectionState.Socket);
+
+            connectionState.Direction = SocketDirection.Outbound;
+            connectionState.HostAddr = hostAddr;
 
             connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length,
                 _receiveCallback, connectionState);
@@ -99,11 +108,14 @@ public static class AsyncTcpSocket
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
 
-        connectionState?.Disconnect();
-        //connectionState?.NetworkStream?.Dispose();
+        connectionState.Socket?.DropConnection();
+        connectionState.Socket = null;
 
-        connectionState?.BytesReceived?.Clear();
-        connectionState?.BytesSend?.Clear();
+        connectionState.NetworkStream?.Dispose();
+        connectionState.NetworkStream = null;
+
+        connectionState.BytesReceived?.Clear();
+        connectionState.BytesSend?.Clear();
     }
 
     public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)

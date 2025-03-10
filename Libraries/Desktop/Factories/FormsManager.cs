@@ -19,7 +19,7 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
 
     public FormsManager()
     {
-        ThreadExit += (sender, e) => { TaskManager.Current?.Dispose(); };
+        ThreadExit += (sender, e) => TaskManager.Current?.Dispose();
     }
 
     public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
@@ -75,7 +75,7 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
             var forms = null as List<FormBase>;
             using (var @lock = LockContext.GetLock(_forms))
             {
-                forms = _forms?.Values?.ToList() ?? new List<FormBase>();
+                forms = _forms?.Values?.ToList() ?? [];
             }
 
             var app = forms
@@ -86,6 +86,7 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
                     f is IFormDialog
                 ))
                 new TCF(
+                        false,
                         TaskManager.Current,
                         app,
                         this)

@@ -16,7 +16,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
     public ScriptEvents()
     {
         foreach (var type in _eventTypes)
-            _events[type] = new List<EventHandler>();
+            _events[type] = [];
     }
 
     ~ScriptEvents()

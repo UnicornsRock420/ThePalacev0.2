@@ -41,8 +41,8 @@ public class ServerSessionState : Disposable, IServerSessionState
     public string? MediaUrl { get; set; } = null;
     public string? ServerName { get; set; } = null;
     public int ServerPopulation { get; set; } = 0;
-    public List<ListRec> ServerRooms { get; set; } = new();
-    public List<ListRec> ServerUsers { get; set; } = new();
+    public List<ListRec> ServerRooms { get; set; } = [];
+    public List<ListRec> ServerUsers { get; set; } = [];
 
     ~ServerSessionState()
     {

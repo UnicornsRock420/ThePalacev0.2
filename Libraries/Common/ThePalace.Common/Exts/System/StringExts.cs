@@ -278,24 +278,24 @@ public static class StringExts
     private static readonly IReadOnlyDictionary<i, d[]> IREADONLYDICTIONARY_CONVERT_DELEGATES =
         new Dictionary<i, d[]>
         {
-            { (i)tc.Char, new d[] { v => char.Parse(v), v => c.ToChar(v) } },
-            { (i)tc.Byte, new d[] { v => byte.Parse(v), v => c.ToByte(v) } },
-            { (i)tc.SByte, new d[] { v => sbyte.Parse(v), v => c.ToSByte(v) } },
-            { (i)tc.Int16, new d[] { v => short.Parse(v), v => c.ToInt16(v) } },
-            { (i)tc.UInt16, new d[] { v => ushort.Parse(v), v => c.ToUInt16(v) } },
-            { (i)tc.Int32, new d[] { v => i.Parse(v), v => c.ToInt32(v) } },
-            { (i)tc.UInt32, new d[] { v => uint.Parse(v), v => c.ToUInt32(v) } },
-            { (i)tc.Int64, new d[] { v => l.Parse(v), v => c.ToInt64(v) } },
-            { (i)tc.UInt64, new d[] { v => ulong.Parse(v), v => c.ToUInt64(v) } },
-            { (i)tc.Single, new d[] { v => float.Parse(v), v => c.ToSingle(v) } },
-            { (i)tc.Double, new d[] { v => db.Parse(v), v => c.ToDouble(v) } },
-            { (i)tc.Decimal, new d[] { v => decimal.Parse(v), v => c.ToDecimal(v) } },
-            { (i)tc.Boolean, new d[] { v => bool.Parse(v), v => c.ToBoolean(v) } },
-            { (i)tc.DateTime, new d[] { v => DateTime.Parse(v), v => c.ToDateTime(v) } },
-            { (i)tc.Guid, new d[] { v => Guid.Parse(v) } },
-            { (i)tc.TimeSpan, new d[] { v => ts.Parse(v) } },
-            { (i)tc.Int128, new d[] { v => Int128.Parse(v) } },
-            { (i)tc.UInt128, new d[] { v => UInt128.Parse(v) } }
+            { (i)tc.Char, [v => char.Parse(v), v => c.ToChar(v)] },
+            { (i)tc.Byte, [v => byte.Parse(v), v => c.ToByte(v)] },
+            { (i)tc.SByte, [v => sbyte.Parse(v), v => c.ToSByte(v)] },
+            { (i)tc.Int16, [v => short.Parse(v), v => c.ToInt16(v)] },
+            { (i)tc.UInt16, [v => ushort.Parse(v), v => c.ToUInt16(v)] },
+            { (i)tc.Int32, [v => i.Parse(v), v => c.ToInt32(v)] },
+            { (i)tc.UInt32, [v => uint.Parse(v), v => c.ToUInt32(v)] },
+            { (i)tc.Int64, [v => l.Parse(v), v => c.ToInt64(v)] },
+            { (i)tc.UInt64, [v => ulong.Parse(v), v => c.ToUInt64(v)] },
+            { (i)tc.Single, [v => float.Parse(v), v => c.ToSingle(v)] },
+            { (i)tc.Double, [v => db.Parse(v), v => c.ToDouble(v)] },
+            { (i)tc.Decimal, [v => decimal.Parse(v), v => c.ToDecimal(v)] },
+            { (i)tc.Boolean, [v => bool.Parse(v), v => c.ToBoolean(v)] },
+            { (i)tc.DateTime, [v => DateTime.Parse(v), v => c.ToDateTime(v)] },
+            { (i)tc.Guid, [v => Guid.Parse(v)] },
+            { (i)tc.TimeSpan, [v => ts.Parse(v)] },
+            { (i)tc.Int128, [v => Int128.Parse(v)] },
+            { (i)tc.UInt128, [v => UInt128.Parse(v)] }
         }.IReadOnlyDictionary();
 
     #endregion

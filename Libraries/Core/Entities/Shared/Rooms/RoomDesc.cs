@@ -35,30 +35,30 @@ public partial class RoomDesc : RawStream, IStruct
     {
         RoomInfo = new RoomRec();
 
-        HotSpots = new List<HotspotDesc>();
-        Pictures = new List<PictureRec>();
-        DrawCmds = new List<DrawCmdDesc>();
-        LooseProps = new List<LoosePropRec>();
+        HotSpots = [];
+        Pictures = [];
+        DrawCmds = [];
+        LooseProps = [];
     }
 
     public RoomDesc(RoomRec room)
     {
         RoomInfo = room;
 
-        HotSpots = new List<HotspotDesc>();
-        Pictures = new List<PictureRec>();
-        DrawCmds = new List<DrawCmdDesc>();
-        LooseProps = new List<LoosePropRec>();
+        HotSpots = [];
+        Pictures = [];
+        DrawCmds = [];
+        LooseProps = [];
     }
 
     public RoomDesc(uint8[]? data = null) : base(data)
     {
         RoomInfo = new RoomRec();
 
-        HotSpots = new List<HotspotDesc>();
-        Pictures = new List<PictureRec>();
-        DrawCmds = new List<DrawCmdDesc>();
-        LooseProps = new List<LoosePropRec>();
+        HotSpots = [];
+        Pictures = [];
+        DrawCmds = [];
+        LooseProps = [];
     }
 
     public override void Dispose()
