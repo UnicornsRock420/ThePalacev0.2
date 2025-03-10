@@ -91,31 +91,36 @@ public class MsgBubble : Disposable, IDisposable
 
     private IReadOnlyDictionary<Regex, Func<object[], string?>> _regexPatterns = new Dictionary<Regex, Func<object[], string?>>()
     {
-        { RegexConstants.REGEX_HIDDEN, a =>
+        {
+            RegexConstants.REGEX_HIDDEN, a =>
             {
-                if (a.Length < 1) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[0]");
-                if (a.Length < 2) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[1]");
+                switch (a.Length)
+                {
+                    case < 1: throw new IndexOutOfRangeException("REGEX_HIDDEN[0]");
+                    case < 2: throw new IndexOutOfRangeException("REGEX_HIDDEN[1]");
+                }
 
-                var msgBubble = a[0] as MsgBubble;
-                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+                if (a[0] is not MsgBubble msgBubble) throw new ArgumentException(nameof(msgBubble));
 
-                var text = a[1] as string;
-                if (text == null) throw new ArgumentNullException(nameof(text));
+                if (a[1] is not string text) throw new ArgumentException(nameof(text));
 
                 msgBubble.Visible = false;
 
                 return text;
-            } },
-        { RegexConstants.REGEX_BUBBLE_TYPE, a =>
+            }
+        },
+        {
+            RegexConstants.REGEX_BUBBLE_TYPE, a =>
             {
-                if (a.Length < 1) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[0]");
-                if (a.Length < 2) throw new ArgumentNullException("REGEX_BUBBLE_TYPE[1]");
+                switch (a.Length)
+                {
+                    case < 1: throw new IndexOutOfRangeException("REGEX_BUBBLE_TYPE[0]");
+                    case < 2: throw new IndexOutOfRangeException("REGEX_BUBBLE_TYPE[1]");
+                }
 
-                var msgBubble = a[0] as MsgBubble;
-                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+                if (a[0] is not MsgBubble msgBubble) throw new ArgumentException(nameof(msgBubble));
 
-                var text = a[1] as string;
-                if (text == null) throw new ArgumentNullException(nameof(text));
+                if (a[1] is not string text) throw new ArgumentException(nameof(text));
 
                 var match = RegexConstants.REGEX_BUBBLE_TYPE.Match(text);
 
@@ -126,17 +131,20 @@ public class MsgBubble : Disposable, IDisposable
                 }
 
                 return match.Groups[2].Value?.Trim();
-            } },
-        { RegexConstants.REGEX_COORDINATES, a =>
+            }
+        },
+        {
+            RegexConstants.REGEX_COORDINATES, a =>
             {
-                if (a.Length < 1) throw new ArgumentNullException("REGEX_COORDINATES[0]");
-                if (a.Length < 2) throw new ArgumentNullException("REGEX_COORDINATES[1]");
+                switch (a.Length)
+                {
+                    case < 1: throw new IndexOutOfRangeException("REGEX_COORDINATES[0]");
+                    case < 2: throw new IndexOutOfRangeException("REGEX_COORDINATES[1]");
+                }
 
-                var msgBubble = a[0] as MsgBubble;
-                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+                if (a[0] is not MsgBubble msgBubble) throw new ArgumentException(nameof(msgBubble));
 
-                var text = a[1] as string;
-                if (text == null) throw new ArgumentNullException(nameof(text));
+                if (a[1] is not string text) throw new ArgumentException(nameof(text));
 
                 var match = RegexConstants.REGEX_COORDINATES.Match(text);
 
@@ -145,17 +153,20 @@ public class MsgBubble : Disposable, IDisposable
                 msgBubble.Origin = new Point(x, y);
 
                 return match.Groups[3].Value?.Trim();
-            } },
-        { RegexConstants.REGEX_SOUND, a =>
+            }
+        },
+        {
+            RegexConstants.REGEX_SOUND, a =>
             {
-                if (a.Length < 1) throw new ArgumentNullException("REGEX_SOUND[0]");
-                if (a.Length < 2) throw new ArgumentNullException("REGEX_SOUND[1]");
+                switch (a.Length)
+                {
+                    case < 1: throw new IndexOutOfRangeException("REGEX_SOUND[0]");
+                    case < 2: throw new IndexOutOfRangeException("REGEX_SOUND[1]");
+                }
 
-                var msgBubble = a[0] as MsgBubble;
-                if (msgBubble == null) throw new ArgumentNullException(nameof(msgBubble));
+                if (a[0] is not MsgBubble msgBubble) throw new ArgumentException(nameof(msgBubble));
 
-                var text = a[1] as string;
-                if (text == null) throw new ArgumentNullException(nameof(text));
+                if (a[1] is not string text) throw new ArgumentException(nameof(text));
 
                 var mediaFilenames = new List<string>();
                 var match = (Match?)null;
@@ -177,8 +188,10 @@ public class MsgBubble : Disposable, IDisposable
                     msgBubble.MediaFilenames = mediaFilenames.ToArray();
 
                 return text;
-            } },
+            }
+        },
     }.AsReadOnly();
+
     private static readonly Regex[] CONST_regexSequence =
     [
         RegexConstants.REGEX_HIDDEN,
@@ -190,6 +203,7 @@ public class MsgBubble : Disposable, IDisposable
     ];
 
     #endregion
+
     private void Parse(string text, int duration = 0)
     {
         OriginalText = text;
@@ -220,19 +234,18 @@ public class MsgBubble : Disposable, IDisposable
             if (newLineSize.Width < _maxWidth)
                 line.Enqueue(words.Dequeue());
 
-            if (newLineSize.Width >= _maxWidth ||
-                words.Count < 1)
-            {
-                newLine = line.Join(" ");
-                newLineSize = TextRenderer.MeasureText(newLine,
-                    new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
+            if (newLineSize.Width < _maxWidth &&
+                words.Count >= 1) continue;
 
-                if (newLineSize.Width > TextSize.Width)
-                    TextSize = new Size(newLineSize.Width, TextSize.Height);
+            newLine = line.Join(" ");
+            newLineSize = TextRenderer.MeasureText(newLine,
+                new Font(DesktopConstants.Font.NAME, DesktopConstants.Font.HEIGHT));
 
-                lines.Add(newLine);
-                line.Clear();
-            }
+            if (newLineSize.Width > TextSize.Width)
+                TextSize = new Size(newLineSize.Width, TextSize.Height);
+
+            lines.Add(newLine);
+            line.Clear();
         }
 
         Text = lines.ToArray();
@@ -246,6 +259,7 @@ public class MsgBubble : Disposable, IDisposable
     }
 
     private delegate void RenderMethod(MsgBubble msgBubble, GraphicsHelper helper, int w, int h, short x, short y);
+
     private static readonly IReadOnlyDictionary<BubbleTypes, RenderMethod> _bubbleTypeMethodMappings = new Dictionary<BubbleTypes, RenderMethod>()
     {
         { BubbleTypes.Normal, Render_Normal },
@@ -253,6 +267,7 @@ public class MsgBubble : Disposable, IDisposable
         { BubbleTypes.Sticky, Render_Sticky },
         { BubbleTypes.Thought, Render_Thought2 }
     }.AsReadOnly();
+
     private static readonly IReadOnlyDictionary<char, BubbleTypes> _charBubbleTypeMappings = new Dictionary<char, BubbleTypes>()
     {
         { '!', BubbleTypes.Shout },

@@ -399,11 +399,9 @@ public class Program : Disposable
         {
             CmdFnc = a =>
             {
-                var sessionState = a[0] as IDesktopSessionState;
-                if (sessionState == null) return null;
+                if (a[0] is not IDesktopSessionState sessionState) return null;
 
-                var scriptEvent = a[1] as ScriptEvent;
-                if (scriptEvent == null) return null;
+                if (a[1] is not ScriptEvent scriptEvent) return null;
 
                 sessionState.RefreshScriptEvent(scriptEvent);
 
