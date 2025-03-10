@@ -154,7 +154,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     {
         var isConnected = ConnectionState.IsConnected();
 
-        var form = GetForm("Program");
+        var form = GetForm();
         if (form == null) return;
 
         if (GetControl("toolStrip") is not ToolStrip toolStrip) return;
@@ -272,21 +272,25 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         }
     }
 
-    public FormBase GetForm(string friendlyName)
+    public FormBase GetForm(string? friendlyName = null)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName))
             return _uiControls.GetValue(friendlyName) as FormBase;
 
-        return null;
+        return _uiControls.Values
+            ?.Where(f => f is FormBase)
+            ?.FirstOrDefault() as FormBase;
     }
 
-    public T GetForm<T>(string friendlyName)
+    public T GetForm<T>(string? friendlyName = null)
         where T : FormBase
     {
         if (!string.IsNullOrWhiteSpace(friendlyName))
             return _uiControls.GetValue(friendlyName) as T;
 
-        return default;
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
     }
 
     public void RegisterForm(string friendlyName, FormBase form)
@@ -303,12 +307,14 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiControls?.TryRemove(friendlyName, out _);
     }
 
-    public Control GetControl(string friendlyName)
+    public Control GetControl(string? friendlyName = null)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName))
             return _uiControls.GetValue(friendlyName) as Control;
 
-        return null;
+        return _uiControls.Values
+            ?.Where(c => c is Control)
+            ?.FirstOrDefault() as Control;
     }
 
     public void RegisterControl(string friendlyName, Control control)
