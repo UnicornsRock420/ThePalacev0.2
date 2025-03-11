@@ -36,7 +36,6 @@ public class ScreenLayer : Disposable, IScreenLayer
     public bool Visible { get; set; } = true;
     public float Opacity { get; set; } = 1.0F;
     public Bitmap Image { get; protected set; }
-    public Graphics Graphics { get; protected set; }
 
     public ScreenLayerTypes LayerLayerType { get; }
     public int Width => Image?.Width ?? 0;
@@ -82,10 +81,10 @@ public class ScreenLayer : Disposable, IScreenLayer
 
         if (backgroundImage == null) return;
 
+        Unload();
+
         using (var @lock = LockContext.GetLock(this))
         {
-            Unload();
-
             Image = backgroundImage;
             Image.Tag = Path.GetFileName(xPath);
         }
@@ -99,22 +98,16 @@ public class ScreenLayer : Disposable, IScreenLayer
 
     public void Unload()
     {
-        try
+        using (var @lock = LockContext.GetLock(this))
         {
-            Image?.Dispose();
-            Image = null;
-        }
-        catch
-        {
-        }
-
-        try
-        {
-            Graphics?.Dispose();
-            Graphics = null;
-        }
-        catch
-        {
+            try
+            {
+                Image?.Dispose();
+                Image = null;
+            }
+            catch
+            {
+            }
         }
     }
 
@@ -127,9 +120,9 @@ public class ScreenLayer : Disposable, IScreenLayer
         Image ??= new Bitmap(width, height);
         Image.MakeTransparent(Color.Transparent);
 
-        Graphics ??= Graphics.FromImage(Image);
-        Graphics.Clear(Color.Transparent);
+        var g = Graphics.FromImage(Image);
+        g.Clear(Color.Transparent);
 
-        return Graphics;
+        return g;
     }
 }
