@@ -9,6 +9,7 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
+using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
@@ -40,6 +41,7 @@ using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Helpers.Scripting;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
@@ -54,29 +56,8 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace ThePalace.Client.Desktop;
 
-public class Program : Disposable
+public class Program : Disposable, IApp<IDesktopSessionState>
 {
-    private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
-        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
-        .ToList()
-        .AsReadOnly();
-
-    public Program()
-    {
-        _managedResources.Add(_contextMenu);
-
-        Initialize();
-    }
-
-    private readonly ContextMenuStrip _contextMenu = new();
-
-    public IDesktopSessionState SessionState { get; protected set; } =
-        SessionManager.Current.CreateSession<DesktopSessionState>();
-
-    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
-
-    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
-
     /// <summary>
     ///     The main entry point for the application.
     /// </summary>
@@ -300,6 +281,13 @@ public class Program : Disposable
         TaskManager.Current.Shutdown();
     }
 
+    public Program()
+    {
+        _managedResources.Add(_contextMenu);
+
+        Initialize();
+    }
+
     ~Program()
     {
         Dispose();
@@ -309,8 +297,7 @@ public class Program : Disposable
     {
         if (IsDisposed) return;
 
-        foreach (var type in CONST_eventTypes)
-            ScriptEvents.Current.UnregisterEvent(type, RefreshScreen);
+        CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
 
         if (SessionState.UIControls.GetValue(nameof(NotifyIcon)) is not NotifyIcon trayIcon) return;
 
@@ -329,11 +316,48 @@ public class Program : Disposable
         GC.SuppressFinalize(this);
     }
 
+    private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
+        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
+        .ToList()
+        .AsReadOnly();
+
+    private readonly ContextMenuStrip _contextMenu = new();
+
+    public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
+
+    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+
+    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
+
+    #region Form Methods
+
+    public static void RefreshScreen(object sender, EventArgs e)
+    {
+        if (sender is not IDesktopSessionState sessionState) return;
+
+        if (e is not ScriptEvent scriptEvent) return;
+
+        ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+        {
+            CmdFnc = a =>
+            {
+                if (a[0] is not IDesktopSessionState sessionState) return null;
+
+                if (a[1] is not ScriptEvent scriptEvent) return null;
+
+                sessionState.RefreshScriptEvent(scriptEvent);
+
+                return null;
+            },
+            Values = [sessionState, scriptEvent],
+        });
+    }
+
     public void Initialize()
     {
         if (IsDisposed) return;
 
-        foreach (var type in CONST_eventTypes) ScriptEvents.Current.RegisterEvent(type, RefreshScreen);
+        CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.RegisterEvent(t, RefreshScreen));
 
         ApiManager.Current.RegisterApi(nameof(ShowConnectionForm), ShowConnectionForm);
         ApiManager.Current.RegisterApi(nameof(toolStripDropdownlist_Click), toolStripDropdownlist_Click);
@@ -375,7 +399,7 @@ public class Program : Disposable
 
                     trayIcon = new NotifyIcon
                     {
-                        ContextMenuStrip = new ContextMenuStrip(),
+                        ContextMenuStrip = _contextMenu,
                         Icon = form.Icon,
                         Visible = true
                     };
@@ -387,28 +411,6 @@ public class Program : Disposable
                 },
                 Values = [SessionState]
             });
-    }
-
-    public static void RefreshScreen(object sender, EventArgs e)
-    {
-        if (sender is not IDesktopSessionState sessionState) return;
-
-        if (e is not ScriptEvent scriptEvent) return;
-
-        ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-        {
-            CmdFnc = a =>
-            {
-                if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                if (a[1] is not ScriptEvent scriptEvent) return null;
-
-                sessionState.RefreshScriptEvent(scriptEvent);
-
-                return null;
-            },
-            Values = [sessionState, scriptEvent],
-        });
     }
 
     private void ShowAppForm()
@@ -571,9 +573,9 @@ public class Program : Disposable
                                         queue.Clear();
 
                                     SessionState.RefreshScreen(
-                                        ScreenLayerTypes.UserProp,
-                                        ScreenLayerTypes.UserNametag,
-                                        ScreenLayerTypes.Messages);
+                                        LayerScreenTypes.UserProp,
+                                        LayerScreenTypes.UserNametag,
+                                        LayerScreenTypes.Messages);
 
                                     SessionState.Send(
                                         new MSG_USERMOVE
@@ -994,7 +996,7 @@ public class Program : Disposable
             }
         }
 
-        SessionState.RefreshScreen(ScreenLayerTypes.Base);
+        SessionState.RefreshScreen(LayerScreenTypes.Base);
         SessionState.RefreshUI();
 
         ShowConnectionForm();
@@ -1150,7 +1152,7 @@ public class Program : Disposable
             connectionForm.Show();
             connectionForm.Focus();
 
-            SessionState.RefreshScreen(ScreenLayerTypes.Base);
+            SessionState.RefreshScreen(LayerScreenTypes.Base);
             SessionState.RefreshUI();
             SessionState.RefreshScreen();
             SessionState.RefreshRibbon();
@@ -1368,9 +1370,9 @@ public class Program : Disposable
                     if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue) queue.Clear();
 
                     SessionState.RefreshScreen(
-                        ScreenLayerTypes.UserProp,
-                        ScreenLayerTypes.UserNametag,
-                        ScreenLayerTypes.Messages);
+                        LayerScreenTypes.UserProp,
+                        LayerScreenTypes.UserNametag,
+                        LayerScreenTypes.Messages);
 
                     SessionState.Send(
                         new MSG_USERMOVE
@@ -1383,4 +1385,6 @@ public class Program : Disposable
                 break;
         }
     }
+
+    #endregion
 }

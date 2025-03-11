@@ -2,14 +2,13 @@ using ThePalace.Client.Desktop.Enums;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
-public interface IScreenLayer : IDisposable
+public interface ILayerScreen : IDisposable
 {
-    Type ResourceType { get; set; }
     bool Visible { get; set; }
     float Opacity { get; set; }
     Bitmap Image { get; }
 
-    ScreenLayerTypes LayerLayerType { get; }
+    LayerScreenTypes Type { get; }
     int Width { get; }
     int Height { get; }
 
