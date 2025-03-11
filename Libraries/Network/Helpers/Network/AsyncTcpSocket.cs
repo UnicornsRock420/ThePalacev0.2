@@ -55,8 +55,6 @@ public static class AsyncTcpSocket
         }
         catch (TaskCanceledException ex)
         {
-            //LoggerHub.Current.Error(ex);
-
             connectionState?.Disconnect();
 
             return false;
