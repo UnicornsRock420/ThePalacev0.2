@@ -865,7 +865,7 @@ public static class IptscraeEngine
                     iptTracking.Stack.Push(new IptVariable
                     {
                         Type = IptVariableTypes.Integer,
-                        Value = sessionState.UserDesc?.UserInfo?.PropSpec?.Length ?? 0,
+                        //Value = sessionState.UserDesc?.UserInfo?.PropSpec?.Length ?? 0,
                     });
                 })
             },
@@ -1730,7 +1730,7 @@ public static class IptscraeEngine
                     iptTracking.Stack.Push(new IptVariable
                     {
                         Type = IptVariableTypes.Integer,
-                        Value = sessionState.UserDesc?.UserInfo?.RoomPos?.HAxis ?? 0,
+                        //Value = sessionState.UserDesc?.UserInfo?.RoomPos?.HAxis ?? 0,
                     });
                 })
             },
@@ -1745,7 +1745,7 @@ public static class IptscraeEngine
                     iptTracking.Stack.Push(new IptVariable
                     {
                         Type = IptVariableTypes.Integer,
-                        Value = sessionState.UserDesc?.UserInfo?.RoomPos?.VAxis ?? 0,
+                        //Value = sessionState.UserDesc?.UserInfo?.RoomPos?.VAxis ?? 0,
                     });
                 })
             },
@@ -2321,7 +2321,7 @@ public static class IptscraeEngine
                     iptTracking.Stack.Push(new IptVariable
                     {
                         Type = IptVariableTypes.Integer,
-                        Value = (int)sessionState.ServerPopulation,
+                        //Value = (int)sessionState.ServerPopulation,
                     });
                 })
             },

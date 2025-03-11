@@ -1,23 +1,25 @@
-﻿using ThePalace.Common.Factories.System.Collections;
+﻿using System.Collections;
 
 namespace ThePalace.Core.Factories.Filesystem;
 
-public abstract class StreamBase : Disposable, IDisposable
+public abstract class StreamBase : Disposable
 {
-    protected FileStream _fileStream;
-    protected string _pathToFile;
-
     public override void Dispose()
     {
         Close();
 
         base.Dispose();
+        
+        GC.SuppressFinalize(this);
     }
 
     ~StreamBase()
     {
         Dispose();
     }
+
+    protected FileStream _fileStream;
+    protected string _pathToFile;
 
     public bool Open(string pathToFile, bool write = false)
     {

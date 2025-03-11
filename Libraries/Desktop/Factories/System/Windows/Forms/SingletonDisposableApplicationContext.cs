@@ -1,8 +1,6 @@
-﻿using System.Collections;
+﻿namespace System.Windows.Forms;
 
-namespace System;
-
-public abstract class SingletonDisposable<T> : Disposable
+public abstract class SingletonDisposableApplicationContext<T> : DisposableApplicationContext
     where T : class, new()
 {
     private static readonly Lazy<T> _current = new();

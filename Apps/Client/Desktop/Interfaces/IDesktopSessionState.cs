@@ -6,10 +6,11 @@ using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
+using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
-public interface IDesktopSessionState : IUISessionState
+public interface IDesktopSessionState : IClientSessionState, IUISessionState
 {
     IReadOnlyDictionary<string, IDisposable> UIControls { get; }
     IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers { get; }

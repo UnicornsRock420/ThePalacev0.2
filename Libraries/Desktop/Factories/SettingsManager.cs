@@ -1,6 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using ThePalace.Common.Desktop.Entities.Ribbon;

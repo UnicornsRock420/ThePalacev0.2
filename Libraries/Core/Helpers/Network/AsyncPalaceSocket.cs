@@ -7,7 +7,7 @@ namespace ThePalace.Core.Helpers.Network;
 
 public static class AsyncPalaceSocket
 {
-    public static void Send(this ISessionState sessionState, IProtocol obj, bool directAccess = false)
+    public static void Send(this ISessionState sessionState, int refNum, IProtocol obj, bool directAccess = false)
     {
         ArgumentNullException.ThrowIfNull(sessionState?.ConnectionState,
             nameof(AsyncPalaceSocket) + "." + nameof(sessionState));
@@ -17,7 +17,7 @@ public static class AsyncPalaceSocket
                 ? (Stream?)sessionState.ConnectionState.NetworkStream
                 : (Stream?)sessionState.ConnectionState.BytesSend)
             ?.PalaceSerialize(
-                (int)sessionState.UserId,
+                refNum,
                 obj,
                 opts: SerializerOptions.IncludeHeader);
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
@@ -16,8 +17,6 @@ using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System.Collections;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
@@ -65,8 +64,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             Variable = new IptVariable(IptVariableTypes.Shadow, this),
         });
 
-        UserDesc.Extended.TryAdd(@"MessageQueue", new DisposableQueue<MsgBubble>());
-        UserDesc.Extended.TryAdd(@"CurrentMessage", null);
+        InitializeUIUserRec(UserDesc);
 
         var seed = (uint)Cipher.WizKeytoSeed(ClientConstants.RegCodeSeed);
         RegInfo.Crc = Cipher.ComputeLicenseCrc(seed);
@@ -131,10 +129,17 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
+    
     public object? SessionTag { get; set; } = null;
+    public object? ScriptTag { get; set; } = null;
 
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
-    public object? ScriptTag { get; set; } = null;
+
+    public static void InitializeUIUserRec(UserDesc user)
+    {
+        user.Extended.TryAdd(@"MessageQueue", new ConcurrentQueue<MsgBubble>());
+        user.Extended.TryAdd(@"CurrentMessage", null);
+    }
 
     #endregion
 
@@ -151,8 +156,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
 
-    public List<ListRec> ServerRooms { get; set; } = [];
-    public List<ListRec> ServerUsers { get; set; } = [];
+    public List<ListRec> Rooms { get; set; } = [];
+    public List<ListRec> Users { get; set; } = [];
 
     #endregion
 
@@ -1100,7 +1105,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     {
         var users = RoomUsers.Values.ToList();
         if ((users?.Count ?? 0) <= 0) return;
-        
+
         foreach (var u in users)
         {
             if (u.UserInfo.RoomPos == null) continue;

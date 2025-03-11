@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using ThePalace.Common.Factories.System.Collections;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Users;
@@ -28,6 +28,6 @@ public class SessionState : Disposable, ISessionState
     public string? MediaUrl { get; set; } = null;
     public string? ServerName { get; set; } = null;
     public int ServerPopulation { get; set; } = 0;
-    public List<ListRec> ServerRooms { get; set; } = [];
-    public List<ListRec> ServerUsers { get; set; } = [];
+    public List<ListRec> Rooms { get; set; } = [];
+    public List<ListRec> Users { get; set; } = [];
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
@@ -9,7 +10,6 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
@@ -18,8 +18,6 @@ using ThePalace.Common.Exts.System;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Exts.System.Collections.Generic;
 using ThePalace.Common.Exts.System.ComponentModel;
-using ThePalace.Common.Factories.System.Collections;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
@@ -283,7 +281,9 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
     public Program()
     {
-        _managedResources.Add(_contextMenu);
+        _managedResources.AddRange(
+            _contextMenu,
+            SessionState);
 
         Initialize();
     }
@@ -578,6 +578,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                         LayerScreenTypes.Messages);
 
                                     SessionState.Send(
+                                        (int)SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
                                             Pos = point
@@ -971,7 +972,9 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                     xTalk.Text = variable.Variable.Value.ToString();
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    SessionState.Send(xTalk);
+                                    SessionState.Send(
+                                        (int)SessionState.UserId,
+                                        xTalk);
                             }
                         }
                     }
@@ -1208,6 +1211,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
                                 SessionState.Send(
+                                    (int)SessionState.UserId,
                                     new MSG_ROOMGOTO
                                     {
                                         Dest = roomID
@@ -1277,6 +1281,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     var value = (int)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_WHISPER
                         {
                             TargetID = value,
@@ -1290,6 +1295,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     var value = (uint)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_KILLUSER
                         {
                             TargetID = value
@@ -1302,6 +1308,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     var value = (short)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_SPOTDEL
                         {
                             SpotID = value
@@ -1347,6 +1354,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 var value = (int)values[1];
 
                 SessionState.Send(
+                    (int)SessionState.UserId,
                     new MSG_PROPDEL
                     {
                         PropNum = value
@@ -1375,6 +1383,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                         LayerScreenTypes.Messages);
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_USERMOVE
                         {
                             Pos = value

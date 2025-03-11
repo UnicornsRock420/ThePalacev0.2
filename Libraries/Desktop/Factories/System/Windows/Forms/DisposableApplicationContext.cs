@@ -1,11 +1,11 @@
-﻿namespace System.Collections;
+﻿namespace System.Windows.Forms;
 
-public class Disposable : IDisposable
+public abstract class DisposableApplicationContext : ApplicationContext
 {
     // NOTE: Leave out the finalizer altogether if this class doesn't
     // own unmanaged resources, but leave the other methods
     // exactly as they are.
-    ~Disposable()
+    ~DisposableApplicationContext()
     {
         // Finalizer calls Dispose(false)
         Dispose(false);

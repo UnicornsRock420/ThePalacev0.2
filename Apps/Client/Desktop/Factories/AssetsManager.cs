@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.Collections.Concurrent;
+using System.Drawing.Drawing2D;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
@@ -6,7 +7,6 @@ using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Network.Shared.Assets;
@@ -14,7 +14,6 @@ using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
 using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;
@@ -57,7 +56,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
-        if (sender is not IUISessionState sessionState) return;
+        if (sender is not IDesktopSessionState sessionState) return;
 
         if (e is not ApiEvent apiEvent) return;
 
@@ -70,6 +69,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
         if (list.Count > 0)
             sessionState.Send(
+                (int)sessionState.UserId,
                 new MSG_USERPROP
                 {
                     AssetSpec = list
@@ -234,6 +234,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
             if (downloadAsset)
                 sessionState.Send(
+                    (int)sessionState.UserId,
                     new MSG_ASSETQUERY
                     {
                         AssetType = LegacyAssetTypes.RT_PROP,

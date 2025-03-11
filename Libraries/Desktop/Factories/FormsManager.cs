@@ -1,35 +1,37 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories.System.Windows.Forms;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Exts.System;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Logging.Entities;
 
 namespace ThePalace.Common.Desktop.Factories;
 
-public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposable
+public class FormsManager : SingletonDisposableApplicationContext<FormsManager>, IDisposable
 {
     private static readonly string CONST_TypeFullName = typeof(FormBase).FullName;
 
-    private readonly DisposableDictionary<string, FormBase> _forms = new();
-    protected bool IsDisposed;
-
     public FormsManager()
     {
-        ThreadExit += (sender, e) => TaskManager.Current?.Dispose();
+        ThreadExit += (sender, e) => this.Dispose();
+
+        _managedResources.AddRange(
+            _forms,
+            HotKeyManager.Current,
+            TaskManager.Current);
     }
 
-    public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
+    ~FormsManager()
+    {
+        Dispose();
+    }
 
-    public new void Dispose()
+    public override void Dispose()
     {
         if (IsDisposed) return;
-
-        IsDisposed = true;
 
         FormClosed?.Clear();
 
@@ -48,10 +50,6 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
                 }
         }
 
-        _forms?.Dispose();
-
-        HotKeyManager.Current.Dispose();
-
         base.Dispose();
 
         ExitThread();
@@ -59,10 +57,8 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
 
     public event EventHandler FormClosed;
 
-    ~FormsManager()
-    {
-        Dispose();
-    }
+    private readonly DisposableDictionary<string, FormBase> _forms = new();
+    public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
 
     private void _FormClosed(object sender, EventArgs e)
     {
@@ -94,12 +90,6 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
                     .Execute();
         }
     }
-
-    //public static void InitializeUIUserRec(UserDesc user)
-    //{
-    //    user.Extended.TryAdd(@"MessageQueue", new ConcurrentQueue<MsgBubble>());
-    //    user.Extended.TryAdd(@"CurrentMessage", null);
-    //}
 
     public bool RegisterForm(FormBase form, bool assignFormClosedHandler = true)
     {
