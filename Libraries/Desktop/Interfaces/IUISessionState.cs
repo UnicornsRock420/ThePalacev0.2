@@ -2,6 +2,6 @@
 
 namespace ThePalace.Common.Desktop.Interfaces;
 
-public interface IUISessionState : ISessionState, IDisposable
+public interface IUISessionState : ISessionState
 {
 }

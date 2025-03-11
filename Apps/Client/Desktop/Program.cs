@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
@@ -9,7 +10,6 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
@@ -18,8 +18,6 @@ using ThePalace.Common.Exts.System;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Exts.System.Collections.Generic;
 using ThePalace.Common.Exts.System.ComponentModel;
-using ThePalace.Common.Factories.System.Collections;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
@@ -122,82 +120,106 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     Task.WaitAll(
                         TaskManager.StartMany(
                             cancellationToken.Token,
-                            () =>
-                            {
-                                while (q.TryDequeue(out var cmd))
-                                {
-                                    switch ((NetworkCommandTypes)cmd.Flags)
-                                    {
-                                        case NetworkCommandTypes.CONNECT:
-                                            ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
-                                            break;
-                                        case NetworkCommandTypes.DISCONNECT:
-                                        default:
-                                            app.SessionState.ConnectionState.Disconnect();
-                                            cancellationToken.Cancel();
-                                            break;
-                                    }
-                                }
-                            },
                             async () =>
                             {
-                                while (!cancellationToken.IsCancellationRequested &&
-                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
-                                       (app?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                while (!cancellationToken.IsCancellationRequested)
                                 {
-                                    var msgBytes = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-
-                                    app.SessionState.ConnectionState.Send(msgBytes);
-
-                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
-                                }
-                            },
-                            async () =>
-                            {
-                                while (!cancellationToken.IsCancellationRequested &&
-                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
-                                       (app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
-                                {
-                                    var msgBytes = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
-
-                                    var msgHeader = new MSG_Header();
-                                    var msgObj = (IProtocol?)null;
-                                    var msgType = (Type?)null;
-
-                                    using (var ms = new MemoryStream(msgBytes))
-                                    {
-                                        ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
-
-                                        var eventType = msgHeader.EventType.ToString();
-                                        msgType = AppDomain.CurrentDomain
-                                            .GetAssemblies()
-                                            .Where(a => a.FullName.StartsWith("ThePalace"))
-                                            .SelectMany(t => t.GetTypes())
-                                            .Where(t => t.Name == eventType)
-                                            .FirstOrDefault();
-                                        if (msgType != null)
+                                    if (q.TryDequeue(out var cmd))
+                                        switch ((NetworkCommandTypes)cmd.Flags)
                                         {
-                                            msgObj = (IProtocol?)msgType.GetInstance();
-
-                                            ms.PalaceDeserialize(
-                                                msgObj,
-                                                msgType);
+                                            case NetworkCommandTypes.CONNECT:
+                                                ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
+                                                return;
+                                            case NetworkCommandTypes.DISCONNECT:
+                                            default:
+                                                app.SessionState.ConnectionState.Disconnect();
+                                                cancellationToken.Cancel();
+                                                return;
                                         }
+
+                                    if (q.IsEmpty)
+                                        await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                }
+                            },
+                            async () =>
+                            {
+                                while (!cancellationToken.IsCancellationRequested &&
+                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                {
+                                    var delay = 0;
+
+                                    if ((app?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                    {
+                                        var msgBytes = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+
+                                        app.SessionState.ConnectionState.Send(msgBytes);
+
+                                        delay = RndGenerator.Next(75, 150);
+                                    }
+                                    else
+                                    {
+                                        delay = RndGenerator.Next(150, 350);
                                     }
 
-                                    var boType = EventBus.Current.GetType(msgObj);
+                                    await Task.Delay(delay, cancellationToken.Token);
+                                }
+                            },
+                            async () =>
+                            {
+                                while (!cancellationToken.IsCancellationRequested &&
+                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                {
+                                    var delay = 0;
 
-                                    EventBus.Current.Publish(
-                                        null,
-                                        boType,
-                                        new ProtocolEventParams
+                                    if ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                    {
+                                        var msgBytes = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
+
+                                        var msgHeader = new MSG_Header();
+                                        var msgObj = (IProtocol?)null;
+                                        var msgType = (Type?)null;
+
+                                        using (var ms = new MemoryStream(msgBytes))
                                         {
-                                            SourceID = (int)(app?.SessionState?.UserId ?? 0),
-                                            RefNum = msgHeader.RefNum,
-                                            Request = msgObj
-                                        });
+                                            ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
 
-                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                            var eventType = msgHeader.EventType.ToString();
+                                            msgType = AppDomain.CurrentDomain
+                                                .GetAssemblies()
+                                                .Where(a => a.FullName.StartsWith("ThePalace"))
+                                                .SelectMany(t => t.GetTypes())
+                                                .Where(t => t.Name == eventType)
+                                                .FirstOrDefault();
+                                            if (msgType != null)
+                                            {
+                                                msgObj = (IProtocol?)msgType.GetInstance();
+
+                                                ms.PalaceDeserialize(
+                                                    msgObj,
+                                                    msgType);
+                                            }
+                                        }
+
+                                        var boType = EventBus.Current.GetType(msgObj);
+
+                                        EventBus.Current.Publish(
+                                            typeof(Program),
+                                            boType,
+                                            new ProtocolEventParams
+                                            {
+                                                SourceID = (int)(app?.SessionState?.UserId ?? 0),
+                                                RefNum = msgHeader.RefNum,
+                                                Request = msgObj
+                                            });
+
+                                        delay = RndGenerator.Next(75, 150);
+                                    }
+                                    else
+                                    {
+                                        delay = RndGenerator.Next(150, 350);
+                                    }
+
+                                    await Task.Delay(delay, cancellationToken.Token);
                                 }
                             }), cancellationToken.Token);
                 }
@@ -283,7 +305,9 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
     public Program()
     {
-        _managedResources.Add(_contextMenu);
+        _managedResources.AddRange(
+            _contextMenu,
+            SessionState);
 
         Initialize();
     }
@@ -299,16 +323,17 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
         CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
 
-        if (SessionState.UIControls.GetValue(nameof(NotifyIcon)) is not NotifyIcon trayIcon) return;
-
-        trayIcon.Visible = false;
-
-        try
+        if (SessionState.UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon)
         {
-            trayIcon.Dispose();
-        }
-        catch
-        {
+            trayIcon.Visible = false;
+
+            try
+            {
+                trayIcon.Dispose();
+            }
+            catch
+            {
+            }
         }
 
         base.Dispose();
@@ -317,7 +342,10 @@ public class Program : Disposable, IApp<IDesktopSessionState>
     }
 
     private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
-        .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<ScreenRefreshAttribute>()?.Any() ?? false)
+        .Where(v => v.GetType()
+            ?.GetField(v.ToString())
+            ?.GetCustomAttributes<ScreenRefreshAttribute>()
+            ?.Any() ?? false)
         .ToList()
         .AsReadOnly();
 
@@ -578,6 +606,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                         LayerScreenTypes.Messages);
 
                                     SessionState.Send(
+                                        (int)SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
                                             Pos = point
@@ -593,7 +622,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                 {
                                     toolStripItem.Tag = new object[]
                                     {
-                                        ContextMenuCommandTypes.MSG_USERMOVE,
+                                        ContextMenuCommandTypes.CMD_USERMOVE,
                                         point
                                     };
                                     toolStripItem.Click += contextMenuItem_Click;
@@ -706,7 +735,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
-                                                    ContextMenuCommandTypes.MSG_KILLUSER,
+                                                    ContextMenuCommandTypes.CMD_KILLUSER,
                                                     roomUser.UserInfo.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
@@ -720,7 +749,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                     {
                                         toolStripItem.Tag = new object[]
                                         {
-                                            ContextMenuCommandTypes.MSG_PROPDEL,
+                                            ContextMenuCommandTypes.CMD_PROPDEL,
                                             -1
                                         };
                                         toolStripItem.Click += contextMenuItem_Click;
@@ -759,7 +788,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
-                                                    ContextMenuCommandTypes.MSG_PROPDEL,
+                                                    ContextMenuCommandTypes.CMD_PROPDEL,
                                                     j
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
@@ -795,7 +824,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
                                             toolStripItem.Tag = new object[]
                                             {
-                                                ContextMenuCommandTypes.MSG_SPOTDEL,
+                                                ContextMenuCommandTypes.CMD_SPOTDEL,
                                                 hotSpot.SpotInfo.HotspotID
                                             };
                                             toolStripItem.Click += contextMenuItem_Click;
@@ -971,7 +1000,9 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                     xTalk.Text = variable.Variable.Value.ToString();
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    SessionState.Send(xTalk);
+                                    SessionState.Send(
+                                        (int)SessionState.UserId,
+                                        xTalk);
                             }
                         }
                     }
@@ -1208,6 +1239,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
                                 SessionState.Send(
+                                    (int)SessionState.UserId,
                                     new MSG_ROOMGOTO
                                     {
                                         Dest = roomID
@@ -1277,6 +1309,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     var value = (int)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_WHISPER
                         {
                             TargetID = value,
@@ -1285,11 +1318,12 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 }
 
                     break;
-                case ContextMenuCommandTypes.MSG_KILLUSER:
+                case ContextMenuCommandTypes.CMD_KILLUSER:
                 {
                     var value = (uint)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_KILLUSER
                         {
                             TargetID = value
@@ -1297,11 +1331,12 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 }
 
                     break;
-                case ContextMenuCommandTypes.MSG_SPOTDEL:
+                case ContextMenuCommandTypes.CMD_SPOTDEL:
                 {
                     var value = (short)values[1];
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_SPOTDEL
                         {
                             SpotID = value
@@ -1342,11 +1377,12 @@ public class Program : Disposable, IApp<IDesktopSessionState>
             }
 
                 break;
-            case ContextMenuCommandTypes.MSG_PROPDEL:
+            case ContextMenuCommandTypes.CMD_PROPDEL:
             {
                 var value = (int)values[1];
 
                 SessionState.Send(
+                    (int)SessionState.UserId,
                     new MSG_PROPDEL
                     {
                         PropNum = value
@@ -1354,14 +1390,13 @@ public class Program : Disposable, IApp<IDesktopSessionState>
             }
 
                 break;
-            case ContextMenuCommandTypes.MSG_USERMOVE:
+            case ContextMenuCommandTypes.CMD_USERMOVE:
             {
                 var value = values[1] as Core.Entities.Shared.Types.Point;
 
                 SessionState.UserDesc.UserInfo.RoomPos = value;
 
-                var user = null as UserDesc;
-                user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
+                var user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                 if (user != null)
                 {
                     user.UserInfo.RoomPos = value;
@@ -1375,6 +1410,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                         LayerScreenTypes.Messages);
 
                     SessionState.Send(
+                        (int)SessionState.UserId,
                         new MSG_USERMOVE
                         {
                             Pos = value
