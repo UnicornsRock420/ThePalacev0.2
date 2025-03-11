@@ -55,10 +55,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
 
         foreach (var layer in _layerTypes)
-            _uiLayers.TryAdd(layer, new ScreenLayer(layer)
-            {
-                ResourceType = typeof(FormsManager)
-            });
+            _uiLayers.TryAdd(layer, new LayerScreen(layer));
 
         var iptTracking = new IptTracking();
         ScriptTag = iptTracking;
@@ -120,9 +117,9 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public UserDesc SelectedUser { get; set; } = null;
     public HotspotDesc SelectedHotSpot { get; set; } = null;
 
-    private static readonly IReadOnlyList<ScreenLayerTypes> _layerTypes = Enum.GetValues<ScreenLayerTypes>().AsReadOnly();
-    private readonly DisposableDictionary<ScreenLayerTypes, IScreenLayer> _uiLayers = new();
-    public IReadOnlyDictionary<ScreenLayerTypes, IScreenLayer> UILayers => _uiLayers.AsReadOnly();
+    private static readonly IReadOnlyList<LayerScreenTypes> _layerTypes = Enum.GetValues<LayerScreenTypes>().AsReadOnly();
+    private readonly DisposableDictionary<LayerScreenTypes, ILayerScreen> _uiLayers = new();
+    public IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers => _uiLayers.AsReadOnly();
     private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
     public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
 
@@ -161,8 +158,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region Screen Layer Consts
 
-    private static readonly ScreenLayerTypes[] CONST_allLayers = Enum.GetValues<ScreenLayerTypes>()
-        .Where(v => !new[] { ScreenLayerTypes.Base, ScreenLayerTypes.DimRoom }.Contains(v))
+    private static readonly LayerScreenTypes[] CONST_allLayers = Enum.GetValues<LayerScreenTypes>()
+        .Where(v => !new[] { LayerScreenTypes.Base, LayerScreenTypes.DimRoom }.Contains(v))
         .ToArray();
 
     private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
@@ -170,40 +167,40 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         .ToList()
         .AsReadOnly();
 
-    private static readonly IReadOnlyDictionary<IptEventTypes[], ScreenLayerTypes[]> CONST_EventLayerMappings =
-        new Dictionary<IptEventTypes[], ScreenLayerTypes[]>
+    private static readonly IReadOnlyDictionary<IptEventTypes[], LayerScreenTypes[]> CONST_EventLayerMappings =
+        new Dictionary<IptEventTypes[], LayerScreenTypes[]>
         {
-            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [ScreenLayerTypes.Base] },
-            { [IptEventTypes.InChat], [ScreenLayerTypes.Messages] },
-            { [IptEventTypes.NameChange], [ScreenLayerTypes.UserNametag] },
-            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [ScreenLayerTypes.UserProp] },
+            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [LayerScreenTypes.Base] },
+            { [IptEventTypes.InChat], [LayerScreenTypes.Messages] },
+            { [IptEventTypes.NameChange], [LayerScreenTypes.UserNametag] },
+            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [LayerScreenTypes.UserProp] },
             {
                 [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
-                [ScreenLayerTypes.LooseProp]
+                [LayerScreenTypes.LooseProp]
             },
             {
                 [
                     IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
                     IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
                 ],
-                [ScreenLayerTypes.SpotImage]
+                [LayerScreenTypes.SpotImage]
             },
             {
                 [
                     IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
                     IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
                 ],
-                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag]
+                [LayerScreenTypes.UserProp, LayerScreenTypes.UserNametag]
             },
-            { [IptEventTypes.MsgAssetSend], [ScreenLayerTypes.UserProp, ScreenLayerTypes.LooseProp] },
+            { [IptEventTypes.MsgAssetSend], [LayerScreenTypes.UserProp, LayerScreenTypes.LooseProp] },
             {
                 [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
-                [ScreenLayerTypes.UserProp, ScreenLayerTypes.UserNametag, ScreenLayerTypes.Messages]
+                [LayerScreenTypes.UserProp, LayerScreenTypes.UserNametag, LayerScreenTypes.Messages]
             },
-            { [IptEventTypes.MsgDraw], [ScreenLayerTypes.BottomPaint, ScreenLayerTypes.TopPaint] },
+            { [IptEventTypes.MsgDraw], [LayerScreenTypes.BottomPaint, LayerScreenTypes.TopPaint] },
             {
                 [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
-                [ScreenLayerTypes.SpotBorder, ScreenLayerTypes.SpotNametag, ScreenLayerTypes.SpotImage]
+                [LayerScreenTypes.SpotBorder, LayerScreenTypes.SpotNametag, LayerScreenTypes.SpotImage]
             }
         }.AsReadOnly();
 
@@ -277,8 +274,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 select layer.Value)
             .FirstOrDefault();
 
-        if (screenLayers.Contains(ScreenLayerTypes.Base))
-            RefreshScreen(ScreenLayerTypes.Base);
+        if (screenLayers.Contains(LayerScreenTypes.Base))
+            RefreshScreen(LayerScreenTypes.Base);
 
         if (CONST_uiRefreshEvents.Contains(scriptEvent.EventType))
         {
@@ -287,7 +284,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         }
 
         RefreshScreen(
-            !screenLayers.Contains(ScreenLayerTypes.Base)
+            !screenLayers.Contains(LayerScreenTypes.Base)
                 ? screenLayers
                 : CONST_allLayers);
 
@@ -478,7 +475,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             ?.FirstOrDefault() as Control;
     }
 
-    public Control GetControl<T>(string? friendlyName = null)
+    public T GetControl<T>(string? friendlyName = null)
         where T : Control
     {
         if (!string.IsNullOrWhiteSpace(friendlyName))
@@ -517,7 +514,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiControls?.TryRemove(friendlyName, out _);
     }
 
-    public void RefreshScreen(params ScreenLayerTypes[] layers)
+    public void RefreshScreen(params LayerScreenTypes[] layers)
     {
         if (layers.Length > 0)
             RefreshLayers(layers);
@@ -529,17 +526,17 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             {
                 foreach (var layer in _layerTypes)
                 {
-                    if (layer == ScreenLayerTypes.Base) continue;
+                    if (layer == LayerScreenTypes.Base) continue;
 
                     _uiLayers[layer].Unload();
                 }
 
-                _uiLayers[ScreenLayerTypes.Base].Load(
+                _uiLayers[LayerScreenTypes.Base].Load(
                     LayerSourceTypes.Resource,
                     "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png",
                     this);
             }
-            else if (layers.Contains(ScreenLayerTypes.Base))
+            else if (layers.Contains(LayerScreenTypes.Base))
             {
                 var filePath = null as string;
 
@@ -557,15 +554,15 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     }
 
                     if (File.Exists(filePath))
-                        _uiLayers[ScreenLayerTypes.Base].Load(
+                        _uiLayers[LayerScreenTypes.Base].Load(
                             LayerSourceTypes.Filesystem,
                             filePath,
                             this);
                 }
 
                 if (RoomInfo.Picture !=
-                    _uiLayers[ScreenLayerTypes.Base].Image?.Tag?.ToString())
-                    _uiLayers[ScreenLayerTypes.Base].Load(
+                    _uiLayers[LayerScreenTypes.Base].Image?.Tag?.ToString())
+                    _uiLayers[LayerScreenTypes.Base].Load(
                         LayerSourceTypes.Resource,
                         "ThePalace.Media.Resources.backgrounds.clouds.jpg",
                         this);
@@ -654,21 +651,21 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         }
     }
 
-    public void LayerVisibility(bool visible, params ScreenLayerTypes[] layers)
+    public void LayerVisibility(bool visible, params LayerScreenTypes[] layers)
     {
         foreach (var layer in layers)
         {
-            if (layer == ScreenLayerTypes.Base) continue;
+            if (layer == LayerScreenTypes.Base) continue;
 
             _uiLayers[layer].Visible = visible;
         }
     }
 
-    public void LayerOpacity(float opacity, params ScreenLayerTypes[] layers)
+    public void LayerOpacity(float opacity, params LayerScreenTypes[] layers)
     {
         foreach (var layer in layers)
         {
-            if (layer == ScreenLayerTypes.Base) continue;
+            if (layer == LayerScreenTypes.Base) continue;
 
             _uiLayers[layer].Opacity = opacity;
             _uiLayers[layer].Visible = opacity != 0F;
@@ -679,7 +676,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region ScreenLayer Methods
 
-    private void RefreshLayers(params ScreenLayerTypes[] layers)
+    private void RefreshLayers(params LayerScreenTypes[] layers)
     {
         if (!Visible ||
             ScreenWidth < 1 ||
@@ -690,11 +687,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             foreach (var layer in layers)
                 lock (_uiLayers[layer])
                 {
-                    if (layer == ScreenLayerTypes.Base) continue;
+                    if (layer == LayerScreenTypes.Base) continue;
 
                     switch (layer)
                     {
-                        case ScreenLayerTypes.DimRoom:
+                        case LayerScreenTypes.DimRoom:
                             if (_uiLayers[layer].Opacity >= 1F)
                             {
                                 _uiLayers[layer].Unload();
@@ -719,18 +716,18 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                                 switch (layer)
                                 {
-                                    case ScreenLayerTypes.LooseProp: ScreenLayer_LooseProp(g); break;
-                                    case ScreenLayerTypes.SpotImage: ScreenLayer_SpotImage(g); break;
-                                    case ScreenLayerTypes.BottomPaint: ScreenLayer_BottomPaint(g); break;
-                                    case ScreenLayerTypes.SpotNametag: ScreenLayer_SpotNametag(g); break;
-                                    case ScreenLayerTypes.UserProp: ScreenLayer_UserProp(g); break;
-                                    case ScreenLayerTypes.UserNametag: ScreenLayer_UserNametag(g); break;
-                                    case ScreenLayerTypes.ScriptedImage: ScreenLayer_ScriptedImage(g); break;
-                                    case ScreenLayerTypes.ScriptedText: ScreenLayer_ScriptedText(g); break;
-                                    case ScreenLayerTypes.SpotBorder: ScreenLayer_SpotBorder(g); break;
-                                    case ScreenLayerTypes.TopPaint: ScreenLayer_TopPaint(g); break;
-                                    case ScreenLayerTypes.DimRoom: ScreenLayer_DimRoom(g); break;
-                                    case ScreenLayerTypes.Messages: ScreenLayer_Messages(g); break;
+                                    case LayerScreenTypes.LooseProp: ScreenLayer_LooseProp(g); break;
+                                    case LayerScreenTypes.SpotImage: ScreenLayer_SpotImage(g); break;
+                                    case LayerScreenTypes.BottomPaint: ScreenLayer_BottomPaint(g); break;
+                                    case LayerScreenTypes.SpotNametag: ScreenLayer_SpotNametag(g); break;
+                                    case LayerScreenTypes.UserProp: ScreenLayer_UserProp(g); break;
+                                    case LayerScreenTypes.UserNametag: ScreenLayer_UserNametag(g); break;
+                                    case LayerScreenTypes.ScriptedImage: ScreenLayer_ScriptedImage(g); break;
+                                    case LayerScreenTypes.ScriptedText: ScreenLayer_ScriptedText(g); break;
+                                    case LayerScreenTypes.SpotBorder: ScreenLayer_SpotBorder(g); break;
+                                    case LayerScreenTypes.TopPaint: ScreenLayer_TopPaint(g); break;
+                                    case LayerScreenTypes.DimRoom: ScreenLayer_DimRoom(g); break;
+                                    case LayerScreenTypes.Messages: ScreenLayer_Messages(g); break;
                                 }
 
                                 g.Save();

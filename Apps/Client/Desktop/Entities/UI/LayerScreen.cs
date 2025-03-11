@@ -5,18 +5,18 @@ using ThePalace.Common.Factories.System.Collections;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class ScreenLayer : Disposable, IScreenLayer
+public class LayerScreen : Disposable, ILayerScreen
 {
-    private ScreenLayer()
+    private LayerScreen()
     {
     }
 
-    public ScreenLayer(ScreenLayerTypes layerType)
+    public LayerScreen(LayerScreenTypes type)
     {
-        LayerLayerType = layerType;
+        Type = type;
     }
 
-    ~ScreenLayer()
+    ~LayerScreen()
     {
         Dispose();
     }
@@ -32,12 +32,11 @@ public class ScreenLayer : Disposable, IScreenLayer
         GC.SuppressFinalize(this);
     }
 
-    public Type ResourceType { get; set; }
     public bool Visible { get; set; } = true;
     public float Opacity { get; set; } = 1.0F;
     public Bitmap Image { get; protected set; }
 
-    public ScreenLayerTypes LayerLayerType { get; }
+    public LayerScreenTypes Type { get; }
     public int Width => Image?.Width ?? 0;
     public int Height => Image?.Height ?? 0;
 
@@ -48,7 +47,7 @@ public class ScreenLayer : Disposable, IScreenLayer
         int? width = null,
         int? height = null)
     {
-        ArgumentNullException.ThrowIfNull(xPath, nameof(xPath));
+        if (string.IsNullOrWhiteSpace(xPath)) throw new ArgumentNullException(nameof(xPath));
 
         var backgroundImage = (Bitmap?)null;
 
@@ -62,9 +61,25 @@ public class ScreenLayer : Disposable, IScreenLayer
 
                     break;
                 case LayerSourceTypes.Resource:
-                    using (var stream = ResourceType
-                               ?.Assembly
-                               ?.GetManifestResourceStream(xPath))
+                    using (var stream = AppDomain.CurrentDomain
+                               .GetAssemblies()
+                               .Where(a =>
+                               {
+                                   try
+                                   {
+                                       using (var stream = a.GetManifestResourceStream(xPath))
+                                       {
+                                           return stream != null;
+                                       }
+                                   }
+                                   catch
+                                   {
+                                   }
+
+                                   return false;
+                               })
+                               .Select(a => a.GetManifestResourceStream(xPath))
+                               .FirstOrDefault())
                     {
                         if (stream == null) return;
 
@@ -90,7 +105,7 @@ public class ScreenLayer : Disposable, IScreenLayer
             Image.Tag = Path.GetFileName(xPath);
         }
 
-        if (LayerLayerType != ScreenLayerTypes.Base ||
+        if (Type != LayerScreenTypes.Base ||
             sessionState == null) return;
 
         sessionState.ScreenWidth = width ?? backgroundImage.Width;

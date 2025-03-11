@@ -223,6 +223,13 @@ public class FormsManager : SingletonApplicationContext<FormsManager>, IDisposab
         parent.Controls.Add(control);
     }
 
+    public static void RegisterControl<TForm, TControl>(TForm parent, TControl control)
+        where TForm : FormBase
+        where TControl : Control
+    {
+        parent.Controls.Add(control);
+    }
+
     public TControl[] CreateControl<TForm, TControl>(TForm parent, bool visible = true, params ControlCfg[] cfgs)
         where TForm : FormBase
         where TControl : Control, new()

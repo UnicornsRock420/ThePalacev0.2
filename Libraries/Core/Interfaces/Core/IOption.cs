@@ -4,8 +4,7 @@ public interface IOption : ISettingBase
 {
     string Text { get; }
 
-    bool Enabled();
-    //object Parse(string value);
+    bool Enabled { get; set; }
 }
 
 public interface IOption<T> : IOption
