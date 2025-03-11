@@ -1068,7 +1068,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     buttonDisconnect.Click += (sender, e) =>
                     {
                         if (SessionState.ConnectionState?.IsConnected() ?? false)
-                            SessionState.ConnectionState.Socket?.DropConnection();
+                            SessionState.ConnectionState.Disconnect();
 
                         var connectionForm = SessionState.GetForm(nameof(Connection));
                         connectionForm?.Close();

@@ -7,6 +7,8 @@ namespace ThePalace.Network.Interfaces;
 
 public interface IConnectionState : IDisposable
 {
+    Guid Id { get; }
+    
     SocketDirection Direction { get; set; }
 
     IPEndPoint? HostAddr { get; set; }
@@ -19,8 +21,12 @@ public interface IConnectionState : IDisposable
     BufferStream? BytesReceived { get; set; }
     BufferStream? BytesSend { get; set; }
 
-    Socket? Socket { get; set; }
-    NetworkStream? NetworkStream { get; set; }
+    internal Socket? Socket { get; set; }
+    public NetworkStream? NetworkStream { get; set; }
 
-    object? Tag { get; set; }
+    object? ConnectionTag { get; set; }
+
+    bool IsConnected(int passiveIdleTimeoutInSeconds = 750);
+    
+    void Disconnect();
 }

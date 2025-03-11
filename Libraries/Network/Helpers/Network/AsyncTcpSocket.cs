@@ -86,16 +86,7 @@ public static class AsyncTcpSocket
 
         return connectionState.Do(() =>
         {
-            connectionState.Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
-            connectionState.Socket.Connect(hostAddr);
-
-            connectionState.NetworkStream = ConnectionManager.CreateNetworkStream(connectionState.Socket);
-
-            connectionState.Direction = SocketDirection.Outbound;
-            connectionState.HostAddr = hostAddr;
-
-            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length,
-                _receiveCallback, connectionState);
+            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
 
             ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
@@ -105,14 +96,7 @@ public static class AsyncTcpSocket
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
 
-        connectionState.Socket?.DropConnection();
-        connectionState.Socket = null;
-
-        connectionState.NetworkStream?.Dispose();
-        connectionState.NetworkStream = null;
-
-        connectionState.BytesReceived?.Clear();
-        connectionState.BytesSend?.Clear();
+        connectionState.Disconnect();
     }
 
     public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)
@@ -276,46 +260,6 @@ public static class AsyncTcpSocket
             if (bytesSent > 0)
                 connectionState.LastSent = DateTime.UtcNow;
         });
-    }
-
-    public static bool IsConnected(this IConnectionState connectionState, int passiveIdleTimeoutInSeconds = 750)
-    {
-        var passiveIdleTimeout_Timespan = TimeSpan.FromSeconds(passiveIdleTimeoutInSeconds);
-
-        try
-        {
-            if (connectionState.LastReceived.HasValue &&
-                DateTime.UtcNow.Subtract(connectionState.LastReceived.Value) > passiveIdleTimeout_Timespan)
-            {
-                var result = !connectionState.Socket?.Poll(1, SelectMode.SelectRead) ?? false;
-
-                connectionState.LastReceived = DateTime.UtcNow;
-
-                return result;
-            }
-        }
-        catch (TaskCanceledException ex)
-        {
-            connectionState?.Disconnect();
-
-            return false;
-        }
-        catch (SocketException ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            connectionState?.Disconnect();
-
-            return false;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-
-            return false;
-        }
-
-        return connectionState.Socket?.Connected ?? false;
     }
     
     

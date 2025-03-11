@@ -93,24 +93,19 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     {
         if (IsDisposed) return;
 
-        var id = (uint)0;
+        var id =
+            (from state
+                    in _connectionStates.ToList()
+                where connectionState.Id == state.Value.Id
+                select state.Key)
+            .FirstOrDefault();
 
-        foreach (var state in _connectionStates.ToList())
-            if (connectionState.Equals(state) ||
-                (connectionState.Socket?.Handle != null &&
-                 state.Value.Socket?.Handle != null &&
-                 connectionState.Socket?.Handle == state.Value.Socket?.Handle))
-            {
-                id = state.Key;
+        if (id < 1) return;
 
-                break;
-            }
-
-        if (id > 0)
-            using (var @lock = LockContext.GetLock(_connectionStates))
-            {
-                _connectionStates.Remove(id, out _);
-            }
+        using (var @lock = LockContext.GetLock(_connectionStates))
+        {
+            _connectionStates.Remove(id, out _);
+        }
     }
 
     public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream,
@@ -172,7 +167,13 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
 
-        connectionState.Connect(hostAddr);
+        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork);
+        connectionState.Socket.Connect(hostAddr);
+
+        connectionState.NetworkStream = CreateNetworkStream(connectionState.Socket);
+
+        connectionState.Direction = SocketDirection.Outbound;
+        connectionState.HostAddr = hostAddr;
     }
 
     public static void Connect(IConnectionState connectionState, IPAddress ipAddress, int port)
@@ -198,10 +199,5 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
 
         Connect(connectionState, url.Host, url.Port);
-    }
-
-    public static void Disconnect(IConnectionState connectionState)
-    {
-        connectionState?.Socket?.DropConnection();
     }
 }

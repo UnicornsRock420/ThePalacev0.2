@@ -27,6 +27,24 @@ public static class NetworkExts
             }
     }
 
+    public static void DropConnection(this NetworkStream handler)
+    {
+        var actions = new List<Action>
+        {
+            () => handler?.Close(),
+            () => handler?.Dispose()
+        };
+
+        foreach (var action in actions)
+            try
+            {
+                action();
+            }
+            catch
+            {
+            }
+    }
+
     public static void SetKeepAlive(this Socket handler, bool on = true, int keepAliveInterval_InMilliseconds = 15000,
         int keepAliveTime_InMilliseconds = 15000)
     {
