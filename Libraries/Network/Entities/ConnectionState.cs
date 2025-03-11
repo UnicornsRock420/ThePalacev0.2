@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Entities.Network;
+using ThePalace.Logging.Entities;
 using ThePalace.Network.Constants;
 using ThePalace.Network.Enums;
 using ThePalace.Network.Interfaces;
@@ -9,28 +10,30 @@ namespace ThePalace.Network.Entities;
 
 public class ConnectionState : EventArgs, IConnectionState
 {
-    public BufferStream BytesSent { get; set; } = new();
+    ~ConnectionState()
+    {
+        Dispose();
+    }
 
     public void Dispose()
     {
         try
         {
-            BytesSent?.Dispose();
-        }
-        catch
-        {
-        }
-
-        BytesSent = null;
-        try
-        {
             BytesReceived?.Dispose();
         }
-        catch
+        finally
         {
+            BytesReceived = null;
         }
 
-        BytesReceived = null;
+        try
+        {
+            BytesSend?.Dispose();
+        }
+        finally
+        {
+            BytesSend = null;
+        }
 
         try
         {
@@ -62,13 +65,15 @@ public class ConnectionState : EventArgs, IConnectionState
         HostAddr = null;
         RemoteAddr = null;
         Buffer = null;
-        Tag = null;
+        ConnectionTag = null;
 
         LastReceived = null;
         LastSent = null;
 
         GC.SuppressFinalize(this);
     }
+
+    public Guid Id { get; } = Guid.NewGuid();
 
     public SocketDirection Direction { get; set; }
 
@@ -84,11 +89,61 @@ public class ConnectionState : EventArgs, IConnectionState
     public Socket? Socket { get; set; }
     public NetworkStream? NetworkStream { get; set; }
 
-    public object? Tag { get; set; }
+    public object? ConnectionTag { get; set; }
 
-    ~ConnectionState()
+    public bool IsConnected(int passiveIdleTimeoutInSeconds = 750)
     {
-        Dispose();
+        var passiveIdleTimeout_Timespan = TimeSpan.FromSeconds(passiveIdleTimeoutInSeconds);
+
+        try
+        {
+            if (LastReceived.HasValue &&
+                DateTime.UtcNow.Subtract(LastReceived.Value) > passiveIdleTimeout_Timespan)
+            {
+                var result = !Socket?.Poll(1, SelectMode.SelectRead) ?? false;
+
+                if (result)
+                {
+                    LastReceived = DateTime.UtcNow;
+                }
+
+                return result;
+            }
+        }
+        catch (TaskCanceledException ex)
+        {
+            Disconnect();
+
+            return false;
+        }
+        catch (SocketException ex)
+        {
+            LoggerHub.Current.Error(ex);
+
+            Disconnect();
+
+            return false;
+        }
+        catch (Exception ex)
+        {
+            LoggerHub.Current.Error(ex);
+
+            return false;
+        }
+
+        return Socket?.Connected ?? false;
+    }
+
+    public void Disconnect()
+    {
+        Socket?.DropConnection();
+        Socket = null;
+
+        NetworkStream?.DropConnection();
+        NetworkStream = null;
+
+        BytesReceived?.Clear();
+        BytesSend?.Clear();
     }
 }
 
