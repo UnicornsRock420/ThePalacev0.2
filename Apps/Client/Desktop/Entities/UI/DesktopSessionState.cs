@@ -209,7 +209,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     #endregion
 
     #region UI Methods
-    
+
     private void _FormClosed(object sender, EventArgs e)
     {
         if (IsDisposed) return;
@@ -425,7 +425,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             }
         }
     }
-    
+
     #endregion
 
     #region Form/Control Methods
@@ -458,7 +458,23 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiControls?.TryAdd(friendlyName, form);
     }
 
+    public void RegisterForm<T>(string friendlyName, T form)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryAdd(friendlyName, form);
+    }
+
     public void UnregisterForm(string friendlyName, FormBase form)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterForm<T>(string friendlyName, T form)
+        where T : FormBase
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
@@ -493,6 +509,14 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiControls?.TryAdd(friendlyName, control);
     }
 
+    public void RegisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
     public void RegisterControl(string friendlyName, IDisposable control)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
@@ -500,14 +524,22 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiControls?.TryAdd(friendlyName, control);
     }
 
-    public void UnregisterForm(string friendlyName, Control control)
+    public void UnregisterControl(string friendlyName, Control control)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
             _uiControls?.TryRemove(friendlyName, out _);
     }
 
-    public void UnregisterForm(string friendlyName, IDisposable control)
+    public void UnregisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterControl(string friendlyName, IDisposable control)
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
@@ -874,9 +906,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     private void ScreenLayer_UserProp(Graphics g)
     {
-        var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
-        var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
-
         var users = null as List<UserDesc>;
         lock (RoomUsers)
         {
@@ -890,14 +919,14 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         if (users.Count > 0)
             foreach (var u in users)
             {
-                var x = u.UserInfo.RoomPos.HAxis - halfPropWidth;
-                var y = u.UserInfo.RoomPos.VAxis - halfPropHeight;
+                var x = u.UserInfo.RoomPos.HAxis - CONST_INT_halfPropWidth;
+                var y = u.UserInfo.RoomPos.VAxis - CONST_INT_halfPropHeight;
 
-                if (x < -halfPropWidth) x = -halfPropWidth;
-                else if (x > ScreenWidth + halfPropWidth) x = ScreenWidth + halfPropWidth;
+                if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
+                else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
 
-                if (y < -halfPropHeight) y = -halfPropHeight;
-                else if (y > ScreenHeight + halfPropHeight) y = ScreenHeight + halfPropHeight;
+                if (y < -CONST_INT_halfPropHeight) y = -CONST_INT_halfPropHeight;
+                else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = ScreenHeight + CONST_INT_halfPropHeight;
 
                 //if (x < 0 ||
                 //    y < 0) continue;
@@ -980,9 +1009,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     private void ScreenLayer_UserNametag(Graphics g)
     {
-        var halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
-        var halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
-
         var font = new Font("Arial", 11);
         var padding = 2;
 
@@ -1008,11 +1034,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     var x = u.UserInfo.RoomPos.HAxis - halfNameTagWidth - padding * 2;
                     var y = u.UserInfo.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
 
-                    if (x < -halfPropWidth) x = -halfPropWidth;
-                    else if (x > ScreenWidth + halfPropWidth) x = ScreenWidth + halfPropWidth;
+                    if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
+                    else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
 
-                    if (y < -halfPropHeight) y = -halfPropHeight;
-                    else if (y > ScreenHeight + halfPropHeight) y = ScreenHeight + halfPropHeight;
+                    if (y < -CONST_INT_halfPropHeight) y = -CONST_INT_halfPropHeight;
+                    else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = ScreenHeight + CONST_INT_halfPropHeight;
 
                     //if (x < 0 ||
                     //    y < 0) continue;
@@ -1072,59 +1098,55 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     private void ScreenLayer_Messages(Graphics g)
     {
-        var users = null as List<UserDesc>;
-        lock (RoomUsers)
+        var users = RoomUsers.Values.ToList();
+        if ((users?.Count ?? 0) <= 0) return;
+        
+        foreach (var u in users)
         {
-            users = RoomUsers.Values.ToList();
-        }
+            if (u.UserInfo.RoomPos == null) continue;
 
-        if ((users?.Count ?? 0) > 0)
-            foreach (var u in users)
-            {
-                if (u.UserInfo.RoomPos == null) continue;
+            if (u.Extended["MessageQueue"] is not DisposableQueue<MsgBubble> queue) continue;
 
-                if (u.Extended["MessageQueue"] is not DisposableQueue<MsgBubble> queue) continue;
-
-                var msg = u.Extended["CurrentMessage"] as MsgBubble;
-                if (msg != null)
-                    if ((msg.Type != BubbleTypes.Sticky || queue.Count > 0) &&
-                        DateTime.Now.Subtract(msg.Accessed).TotalMilliseconds >= msg.Duration)
-                    {
-                        u.Extended["CurrentMessage"] = null;
-                        msg.Dispose();
-                    }
-
-                if (msg == null)
+            var msg = u.Extended["CurrentMessage"] as MsgBubble;
+            if (msg != null)
+                if ((msg.Type != BubbleTypes.Sticky || queue.Count > 0) &&
+                    DateTime.Now.Subtract(msg.Accessed).TotalMilliseconds >= msg.Duration)
                 {
-                    if (queue.Count < 1) continue;
-                    queue.TryDequeue(out msg);
-
-                    if (msg == null) continue;
-
-                    u.Extended["CurrentMessage"] = msg;
+                    u.Extended["CurrentMessage"] = null;
+                    msg.Dispose();
                 }
 
+            if (msg == null)
+            {
+                if (queue.Count < 1) continue;
+                queue.TryDequeue(out msg);
+
                 if (msg == null) continue;
-                if (!msg.Visible) continue;
 
-                var loc = msg.Origin;
-
-                var x = UserDesc.UserInfo.RoomPos.HAxis;
-                var y = UserDesc.UserInfo.RoomPos.VAxis;
-
-                if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
-                else if (x > this.ScreenWidth + CONST_INT_halfPropWidth) x = (short)(this.ScreenWidth + CONST_INT_halfPropWidth);
-
-                if (y < -CONST_INT_halfPropHeight) y = (short)-CONST_INT_halfPropHeight;
-                else if (y > this.ScreenHeight + CONST_INT_halfPropHeight) y = (short)(this.ScreenHeight + CONST_INT_halfPropHeight);
-
-                if (x < 0 ||
-                    y < 0) continue;
-
-                var image = msg.Render(this);
-
-                // TODO:
+                u.Extended["CurrentMessage"] = msg;
             }
+
+            if (msg == null) continue;
+            if (!msg.Visible) continue;
+
+            var loc = msg.Origin;
+
+            var x = UserDesc.UserInfo.RoomPos.HAxis;
+            var y = UserDesc.UserInfo.RoomPos.VAxis;
+
+            if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
+            else if (x > this.ScreenWidth + CONST_INT_halfPropWidth) x = (short)(this.ScreenWidth + CONST_INT_halfPropWidth);
+
+            if (y < -CONST_INT_halfPropHeight) y = (short)-CONST_INT_halfPropHeight;
+            else if (y > this.ScreenHeight + CONST_INT_halfPropHeight) y = (short)(this.ScreenHeight + CONST_INT_halfPropHeight);
+
+            if (x < 0 ||
+                y < 0) continue;
+
+            var image = msg.Render(this);
+
+            // TODO:
+        }
     }
 
     private void ScreenLayer_Paint(Graphics g, bool layer)

@@ -9,6 +9,7 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
+using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
