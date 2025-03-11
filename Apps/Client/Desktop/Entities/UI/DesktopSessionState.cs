@@ -41,6 +41,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
 
+    #region cStr
+
     public DesktopSessionState()
     {
         _managedResources.AddRange(
@@ -93,20 +95,24 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         GC.SuppressFinalize(this);
     }
 
+    #endregion
+
     #region Properties
 
     #region Object Info
 
     public Guid Id { get; } = Guid.NewGuid();
+    public DateTime? LastActivity { get; set; }
 
     #endregion
 
-    #region GUI Info
+    #region ScreenLayer Info
+
+    private static readonly IReadOnlyList<LayerScreenTypes> _layerTypes = Enum.GetValues<LayerScreenTypes>().AsReadOnly();
+    private readonly DisposableDictionary<LayerScreenTypes, ILayerScreen> _uiLayers = new();
+    public IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers => _uiLayers.AsReadOnly();
 
     public bool Visible { get; set; } = true;
-    public DateTime? LastActivity { get; set; }
-    public HistoryManager History { get; } = new();
-    public TabPage TabPage { get; set; } = null;
     public double Scale { get; set; } = 1.0D;
     public int ScreenWidth { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
     public int ScreenHeight { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
@@ -115,11 +121,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public UserDesc SelectedUser { get; set; } = null;
     public HotspotDesc SelectedHotSpot { get; set; } = null;
 
-    private static readonly IReadOnlyList<LayerScreenTypes> _layerTypes = Enum.GetValues<LayerScreenTypes>().AsReadOnly();
-    private readonly DisposableDictionary<LayerScreenTypes, ILayerScreen> _uiLayers = new();
-    public IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers => _uiLayers.AsReadOnly();
-    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
-    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+    public HistoryManager History { get; } = new();
+    public TabPage TabPage { get; set; } = null;
 
     #endregion
 
@@ -129,7 +132,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
-    
+
     public object? SessionTag { get; set; } = null;
     public object? ScriptTag { get; set; } = null;
 
@@ -161,7 +164,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #endregion
 
-    #region Screen Layer Consts
+    #region ScreenLayer Consts
 
     private static readonly LayerScreenTypes[] CONST_allLayers = Enum.GetValues<LayerScreenTypes>()
         .Where(v => !new[] { LayerScreenTypes.Base, LayerScreenTypes.DimRoom }.Contains(v))
@@ -211,7 +214,16 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #endregion
 
+    #region Form/Control Info
+
+    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
+    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+
     #endregion
+
+    #endregion
+
+    #region Methods
 
     #region UI Methods
 
@@ -428,284 +440,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                     break;
             }
-        }
-    }
-
-    #endregion
-
-    #region Form/Control Methods
-
-    public FormBase GetForm(string? friendlyName = null)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as FormBase;
-
-        return _uiControls.Values
-            ?.Where(f => f is FormBase)
-            ?.FirstOrDefault() as FormBase;
-    }
-
-    public T GetForm<T>(string? friendlyName = null)
-        where T : FormBase
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as T;
-
-        return _uiControls.Values
-            ?.Where(f => f is T)
-            ?.FirstOrDefault() as T;
-    }
-
-    public void RegisterForm(string friendlyName, FormBase form)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryAdd(friendlyName, form);
-    }
-
-    public void RegisterForm<T>(string friendlyName, T form)
-        where T : FormBase
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryAdd(friendlyName, form);
-    }
-
-    public void UnregisterForm(string friendlyName, FormBase form)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void UnregisterForm<T>(string friendlyName, T form)
-        where T : FormBase
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public Control GetControl(string? friendlyName = null)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as Control;
-
-        return _uiControls.Values
-            ?.Where(c => c is Control)
-            ?.FirstOrDefault() as Control;
-    }
-
-    public T GetControl<T>(string? friendlyName = null)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as T;
-
-        return _uiControls.Values
-            ?.Where(f => f is T)
-            ?.FirstOrDefault() as T;
-    }
-
-    public void RegisterControl(string friendlyName, Control control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
-
-    public void RegisterControl<T>(string friendlyName, T control)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
-
-    public void RegisterControl(string friendlyName, IDisposable control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
-
-    public void UnregisterControl(string friendlyName, Control control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void UnregisterControl<T>(string friendlyName, T control)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void UnregisterControl(string friendlyName, IDisposable control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void RefreshScreen(params LayerScreenTypes[] layers)
-    {
-        if (layers.Length > 0)
-            RefreshLayers(layers);
-
-        try
-        {
-            var isConnected = ConnectionState.IsConnected();
-            if (!isConnected)
-            {
-                foreach (var layer in _layerTypes)
-                {
-                    if (layer == LayerScreenTypes.Base) continue;
-
-                    _uiLayers[layer].Unload();
-                }
-
-                _uiLayers[LayerScreenTypes.Base].Load(
-                    LayerSourceTypes.Resource,
-                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png",
-                    this);
-            }
-            else if (layers.Contains(LayerScreenTypes.Base))
-            {
-                var filePath = null as string;
-
-                if (!string.IsNullOrWhiteSpace(MediaUrl) &&
-                    !string.IsNullOrWhiteSpace(ServerName) &&
-                    !string.IsNullOrWhiteSpace(RoomInfo.Picture))
-                {
-                    var fileName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(RoomInfo.Picture, @"_");
-                    filePath = Path.Combine(Environment.CurrentDirectory, "Media", fileName);
-
-                    if (!File.Exists(filePath))
-                    {
-                        var _serverName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
-                        filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, fileName);
-                    }
-
-                    if (File.Exists(filePath))
-                        _uiLayers[LayerScreenTypes.Base].Load(
-                            LayerSourceTypes.Filesystem,
-                            filePath,
-                            this);
-                }
-
-                if (RoomInfo.Picture !=
-                    _uiLayers[LayerScreenTypes.Base].Image?.Tag?.ToString())
-                    _uiLayers[LayerScreenTypes.Base].Load(
-                        LayerSourceTypes.Resource,
-                        "ThePalace.Media.Resources.backgrounds.clouds.jpg",
-                        this);
-            }
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-        }
-
-        if (GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
-
-        try
-        {
-            var img = null as Bitmap;
-            if (imgScreen.Image == null ||
-                imgScreen.Image.Width != ScreenWidth ||
-                imgScreen.Image.Height != ScreenHeight)
-            {
-                try
-                {
-                    imgScreen.Image?.Dispose();
-                }
-                catch
-                {
-                }
-
-                img = new Bitmap(ScreenWidth, ScreenHeight);
-                img.MakeTransparent(Color.Transparent);
-            }
-
-            using (var g = Graphics.FromImage(img))
-            {
-                g.InterpolationMode =
-                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
-                g.PixelOffsetMode =
-                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
-                g.SmoothingMode =
-                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
-
-                g.Clear(Color.Transparent);
-
-                foreach (var layer in _layerTypes)
-                {
-                    if (!_uiLayers[layer].Visible ||
-                        _uiLayers[layer].Opacity == 0F ||
-                        _uiLayers[layer].Image == null) continue;
-
-                    using (var @lock = LockContext.GetLock(_uiLayers[layer]))
-                    {
-                        var imgAttributes = null as ImageAttributes;
-
-                        if (_uiLayers[layer].Opacity < 1.0F)
-                        {
-                            var matrix = new ColorMatrix
-                            {
-                                Matrix33 = _uiLayers[layer].Opacity
-                            };
-
-                            imgAttributes = new ImageAttributes();
-                            imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                        }
-
-                        g.DrawImage(
-                            _uiLayers[layer].Image,
-                            new Rectangle(
-                                0, 0,
-                                img.Width,
-                                img.Height),
-                            0, 0,
-                            _uiLayers[layer].Image.Width,
-                            _uiLayers[layer].Image.Height,
-                            GraphicsUnit.Pixel,
-                            imgAttributes);
-                    }
-                }
-
-                g.Save();
-            }
-
-            imgScreen.Image = img;
-        }
-        catch (Exception ex)
-        {
-            LoggerHub.Current.Error(ex);
-        }
-    }
-
-    public void LayerVisibility(bool visible, params LayerScreenTypes[] layers)
-    {
-        foreach (var layer in layers)
-        {
-            if (layer == LayerScreenTypes.Base) continue;
-
-            _uiLayers[layer].Visible = visible;
-        }
-    }
-
-    public void LayerOpacity(float opacity, params LayerScreenTypes[] layers)
-    {
-        foreach (var layer in layers)
-        {
-            if (layer == LayerScreenTypes.Base) continue;
-
-            _uiLayers[layer].Opacity = opacity;
-            _uiLayers[layer].Visible = opacity != 0F;
         }
     }
 
@@ -1282,6 +1016,286 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         break;
                 }
     }
+
+    #endregion
+
+    #region Form/Control Methods
+
+    public FormBase GetForm(string? friendlyName = null)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as FormBase;
+
+        return _uiControls.Values
+            ?.Where(f => f is FormBase)
+            ?.FirstOrDefault() as FormBase;
+    }
+
+    public T GetForm<T>(string? friendlyName = null)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as T;
+
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
+    }
+
+    public void RegisterForm(string friendlyName, FormBase form)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryAdd(friendlyName, form);
+    }
+
+    public void RegisterForm<T>(string friendlyName, T form)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryAdd(friendlyName, form);
+    }
+
+    public void UnregisterForm(string friendlyName, FormBase form)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterForm<T>(string friendlyName, T form)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public Control GetControl(string? friendlyName = null)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as Control;
+
+        return _uiControls.Values
+            ?.Where(c => c is Control)
+            ?.FirstOrDefault() as Control;
+    }
+
+    public T GetControl<T>(string? friendlyName = null)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as T;
+
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
+    }
+
+    public void RegisterControl(string friendlyName, Control control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void RegisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void RegisterControl(string friendlyName, IDisposable control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void UnregisterControl(string friendlyName, Control control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterControl(string friendlyName, IDisposable control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void RefreshScreen(params LayerScreenTypes[] layers)
+    {
+        if (layers.Length > 0)
+            RefreshLayers(layers);
+
+        try
+        {
+            var isConnected = ConnectionState.IsConnected();
+            if (!isConnected)
+            {
+                foreach (var layer in _layerTypes)
+                {
+                    if (layer == LayerScreenTypes.Base) continue;
+
+                    _uiLayers[layer].Unload();
+                }
+
+                _uiLayers[LayerScreenTypes.Base].Load(
+                    LayerSourceTypes.Resource,
+                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png",
+                    this);
+            }
+            else if (layers.Contains(LayerScreenTypes.Base))
+            {
+                var filePath = null as string;
+
+                if (!string.IsNullOrWhiteSpace(MediaUrl) &&
+                    !string.IsNullOrWhiteSpace(ServerName) &&
+                    !string.IsNullOrWhiteSpace(RoomInfo.Picture))
+                {
+                    var fileName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(RoomInfo.Picture, @"_");
+                    filePath = Path.Combine(Environment.CurrentDirectory, "Media", fileName);
+
+                    if (!File.Exists(filePath))
+                    {
+                        var _serverName = RegexConstants.REGEX_FILESYSTEMCHARS.Replace(ServerName, @" ").Trim();
+                        filePath = Path.Combine(Environment.CurrentDirectory, "Media", _serverName, fileName);
+                    }
+
+                    if (File.Exists(filePath))
+                        _uiLayers[LayerScreenTypes.Base].Load(
+                            LayerSourceTypes.Filesystem,
+                            filePath,
+                            this);
+                }
+
+                if (RoomInfo.Picture !=
+                    _uiLayers[LayerScreenTypes.Base].Image?.Tag?.ToString())
+                    _uiLayers[LayerScreenTypes.Base].Load(
+                        LayerSourceTypes.Resource,
+                        "ThePalace.Media.Resources.backgrounds.clouds.jpg",
+                        this);
+            }
+        }
+        catch (Exception ex)
+        {
+            LoggerHub.Current.Error(ex);
+        }
+
+        if (GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
+
+        try
+        {
+            var img = null as Bitmap;
+            if (imgScreen.Image == null ||
+                imgScreen.Image.Width != ScreenWidth ||
+                imgScreen.Image.Height != ScreenHeight)
+            {
+                try
+                {
+                    imgScreen.Image?.Dispose();
+                }
+                catch
+                {
+                }
+
+                img = new Bitmap(ScreenWidth, ScreenHeight);
+                img.MakeTransparent(Color.Transparent);
+            }
+
+            using (var g = Graphics.FromImage(img))
+            {
+                g.InterpolationMode =
+                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
+                g.PixelOffsetMode =
+                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
+                g.SmoothingMode =
+                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+
+                g.Clear(Color.Transparent);
+
+                foreach (var layer in _layerTypes)
+                {
+                    if (!_uiLayers[layer].Visible ||
+                        _uiLayers[layer].Opacity == 0F ||
+                        _uiLayers[layer].Image == null) continue;
+
+                    using (var @lock = LockContext.GetLock(_uiLayers[layer]))
+                    {
+                        var imgAttributes = null as ImageAttributes;
+
+                        if (_uiLayers[layer].Opacity < 1.0F)
+                        {
+                            var matrix = new ColorMatrix
+                            {
+                                Matrix33 = _uiLayers[layer].Opacity
+                            };
+
+                            imgAttributes = new ImageAttributes();
+                            imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                        }
+
+                        g.DrawImage(
+                            _uiLayers[layer].Image,
+                            new Rectangle(
+                                0, 0,
+                                img.Width,
+                                img.Height),
+                            0, 0,
+                            _uiLayers[layer].Image.Width,
+                            _uiLayers[layer].Image.Height,
+                            GraphicsUnit.Pixel,
+                            imgAttributes);
+                    }
+                }
+
+                g.Save();
+            }
+
+            imgScreen.Image = img;
+        }
+        catch (Exception ex)
+        {
+            LoggerHub.Current.Error(ex);
+        }
+    }
+
+    public void LayerVisibility(bool visible, params LayerScreenTypes[] layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer == LayerScreenTypes.Base) continue;
+
+            _uiLayers[layer].Visible = visible;
+        }
+    }
+
+    public void LayerOpacity(float opacity, params LayerScreenTypes[] layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer == LayerScreenTypes.Base) continue;
+
+            _uiLayers[layer].Opacity = opacity;
+            _uiLayers[layer].Visible = opacity != 0F;
+        }
+    }
+
+    #endregion
 
     #endregion
 }

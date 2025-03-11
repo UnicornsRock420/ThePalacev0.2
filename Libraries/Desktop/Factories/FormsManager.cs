@@ -64,31 +64,30 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     {
         if (IsDisposed) return;
 
-        if (sender is FormBase _sender &&
-            UnregisterForm(_sender))
+        if (sender is not FormBase _sender ||
+            !UnregisterForm(_sender)) return;
+        
+        FormClosed?.Invoke(_sender, e);
+
+        var forms = null as List<FormBase>;
+        using (var @lock = LockContext.GetLock(_forms))
         {
-            FormClosed?.Invoke(_sender, e);
-
-            var forms = null as List<FormBase>;
-            using (var @lock = LockContext.GetLock(_forms))
-            {
-                forms = _forms?.Values?.ToList() ?? [];
-            }
-
-            var app = forms
-                //.Where(f => f.GetType().Name == "Program")
-                .FirstOrDefault();
-            if (!forms.Any(f =>
-                    f != app &&
-                    f is IFormDialog
-                ))
-                new TCF(
-                        false,
-                        TaskManager.Current,
-                        app,
-                        this)
-                    .Execute();
+            forms = _forms?.Values?.ToList() ?? [];
         }
+
+        var app = forms
+            //.Where(f => f.GetType().Name == "Program")
+            .FirstOrDefault();
+        if (!forms.Any(f =>
+                f != app &&
+                f is IFormDialog
+            ))
+            new TCF(
+                    false,
+                    TaskManager.Current,
+                    app,
+                    this)
+                .Execute();
     }
 
     public bool RegisterForm(FormBase form, bool assignFormClosedHandler = true)

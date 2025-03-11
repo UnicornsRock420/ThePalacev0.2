@@ -12,9 +12,7 @@ namespace ThePalace.Client.Desktop.Interfaces;
 
 public interface IDesktopSessionState : IClientSessionState, IUISessionState
 {
-    IReadOnlyDictionary<string, IDisposable> UIControls { get; }
     IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers { get; }
-
     bool Visible { get; set; }
     double Scale { get; set; }
     int ScreenWidth { get; set; }
@@ -34,6 +32,7 @@ public interface IDesktopSessionState : IClientSessionState, IUISessionState
     void LayerVisibility(bool visible, params LayerScreenTypes[] layers);
     void LayerOpacity(float opacity, params LayerScreenTypes[] layers);
 
+    IReadOnlyDictionary<string, IDisposable> UIControls { get; }
     FormBase GetForm(string? friendlyName = null);
     T GetForm<T>(string? friendlyName = null) where T : FormBase;
     void RegisterForm(string friendlyName, FormBase form);
