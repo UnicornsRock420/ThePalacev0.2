@@ -24,7 +24,7 @@ public class BO_ASSETREGI : IEventHandler<MSG_ASSETREGI>
 
         if (inboundPacket.AssetRec.AssetSpec.Id == 0) return null;
         
-        LoggerHub.Current.Info($"MSG_ASSETREGI[{@params.SourceID}]: {inboundPacket.AssetRec.AssetSpec.Id}, {inboundPacket.AssetRec.AssetSpec.Crc}");
+        LoggerHub.Current.Info(nameof(MSG_ASSETREGI) + $"[{@params.SourceID}]: {inboundPacket.AssetRec.AssetSpec.Id}, {inboundPacket.AssetRec.AssetSpec.Crc}");
 
         var assetStream = new AssetStream(inboundPacket.AssetRec);
             
