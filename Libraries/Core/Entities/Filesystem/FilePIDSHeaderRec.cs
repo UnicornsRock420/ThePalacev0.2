@@ -3,7 +3,7 @@ using sint32 = int;
 
 namespace ThePalace.Core.Entities.Filesystem;
 
-public struct FilePIDSHeaderRec
+public class FilePIDSHeaderRec
 {
     public AssetSpec AssetSpec;
     public sint32 dataOffset;

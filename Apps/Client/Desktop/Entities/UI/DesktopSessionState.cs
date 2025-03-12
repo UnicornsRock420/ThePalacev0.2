@@ -34,8 +34,8 @@ using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
-using RoomID = System.Int16;
-using UserID = System.Int32;
+using RoomID = short;
+using UserID = int;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 

@@ -8,7 +8,7 @@ using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
-using UserID = System.Int32;
+using UserID = int;
 
 namespace ThePalace.Network.Factories;
 

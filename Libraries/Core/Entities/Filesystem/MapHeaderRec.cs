@@ -4,7 +4,7 @@ using sint32 = int;
 namespace ThePalace.Core.Entities.Filesystem;
 
 [ByteSize(24)]
-public struct MapHeaderRec
+public class MapHeaderRec
 {
     public sint32 NbrTypes;
     public sint32 NbrAssets;

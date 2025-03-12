@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ThePalace.Common.Helpers;
+using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
+using ThePalace.Network.Helpers.Network;
 
 namespace ThePalace.Core.Helpers.Scripting;
 
@@ -469,10 +472,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -857,10 +858,8 @@ public static class IptscraeEngine
             {
                 "NBRUSERPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1428,10 +1427,8 @@ public static class IptscraeEngine
             {
                 "DEST", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     var index = iptTracking.Variables.TryGetValue("ME", out var variable)
                         ? (int)variable.Variable.Value
@@ -1479,10 +1476,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     var index = (int)register.Value;
                     if (index < 0) throw new Exception("Index out of bounds...");
@@ -1497,10 +1492,8 @@ public static class IptscraeEngine
             {
                 "NBRSPOTS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
                     //Value = sessionState.RoomInfo.HotSpots.Count,
@@ -1509,10 +1502,8 @@ public static class IptscraeEngine
             {
                 "NBRDOORS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
                     //Value = sessionState.RoomInfo.HotSpots
@@ -1525,10 +1516,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     var index = (int)register.Value;
                     if (index < 0) throw new Exception("Index out of bounds...");
@@ -1643,10 +1632,8 @@ public static class IptscraeEngine
             {
                 "WHOME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1661,10 +1648,8 @@ public static class IptscraeEngine
                     var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
                     var register2 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -1686,10 +1671,8 @@ public static class IptscraeEngine
                     var register1 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
                     var register2 = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -1722,10 +1705,8 @@ public static class IptscraeEngine
             {
                 "POSX", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1737,10 +1718,8 @@ public static class IptscraeEngine
             {
                 "POSY", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1752,10 +1731,8 @@ public static class IptscraeEngine
             {
                 "SERVERNAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1767,10 +1744,8 @@ public static class IptscraeEngine
             {
                 "ROOMNAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1782,10 +1757,8 @@ public static class IptscraeEngine
             {
                 "ROOMID", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1797,10 +1770,8 @@ public static class IptscraeEngine
             {
                 "USERNAME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1812,10 +1783,8 @@ public static class IptscraeEngine
             {
                 "NBRROOMUSERS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1827,10 +1796,8 @@ public static class IptscraeEngine
             {
                 "ISWIZARD", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1842,10 +1809,8 @@ public static class IptscraeEngine
             {
                 "ISGOD", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1857,10 +1822,8 @@ public static class IptscraeEngine
             {
                 "ISGUEST", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -1872,10 +1835,8 @@ public static class IptscraeEngine
             {
                 "NAKED", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //if (sessionState.UserInfo.assetSpec != null)
                     //    AssetsManager.Current.FreeAssets(
@@ -1893,15 +1854,15 @@ public static class IptscraeEngine
                     //        assetSpec = new(),
                     //    },
                     //});
+
+                    throw new NotImplementedException("NAKED");
                 })
             },
             {
                 "WHOTARGET", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //iptTracking.Stack.Push(new IptVariable
                     //{
@@ -1917,10 +1878,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -1930,6 +1889,8 @@ public static class IptscraeEngine
                     //        faceNbr = (short)(int)register.Value,
                     //    },
                     //});
+
+                    throw new NotImplementedException("SETFACE");
                 })
             },
             {
@@ -1937,10 +1898,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -1950,6 +1909,8 @@ public static class IptscraeEngine
                     //        colorNbr = (short)(int)register.Value,
                     //    },
                     //});
+
+                    throw new NotImplementedException("SETCOLOR");
                 })
             },
             {
@@ -1957,10 +1918,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //var sourceID = (UInt32)register.Value;
 
@@ -1979,67 +1938,53 @@ public static class IptscraeEngine
                     throw new NotImplementedException("WHONAME");
                 })
             },
-            { "WHOCHAT", (IptCommandFnc)((iptTracking, recursionDepth) => { }) },
+            { "WHOCHAT", (IptCommandFnc)((iptTracking, recursionDepth) => throw new NotImplementedException("WHOCHAT")) },
             {
                 "WHOPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    var register = getStack(iptTracking);
+                    var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    var user = (UserRec?)null;
 
                     switch (register.Type)
                     {
                         case IptVariableTypes.String:
                         {
-                            var key = register.Value.ToString();
-                            //var user = sessionState.RoomUsers.Values
-                            //    .Where(u => u.Name == key)
-                            //    .FirstOrDefault();
-                            //if (user == null) return;
-
-                            //iptTracking.Stack.Push(new IptVariable
-                            //{
-                            //    Type = IptVariableTypes.Integer,
-                            //    Value = user.RoomPos.HAxis,
-                            //});
-
-                            //iptTracking.Stack.Push(new IptVariable
-                            //{
-                            //    Type = IptVariableTypes.Integer,
-                            //    Value = user.RoomPos.VAxis,
-                            //});
+                            var key = register.Value?.ToString()?.Trim();
+                            //if (!string.IsNullOrWhiteSpace(key))
+                            //    user = sessionState.RoomUsers.Values
+                            //        .Where(u => u.Name == key)
+                            //        .FirstOrDefault();
                         }
 
                             break;
                         case IptVariableTypes.Integer:
                         {
-                            var sourceID = (uint)register.Value;
-
-                            var user = (UserRec?)null;
+                            var sourceID = (int)register.Value;
                             //if (sourceID > 0)
                             //    user = sessionState.RoomUsers.GetValueLocked(sourceID);
-
-                            if (user == null) return;
-
-                            iptTracking.Stack.Push(new IptVariable
-                            {
-                                Type = IptVariableTypes.Integer,
-                                Value = user.RoomPos.HAxis
-                            });
-
-                            iptTracking.Stack.Push(new IptVariable
-                            {
-                                Type = IptVariableTypes.Integer,
-                                Value = user.RoomPos.VAxis
-                            });
                         }
 
                             break;
                         default: throw new Exception($"Wrong datatype {register.Type}...");
                     }
+
+                    if (user == null) return;
+
+                    iptTracking.Stack.Push(new IptVariable
+                    {
+                        Type = IptVariableTypes.Integer,
+                        Value = user.RoomPos.HAxis,
+                    });
+
+                    iptTracking.Stack.Push(new IptVariable
+                    {
+                        Type = IptVariableTypes.Integer,
+                        Value = user.RoomPos.VAxis,
+                    });
                 })
             },
             {
@@ -2047,10 +1992,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     var index = (int)register.Value;
                     if (index < 0) throw new Exception("Index out of bounds...");
@@ -2070,19 +2013,15 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
-
-                    //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
-                    //{
-                    //    eventType = Core.Enums.EventTypes.MSG_ROOMGOTO,
-                    //    protocolSend = new MSG_ROOMGOTO
-                    //    {
-                    //        dest = (short)(int)register.Value,
-                    //    },
-                    //});
+                    sessionState.Send(
+                        0,
+                        new MSG_ROOMGOTO
+                        {
+                            Dest = (short)register.Value,
+                        });
                 })
             },
             // End User Commands
@@ -2090,9 +2029,11 @@ public static class IptscraeEngine
             {
                 "LAUNCHAPP", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    var register = popStack(iptTracking);
+                    var register = popStack(iptTracking, IptVariableTypes.String);
 
                     // Effectively does nothing, just for legacy support
+
+                    throw new NotImplementedException("LAUNCHAPP");
                 })
             },
             {
@@ -2100,18 +2041,21 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     var value = 1F - (int)register.Value / 100F;
-
-                    if (value > 1F) value = 1F;
-                    else if (value < 0) value = 0F;
+                    value = value switch
+                    {
+                        > 1F => 1F,
+                        < 0 => 0F,
+                        _ => value
+                    };
 
                     //sessionState.LayerOpacity(value, ScreenLayers.DimRoom);
                     //sessionState.RefreshScreen(ScreenLayers.DimRoom);
+
+                    throw new NotImplementedException("DIMROOM");
                 })
             },
             {
@@ -2125,12 +2069,12 @@ public static class IptscraeEngine
             {
                 "BEEP", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Audio, null, sessionState, AudioCommandTypes.BEEP);
+
+                    throw new NotImplementedException("BEEP");
                 })
             },
             {
@@ -2169,10 +2113,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.SEND, new MSG_Header
                     //{
@@ -2182,6 +2124,8 @@ public static class IptscraeEngine
                     //        targetID = (uint)register.Value,
                     //    },
                     //});
+
+                    throw new NotImplementedException("KILLUSER");
                 })
             },
             {
@@ -2307,10 +2251,8 @@ public static class IptscraeEngine
                 "NBRSERVERUSERS",
                 (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable
                     {
@@ -2797,10 +2739,8 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //ThreadManager.Current.Enqueue(ThreadQueues.Network, null, sessionState, NetworkCommandTypes.CONNECT, register.Value.ToString());
                 })
@@ -2808,10 +2748,8 @@ public static class IptscraeEngine
             {
                 "DISCONNECT", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    if (!iptTracking.Variables.ContainsKey("SESSIONSTATE")) return;
-
-                    var sessionState = iptTracking.Variables["SESSIONSTATE"].Variable.GetValue<ISessionState>();
-                    if (sessionState == null) return;
+                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
+                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     //NetworkManager.Current.Disconnect(sessionState);
                 })
@@ -3977,5 +3915,45 @@ public static class IptscraeEngine
             }
 
         return result;
+    }
+
+    public static void RegisterAlias(params KeyValuePair<string, string>[] aliases)
+    {
+        foreach (var alias in aliases)
+        {
+            IptCommands.TryAdd(alias.Key, alias.Value);
+        }
+    }
+
+    public static void RegisterCommand(params KeyValuePair<string, IptCommandFnc>[] commands)
+    {
+        foreach (var cmd in commands)
+        {
+            IptCommands.TryAdd(cmd.Key, cmd.Value);
+        }
+    }
+
+    public static void RegisterOperator(params KeyValuePair<string, IptOperator>[] operators)
+    {
+        foreach (var op in operators)
+        {
+            IptOperators.TryAdd(op.Key, op.Value);
+        }
+    }
+
+    public static void UnregisterCommand(params string[] commands)
+    {
+        foreach (var cmd in commands)
+        {
+            IptCommands.TryRemove(cmd, out var _);
+        }
+    }
+
+    public static void UnregisterOperator(params string[] operators)
+    {
+        foreach (var op in operators)
+        {
+            IptOperators.TryRemove(op, out var _);
+        }
     }
 }

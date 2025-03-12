@@ -6,7 +6,7 @@ public interface ISessionState : IDisposable
 {
     Guid Id { get; }
     IConnectionState? ConnectionState { get; set; }
-    
+
     object? SessionTag { get; set; }
 
     string? MediaUrl { get; set; }

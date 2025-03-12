@@ -45,11 +45,11 @@ using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
-using AssetID = System.Int32;
+using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
-using HotspotID = System.Int16;
+using HotspotID = short;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
-using UserID = System.Int32;
+using UserID = int;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Microsoft.Toolkit.Uwp.Notifications;

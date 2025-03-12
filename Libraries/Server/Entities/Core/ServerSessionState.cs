@@ -4,8 +4,8 @@ using ThePalace.Common.Server.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Interfaces;
-using RoomID = System.Int16;
-using UserID = System.Int32;
+using RoomID = short;
+using UserID = int;
 
 namespace ThePalace.Common.Server.Entities.Core;
 
