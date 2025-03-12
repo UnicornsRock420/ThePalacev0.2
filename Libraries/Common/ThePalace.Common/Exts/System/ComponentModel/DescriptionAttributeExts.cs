@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace ThePalace.Common.Exts.System.ComponentModel;
+namespace System.ComponentModel;
 
 public static class DescriptionAttributeExts
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Specialized;
 
-namespace ThePalace.Common.Exts.System.Collections.Specialized;
+namespace System.Collections.Specialized;
 
 public static class NameValueCollectionExts
 {

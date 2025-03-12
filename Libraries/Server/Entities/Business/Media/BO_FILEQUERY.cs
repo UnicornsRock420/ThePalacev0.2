@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Client.Media;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Client.Media;
+namespace ThePalace.Common.Server.Entities.Business.Media;
 
 [Mnemonic("qFil")]
 public class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>

@@ -1,4 +1,4 @@
-﻿using ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
+﻿using ThePalace.Common.Client.Entities.Business.ServerInfo;
 using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Factories.Core;

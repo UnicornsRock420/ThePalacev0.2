@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Assets;
+namespace ThePalace.Common.Client.Entities.Business.Assets;
 
 [Mnemonic("dPrp")]
 public class BO_PROPDEL : IEventHandler<MSG_PROPDEL>

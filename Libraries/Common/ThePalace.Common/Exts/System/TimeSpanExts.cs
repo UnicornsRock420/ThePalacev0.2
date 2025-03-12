@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Exts.System;
+﻿namespace System;
 
 public static class TimeSpanExts
 {

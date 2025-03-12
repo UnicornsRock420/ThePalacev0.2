@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
@@ -14,7 +15,6 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Factories.System.Collections.Concurrent;

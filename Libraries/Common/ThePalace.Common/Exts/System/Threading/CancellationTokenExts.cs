@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Exts.System.Threading;
+﻿namespace System.Threading;
 
 public static class CancellationTokenExts
 {

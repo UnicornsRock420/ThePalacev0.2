@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Mapster;
 
-namespace ThePalace.Common.Exts.System;
+namespace System;
 
 public static class ObjectExts
 {

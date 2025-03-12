@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Communications;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Communications;
+namespace ThePalace.Common.Client.Entities.Business.Communications;
 
 [Mnemonic("whis")]
 public class BO_WHISPER : IEventHandler<MSG_WHISPER>

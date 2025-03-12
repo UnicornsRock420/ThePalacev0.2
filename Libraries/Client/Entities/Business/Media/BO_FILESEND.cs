@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Server.Media;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.Media;
+namespace ThePalace.Common.Client.Entities.Business.Media;
 
 [Mnemonic("sFil")]
 public class BO_FILESEND : IEventHandler<MSG_FILESEND>

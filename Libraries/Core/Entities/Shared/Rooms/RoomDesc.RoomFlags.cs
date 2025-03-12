@@ -1,5 +1,5 @@
-﻿using System.Runtime.Serialization;
-using ThePalace.Common.Exts.System;
+﻿using System;
+using System.Runtime.Serialization;
 using ThePalace.Core.Enums;
 using sint32 = int;
 

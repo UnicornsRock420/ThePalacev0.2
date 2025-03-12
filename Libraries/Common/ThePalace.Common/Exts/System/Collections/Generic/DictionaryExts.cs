@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using ThePalace.Common.Factories.Core;
 
-namespace ThePalace.Common.Exts.System.Collections.Generic;
+namespace System.Collections.Generic;
 
 public static class DictionaryExts
 {

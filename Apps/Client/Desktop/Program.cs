@@ -1,4 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -12,10 +16,6 @@ using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Enums.App;
-using ThePalace.Common.Exts.System;
-using ThePalace.Common.Exts.System.Collections.Concurrent;
-using ThePalace.Common.Exts.System.Collections.Generic;
-using ThePalace.Common.Exts.System.ComponentModel;
 using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Helpers;
@@ -45,10 +45,10 @@ using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
-using Connection = ThePalace.Client.Desktop.Forms.Connection;
-using RegexConstants = ThePalace.Core.Constants.RegexConstants;
 using AssetID = System.Int32;
+using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = System.Int16;
+using RegexConstants = ThePalace.Core.Constants.RegexConstants;
 using UserID = System.Int32;
 
 #if WINDOWS10_0_17763_0_OR_GREATER

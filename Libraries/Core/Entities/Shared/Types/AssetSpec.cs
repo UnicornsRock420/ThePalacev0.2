@@ -1,8 +1,7 @@
-﻿using ThePalace.Common.Exts.System;
-using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
-using sint32 = int;
+using AssetID = int;
 using uint32 = uint;
 
 namespace ThePalace.Core.Entities.Shared.Types;
@@ -10,9 +9,8 @@ namespace ThePalace.Core.Entities.Shared.Types;
 [ByteSize(8)]
 public class AssetSpec : IStructSerializer
 {
+    public AssetID Id;
     public uint32 Crc;
-
-    public sint32 Id;
 
     public AssetSpec()
     {
@@ -20,13 +18,13 @@ public class AssetSpec : IStructSerializer
         Crc = 0;
     }
 
-    public AssetSpec(sint32 Id)
+    public AssetSpec(AssetID Id)
     {
         this.Id = Id;
         Crc = 0;
     }
 
-    public AssetSpec(sint32 Id, uint32 Crc)
+    public AssetSpec(AssetID Id, uint32 Crc)
     {
         this.Id = Id;
         this.Crc = Crc;

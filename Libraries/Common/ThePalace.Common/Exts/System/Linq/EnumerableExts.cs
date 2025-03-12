@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Exts.System.Linq;
+﻿namespace System.Linq;
 
 public static class EnumerableExts
 {

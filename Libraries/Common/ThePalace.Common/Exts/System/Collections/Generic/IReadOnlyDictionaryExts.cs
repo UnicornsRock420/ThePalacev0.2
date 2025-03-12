@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Exts.System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
 public static class IReadOnlyDictionaryExts
 {

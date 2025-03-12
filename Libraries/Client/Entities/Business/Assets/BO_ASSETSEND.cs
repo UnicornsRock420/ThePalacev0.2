@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Server.Assets;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.Assets;
+namespace ThePalace.Common.Client.Entities.Business.Assets;
 
 [Mnemonic("sAst")]
 public class BO_ASSETSEND : IEventHandler<MSG_ASSETSEND>
