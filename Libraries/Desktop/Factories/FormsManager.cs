@@ -1,10 +1,8 @@
-﻿using System;
+﻿using System.Collections.Concurrent;
 using ThePalace.Common.Desktop.Entities.UI;
-using ThePalace.Common.Desktop.Factories.System.Windows.Forms;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Logging.Entities;
 
@@ -16,7 +14,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
     public FormsManager()
     {
-        ThreadExit += (sender, e) => this.Dispose();
+        ThreadExit += (sender, e) => Dispose();
 
         _managedResources.AddRange(
             _forms,

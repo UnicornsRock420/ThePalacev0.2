@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.Text.RegularExpressions;
 using Windows.Foundation.Metadata;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
@@ -748,8 +746,8 @@ public class MsgBubble : Disposable, IDisposable
         {
             if (Text.Length < 1) return null;
 
-            var px = (short)this.Origin.X;
-            var py = (short)this.Origin.Y;
+            var px = (short)Origin.X;
+            var py = (short)Origin.Y;
 
             var offsetX = _defaultOffset;
             var x = (short)(Origin.X + offsetX);

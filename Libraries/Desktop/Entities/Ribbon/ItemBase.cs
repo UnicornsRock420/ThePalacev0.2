@@ -1,5 +1,4 @@
-﻿using System;
-using System.Reflection;
+﻿using System.Reflection;
 using ThePalace.Common.Desktop.Entities.Core;
 
 namespace ThePalace.Common.Desktop.Entities.Ribbon;

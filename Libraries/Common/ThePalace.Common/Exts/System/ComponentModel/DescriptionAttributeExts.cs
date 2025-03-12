@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace System.ComponentModel;
+﻿namespace System.ComponentModel;
 
 public static class DescriptionAttributeExts
 {

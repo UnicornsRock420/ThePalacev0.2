@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-
-namespace System.Collections.Specialized;
+﻿namespace System.Collections.Specialized;
 
 public static class NameValueCollectionExts
 {

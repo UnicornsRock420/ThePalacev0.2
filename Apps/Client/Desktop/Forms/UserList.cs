@@ -11,6 +11,6 @@ public partial class UserList : FormBase
 
     ~UserList()
     {
-        this.Dispose();
+        Dispose();
     }
 }

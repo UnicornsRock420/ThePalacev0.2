@@ -11,6 +11,6 @@ public partial class RoomList : FormBase
 
     ~RoomList()
     {
-        this.Dispose();
+        Dispose();
     }
 }

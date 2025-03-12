@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -15,9 +15,8 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
+using ThePalace.Common.Enums.App;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System.Collections;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
@@ -28,6 +27,7 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers.Core;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Helpers.Network;
@@ -104,6 +104,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region Object Info
 
+    public IApp<ISessionState> App { get; set; }
     public Guid Id { get; } = Guid.NewGuid();
     public DateTime? LastActivity { get; set; }
 
@@ -249,7 +250,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         if (IsDisposed) return;
 
         if (this == sender)
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            ((Job<ActionCmd>)App.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
             {
                 CmdFnc = a =>
                 {
@@ -269,7 +270,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         if (IsDisposed) return;
 
         if (this == sender)
-            ((Job<ActionCmd>)Program.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            ((Job<ActionCmd>)App.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
             {
                 CmdFnc = a =>
                 {
@@ -879,10 +880,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             var y = UserDesc.UserInfo.RoomPos.VAxis;
 
             if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
-            else if (x > this.ScreenWidth + CONST_INT_halfPropWidth) x = (short)(this.ScreenWidth + CONST_INT_halfPropWidth);
+            else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = (short)(ScreenWidth + CONST_INT_halfPropWidth);
 
             if (y < -CONST_INT_halfPropHeight) y = (short)-CONST_INT_halfPropHeight;
-            else if (y > this.ScreenHeight + CONST_INT_halfPropHeight) y = (short)(this.ScreenHeight + CONST_INT_halfPropHeight);
+            else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = (short)(ScreenHeight + CONST_INT_halfPropHeight);
 
             if (x < 0 ||
                 y < 0) continue;

@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using ThePalace.Common.Factories.System.Collections;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Users;
@@ -10,6 +10,7 @@ namespace ThePalace.Core.Entities.Core;
 
 public class SessionState : Disposable, ISessionState
 {
+    public IApp<ISessionState> App { get; set; }
     public Guid Id { get; } = Guid.NewGuid();
     public DateTime? LastActivity { get; set; }
     public IConnectionState? ConnectionState { get; set; } = null;

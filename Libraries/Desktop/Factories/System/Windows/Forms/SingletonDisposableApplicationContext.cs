@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Factories.System.Windows.Forms;
+﻿namespace System.Windows.Forms;
 
 public abstract class SingletonDisposableApplicationContext<T> : DisposableApplicationContext
     where T : class, new()

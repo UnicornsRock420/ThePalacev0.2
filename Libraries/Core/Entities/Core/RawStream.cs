@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Core.Exts;
+﻿using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = int;
 using uint8 = byte;
@@ -479,12 +478,12 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
     public void SetData(IEnumerable<uint8>? data = null)
     {
-        this._stream = new MemoryStream(data?.ToArray() ?? []);
+        _stream = new MemoryStream(data?.ToArray() ?? []);
     }
 
     public void SetData(uint8[]? data = null)
     {
-        this._stream = new MemoryStream(data ?? []);
+        _stream = new MemoryStream(data ?? []);
     }
 
     public void AppendBytes(uint8[]? data = null)

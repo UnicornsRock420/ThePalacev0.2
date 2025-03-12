@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Core.Entities.Shared.Types;
+﻿using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
 

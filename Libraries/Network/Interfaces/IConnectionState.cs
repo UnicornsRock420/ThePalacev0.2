@@ -22,11 +22,18 @@ public interface IConnectionState : IDisposable
     BufferStream? BytesSend { get; set; }
 
     internal Socket? Socket { get; set; }
-    public NetworkStream? NetworkStream { get; set; }
+    internal NetworkStream? NetworkStream { get; set; }
 
     object? ConnectionTag { get; set; }
 
     bool IsConnected(int passiveIdleTimeoutInSeconds = 750);
+    
+    void Connect(IPEndPoint hostAddr);
+    void Connect(IPAddress ipAddress, int port);
+    void Connect(Uri uri);
+    
+    int Read(byte[] buffer, int offset = 0, int length = 0);
+    void Write(byte[] buffer, int offset = 0, int length = 0, bool directAccess = false);
     
     void Disconnect();
 }

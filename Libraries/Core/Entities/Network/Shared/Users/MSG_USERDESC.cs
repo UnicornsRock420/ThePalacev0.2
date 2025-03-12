@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.Types;

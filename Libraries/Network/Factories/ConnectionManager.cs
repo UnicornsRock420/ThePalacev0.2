@@ -2,10 +2,8 @@
 using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System;
 using ThePalace.Network.Enums;
 using ThePalace.Network.Exts.System.Net.Sockets;
-using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
 using UserID = int;
@@ -164,43 +162,5 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         instance?.Register(result);
 
         return result;
-    }
-
-    public static void Connect(IConnectionState connectionState, IPEndPoint hostAddr)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
-
-        connectionState.Socket = CreateSocket(AddressFamily.InterNetwork);
-        connectionState.Socket.Connect(hostAddr);
-
-        connectionState.NetworkStream = CreateNetworkStream(connectionState.Socket);
-
-        connectionState.Direction = SocketDirection.Outbound;
-        connectionState.HostAddr = hostAddr;
-    }
-
-    public static void Connect(IConnectionState connectionState, IPAddress ipAddress, int port)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
-
-        Connect(connectionState, new IPEndPoint(ipAddress, port));
-    }
-
-    public static void Connect(IConnectionState connectionState, string hostname, int port)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
-
-        var ipAddr = hostname.Resolve();
-        if (ipAddr != null)
-        {
-            Connect(connectionState, ipAddr, port);
-        }
-    }
-
-    public static void Connect(IConnectionState connectionState, Uri url)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(ConnectionManager) + "." + nameof(connectionState));
-
-        Connect(connectionState, url.Host, url.Port);
     }
 }

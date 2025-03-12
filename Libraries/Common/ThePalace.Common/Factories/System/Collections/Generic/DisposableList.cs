@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Factories.System.Collections.Generic;
+﻿namespace System.Collections.Generic;
 
 public class DisposableList<T> : List<T>, IDisposable
     where T : IDisposable

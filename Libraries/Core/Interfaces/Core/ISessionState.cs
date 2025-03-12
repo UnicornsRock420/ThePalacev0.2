@@ -4,6 +4,8 @@ namespace ThePalace.Core.Interfaces.Core;
 
 public interface ISessionState : IDisposable
 {
+    IApp<ISessionState> App { get; set; }
+
     Guid Id { get; }
     IConnectionState? ConnectionState { get; set; }
 

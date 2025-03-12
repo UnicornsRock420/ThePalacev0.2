@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using ThePalace.Common.Helpers;
@@ -13,7 +10,6 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Helpers.Network;
 
 namespace ThePalace.Core.Helpers.Scripting;
 

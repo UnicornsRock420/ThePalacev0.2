@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
@@ -16,8 +13,6 @@ using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Enums.App;
-using ThePalace.Common.Factories.System.Collections;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
@@ -43,7 +38,6 @@ using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
@@ -57,7 +51,7 @@ using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace ThePalace.Client.Desktop;
 
-public class Program : Disposable, IApp<IDesktopSessionState>
+public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 {
     /// <summary>
     ///     The main entry point for the application.
@@ -78,12 +72,11 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 t.Namespace?.StartsWith("ThePalace.Common.Client.Entities.Business") == true)
             .ToArray());
 
-        var app = (Program?)null;
-        var job = (IJob?)null;
+        var jobs = new Dictionary<ThreadQueues, IJob>();
 
         #region Jobs
 
-        job = TaskManager.Current.CreateJob<ActionCmd>(q =>
+        jobs[ThreadQueues.GUI] = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var cmd)) return;
@@ -98,31 +91,24 @@ public class Program : Disposable, IApp<IDesktopSessionState>
             {
                 Enabled = true
             });
-        if (job != null)
+        ((Job<ActionCmd>)jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
         {
-            _jobs[ThreadQueues.GUI] = job;
+            CmdFnc = a => Current,
+        });
 
-            ((Job<ActionCmd>)job).Enqueue(new ActionCmd
+        jobs[ThreadQueues.Network] = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
-                CmdFnc = a =>
-                {
-                    app = new Program();
-
-                    return null;
-                }
-            });
-        }
-
-        job = TaskManager.Current.CreateJob<ActionCmd>(q =>
-            {
-                var cancellationToken = CancellationTokenFactory.NewToken();
-
-                while ((app?.SessionState?.ConnectionState?.IsConnected() ?? false) &&
+                while ((Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
                        !q.IsEmpty)
                 {
+                    var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+
                     Task.WaitAll(
                         TaskManager.StartMany(
                             cancellationToken.Token,
+
+                            #region Command Processor Sub-Task
+
                             async () =>
                             {
                                 while (!cancellationToken.IsCancellationRequested)
@@ -131,144 +117,147 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                         switch ((NetworkCommandTypes)cmd.Flags)
                                         {
                                             case NetworkCommandTypes.CONNECT:
-                                                ConnectionManager.Connect(app.SessionState.ConnectionState, cmd.Values[0] as Uri);
+                                                Current.SessionState.ConnectionState.Connect(cmd.Values[0] as Uri);
                                                 return;
                                             case NetworkCommandTypes.DISCONNECT:
                                             default:
-                                                app.SessionState.ConnectionState.Disconnect();
-                                                cancellationToken.Cancel();
+                                                Current.SessionState.ConnectionState.Disconnect();
                                                 return;
                                         }
 
-                                    if (q.IsEmpty)
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                    if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
+                                        q.IsEmpty)
                                         await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
                                 }
                             },
+
+                            #endregion
+
+                            #region Process BytesSend Processor Sub-Task
+
                             async () =>
                             {
                                 while (!cancellationToken.IsCancellationRequested &&
-                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                       (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
                                 {
-                                    var delay = 0;
+                                    var delay = RndGenerator.Next(150, 350);
 
-                                    if ((app?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                    if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                     {
-                                        var msgBytes = app?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-
-                                        app.SessionState.ConnectionState.Send(msgBytes);
+                                        var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                        Current.SessionState.ConnectionState.Send(msgBytes);
 
                                         delay = RndGenerator.Next(75, 150);
                                     }
-                                    else
-                                    {
-                                        delay = RndGenerator.Next(150, 350);
-                                    }
+
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
 
                                     await Task.Delay(delay, cancellationToken.Token);
                                 }
                             },
+
+                            #endregion
+
+                            #region Process BytesReceived Processor Sub-Task
+
                             async () =>
                             {
                                 while (!cancellationToken.IsCancellationRequested &&
-                                       (app?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                       (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
                                 {
-                                    var delay = 0;
+                                    var delay = RndGenerator.Next(150, 350);
 
-                                    if ((app?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                    if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                                     {
-                                        var msgBytes = app?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
-
-                                        var msgHeader = new MSG_Header();
-                                        var msgObj = (IProtocol?)null;
-                                        var msgType = (Type?)null;
-
+                                        var msgBytes = Current?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
                                         using (var ms = new MemoryStream(msgBytes))
                                         {
+                                            var msgHeader = new MSG_Header();
                                             ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
 
                                             var eventType = msgHeader.EventType.ToString();
-                                            msgType = AppDomain.CurrentDomain
-                                                .GetAssemblies()
-                                                .Where(a => a.FullName.StartsWith("ThePalace"))
-                                                .SelectMany(t => t.GetTypes())
-                                                .Where(t => t.Name == eventType)
-                                                .FirstOrDefault();
-                                            if (msgType != null)
-                                            {
-                                                msgObj = (IProtocol?)msgType.GetInstance();
+                                            var msgType = AppDomain.CurrentDomain.GetAssemblies()
+                                                ?.Where(a => a.FullName.StartsWith("ThePalace"))
+                                                ?.SelectMany(t => t.GetTypes())
+                                                ?.Where(t => t.Name == eventType)
+                                                ?.FirstOrDefault();
+                                            if (msgType == null) throw new InvalidDataException(nameof(msgType));
 
-                                                ms.PalaceDeserialize(
-                                                    msgObj,
-                                                    msgType);
-                                            }
+                                            var msgObj = (IProtocol?)msgType.GetInstance();
+                                            if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
+
+                                            ms.PalaceDeserialize(
+                                                msgObj,
+                                                msgType);
+
+                                            var boType = EventBus.Current.GetType(msgObj);
+                                            if (boType == null) throw new InvalidDataException(nameof(msgType));
+
+                                            EventBus.Current.Publish(
+                                                Current,
+                                                boType,
+                                                new ProtocolEventParams
+                                                {
+                                                    SourceID = Current?.SessionState?.UserId ?? 0,
+                                                    RefNum = msgHeader.RefNum,
+                                                    Request = msgObj
+                                                });
                                         }
-
-                                        var boType = EventBus.Current.GetType(msgObj);
-
-                                        EventBus.Current.Publish(
-                                            typeof(Program),
-                                            boType,
-                                            new ProtocolEventParams
-                                            {
-                                                SourceID = (int)(app?.SessionState?.UserId ?? 0),
-                                                RefNum = msgHeader.RefNum,
-                                                Request = msgObj
-                                            });
 
                                         delay = RndGenerator.Next(75, 150);
                                     }
-                                    else
-                                    {
-                                        delay = RndGenerator.Next(150, 350);
-                                    }
+
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
 
                                     await Task.Delay(delay, cancellationToken.Token);
                                 }
-                            }), cancellationToken.Token);
+                            }
+
+                            #endregion
+
+                        ), cancellationToken.Token);
                 }
             },
-            null,
-            RunOptions.UseSleepInterval,
-            TimeSpan.FromMilliseconds(500));
-        if (job != null)
-        {
-            _jobs[ThreadQueues.Network] = job;
+            opts: RunOptions.UseSleepInterval,
+            sleepInterval: TimeSpan.FromMilliseconds(500));
 
-            AsyncTcpSocket.DataReceived += (o, a) => _jobs[ThreadQueues.Network].ResetEvent.Set();
-        }
+        jobs[ThreadQueues.Assets] = TaskManager.Current.CreateJob<AssetCmd>(async q =>
+            {
+                if (q.IsEmpty ||
+                    !q.TryDequeue(out var assetCmd)) return;
 
-        job = TaskManager.Current.CreateJob<MediaCmd>(q =>
+                var assetDesc = AssetsManager.Current.GetAsset(Current.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
+                if (assetDesc is not { Image: null }) return;
+
+                await AssetDesc.Render(assetDesc);
+            },
+            opts: RunOptions.UseResetEvent);
+
+        jobs[ThreadQueues.Media] = TaskManager.Current.CreateJob<MediaCmd>(q =>
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var mediaCmd)) return;
 
                 // TODO: Media
             },
-            null,
-            RunOptions.UseResetEvent);
-        if (job != null) _jobs[ThreadQueues.Media] = job;
+            opts: RunOptions.UseResetEvent);
 
-        job = TaskManager.Current.CreateJob<AssetCmd>(async q =>
+        jobs[ThreadQueues.Audio] = TaskManager.Current.CreateJob<MediaCmd>(async q =>
             {
                 if (q.IsEmpty ||
-                    !q.TryDequeue(out var assetCmd)) return;
+                    !q.TryDequeue(out var mediaCmd)) return;
 
-                var assetDesc = AssetsManager.Current.GetAsset(app.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
-                if (assetDesc is not { Image: null }) return;
-
-                await AssetDesc.Render(assetDesc);
+                // TODO: Audio
             },
-            null,
-            RunOptions.UseResetEvent);
-        if (job != null) _jobs[ThreadQueues.Assets] = job;
+            opts: RunOptions.UseResetEvent);
 
-        job = TaskManager.Current.CreateJob(q => TaskManager.Current.Run(resources: FormsManager.Current),
-            null,
-            RunOptions.UseSleepInterval | RunOptions.RunNow);
-        if (job != null) _jobs[ThreadQueues.Core] = job;
+        jobs[ThreadQueues.Core] = TaskManager.Current.CreateJob<AssetCmd>(q => TaskManager.Current.Run(resources: FormsManager.Current),
+            opts: RunOptions.UseSleepInterval | RunOptions.RunNow,
+            sleepInterval: TimeSpan.FromMilliseconds(500));
 
-
-        job = TaskManager.Current.CreateJob<ToastCfg>(q =>
+        jobs[ThreadQueues.Toast] = TaskManager.Current.CreateJob<ToastCfg>(q =>
             {
                 if (!q.IsEmpty &&
                     q.TryDequeue(out var toastArgs))
@@ -296,9 +285,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     toast.Show(t => { t.ExpirationTime = toastArgs.ExpirationTime; });
                 }
             },
-            null,
-            RunOptions.UseResetEvent);
-        if (job != null) _jobs[ThreadQueues.Assets] = job;
+            opts: RunOptions.UseResetEvent);
 
         #endregion
 
@@ -313,6 +300,11 @@ public class Program : Disposable, IApp<IDesktopSessionState>
             SessionState);
 
         Initialize();
+    }
+
+    public Program(Dictionary<ThreadQueues, IJob> jobs) : this()
+    {
+        _jobs = new(jobs);
     }
 
     ~Program()
@@ -356,13 +348,13 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
     public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
 
-    private static readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+    private readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
-    public static IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
+    public IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
 
     #region Form Methods
 
-    public static void RefreshScreen(object sender, EventArgs e)
+    public void RefreshScreen(object sender, EventArgs e)
     {
         if (sender is not IDesktopSessionState sessionState) return;
 

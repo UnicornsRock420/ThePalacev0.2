@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using ThePalace.Core.Enums;
 using uint16 = ushort;
 

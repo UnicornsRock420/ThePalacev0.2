@@ -13,12 +13,16 @@ public static class AsyncPalaceSocket
             nameof(AsyncPalaceSocket) + "." + nameof(sessionState));
         ArgumentNullException.ThrowIfNull(obj, nameof(AsyncPalaceSocket) + "." + nameof(obj));
 
-        (directAccess
-                ? (Stream?)sessionState.ConnectionState.NetworkStream
-                : (Stream?)sessionState.ConnectionState.BytesSend)
-            ?.PalaceSerialize(
+        using (var ms = new MemoryStream())
+        {
+            ms.PalaceSerialize(
                 refNum,
                 obj,
                 opts: SerializerOptions.IncludeHeader);
+            
+            sessionState.ConnectionState.Write(
+                ms.ToArray(),
+                directAccess: directAccess);
+        }
     }
 }

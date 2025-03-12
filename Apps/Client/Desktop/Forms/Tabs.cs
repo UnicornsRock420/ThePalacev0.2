@@ -11,6 +11,6 @@ public partial class Tabs : FormBase
 
     ~Tabs()
     {
-        this.Dispose();
+        Dispose();
     }
 }

@@ -1,12 +1,11 @@
-﻿using System.Drawing.Drawing2D;
-using ThePalace.Client.Desktop.Enums;
+﻿using System.Collections.Concurrent;
+using System.Drawing.Drawing2D;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Factories;
+using ThePalace.Common.Enums.App;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Factories.System;
-using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Network.Shared.Assets;
@@ -233,7 +232,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
             {
                 if (value.Image != null) return value;
 
-                var job = (Job<AssetCmd>)Program.Jobs[ThreadQueues.Assets];
+                var job = (Job<AssetCmd>)sessionState.App.Jobs[ThreadQueues.Assets];
 
                 if (job.Queue?.ToList()?.Any(i =>
                         i.AssetDesc?.AssetRec?.AssetSpec?.Id ==

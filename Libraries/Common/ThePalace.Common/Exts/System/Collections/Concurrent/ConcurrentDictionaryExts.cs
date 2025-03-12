@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using ThePalace.Common.Factories.Core;
+﻿using ThePalace.Common.Factories.Core;
 
 namespace System.Collections.Concurrent;
 

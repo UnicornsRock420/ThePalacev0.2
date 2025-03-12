@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Common.Helpers;
+﻿using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Entities.Network.Shared.Network;

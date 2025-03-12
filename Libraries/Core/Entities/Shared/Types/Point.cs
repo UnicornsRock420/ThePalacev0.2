@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Common.Helpers;
+﻿using ThePalace.Common.Helpers;
 using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;

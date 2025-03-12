@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
-using ThePalace.Common.Factories.System;
 using ILogger = Serilog.ILogger;
 
 namespace ThePalace.Logging.Entities;

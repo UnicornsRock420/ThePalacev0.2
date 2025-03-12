@@ -11,6 +11,6 @@ public partial class Connection : FormBase
 
     ~Connection()
     {
-        this.Dispose();
+        Dispose();
     }
 }

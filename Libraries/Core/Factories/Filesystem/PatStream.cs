@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
 using ThePalace.Core.Entities.Shared.Rooms;

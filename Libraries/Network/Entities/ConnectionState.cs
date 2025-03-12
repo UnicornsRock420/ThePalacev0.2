@@ -5,6 +5,8 @@ using ThePalace.Logging.Entities;
 using ThePalace.Network.Constants;
 using ThePalace.Network.Enums;
 using ThePalace.Network.Exts.System.Net.Sockets;
+using ThePalace.Network.Factories;
+using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Network.Entities;
@@ -133,6 +135,60 @@ public class ConnectionState : EventArgs, IConnectionState
         }
 
         return Socket?.Connected ?? false;
+    }
+
+
+    public void Connect(IPEndPoint hostAddr)
+    {
+        Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
+        Socket.Connect(hostAddr);
+
+        NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
+
+        Direction = SocketDirection.Outbound;
+        HostAddr = hostAddr;
+    }
+
+    public void Connect(IPAddress ipAddress, int port)
+    {
+        Connect(new IPEndPoint(ipAddress, port));
+    }
+
+    public void Connect(string hostname, int port)
+    {
+        var ipAddr = hostname.Resolve();
+        if (ipAddr != null)
+        {
+            Connect(ipAddr, port);
+        }
+    }
+
+    public void Connect(Uri url)
+    {
+        Connect(url.Host, url.Port);
+    }
+
+    public int Read(byte[] buffer, int offset = 0, int length = 0)
+    {
+        if (length < 1)
+        {
+            length = buffer?.Length ?? 0;
+        }
+        
+        return BytesReceived.Read(buffer, offset, length);
+    }
+
+    public void Write(byte[] buffer, int offset = 0, int length = 0, bool directAccess = false)
+    {
+        if (length < 1)
+        {
+            length = buffer?.Length ?? 0;
+        }
+
+        (directAccess
+                ? (Stream?)NetworkStream
+                : (Stream?)BytesSend)
+            ?.Write(buffer, offset, length);
     }
 
     public void Disconnect()
