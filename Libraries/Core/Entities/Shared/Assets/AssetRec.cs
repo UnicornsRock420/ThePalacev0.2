@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Core.Attributes.Serialization;
+﻿using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers.Core;
@@ -13,20 +12,15 @@ namespace ThePalace.Core.Entities.Shared.Assets;
 [ByteSize(32)]
 public partial class AssetRec : IStruct
 {
-    public AssetDescRec AssetDesc;
-    public AssetSpec AssetSpec;
+    public LegacyAssetTypes Type;
+
+    public AssetDescRec AssetDesc = new();
+    public AssetSpec AssetSpec = new();
+
     public uint16 BlockNbr;
     public sint32 BlockOffset;
     public uint32 BlockSize;
     public uint16 NbrBlocks;
-
-    public LegacyAssetTypes Type;
-
-    public AssetRec()
-    {
-        AssetSpec = new AssetSpec();
-        AssetDesc = new AssetDescRec();
-    }
 
     public string? Md5 => Data?.ComputeMd5();
 
@@ -37,6 +31,9 @@ public partial class AssetRec : IStruct
 
     public bool ValidateCrc(uint crc)
     {
-        return (Data?.Length ?? 0) < 1 || crc == 0 ? false : Cipher.ComputeCrc(Data, 0, true) == crc;
+        return (Data?.Length ?? 0) < 1 ||
+               crc == 0
+            ? false
+            : Cipher.ComputeCrc(Data, 0, true) == crc;
     }
 }

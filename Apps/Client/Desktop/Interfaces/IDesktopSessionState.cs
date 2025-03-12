@@ -18,6 +18,7 @@ public interface IDesktopSessionState : IClientSessionState, IUISessionState
     int ScreenWidth { get; set; }
     int ScreenHeight { get; set; }
 
+    DateTime? LastActivity { get; set; }
     AssetSpec SelectedProp { get; set; }
     UserDesc SelectedUser { get; set; }
     HotspotDesc SelectedHotSpot { get; set; }

@@ -69,7 +69,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
         if (list.Count > 0)
             sessionState.Send(
-                (int)sessionState.UserId,
+                sessionState.UserId,
                 new MSG_USERPROP
                 {
                     AssetSpec = list
@@ -234,7 +234,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
             if (downloadAsset)
                 sessionState.Send(
-                    (int)sessionState.UserId,
+                    sessionState.UserId,
                     new MSG_ASSETQUERY
                     {
                         AssetType = LegacyAssetTypes.RT_PROP,

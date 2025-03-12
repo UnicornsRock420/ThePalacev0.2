@@ -8,5 +8,5 @@ namespace ThePalace.Core.Entities.Network.Client.Assets;
 [Mnemonic("rAst")]
 public class MSG_ASSETREGI : EventParams, IProtocolC2S
 {
-    public AssetRec? AssetInfo;
+    public AssetRec? AssetRec;
 }
