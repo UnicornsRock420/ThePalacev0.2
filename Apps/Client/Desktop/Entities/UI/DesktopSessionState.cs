@@ -648,7 +648,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     private void ScreenLayer_UserProp(Graphics g)
     {
-        var users = null as List<UserDesc>;
+        var users = (List<UserDesc>?)null;
         lock (RoomUsers)
         {
             users = RoomUsers.Values
@@ -658,11 +658,125 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 .ToList();
         }
 
-        if (users.Count > 0)
-            foreach (var u in users)
+        if (users.Count <= 0) return;
+
+        foreach (var u in users)
+        {
+            var x = u.UserInfo.RoomPos.HAxis - CONST_INT_halfPropWidth;
+            var y = u.UserInfo.RoomPos.VAxis - CONST_INT_halfPropHeight;
+
+            if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
+            else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
+
+            if (y < -CONST_INT_halfPropHeight) y = -CONST_INT_halfPropHeight;
+            else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = ScreenHeight + CONST_INT_halfPropHeight;
+
+            //if (x < 0 ||
+            //    y < 0) continue;
+
+            var animatedProps = new List<AssetDesc>();
+            var stillProps = new List<AssetDesc>();
+            var hasPalindromeProp = false;
+            var hasAnimatedProp = false;
+            var hasHeadProp = false;
+
+            var assetSpecs = u.UserInfo.PropSpec?.ToList() ?? [];
+            if (assetSpecs.Count > 0)
+                foreach (var assetSpec in assetSpecs)
+                {
+                    var asset = AssetsManager.Current.GetAsset(this, assetSpec);
+                    if (asset == null) continue;
+
+                    hasPalindromeProp |= asset.AssetRec.IsPalindrome;
+                    hasAnimatedProp |= asset.AssetRec.IsAnimate;
+                    hasHeadProp |= asset.AssetRec.IsHead;
+
+                    if (asset.Image == null) continue;
+
+                    if (asset.AssetRec.IsAnimate)
+                        animatedProps.Add(asset);
+                    else
+                        stillProps.Add(asset);
+                }
+
+            if (!hasHeadProp)
             {
-                var x = u.UserInfo.RoomPos.HAxis - CONST_INT_halfPropWidth;
-                var y = u.UserInfo.RoomPos.VAxis - CONST_INT_halfPropHeight;
+                var index = (uint)0;
+                index += (uint)(u.UserInfo.FaceNbr % DesktopConstants.MaxNbrFaces);
+                index += (uint)(u.UserInfo.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
+                var smileyFace = AssetsManager.Current.SmileyFaces[index];
+
+                g.DrawImage(
+                    smileyFace,
+                    new Rectangle(
+                        x, y,
+                        smileyFace.Width,
+                        smileyFace.Height),
+                    0, 0,
+                    smileyFace.Width,
+                    smileyFace.Height,
+                    GraphicsUnit.Pixel);
+            }
+
+            foreach (var prop in stillProps)
+                if (prop.Image != null)
+                {
+                    var imgAttributes = (ImageAttributes?)null;
+
+                    if (prop.AssetRec.IsGhost)
+                    {
+                        var matrix = new ColorMatrix
+                        {
+                            Matrix33 = 0.5F
+                        };
+
+                        imgAttributes = new ImageAttributes();
+                        imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                    }
+
+                    g.DrawImage(
+                        prop.Image,
+                        new Rectangle(
+                            x + prop.Offset.HAxis,
+                            y + prop.Offset.VAxis,
+                            prop.Image.Width,
+                            prop.Image.Height),
+                        0, 0,
+                        prop.Image.Width,
+                        prop.Image.Height,
+                        GraphicsUnit.Pixel,
+                        imgAttributes);
+                }
+        }
+    }
+
+    private void ScreenLayer_UserNametag(Graphics g)
+    {
+        var font = new Font("Arial", 11);
+        var padding = 2;
+
+        var users = (List<UserDesc>?)null;
+        lock (RoomUsers)
+        {
+            users = RoomUsers.Values.ToList();
+        }
+
+        if ((users?.Count ?? 0) <= 0) return;
+
+        foreach (var u in users)
+        {
+            if (u.UserInfo.UserId < 1 ||
+                u.UserInfo.RoomPos == null) continue;
+
+            var colour = DesktopConstants.NbrToColor(u.UserInfo.ColorNbr);
+            using (var colourBrush = new SolidBrush(colour))
+            {
+                var textSize = TextRenderer.MeasureText(u.UserInfo.Name, font);
+                var halfNameTagWidth = textSize.Width / 2;
+                var halfNameTagHeight = textSize.Height / 2;
+
+                var x = u.UserInfo.RoomPos.HAxis - halfNameTagWidth - padding * 2;
+                var y = u.UserInfo.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
 
                 if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
                 else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
@@ -673,133 +787,21 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 //if (x < 0 ||
                 //    y < 0) continue;
 
-                var animatedProps = new List<AssetDesc>();
-                var stillProps = new List<AssetDesc>();
-                var hasPalindromeProp = false;
-                var hasAnimatedProp = false;
-                var hasHeadProp = false;
+                g.FillRectangle(
+                    Brushes.Black,
+                    new Rectangle(
+                        x,
+                        y,
+                        textSize.Width + padding,
+                        textSize.Height + padding));
 
-                var assetSpecs = u.UserInfo.PropSpec?.ToList() ?? [];
-                if (assetSpecs.Count > 0)
-                    foreach (var assetSpec in assetSpecs)
-                    {
-                        var asset = AssetsManager.Current.GetAsset(this, assetSpec);
-                        if (asset == null) continue;
-
-                        hasPalindromeProp |= asset.AssetRec.IsPalindrome;
-                        hasAnimatedProp |= asset.AssetRec.IsAnimate;
-                        hasHeadProp |= asset.AssetRec.IsHead;
-
-                        if (asset.Image == null) continue;
-
-                        if (asset.AssetRec.IsAnimate)
-                            animatedProps.Add(asset);
-                        else
-                            stillProps.Add(asset);
-                    }
-
-                if (!hasHeadProp)
-                {
-                    var index = (uint)0;
-                    index += (uint)(u.UserInfo.FaceNbr % DesktopConstants.MaxNbrFaces);
-                    index += (uint)(u.UserInfo.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
-                    var smileyFace = AssetsManager.Current.SmileyFaces[index];
-
-                    g.DrawImage(
-                        smileyFace,
-                        new Rectangle(
-                            x, y,
-                            smileyFace.Width,
-                            smileyFace.Height),
-                        0, 0,
-                        smileyFace.Width,
-                        smileyFace.Height,
-                        GraphicsUnit.Pixel);
-                }
-
-                foreach (var prop in stillProps)
-                    if (prop.Image != null)
-                    {
-                        var imgAttributes = null as ImageAttributes;
-
-                        if (prop.AssetRec.IsGhost)
-                        {
-                            var matrix = new ColorMatrix
-                            {
-                                Matrix33 = 0.5F
-                            };
-
-                            imgAttributes = new ImageAttributes();
-                            imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                        }
-
-                        g.DrawImage(
-                            prop.Image,
-                            new Rectangle(
-                                x + prop.Offset.HAxis,
-                                y + prop.Offset.VAxis,
-                                prop.Image.Width,
-                                prop.Image.Height),
-                            0, 0,
-                            prop.Image.Width,
-                            prop.Image.Height,
-                            GraphicsUnit.Pixel,
-                            imgAttributes);
-                    }
+                g.DrawString(
+                    u.UserInfo.Name,
+                    font,
+                    colourBrush,
+                    x, y);
             }
-    }
-
-    private void ScreenLayer_UserNametag(Graphics g)
-    {
-        var font = new Font("Arial", 11);
-        var padding = 2;
-
-        var users = null as List<UserDesc>;
-        lock (RoomUsers)
-        {
-            users = RoomUsers.Values.ToList();
         }
-
-        if ((users?.Count ?? 0) > 0)
-            foreach (var u in users)
-            {
-                if (u.UserInfo.UserId < 1 ||
-                    u.UserInfo.RoomPos == null) continue;
-
-                var colour = DesktopConstants.NbrToColor(u.UserInfo.ColorNbr);
-                using (var colourBrush = new SolidBrush(colour))
-                {
-                    var textSize = TextRenderer.MeasureText(u.UserInfo.Name, font);
-                    var halfNameTagWidth = textSize.Width / 2;
-                    var halfNameTagHeight = textSize.Height / 2;
-
-                    var x = u.UserInfo.RoomPos.HAxis - halfNameTagWidth - padding * 2;
-                    var y = u.UserInfo.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
-
-                    if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
-                    else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
-
-                    if (y < -CONST_INT_halfPropHeight) y = -CONST_INT_halfPropHeight;
-                    else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = ScreenHeight + CONST_INT_halfPropHeight;
-
-                    //if (x < 0 ||
-                    //    y < 0) continue;
-
-                    g.FillRectangle(
-                        Brushes.Black,
-                        new Rectangle(
-                            x,
-                            y,
-                            textSize.Width + padding,
-                            textSize.Height + padding));
-
-                    g.DrawString(
-                        u.UserInfo.Name,
-                        font,
-                        colourBrush,
-                        x, y);
-                }
-            }
     }
 
     private void ScreenLayer_ScriptedImage(Graphics g)
@@ -1164,7 +1166,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             }
             else if (layers.Contains(LayerScreenTypes.Base))
             {
-                var filePath = null as string;
+                var filePath = (string?)null;
 
                 if (!string.IsNullOrWhiteSpace(MediaUrl) &&
                     !string.IsNullOrWhiteSpace(ServerName) &&
@@ -1203,7 +1205,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         try
         {
-            var img = null as Bitmap;
+            var img = (Bitmap?)null;
             if (imgScreen.Image == null ||
                 imgScreen.Image.Width != ScreenWidth ||
                 imgScreen.Image.Height != ScreenHeight)
@@ -1239,7 +1241,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                     using (var @lock = LockContext.GetLock(_uiLayers[layer]))
                     {
-                        var imgAttributes = null as ImageAttributes;
+                        var imgAttributes = (ImageAttributes?)null;
 
                         if (_uiLayers[layer].Opacity < 1.0F)
                         {

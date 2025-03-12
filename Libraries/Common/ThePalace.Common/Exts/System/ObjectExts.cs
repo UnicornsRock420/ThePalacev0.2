@@ -21,7 +21,7 @@ public static class ObjectExts
         var type = typeof(T);
         if (type.IsClass)
         {
-            var handle = null as GCHandle?;
+            var handle = (GCHandle?)null;
             try
             {
                 handle = GCHandle.Alloc(obj);
@@ -70,7 +70,7 @@ public static class ObjectExts
     public static void ClearEvents(this object obj, string eventName)
     {
         ArgumentNullException.ThrowIfNull(obj, nameof(obj) + " cannot be null");
-        
+
         if (string.IsNullOrWhiteSpace(eventName))
             throw new ArgumentNullException(nameof(eventName), nameof(eventName) + " cannot be null");
 

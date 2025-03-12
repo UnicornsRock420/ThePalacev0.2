@@ -99,7 +99,7 @@ public class PatStream : StreamBase
         var workingPicture = default(PictureRec);
         var workingLooseProp = default(LoosePropRec);
 
-        var workingScript = null as StringBuilder;
+        var workingScript = (StringBuilder?)null;
 
         var insideRoom = false;
         var insideProp = false;

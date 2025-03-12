@@ -1964,7 +1964,7 @@ public static class IptscraeEngine
 
                     //var sourceID = (UInt32)register.Value;
 
-                    //var user = null as UserRec;
+                    //var user = (UserRec?)null;
                     //if (sourceID > 0)
                     //      user = sessionState.RoomUsers.GetValueLocked(sourceID);
 
@@ -2018,7 +2018,7 @@ public static class IptscraeEngine
                         {
                             var sourceID = (uint)register.Value;
 
-                            var user = null as UserRec;
+                            var user = (UserRec?)null;
                             //if (sourceID > 0)
                             //    user = sessionState.RoomUsers.GetValueLocked(sourceID);
 
@@ -2221,10 +2221,7 @@ public static class IptscraeEngine
             },
             {
                 "BITSHIFTRIGHT",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("BITSHIFTRIGHT");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("BITSHIFTRIGHT"); })
             },
             {
                 "BITXOR",
@@ -2292,10 +2289,7 @@ public static class IptscraeEngine
             },
             {
                 "ISSOUNDPLAYING",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("ISSOUNDPLAYING");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("ISSOUNDPLAYING"); })
             },
             {
                 "OPENPALACE",
@@ -2339,10 +2333,7 @@ public static class IptscraeEngine
             },
             {
                 "REGEXPREPLACE",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("REGEXPREPLACE");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("REGEXPREPLACE"); })
             },
             {
                 "REMOVEHEADER",
@@ -2402,17 +2393,11 @@ public static class IptscraeEngine
             },
             {
                 "SOUNDISPLAYING",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SOUNDISPLAYING");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SOUNDISPLAYING"); })
             },
             {
                 "SOUNDGETPOSITION",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SOUNDGETPOSITION");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SOUNDGETPOSITION"); })
             },
             {
                 "SOUNDLENGTH",
@@ -2420,10 +2405,7 @@ public static class IptscraeEngine
             },
             {
                 "SOUNDPLAYFROM",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SOUNDPLAYFROM");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SOUNDPLAYFROM"); })
             },
             {
                 "STOPALARM",
@@ -2473,10 +2455,7 @@ public static class IptscraeEngine
             },
             {
                 "AUTOUSERLAYER",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("AUTOUSERLAYER");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("AUTOUSERLAYER"); })
             },
             {
                 "CACHESCRIPT",
@@ -2496,10 +2475,7 @@ public static class IptscraeEngine
             },
             {
                 "GETBUBBLESTYLE",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETBUBBLESTYLE");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETBUBBLESTYLE"); })
             },
             {
                 "GETPICANGLE",
@@ -2507,10 +2483,7 @@ public static class IptscraeEngine
             },
             {
                 "GETPICDIMENSIONS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETPICDIMENSIONS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETPICDIMENSIONS"); })
             },
             {
                 "GETPICLOC",
@@ -2522,52 +2495,31 @@ public static class IptscraeEngine
             },
             {
                 "GETSPOTTEXTSIZE",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETSPOTTEXTSIZE");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETSPOTTEXTSIZE"); })
             },
             {
                 "GETSPOTPOINTS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETSPOTPOINTS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETSPOTPOINTS"); })
             },
             {
                 "GETSPOTOPTIONS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETSPOTOPTIONS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETSPOTOPTIONS"); })
             },
             {
                 "GETROOMOPTIONS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETROOMOPTIONS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETROOMOPTIONS"); })
             },
             {
                 "GETPICBRIGHTNESS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETPICBRIGHTNESS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETPICBRIGHTNESS"); })
             },
             {
                 "GETPICOPACITY",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETPICOPACITY");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETPICOPACITY"); })
             },
             {
                 "GETPICSATURATION",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("GETPICSATURATION");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("GETPICSATURATION"); })
             },
             {
                 "GETPICNAME",
@@ -2647,17 +2599,11 @@ public static class IptscraeEngine
             },
             {
                 "SETPICLOCLOCAL",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETPICLOCLOCAL");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETPICLOCLOCAL"); })
             },
             {
                 "SETPICBRIGHTNESS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETPICBRIGHTNESS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETPICBRIGHTNESS"); })
             },
             {
                 "SETPICBLUR",
@@ -2665,10 +2611,7 @@ public static class IptscraeEngine
             },
             {
                 "SETPICCONTRAST",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETPICCONTRAST");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETPICCONTRAST"); })
             },
             {
                 "SETPICHUE",
@@ -2676,17 +2619,11 @@ public static class IptscraeEngine
             },
             {
                 "SETPICOPACITY",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETPICOPACITY");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETPICOPACITY"); })
             },
             {
                 "SETPICSATURATION",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETPICSATURATION");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETPICSATURATION"); })
             },
             {
                 "SETSPOTCLIP",
@@ -2702,38 +2639,23 @@ public static class IptscraeEngine
             },
             {
                 "SETSPOTNAMELOCAL",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETSPOTNAMELOCAL");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETSPOTNAMELOCAL"); })
             },
             {
                 "SETSPOTOPTIONS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETSPOTOPTIONS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETSPOTOPTIONS"); })
             },
             {
                 "SETSPOTPICMODE",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETSPOTPICMODE");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETSPOTPICMODE"); })
             },
             {
                 "SETSPOTPOINTS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETSPOTPOINTS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETSPOTPOINTS"); })
             },
             {
                 "SETSPOTSCRIPT",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("SETSPOTSCRIPT");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SETSPOTSCRIPT"); })
             },
             {
                 "SETSPOTSTYLE",
@@ -2783,24 +2705,15 @@ public static class IptscraeEngine
             },
             {
                 "MOVELOOSEPROP",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("MOVELOOSEPROP");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("MOVELOOSEPROP"); })
             },
             {
                 "NBRLOOSEPROPS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("NBRLOOSEPROPS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("NBRLOOSEPROPS"); })
             },
             {
                 "PROPDIMENSIONS",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("PROPDIMENSIONS");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("PROPDIMENSIONS"); })
             },
             {
                 "PROPOFFSETS",
@@ -2808,10 +2721,7 @@ public static class IptscraeEngine
             },
             {
                 "REMOVELOOSEPROP",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("REMOVELOOSEPROP");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("REMOVELOOSEPROP"); })
             },
             // End Prop Commands
             // Start Paint Commands
@@ -2828,10 +2738,7 @@ public static class IptscraeEngine
             },
             {
                 "PENFILLOPACITY",
-                (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    throw new NotImplementedException("PENFILLOPACITY");
-                })
+                (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("PENFILLOPACITY"); })
             },
             {
                 "POLYGON",

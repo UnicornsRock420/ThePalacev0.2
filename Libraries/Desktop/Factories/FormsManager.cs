@@ -69,7 +69,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         
         FormClosed?.Invoke(_sender, e);
 
-        var forms = null as List<FormBase>;
+        var forms = (List<FormBase>?)null;
         using (var @lock = LockContext.GetLock(_forms))
         {
             forms = _forms?.Values?.ToList() ?? [];

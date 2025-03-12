@@ -33,12 +33,6 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         ApiManager.Current.RegisterApi(nameof(ExecuteMacro), ExecuteMacro);
     }
 
-    public Type ResourceType { get; set; }
-
-    public DisposableDictionary<uint, Bitmap> SmileyFaces { get; private set; } = new();
-    public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
-    public List<AssetSpec[]> Macros { get; private set; } = [];
-
     ~AssetsManager()
     {
         Dispose();
@@ -53,6 +47,10 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         SmileyFaces = null;
         Assets = null;
     }
+
+    public DisposableDictionary<uint, Bitmap> SmileyFaces { get; private set; } = new();
+    public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
+    public List<AssetSpec[]> Macros { get; private set; } = [];
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
@@ -69,7 +67,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
         if (list.Count > 0)
             sessionState.Send(
-                (int)sessionState.UserId,
+                sessionState.UserId,
                 new MSG_USERPROP
                 {
                     AssetSpec = list
@@ -82,11 +80,28 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     {
         if (string.IsNullOrWhiteSpace(resourceName)) return;
 
-        var imgSmileyFaces = null as Bitmap;
+        var xPath = $"ThePalace.Core.Desktop.Core.Resources.smilies.{resourceName}";
+        var imgSmileyFaces = (Bitmap?)null;
 
-        using (var imgStream = ResourceType
-                   ?.Assembly
-                   ?.GetManifestResourceStream($"ThePalace.Core.Desktop.Core.Resources.smilies.{resourceName}"))
+        using (var imgStream = AppDomain.CurrentDomain
+                   .GetAssemblies()
+                   .Where(a =>
+                   {
+                       try
+                       {
+                           using (var stream = a.GetManifestResourceStream(xPath))
+                           {
+                               return stream != null;
+                           }
+                       }
+                       catch
+                       {
+                       }
+
+                       return false;
+                   })
+                   .Select(a => a.GetManifestResourceStream(xPath))
+                   .FirstOrDefault())
         {
             if (imgStream == null) return;
 
@@ -234,7 +249,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
             if (downloadAsset)
                 sessionState.Send(
-                    (int)sessionState.UserId,
+                    sessionState.UserId,
                     new MSG_ASSETQUERY
                     {
                         AssetType = LegacyAssetTypes.RT_PROP,

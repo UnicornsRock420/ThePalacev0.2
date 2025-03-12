@@ -593,7 +593,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                             case MouseButtons.Left:
                                 SessionState.UserDesc.UserInfo.RoomPos = point;
 
-                                var user = null as UserDesc;
+                                var user = (UserDesc?)null;
                                 user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                                 if (user != null)
                                 {
@@ -1096,7 +1096,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                             {
                                 // TODO: Load new client tab
                             }
-                            
+
                             if (connectionForm.Controls
                                     .Cast<Control>()
                                     .Where(c => c.Name == "comboBoxUsernames")
@@ -1207,7 +1207,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     if (SessionState.ConnectionState.IsConnected() &&
                         SessionState.History.History.Count > 0)
                     {
-                        var url = null as string;
+                        var url = (string?)null;
 
                         switch (name)
                         {

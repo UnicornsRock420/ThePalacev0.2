@@ -35,7 +35,7 @@ namespace ThePalace.Core.Factories.Filesystem
 
                 else if (read == FilePIDSHeaderRec.SizeOf)
                 {
-                    var asset = null as AssetRec;
+                    var asset = (AssetRec?)null;
                     try
                     {
                         using (var tmp = Packet.FromBytes(data))
