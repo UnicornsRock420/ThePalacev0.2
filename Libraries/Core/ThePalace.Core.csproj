@@ -50,6 +50,10 @@
         <None Include="Factories\Filesystem\PropPIDSStream.cs" />
         <None Include="Factories\Filesystem\PropPROPSStream.cs" />
         <None Include="Factories\Filesystem\PropPRPStream.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_SPOTINFO.cs" />
+        <None Include="Entities\Network\Unused\MSG_SPOTINFO.cs" />
+        <Compile Remove="Entities\Network\Unused\MSG_ROOMINFO.cs" />
+        <None Include="Entities\Network\Unused\MSG_ROOMINFO.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -127,6 +131,10 @@
     <ItemGroup>
         <ProjectReference Include="..\Logging\ThePalace.Logging.csproj" />
         <ProjectReference Include="..\Network\ThePalace.Network.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Entities\Network\Server\" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿namespace System.Windows.Forms;
+﻿namespace ThePalace.Common.Desktop.Factories.System.Windows.Forms;
 
 public abstract class DisposableApplicationContext : ApplicationContext
 {

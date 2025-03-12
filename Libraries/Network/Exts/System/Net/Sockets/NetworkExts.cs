@@ -1,6 +1,8 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
-namespace System.Net.Sockets;
+namespace ThePalace.Network.Exts.System.Net.Sockets;
 
 public static class NetworkExts
 {
@@ -9,12 +11,14 @@ public static class NetworkExts
 
     public static void DropConnection(this Socket handler)
     {
+        if (handler == null) return;
+
         var actions = new List<Action>
         {
-            () => handler?.Disconnect(false),
-            () => handler?.Shutdown(SocketShutdown.Both),
-            () => handler?.Close(),
-            () => handler?.Dispose()
+            () => handler.Disconnect(false),
+            () => handler.Shutdown(SocketShutdown.Both),
+            () => handler.Close(),
+            () => handler.Dispose()
         };
 
         foreach (var action in actions)
@@ -29,10 +33,12 @@ public static class NetworkExts
 
     public static void DropConnection(this NetworkStream handler)
     {
+        if (handler == null) return;
+        
         var actions = new List<Action>
         {
-            () => handler?.Close(),
-            () => handler?.Dispose()
+            handler.Close,
+            handler.Dispose
         };
 
         foreach (var action in actions)

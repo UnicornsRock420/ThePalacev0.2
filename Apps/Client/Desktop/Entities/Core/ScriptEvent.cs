@@ -7,5 +7,5 @@ public class ScriptEvent : EventArgs
 {
     public IptEventTypes EventType { get; set; }
     public IProtocol Packet { get; set; }
-    public object ScriptTag { get; set; }
+    public object? ScriptTag { get; set; } = null;
 }

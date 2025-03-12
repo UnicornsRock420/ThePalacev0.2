@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+
+namespace ThePalace.Common.Factories.System.Collections.Concurrent;
 
 public class DisposableQueue<TValue> : ConcurrentQueue<TValue>, IDisposable
     where TValue : IDisposable

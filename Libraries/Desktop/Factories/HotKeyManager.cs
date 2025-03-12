@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Common.Desktop.Entities.Core;
 using ThePalace.Common.Desktop.Entities.UI;
+using ThePalace.Common.Factories.System;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 

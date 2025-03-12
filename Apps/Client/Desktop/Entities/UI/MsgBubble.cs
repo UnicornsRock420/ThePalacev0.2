@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Windows.Foundation.Metadata;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
@@ -7,6 +6,7 @@ using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Exts.System;
 using ThePalace.Common.Exts.System.Collections.Generic;
+using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.UI;

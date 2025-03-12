@@ -2,22 +2,25 @@
 using System.Net;
 using System.Net.Sockets;
 using ThePalace.Common.Factories.Core;
+using ThePalace.Common.Factories.System;
 using ThePalace.Network.Enums;
+using ThePalace.Network.Exts.System.Net.Sockets;
 using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using ConnectionState = ThePalace.Network.Entities.ConnectionState;
+using UserID = System.Int32;
 
 namespace ThePalace.Network.Factories;
 
 public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
 {
-    private const uint CONST_INT_UserIDCounterMax = 9999;
+    private const UserID CONST_INT_UserIDCounterMax = 9999;
 
-    private volatile ConcurrentDictionary<uint, IConnectionState> _connectionStates = new();
-    private uint _userIDCounter;
-    public IReadOnlyDictionary<uint, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
+    private volatile ConcurrentDictionary<UserID, IConnectionState> _connectionStates = new();
+    private UserID _userIDCounter;
+    public IReadOnlyDictionary<UserID, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
 
-    public uint UserID
+    public UserID UserId
     {
         get
         {
@@ -53,11 +56,11 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         Dispose();
     }
 
-    public uint Register(IConnectionState connectionState)
+    public UserID Register(IConnectionState connectionState)
     {
         if (IsDisposed) return 0;
 
-        var result = UserID;
+        var result = UserId;
 
         using (var @lock = LockContext.GetLock(_connectionStates))
         {
@@ -67,7 +70,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return result;
     }
 
-    public uint Register(uint id, IConnectionState connectionState)
+    public UserID Register(UserID id, IConnectionState connectionState)
     {
         if (IsDisposed) return 0;
 
@@ -79,7 +82,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return id;
     }
 
-    public void Unregister(uint id)
+    public void Unregister(UserID id)
     {
         if (IsDisposed) return;
 

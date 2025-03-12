@@ -2,6 +2,7 @@
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using ThePalace.Common.Desktop.Entities.Ribbon;
+using ThePalace.Common.Factories.System;
 using ThePalace.Logging.Entities;
 
 namespace ThePalace.Common.Desktop.Factories;

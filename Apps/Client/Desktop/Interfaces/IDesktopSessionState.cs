@@ -1,12 +1,12 @@
 ﻿using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
+using ThePalace.Common.Client.Interfaces;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 

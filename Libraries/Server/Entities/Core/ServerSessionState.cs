@@ -1,9 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+using ThePalace.Common.Factories.System.Collections;
 using ThePalace.Common.Server.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Network.Interfaces;
+using RoomID = System.Int16;
+using UserID = System.Int32;
 
 namespace ThePalace.Common.Server.Entities.Core;
 
@@ -37,6 +39,6 @@ public class ServerSessionState : Disposable, IServerSessionState
 
     public string? MediaUrl { get; set; } = null;
     public string? ServerName { get; set; } = null;
-    public List<RoomDesc> Rooms { get; set; } = [];
-    public List<UserDesc> Users { get; set; } = [];
+    public ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; } = [];
+    public ConcurrentDictionary<UserID, UserDesc> Users { get; set; } = [];
 }

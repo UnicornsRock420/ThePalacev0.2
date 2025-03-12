@@ -1,4 +1,4 @@
-﻿namespace System.Collections;
+﻿namespace ThePalace.Common.Factories.System.Collections;
 
 public class Disposable : IDisposable
 {

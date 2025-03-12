@@ -1,4 +1,4 @@
-﻿namespace System;
+﻿namespace ThePalace.Common.Factories.System;
 
 public abstract class Singleton<T>
     where T : class, new()

@@ -1,6 +1,6 @@
-﻿using System.Collections;
+﻿using ThePalace.Common.Factories.System.Collections;
 
-namespace System;
+namespace ThePalace.Common.Factories.System;
 
 public abstract class SingletonDisposable<T> : Disposable
     where T : class, new()

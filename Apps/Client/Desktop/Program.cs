@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
-using System.Net.Sockets;
+﻿using System.Collections.Concurrent;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -18,6 +16,8 @@ using ThePalace.Common.Exts.System;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Exts.System.Collections.Generic;
 using ThePalace.Common.Exts.System.ComponentModel;
+using ThePalace.Common.Factories.System.Collections;
+using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
@@ -47,6 +47,9 @@ using ThePalace.Network.Factories;
 using ThePalace.Network.Helpers.Network;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
+using AssetID = System.Int32;
+using HotspotID = System.Int16;
+using UserID = System.Int32;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
 using Microsoft.Toolkit.Uwp.Notifications;
@@ -606,7 +609,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                         LayerScreenTypes.Messages);
 
                                     SessionState.Send(
-                                        (int)SessionState.UserId,
+                                        SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
                                             Pos = point
@@ -1001,7 +1004,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
                                     SessionState.Send(
-                                        (int)SessionState.UserId,
+                                        SessionState.UserId,
                                         xTalk);
                             }
                         }
@@ -1085,13 +1088,15 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                         var connectionForm = SessionState.GetForm(nameof(Connection));
                         if (connectionForm != null)
                         {
-                            //var checkBoxNewTab = connectionForm.Controls
-                            //    .Cast<Control>()
-                            //    .Where(c => c.Name == "checkBoxNewTab")
-                            //    .FirstOrDefault() as CheckBox;
-                            //if (checkBoxNewTab?.Checked == true)
-                            //{
-                            //}
+                            var checkBoxNewTab = connectionForm.Controls
+                                .Cast<Control>()
+                                .Where(c => c.Name == "checkBoxNewTab")
+                                .FirstOrDefault() as CheckBox;
+                            if (checkBoxNewTab?.Checked == true)
+                            {
+                                // TODO: Load new client tab
+                            }
+                            
                             if (connectionForm.Controls
                                     .Cast<Control>()
                                     .Where(c => c.Name == "comboBoxUsernames")
@@ -1239,7 +1244,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
                                 SessionState.Send(
-                                    (int)SessionState.UserId,
+                                    SessionState.UserId,
                                     new MSG_ROOMGOTO
                                     {
                                         Dest = roomID
@@ -1306,10 +1311,10 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 case ContextMenuCommandTypes.CMD_PROPGAG:
                 case ContextMenuCommandTypes.CMD_UNPROPGAG:
                 {
-                    var value = (int)values[1];
+                    var value = (UserID)values[1];
 
                     SessionState.Send(
-                        (int)SessionState.UserId,
+                        SessionState.UserId,
                         new MSG_WHISPER
                         {
                             TargetID = value,
@@ -1320,10 +1325,10 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     break;
                 case ContextMenuCommandTypes.CMD_KILLUSER:
                 {
-                    var value = (uint)values[1];
+                    var value = (UserID)values[1];
 
                     SessionState.Send(
-                        (int)SessionState.UserId,
+                        SessionState.UserId,
                         new MSG_KILLUSER
                         {
                             TargetID = value
@@ -1333,10 +1338,10 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                     break;
                 case ContextMenuCommandTypes.CMD_SPOTDEL:
                 {
-                    var value = (short)values[1];
+                    var value = (HotspotID)values[1];
 
                     SessionState.Send(
-                        (int)SessionState.UserId,
+                        SessionState.UserId,
                         new MSG_SPOTDEL
                         {
                             SpotID = value
@@ -1350,7 +1355,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
         {
             case ContextMenuCommandTypes.UI_SPOTSELECT:
             {
-                var value = (int)values[1];
+                var value = (HotspotID)values[1];
 
                 SessionState.SelectedHotSpot = SessionState.RoomInfo?.HotSpots
                     ?.Where(s => s.SpotInfo.HotspotID == value)
@@ -1360,7 +1365,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 break;
             case ContextMenuCommandTypes.UI_PROPSELECT:
             {
-                var value = (int)values[1];
+                var value = (AssetID)values[1];
 
                 SessionState.SelectedProp = SessionState.RoomInfo?.LooseProps
                     ?.Where(s => s.AssetSpec.Id == value)
@@ -1371,7 +1376,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 break;
             case ContextMenuCommandTypes.UI_USERSELECT:
             {
-                var value = (uint)values[1];
+                var value = (UserID)values[1];
 
                 SessionState.SelectedUser = SessionState.RoomUsers.GetValueLocked(value);
             }
@@ -1379,10 +1384,10 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                 break;
             case ContextMenuCommandTypes.CMD_PROPDEL:
             {
-                var value = (int)values[1];
+                var value = (AssetID)values[1];
 
                 SessionState.Send(
-                    (int)SessionState.UserId,
+                    SessionState.UserId,
                     new MSG_PROPDEL
                     {
                         PropNum = value
@@ -1410,7 +1415,7 @@ public class Program : Disposable, IApp<IDesktopSessionState>
                         LayerScreenTypes.Messages);
 
                     SessionState.Send(
-                        (int)SessionState.UserId,
+                        SessionState.UserId,
                         new MSG_USERMOVE
                         {
                             Pos = value

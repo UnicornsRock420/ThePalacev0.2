@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
-using ThePalace.Network.Enums;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 

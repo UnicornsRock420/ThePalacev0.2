@@ -9,7 +9,6 @@ public interface ISessionState : IDisposable
     IConnectionState? ConnectionState { get; set; }
     
     object? SessionTag { get; set; }
-    object? ScriptTag { get; set; }
 
     string? MediaUrl { get; set; }
     string? ServerName { get; set; }

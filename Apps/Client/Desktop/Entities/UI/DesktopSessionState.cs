@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Reflection;
@@ -17,6 +16,8 @@ using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
 using ThePalace.Common.Exts.System.Collections.Concurrent;
 using ThePalace.Common.Factories.Core;
+using ThePalace.Common.Factories.System.Collections;
+using ThePalace.Common.Factories.System.Collections.Concurrent;
 using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
@@ -33,6 +34,8 @@ using ThePalace.Network.Helpers.Network;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
+using RoomID = System.Int16;
+using UserID = System.Int32;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
@@ -128,7 +131,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region User Info
 
-    public uint UserId { get; set; } = 0;
+    public UserID UserId { get; set; } = 0;
     public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
@@ -149,7 +152,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     #region Room Info
 
     public RoomDesc RoomInfo { get; set; } = null;
-    public ConcurrentDictionary<uint, UserDesc> RoomUsers { get; set; } = new();
+    public ConcurrentDictionary<UserID, UserDesc> RoomUsers { get; set; } = new();
 
     #endregion
 
@@ -159,8 +162,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public string? ServerName { get; set; } = string.Empty;
     public int ServerPopulation { get; set; } = 0;
 
-    public List<ListRec> Rooms { get; set; } = [];
-    public List<ListRec> Users { get; set; } = [];
+    public ConcurrentDictionary<RoomID, ListRec> Rooms { get; set; } = [];
+    public ConcurrentDictionary<UserID, ListRec> Users { get; set; } = [];
 
     #endregion
 

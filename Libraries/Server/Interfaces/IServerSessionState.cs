@@ -2,6 +2,8 @@
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
+using RoomID = System.Int16;
+using UserID = System.Int32;
 
 namespace ThePalace.Common.Server.Interfaces;
 
@@ -12,6 +14,6 @@ public interface IServerSessionState : ISessionState
     
     ConcurrentDictionary<string, object> Extended { get; }
     
-    List<RoomDesc> Rooms { get; set; }
-    List<UserDesc> Users { get; set; }
+    ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; }
+    ConcurrentDictionary<UserID, UserDesc> Users { get; set; }
 }
