@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Rooms;
+namespace ThePalace.Common.Client.Entities.Business.Rooms;
 
 [Mnemonic("lock")]
 public class BO_DOORLOCK : IEventHandler<MSG_DOORLOCK>

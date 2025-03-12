@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace ThePalace.Common.Exts.System;
+namespace System;
 
 public static class AttributeExts
 {

@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Client.Auth;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Client.Auth;
+namespace ThePalace.Common.Server.Entities.Business.Auth;
 
 [Mnemonic("susr")]
 public class BO_SUPERUSER : IEventHandler<MSG_SUPERUSER>

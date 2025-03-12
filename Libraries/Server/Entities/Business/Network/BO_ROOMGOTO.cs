@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Client.Network;
+namespace ThePalace.Common.Server.Entities.Business.Network;
 
 [Mnemonic("navR")]
 public class BO_ROOMGOTO : IEventHandler<MSG_ROOMGOTO>

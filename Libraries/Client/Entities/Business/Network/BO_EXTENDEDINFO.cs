@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Network;
+namespace ThePalace.Common.Client.Entities.Business.Network;
 
 [Mnemonic("sInf")]
 public class BO_EXTENDEDINFO : IEventHandler<MSG_EXTENDEDINFO>

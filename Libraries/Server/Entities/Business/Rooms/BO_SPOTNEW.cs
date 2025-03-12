@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Client.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Client.Rooms;
+namespace ThePalace.Common.Server.Entities.Business.Rooms;
 
 [Mnemonic("opSn")]
 public class BO_SPOTNEW : IEventHandler<MSG_SPOTNEW>

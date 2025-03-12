@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Shared.Assets;
+namespace ThePalace.Common.Server.Entities.Business.Assets;
 
 [Mnemonic("qAst")]
 public class BO_ASSETQUERY : IEventHandler<MSG_ASSETQUERY>

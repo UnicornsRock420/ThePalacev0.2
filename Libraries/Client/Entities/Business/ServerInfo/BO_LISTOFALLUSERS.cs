@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
+namespace ThePalace.Common.Client.Entities.Business.ServerInfo;
 
 [Mnemonic("uLst")]
 public class BO_LISTOFALLUSERS : IEventHandler<MSG_LISTOFALLUSERS>

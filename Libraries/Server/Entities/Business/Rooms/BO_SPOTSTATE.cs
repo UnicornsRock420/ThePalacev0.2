@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Rooms;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Shared.Rooms;
+namespace ThePalace.Common.Server.Entities.Business.Rooms;
 
 [Mnemonic("sSta")]
 public class BO_SPOTSTATE : IEventHandler<MSG_SPOTSTATE>

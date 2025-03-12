@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using ThePalace.Common.Enums.System;
 
-namespace ThePalace.Common.Exts.System;
+namespace System;
 
 public static class TypeExts
 {

@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
+namespace ThePalace.Common.Client.Entities.Business.ServerInfo;
 
 [Mnemonic("sinf")]
 public class BO_SERVERINFO : IEventHandler<MSG_SERVERINFO>

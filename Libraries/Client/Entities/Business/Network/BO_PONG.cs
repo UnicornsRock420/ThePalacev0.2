@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Shared.Network;
+namespace ThePalace.Common.Client.Entities.Business.Network;
 
 [Mnemonic("pong")]
 public class BO_PONG : IEventHandler<MSG_PONG>

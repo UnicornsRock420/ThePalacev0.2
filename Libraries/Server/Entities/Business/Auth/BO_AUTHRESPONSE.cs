@@ -2,7 +2,7 @@
 using ThePalace.Core.Entities.Network.Server.Auth;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Server.Auth;
+namespace ThePalace.Common.Server.Entities.Business.Auth;
 
 [Mnemonic("autr")]
 public class BO_AUTHRESPONSE : IEventHandler<MSG_AUTHRESPONSE>

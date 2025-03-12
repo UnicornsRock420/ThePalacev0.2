@@ -3,7 +3,7 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Server.ServerInfo;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.ServerInfo;
+namespace ThePalace.Common.Client.Entities.Business.ServerInfo;
 
 [DynamicSize]
 [Mnemonic("rLst")]

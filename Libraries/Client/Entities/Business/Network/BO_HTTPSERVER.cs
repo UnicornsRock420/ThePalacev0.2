@@ -3,7 +3,7 @@ using ThePalace.Core.Attributes.Serialization;
 using ThePalace.Core.Entities.Network.Server.Network;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Server.Network;
+namespace ThePalace.Common.Client.Entities.Business.Network;
 
 [DynamicSize]
 [Mnemonic("HTTP")]
