@@ -28,25 +28,23 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
         FormClosed?.Clear();
 
-        foreach (var form in _forms.Values.ToList())
+        foreach (var control in _forms.Values
+                     .SelectMany(f => f.Controls.Cast<Control>())
+                     .ToList())
         {
-            var controls = form.Controls
-                .Cast<Control>()
-                .ToList();
-            foreach (var control in controls)
-                try
-                {
-                    control?.Dispose();
-                }
-                catch
-                {
-                }
+            try
+            {
+                control?.Dispose();
+            }
+            catch
+            {
+            }
         }
 
         _forms.Clear();
 
         base.Dispose();
-        
+
         try
         {
             HotKeyManager.Current.Dispose();
@@ -75,23 +73,14 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     {
         if (IsDisposed) return;
 
+        var app = GetForm<FormBase>();
+
         if (sender is not FormBase _sender ||
             !UnregisterForm(_sender)) return;
 
         FormClosed?.Invoke(_sender, e);
 
-        var forms = (List<FormBase>?)null;
-        using (var @lock = LockContext.GetLock(_forms))
-        {
-            forms = _forms?.Values?.ToList() ?? [];
-        }
-
-        var app = forms
-            //.Where(f => f.GetType().Name == "Program")
-            .FirstOrDefault();
-        if (!forms.Any(f =>
-                f != app &&
-                f is IFormDialog))
+        if (sender == app)
         {
             TCF._TryDispose(
                     app,

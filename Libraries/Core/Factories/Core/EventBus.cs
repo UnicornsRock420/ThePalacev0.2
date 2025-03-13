@@ -25,8 +25,11 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 
     public Type? GetType(IEventParams @params)
     {
-        var paramsType = @params.GetType();
+        return GetType(@params.GetType());
+    }
 
+    public Type? GetType(Type type)
+    {
         return AppDomain.CurrentDomain
             .GetAssemblies()
             .SelectMany(t => t.GetTypes())
@@ -37,7 +40,7 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
                 var ntrs = t.GetInterfaces();
 
                 return ntrs.Contains(CONST_TYPE_IEventHandler) &&
-                       ntrs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(paramsType));
+                       ntrs.Any(i => i.IsGenericType && i.GetGenericArguments().Contains(type));
             })
             .Select(t => t.GetInterfaces().Contains(CONST_TYPE_IEventHandler) ? t : null)
             .FirstOrDefault();

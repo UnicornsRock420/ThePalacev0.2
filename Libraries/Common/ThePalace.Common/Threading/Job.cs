@@ -362,45 +362,48 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
             IsRunning = true;
 
-            try
+            if (Task.Status != TaskStatus.Running)
             {
-                Task.Start();
+                try
+                {
+                    Task.Start();
+
+                    if (doRunLog)
+                        runLog.Stop();
+
+                    IsRunning = false;
+
+                    Completions++;
+                }
+                catch (Exception ex)
+                {
+                    if (doRunLog)
+                        runLog.Stop(ex);
+
+                    IsRunning = false;
+
+                    Failures++;
+
+                    if (Errors.Count >= LogLimit)
+                        Errors.RemoveAt(0);
+
+                    Errors.Add(ex);
+                }
+
+                TokenSource.Token.ThrowIfCancellationRequested();
 
                 if (doRunLog)
-                    runLog.Stop();
+                {
+                    if (RunLogs.Count >= ErrorLimit)
+                        RunLogs.RemoveAt(0);
 
-                IsRunning = false;
+                    RunLogs.Add(runLog);
+                }
 
-                Completions++;
+                if (doRunRunOnce && runLog.Finish.HasValue) return 0;
+
+                if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
             }
-            catch (Exception ex)
-            {
-                if (doRunLog)
-                    runLog.Stop(ex);
-
-                IsRunning = false;
-
-                Failures++;
-
-                if (Errors.Count >= LogLimit)
-                    Errors.RemoveAt(0);
-
-                Errors.Add(ex);
-            }
-
-            TokenSource.Token.ThrowIfCancellationRequested();
-
-            if (doRunLog)
-            {
-                if (RunLogs.Count >= ErrorLimit)
-                    RunLogs.RemoveAt(0);
-
-                RunLogs.Add(runLog);
-            }
-
-            if (doRunRunOnce && runLog.Finish.HasValue) return 0;
-
-            if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
 
             TokenSource.Token.ThrowIfCancellationRequested();
 
@@ -430,7 +433,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
     public void Enqueue(TCmd cmd, bool clear = false)
     {
         if (IsDisposed) return;
-        
+
         if (clear)
         {
             Queue.Clear();
@@ -440,7 +443,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         {
             ResetEvent.Set();
         }
-        
+
         Queue.Enqueue(cmd);
     }
 }
