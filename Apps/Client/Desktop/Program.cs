@@ -7,6 +7,7 @@ using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
+using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.UI;
@@ -37,12 +38,12 @@ using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Helpers.Network;
+using ThePalace.Network.Helpers;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
-using IptscraeEngine = ThePalace.Client.Desktop.Helpers.IptscraeEngine;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
+using RoomID = short;
 using UserID = int;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
@@ -53,6 +54,8 @@ namespace ThePalace.Client.Desktop;
 
 public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 {
+    #region cStr
+
     /// <summary>
     ///     The main entry point for the application.
     /// </summary>
@@ -93,131 +96,154 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             });
         ((Job<ActionCmd>)jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
         {
-            CmdFnc = a => Current,
+            CmdFnc = a =>
+            {
+                Current.Jobs = jobs;
+                Current.Initialize();
+
+                return Current;
+            },
         });
 
         jobs[ThreadQueues.Network] = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
-                while ((Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
-                       !q.IsEmpty)
+                var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                    if (!q.IsEmpty)
+                        Task.WaitAll(
+                            TaskManager.StartMany(
+                                cancellationToken.Token,
 
-                    Task.WaitAll(
-                        TaskManager.StartMany(
-                            cancellationToken.Token,
+                                #region Command Processor Sub-Task
 
-                            #region Command Processor Sub-Task
-
-                            async () =>
-                            {
-                                while (!cancellationToken.IsCancellationRequested)
+                                async () =>
                                 {
-                                    if (q.TryDequeue(out var cmd))
-                                        switch ((NetworkCommandTypes)cmd.Flags)
+                                    while (!cancellationToken.IsCancellationRequested)
+                                    {
+                                        if (q.TryDequeue(out var cmd))
+                                            switch ((NetworkCommandTypes)cmd.Flags)
+                                            {
+                                                case NetworkCommandTypes.CONNECT:
+                                                    var url = cmd.Values[0] as string;
+                                                    if (url == null ||
+                                                        !RegexConstants.REGEX_PALACEURL.IsMatch(url)) return;
+
+                                                    var match = RegexConstants.REGEX_PALACEURL.Match(url);
+                                                    if (match.Groups.Count < 2) break;
+
+                                                    var hostname = match.Groups[1].Value;
+                                                    var port = match.Groups.Count > 2 &&
+                                                               !string.IsNullOrWhiteSpace(match.Groups[2].Value)
+                                                        ? Convert.ToUInt16(match.Groups[2].Value)
+                                                        : (ushort)0;
+                                                    var roomID = match.Groups.Count > 3 &&
+                                                                 !string.IsNullOrWhiteSpace(match.Groups[3].Value)
+                                                        ? Convert.ToInt16(match.Groups[3].Value)
+                                                        : (RoomID)0;
+
+                                                    Current.SessionState.ConnectionState.Connect(hostname, port);
+                                                    return;
+                                                case NetworkCommandTypes.DISCONNECT:
+                                                default:
+                                                    Current.SessionState.ConnectionState.Disconnect();
+                                                    return;
+                                            }
+
+                                        cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                        if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
+                                            q.IsEmpty)
+                                            await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                    }
+                                },
+
+                                #endregion
+
+                                #region Process BytesSend Processor Sub-Task
+
+                                async () =>
+                                {
+                                    while (!cancellationToken.IsCancellationRequested &&
+                                           (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                    {
+                                        var delay = RndGenerator.Next(150, 350);
+
+                                        if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                         {
-                                            case NetworkCommandTypes.CONNECT:
-                                                Current.SessionState.ConnectionState.Connect(cmd.Values[0] as Uri);
-                                                return;
-                                            case NetworkCommandTypes.DISCONNECT:
-                                            default:
-                                                Current.SessionState.ConnectionState.Disconnect();
-                                                return;
+                                            var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                            Current.SessionState.ConnectionState.Send(msgBytes);
+
+                                            delay = RndGenerator.Next(75, 150);
                                         }
 
-                                    cancellationToken.Token.ThrowIfCancellationRequested();
+                                        cancellationToken.Token.ThrowIfCancellationRequested();
 
-                                    if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
-                                        q.IsEmpty)
-                                        await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
-                                }
-                            },
-
-                            #endregion
-
-                            #region Process BytesSend Processor Sub-Task
-
-                            async () =>
-                            {
-                                while (!cancellationToken.IsCancellationRequested &&
-                                       (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
-                                {
-                                    var delay = RndGenerator.Next(150, 350);
-
-                                    if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
-                                    {
-                                        var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                        Current.SessionState.ConnectionState.Send(msgBytes);
-
-                                        delay = RndGenerator.Next(75, 150);
+                                        await Task.Delay(delay, cancellationToken.Token);
                                     }
+                                },
 
-                                    cancellationToken.Token.ThrowIfCancellationRequested();
+                                #endregion
 
-                                    await Task.Delay(delay, cancellationToken.Token);
-                                }
-                            },
+                                #region Process BytesReceived Processor Sub-Task
 
-                            #endregion
-
-                            #region Process BytesReceived Processor Sub-Task
-
-                            async () =>
-                            {
-                                while (!cancellationToken.IsCancellationRequested &&
-                                       (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                async () =>
                                 {
-                                    var delay = RndGenerator.Next(150, 350);
-
-                                    if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                    while (!cancellationToken.IsCancellationRequested &&
+                                           (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
                                     {
-                                        var msgBytes = Current?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
-                                        using (var ms = new MemoryStream(msgBytes))
+                                        var delay = RndGenerator.Next(150, 350);
+
+                                        if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
                                         {
-                                            var msgHeader = new MSG_Header();
-                                            ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
+                                            var msgBytes = Current?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
+                                            using (var ms = new MemoryStream(msgBytes))
+                                            {
+                                                var msgHeader = new MSG_Header();
+                                                ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
 
-                                            var eventType = msgHeader.EventType.ToString();
-                                            var msgType = AppDomain.CurrentDomain.GetAssemblies()
-                                                ?.Where(a => a.FullName.StartsWith("ThePalace"))
-                                                ?.SelectMany(t => t.GetTypes())
-                                                ?.Where(t => t.Name == eventType)
-                                                ?.FirstOrDefault();
-                                            if (msgType == null) throw new InvalidDataException(nameof(msgType));
+                                                var eventType = msgHeader.EventType.ToString();
+                                                var msgType = AppDomain.CurrentDomain.GetAssemblies()
+                                                    ?.Where(a => a.FullName.StartsWith("ThePalace"))
+                                                    ?.SelectMany(t => t.GetTypes())
+                                                    ?.Where(t => t.Name == eventType)
+                                                    ?.FirstOrDefault();
+                                                if (msgType == null) throw new InvalidDataException(nameof(msgType));
 
-                                            var msgObj = (IProtocol?)msgType.GetInstance();
-                                            if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
+                                                var msgObj = (IProtocol?)msgType.GetInstance();
+                                                if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
 
-                                            ms.PalaceDeserialize(
-                                                msgObj,
-                                                msgType);
+                                                ms.PalaceDeserialize(
+                                                    msgObj,
+                                                    msgType);
 
-                                            var boType = EventBus.Current.GetType(msgObj);
-                                            if (boType == null) throw new InvalidDataException(nameof(msgType));
+                                                var boType = EventBus.Current.GetType(msgObj);
+                                                if (boType == null) throw new InvalidDataException(nameof(msgType));
 
-                                            EventBus.Current.Publish(
-                                                Current,
-                                                boType,
-                                                new ProtocolEventParams
-                                                {
-                                                    SourceID = Current?.SessionState?.UserId ?? 0,
-                                                    RefNum = msgHeader.RefNum,
-                                                    Request = msgObj
-                                                });
+                                                EventBus.Current.Publish(
+                                                    Current,
+                                                    boType,
+                                                    new ProtocolEventParams
+                                                    {
+                                                        SourceID = Current?.SessionState?.UserId ?? 0,
+                                                        RefNum = msgHeader.RefNum,
+                                                        Request = msgObj
+                                                    });
+                                            }
+
+                                            delay = RndGenerator.Next(75, 150);
                                         }
 
-                                        delay = RndGenerator.Next(75, 150);
+                                        cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                        await Task.Delay(delay, cancellationToken.Token);
                                     }
-
-                                    cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                    await Task.Delay(delay, cancellationToken.Token);
                                 }
-                            }
 
-                            #endregion
+                                #endregion
 
-                        ), cancellationToken.Token);
+                            ), cancellationToken.Token);
                 }
             },
             opts: RunOptions.UseSleepInterval,
@@ -257,6 +283,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             opts: RunOptions.UseSleepInterval | RunOptions.RunNow,
             sleepInterval: TimeSpan.FromMilliseconds(500));
 
+#if WINDOWS10_0_17763_0_OR_GREATER
         jobs[ThreadQueues.Toast] = TaskManager.Current.CreateJob<ToastCfg>(q =>
             {
                 if (!q.IsEmpty &&
@@ -286,6 +313,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                 }
             },
             opts: RunOptions.UseResetEvent);
+#endif
 
         #endregion
 
@@ -298,8 +326,6 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         _managedResources.AddRange(
             _contextMenu,
             SessionState);
-
-        Initialize();
     }
 
     public Program(Dictionary<ThreadQueues, IJob> jobs) : this()
@@ -336,6 +362,10 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         GC.SuppressFinalize(this);
     }
 
+    #endregion
+
+    #region Properties
+
     private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
         .Where(v => v.GetType()
             ?.GetField(v.ToString())
@@ -344,13 +374,19 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         .ToList()
         .AsReadOnly();
 
-    private readonly ContextMenuStrip _contextMenu = new();
+    protected readonly ContextMenuStrip _contextMenu = new();
 
     public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
 
-    private readonly ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
+    protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
-    public IReadOnlyDictionary<ThreadQueues, IJob> Jobs => _jobs.AsReadOnly();
+    public IReadOnlyDictionary<ThreadQueues, IJob> Jobs
+    {
+        get => _jobs.AsReadOnly();
+        internal set => _jobs = new(value);
+    }
+
+    #endregion
 
     #region Form Methods
 
@@ -1116,7 +1152,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     Flags = (int)NetworkCommandTypes.CONNECT,
-                                    Values = [new Uri($"palace://{comboBoxAddresses.Text}")]
+                                    Values = [$"palace://{comboBoxAddresses.Text}"]
                                 });
 
                             connectionForm.Close();
@@ -1138,7 +1174,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         .Where(c => c.Name == "comboBoxUsernames")
                         .FirstOrDefault() is ComboBox comboBoxUsernames)
                 {
-                    if (SettingsManager.Current.Get<List<string>>(@"\GUI\Connection\Usernames") is List<string> usernamesList)
+                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Usernames") is string[] usernamesList)
                     {
                         comboBoxUsernames.Items.AddRange(usernamesList
                             .Select(v => new ComboboxItem
@@ -1157,7 +1193,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         .Where(c => c.Name == "comboBoxAddresses")
                         .FirstOrDefault() is ComboBox comboBoxAddresses)
                 {
-                    if (SettingsManager.Current.Get<List<string>>(@"\GUI\Connection\Addresses") is List<string> addressesList)
+                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Addresses") is string[] addressesList)
                     {
                         comboBoxAddresses.Items.AddRange(addressesList
                             .Select(v => new ComboboxItem
@@ -1221,7 +1257,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                             var match = RegexConstants.REGEX_PALACEURL.Match(url);
                             if (match.Groups.Count < 2) break;
 
-                            var host = match.Groups[1].Value;
+                            var hostname = match.Groups[1].Value;
                             var port = match.Groups.Count > 2 &&
                                        !string.IsNullOrWhiteSpace(match.Groups[2].Value)
                                 ? Convert.ToUInt16(match.Groups[2].Value)
@@ -1232,7 +1268,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 : (short)0;
 
                             if ((SessionState.ConnectionState?.IsConnected() ?? false) &&
-                                SessionState.ConnectionState?.HostAddr?.Address.ToString() == host &&
+                                SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
                                 SessionState.Send(
@@ -1245,7 +1281,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     Flags = (int)NetworkCommandTypes.CONNECT,
-                                    Values = [new Uri(url)]
+                                    Values = [url]
                                 });
                         }
                     }

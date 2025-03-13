@@ -435,6 +435,11 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         {
             Queue.Clear();
         }
+
+        if ((Options & RunOptions.UseResetEvent) == RunOptions.UseResetEvent)
+        {
+            ResetEvent.Set();
+        }
         
         Queue.Enqueue(cmd);
     }

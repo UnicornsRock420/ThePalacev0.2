@@ -30,6 +30,7 @@ public interface IConnectionState : IDisposable
     
     void Connect(IPEndPoint hostAddr);
     void Connect(IPAddress ipAddress, int port);
+    void Connect(string hostname,  int port);
     void Connect(Uri uri);
     
     int Read(byte[] buffer, int offset = 0, int length = 0);

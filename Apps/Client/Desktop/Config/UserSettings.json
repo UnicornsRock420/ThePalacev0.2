@@ -16,43 +16,39 @@
   "GUI": {
     "Connection": {
       "Addresses": [
-        "Janus (Testing Client)"
-      ],
-      "Usernames": [
         "alluringhistoria.epalaces.com:9998",
         "animanic.epalaces.com:9998"
+      ],
+      "Usernames": [
+        "Janus (Testing Client)"
       ]
+    },
+    "General": {
+      "InterpolationMode": "NearestNeighbor",
+      "PixelOffsetMode": "Half",
+      "SmoothingMode": "NearestNeighbor",
+      "SysTrayIcon": false
+    },
+    "Notifications": {
+      "Toast": {
+        "Enabled": true
+      }
     }
   },
-  "Options": {
-    "GUI": {
-      "General": {
-        "InterpolationMode": "NearestNeighbor",
-        "PixelOffsetMode": "Half",
-        "SmoothingMode": "NearestNeighbor",
-        "SysTrayIcon": false
-      },
-      "Notifications": {
-        "Toast": {
-          "Enabled": true
-        }
+  "Scripting": {
+    "Iptscrae": {
+      "Cyborgs": {
+        "Enabled": true
       }
     },
-    "Scripting": {
-      "Iptscrae": {
-        "Cyborgs": {
-          "Enabled": true
-        }
-      },
-      "JavaScript": {
-        "Cyborgs": {
-          "Enabled": false
-        }
-      },
-      "Python": {
-        "Cyborgs": {
-          "Enabled": false
-        }
+    "JavaScript": {
+      "Cyborgs": {
+        "Enabled": false
+      }
+    },
+    "Python": {
+      "Cyborgs": {
+        "Enabled": false
       }
     }
   },

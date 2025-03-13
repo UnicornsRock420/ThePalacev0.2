@@ -13,8 +13,8 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         try
         {
             _configuration = new ConfigurationBuilder()
-                .AddJsonFile("AppSettings.json")
-                .AddJsonFile("UserSettings.json")
+                .AddJsonFile(@"Config\AppSettings.json")
+                .AddJsonFile(@"Config\UserSettings.json")
                 .Build();
         }
         catch (Exception ex)
@@ -124,7 +124,9 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
     {
         try
         {
-            return (T)Convert.ChangeType(_configuration[xPath], typeof(T));
+            return _configuration
+                .GetSection(xPath)
+                .Get<T>();
         }
         catch
         {

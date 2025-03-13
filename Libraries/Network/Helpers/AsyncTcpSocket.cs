@@ -6,7 +6,7 @@ using ThePalace.Network.Entities;
 using ThePalace.Network.Factories;
 using ThePalace.Network.Interfaces;
 
-namespace ThePalace.Network.Helpers.Network;
+namespace ThePalace.Network.Helpers;
 
 public static class AsyncTcpSocket
 {
@@ -76,7 +76,7 @@ public static class AsyncTcpSocket
         }
     }
 
-    public static async Task<bool> Connect(this IConnectionState connectionState, IPEndPoint? hostAddr = null)
+    public static bool Connect(IConnectionState connectionState, IPEndPoint? hostAddr = null)
     {
         ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(AsyncTcpSocket) + "." + nameof(hostAddr));
@@ -85,7 +85,11 @@ public static class AsyncTcpSocket
 
         return connectionState.Do(() =>
         {
-            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length, _receiveCallback, connectionState);
+            connectionState.Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
+            connectionState.Socket.Connect(hostAddr);
+            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState);
+
+            connectionState.NetworkStream = ConnectionManager.CreateNetworkStream(connectionState.Socket);
 
             ConnectionEstablished?.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
         });
@@ -182,11 +186,7 @@ public static class AsyncTcpSocket
         var connectionState = ConnectionManager.CreateConnectionState(handler, ConnectionManager.Current);
         if (connectionState == null) throw new SocketException();
 
-        connectionState.Do(() =>
-        {
-            connectionState.NetworkStream.BeginRead(connectionState.Buffer, 0, connectionState.Buffer.Length,
-                _receiveCallback, connectionState);
-        });
+        connectionState.Do(() => { connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState); });
 
         ConnectionReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
     }
@@ -221,11 +221,7 @@ public static class AsyncTcpSocket
             }
         }
 
-        connectionState.Do(() =>
-        {
-            connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0,
-                _receiveCallback, connectionState);
-        });
+        connectionState.Do(() => { connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState); });
 
         if (connectionState.NetworkStream.DataAvailable)
             DataReceived.Invoke(typeof(AsyncTcpSocket), (ConnectionState)connectionState);
@@ -238,10 +234,7 @@ public static class AsyncTcpSocket
 
         using (var @lock = LockContext.GetLock(connectionState.Socket))
         {
-            connectionState.Do(() =>
-            {
-                connectionState.NetworkStream.BeginWrite(data, 0, data.Length, _sendCallback, connectionState);
-            });
+            connectionState.Do(() => { connectionState.Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, connectionState); });
         }
     }
 
@@ -260,8 +253,8 @@ public static class AsyncTcpSocket
                 connectionState.LastSent = DateTime.UtcNow;
         });
     }
-    
-    
+
+
     public static IPAddress Resolve(this string hostname)
     {
         return Dns.GetHostAddresses(hostname).FirstOrDefault(addr => addr.AddressFamily == AddressFamily.InterNetwork);

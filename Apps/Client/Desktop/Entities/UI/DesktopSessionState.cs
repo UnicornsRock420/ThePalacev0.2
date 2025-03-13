@@ -30,7 +30,7 @@ using ThePalace.Core.Helpers.Core;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
-using ThePalace.Network.Helpers.Network;
+using ThePalace.Network.Helpers;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
@@ -484,11 +484,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                                 if (!_uiLayers[layer].Visible) continue;
 
                                 g.InterpolationMode =
-                                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
+                                    SettingsManager.Current.Get<InterpolationMode>("GUI:General:" + nameof(InterpolationMode));
                                 g.PixelOffsetMode =
-                                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
+                                    SettingsManager.Current.Get<PixelOffsetMode>("GUI:General:" + nameof(PixelOffsetMode));
                                 g.SmoothingMode =
-                                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+                                    SettingsManager.Current.Get<SmoothingMode>("GUI:General:" + nameof(SmoothingMode));
 
                                 switch (layer)
                                 {
@@ -1227,11 +1227,11 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             using (var g = Graphics.FromImage(img))
             {
                 g.InterpolationMode =
-                    SettingsManager.Current.Get<InterpolationMode>(@"\GUI\General\" + nameof(InterpolationMode));
+                    SettingsManager.Current.Get<InterpolationMode>("GUI:General:" + nameof(InterpolationMode));
                 g.PixelOffsetMode =
-                    SettingsManager.Current.Get<PixelOffsetMode>(@"\GUI\General\" + nameof(PixelOffsetMode));
+                    SettingsManager.Current.Get<PixelOffsetMode>("GUI:General:" + nameof(PixelOffsetMode));
                 g.SmoothingMode =
-                    SettingsManager.Current.Get<SmoothingMode>(@"\GUI\General\" + nameof(SmoothingMode));
+                    SettingsManager.Current.Get<SmoothingMode>("GUI:General:" + nameof(SmoothingMode));
 
                 g.Clear(Color.Transparent);
 

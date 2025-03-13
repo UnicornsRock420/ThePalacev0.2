@@ -12,7 +12,7 @@ public class LoggerHub : Singleton<LoggerHub>, ILogger
     public LoggerHub()
     {
         _configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile(@"Config\AppSettings.json")
             .Build();
 
         Logger = new LoggerConfiguration()
