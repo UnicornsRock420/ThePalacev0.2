@@ -63,6 +63,10 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
     [STAThread]
     public static void Main()
     {
+        var filePath = Path.Combine(Environment.CurrentDirectory, "ThePalace.Media.dll");
+        if (File.Exists(filePath))
+            Assembly.LoadFile(filePath);
+
         //// To customize application configuration such as set high DPI settings or default font,
         //// see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
@@ -415,8 +419,6 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         ApiManager.Current.RegisterApi(nameof(toolStripDropdownlist_Click), toolStripDropdownlist_Click);
         ApiManager.Current.RegisterApi(nameof(toolStripMenuItem_Click), toolStripMenuItem_Click);
         ApiManager.Current.RegisterApi(nameof(contextMenuItem_Click), contextMenuItem_Click);
-
-        ShowAppForm();
 
 #if WINDOWS10_0_17763_0_OR_GREATER
         ((Job<ToastCfg>)Jobs[ThreadQueues.Toast])?.Enqueue(new ToastCfg

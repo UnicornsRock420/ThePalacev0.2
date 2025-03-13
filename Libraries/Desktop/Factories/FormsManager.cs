@@ -15,11 +15,6 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     public FormsManager()
     {
         ThreadExit += (sender, e) => Dispose();
-
-        _managedResources.AddRange(
-            _forms,
-            HotKeyManager.Current,
-            TaskManager.Current);
     }
 
     ~FormsManager()
@@ -33,7 +28,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
         FormClosed?.Clear();
 
-        foreach (var form in _forms.Values)
+        foreach (var form in _forms.Values.ToList())
         {
             var controls = form.Controls
                 .Cast<Control>()
@@ -48,7 +43,25 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
                 }
         }
 
+        _forms.Clear();
+
         base.Dispose();
+        
+        try
+        {
+            HotKeyManager.Current.Dispose();
+        }
+        catch
+        {
+        }
+
+        try
+        {
+            TaskManager.Current.Dispose();
+        }
+        catch
+        {
+        }
 
         ExitThread();
     }
@@ -78,19 +91,19 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
             .FirstOrDefault();
         if (!forms.Any(f =>
                 f != app &&
-                f is IFormDialog
-            ))
+                f is IFormDialog))
+        {
             TCF._TryDispose(
-                    TaskManager.Current,
                     app,
                     this)
                 .Execute();
+        }
     }
 
     public bool RegisterForm(FormBase form, bool assignFormClosedHandler = true)
     {
         if (IsDisposed) return false;
-        
+
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
         using (var @lock = LockContext.GetLock(_forms))
@@ -114,7 +127,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     public bool UnregisterForm(FormBase form)
     {
         if (IsDisposed) return false;
-        
+
         ArgumentNullException.ThrowIfNull(form, nameof(form));
 
         using (var @lock = LockContext.GetLock(_forms))
@@ -187,7 +200,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         where T : FormBase
     {
         ArgumentNullException.ThrowIfNull(form, nameof(form));
-        
+
         form.SuspendLayout();
 
         form.ClientSize = cfg.Size;
@@ -246,41 +259,36 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         foreach (var cfg in cfgs)
         {
             var control = new TControl();
-
-            if (control is Button button)
+            switch (control)
             {
-                button.UseVisualStyleBackColor = cfg.UseVisualStyleBackColor;
+                case Button button:
+                    button.UseVisualStyleBackColor = cfg.UseVisualStyleBackColor;
+                    break;
+                case CheckBox checkBox:
+                    checkBox.Checked = cfg.Value != 0;
+                    checkBox.UseVisualStyleBackColor = cfg.UseVisualStyleBackColor;
+                    break;
+                case PictureBox pictureBox:
+                    pictureBox.BorderStyle = cfg.BorderStyle;
+                    break;
+                case ProgressBar progressBar:
+                    progressBar.Value = cfg.Value;
+                    break;
+                case RichTextBox richTextBox:
+                    richTextBox.MaxLength = cfg.MaxLength;
+                    richTextBox.Multiline = cfg.Multiline;
+                    break;
+                case ScrollableControl scrollableControl when
+                    cfg.Scroll != null:
+                    scrollableControl.Scroll += cfg.Scroll;
+                    break;
+                case TextBox textBox:
+                    textBox.MaxLength = cfg.MaxLength;
+                    textBox.Multiline = cfg.Multiline;
+                    break;
+                case null:
+                    continue;
             }
-            else if (control is CheckBox checkBox)
-            {
-                checkBox.Checked = cfg.Value != 0;
-                checkBox.UseVisualStyleBackColor = cfg.UseVisualStyleBackColor;
-            }
-            else if (control is PictureBox pictureBox)
-            {
-                pictureBox.BorderStyle = cfg.BorderStyle;
-            }
-            else if (control is ProgressBar progressBar)
-            {
-                progressBar.Value = cfg.Value;
-            }
-            else if (control is RichTextBox richTextBox)
-            {
-                richTextBox.MaxLength = cfg.MaxLength;
-                richTextBox.Multiline = cfg.Multiline;
-            }
-            else if (control is ScrollableControl scrollableControl &&
-                     cfg.Scroll != null)
-            {
-                scrollableControl.Scroll += cfg.Scroll;
-            }
-            else if (control is TextBox textBox)
-            {
-                textBox.MaxLength = cfg.MaxLength;
-                textBox.Multiline = cfg.Multiline;
-            }
-
-            if (control == null) continue;
 
             control.Name = $"{typeof(TControl).FullName}_{Guid.NewGuid()}";
 

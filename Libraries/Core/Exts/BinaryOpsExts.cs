@@ -498,29 +498,30 @@ public static class BinaryOpsExts
             var _name = (string?)null;
             var _cb = (Action<MemberInfo, object>)null;
 
-            if (member is FieldInfo _fieldNfo)
+            switch (member)
             {
-                _type = _fieldNfo.FieldType;
-                _name = _fieldNfo.Name;
+                case FieldInfo _fieldNfo:
+                    _type = _fieldNfo.FieldType;
+                    _name = _fieldNfo.Name;
 
-                _cb = (o, v) =>
-                {
-                    if (o is FieldInfo _fieldNfo) _fieldNfo.SetValue(obj, v);
-                };
+                    _cb = (o, v) =>
+                    {
+                        if (o is FieldInfo _fieldNfo) _fieldNfo.SetValue(obj, v);
+                    };
 
-                _attrs.AddRange(_fieldNfo.GetCustomAttributes());
-            }
-            else if (member is PropertyInfo _propNfo)
-            {
-                _type = _propNfo.PropertyType;
-                _name = _propNfo.Name;
+                    _attrs.AddRange(_fieldNfo.GetCustomAttributes());
+                    break;
+                case PropertyInfo _propNfo:
+                    _type = _propNfo.PropertyType;
+                    _name = _propNfo.Name;
 
-                _cb = (o, v) =>
-                {
-                    if (o is PropertyInfo _propNfo) _propNfo.SetValue(obj, v);
-                };
+                    _cb = (o, v) =>
+                    {
+                        if (o is PropertyInfo _propNfo) _propNfo.SetValue(obj, v);
+                    };
 
-                _attrs.AddRange(_propNfo.GetCustomAttributes());
+                    _attrs.AddRange(_propNfo.GetCustomAttributes());
+                    break;
             }
 
             _attrs.AddRange(_type?.GetCustomAttributes() ?? []);
@@ -745,37 +746,38 @@ public static class BinaryOpsExts
             var _name = (string?)null;
             var _value = (object?)null;
 
-            if (member is FieldInfo _fieldNfo)
+            switch (member)
             {
-                _type = _fieldNfo.FieldType;
-                _name = _fieldNfo.Name;
+                case FieldInfo _fieldNfo:
+                    _type = _fieldNfo.FieldType;
+                    _name = _fieldNfo.Name;
 
-                try
-                {
-                    _value = _fieldNfo.GetValue(obj);
-                }
-                catch
-                {
-                    _value = null;
-                }
+                    try
+                    {
+                        _value = _fieldNfo.GetValue(obj);
+                    }
+                    catch
+                    {
+                        _value = null;
+                    }
 
-                _attrs.AddRange(_fieldNfo.GetCustomAttributes());
-            }
-            else if (member is PropertyInfo _propNfo)
-            {
-                _type = _propNfo.PropertyType;
-                _name = _propNfo.Name;
+                    _attrs.AddRange(_fieldNfo.GetCustomAttributes());
+                    break;
+                case PropertyInfo _propNfo:
+                    _type = _propNfo.PropertyType;
+                    _name = _propNfo.Name;
 
-                try
-                {
-                    _value = _propNfo.GetValue(obj);
-                }
-                catch
-                {
-                    _value = null;
-                }
+                    try
+                    {
+                        _value = _propNfo.GetValue(obj);
+                    }
+                    catch
+                    {
+                        _value = null;
+                    }
 
-                _attrs.AddRange(_propNfo.GetCustomAttributes());
+                    _attrs.AddRange(_propNfo.GetCustomAttributes());
+                    break;
             }
 
             _attrs.AddRange(_type?.GetCustomAttributes() ?? []);

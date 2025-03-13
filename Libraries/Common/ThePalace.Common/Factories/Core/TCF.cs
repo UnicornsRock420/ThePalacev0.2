@@ -203,13 +203,14 @@ public sealed class TCF : IDisposable
                 {
                     switch (tryBlock)
                     {
+                        case IDisposable iDisposable:
+                            iDisposable.Dispose();
+                            break;
                         case Action action:
                             action();
-
                             break;
                         case Func<object> @func:
                             results._Results.Add(@func());
-
                             break;
                     }
                 }

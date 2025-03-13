@@ -8,6 +8,7 @@ public interface ILayerScreen : IDisposable
     float Opacity { get; set; }
     Bitmap Image { get; }
 
+    IDesktopSessionState SessionState { get; }
     LayerScreenTypes Type { get; }
     int Width { get; }
     int Height { get; }
@@ -17,7 +18,6 @@ public interface ILayerScreen : IDisposable
     void Load(
         LayerSourceTypes srcType,
         string xPath,
-        IDesktopSessionState? sessionState = null,
         int? width = null,
         int? height = null);
 

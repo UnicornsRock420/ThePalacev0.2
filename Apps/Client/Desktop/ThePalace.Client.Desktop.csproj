@@ -16,6 +16,7 @@
         <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj"/>
         <ProjectReference Include="..\..\..\Libraries\Network\ThePalace.Network.csproj"/>
         <ProjectReference Include="..\..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
+        <ProjectReference Include="..\..\..\Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj" />
         <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
     </ItemGroup>
 

@@ -34,33 +34,36 @@ public abstract class ItemBase : IDisposable
                 {
                 }
 
-        if (this is StandardItem _standardItem)
+        switch (this)
         {
-            try
-            {
-                _standardItem.Image?.Dispose();
-            }
-            catch
-            {
-            }
-        }
-        else if (this is BooleanItem _booleanItem)
-        {
-            try
-            {
-                _booleanItem.OnImage?.Dispose();
-            }
-            catch
-            {
-            }
+            case StandardItem _standardItem:
+                try
+                {
+                    _standardItem.Image?.Dispose();
+                }
+                catch
+                {
+                }
 
-            try
-            {
-                _booleanItem.OffImage?.Dispose();
-            }
-            catch
-            {
-            }
+                break;
+            case BooleanItem _booleanItem:
+                try
+                {
+                    _booleanItem.OnImage?.Dispose();
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    _booleanItem.OffImage?.Dispose();
+                }
+                catch
+                {
+                }
+
+                break;
         }
     }
 
@@ -101,18 +104,23 @@ public abstract class ItemBase : IDisposable
                 HoverFrames = hoverFrames.ToArray();
             }
 
-        if (this is StandardItem _standardItem)
+        switch (this)
         {
-            if (!string.IsNullOrWhiteSpace(_standardItem.Icon))
-                _standardItem.Image = GetIcon(assembly, $"{rootPath}.{_standardItem.Icon}");
-        }
-        else if (this is BooleanItem _booleanItem)
-        {
-            if (!string.IsNullOrWhiteSpace(_booleanItem.OnIcon))
-                _booleanItem.OnImage = GetIcon(assembly, $"{rootPath}.{_booleanItem.OnIcon}");
+            case StandardItem _standardItem:
+            {
+                if (!string.IsNullOrWhiteSpace(_standardItem.Icon))
+                    _standardItem.Image = GetIcon(assembly, $"{rootPath}.{_standardItem.Icon}");
+                break;
+            }
+            case BooleanItem _booleanItem:
+            {
+                if (!string.IsNullOrWhiteSpace(_booleanItem.OnIcon))
+                    _booleanItem.OnImage = GetIcon(assembly, $"{rootPath}.{_booleanItem.OnIcon}");
 
-            if (!string.IsNullOrWhiteSpace(_booleanItem.OffIcon))
-                _booleanItem.OffImage = GetIcon(assembly, $"{rootPath}.{_booleanItem.OffIcon}");
+                if (!string.IsNullOrWhiteSpace(_booleanItem.OffIcon))
+                    _booleanItem.OffImage = GetIcon(assembly, $"{rootPath}.{_booleanItem.OffIcon}");
+                break;
+            }
         }
     }
 
@@ -212,20 +220,20 @@ public abstract class ItemBase : IDisposable
         result.Title = instance.Title;
         result.HoverIcon = instance.HoverIcon;
         result.HoverFrames = instance.HoverFrames;
-        if (result is StandardItem _standardItem1 &&
-            instance is StandardItem _standardItem2)
+        switch (result)
         {
-            _standardItem1.Icon = _standardItem2.Icon;
-            _standardItem1.Image = _standardItem2.Image;
-        }
-        else if (
-            result is BooleanItem _booleanItem1 &&
-            instance is BooleanItem _booleanItem2)
-        {
-            _booleanItem1.OnIcon = _booleanItem2.OnIcon;
-            _booleanItem1.OnImage = _booleanItem2.OnImage;
-            _booleanItem1.OffIcon = _booleanItem2.OffIcon;
-            _booleanItem1.OffImage = _booleanItem2.OffImage;
+            case StandardItem _standardItem1 when
+                instance is StandardItem _standardItem2:
+                _standardItem1.Icon = _standardItem2.Icon;
+                _standardItem1.Image = _standardItem2.Image;
+                break;
+            case BooleanItem _booleanItem1 when
+                instance is BooleanItem _booleanItem2:
+                _booleanItem1.OnIcon = _booleanItem2.OnIcon;
+                _booleanItem1.OnImage = _booleanItem2.OnImage;
+                _booleanItem1.OffIcon = _booleanItem2.OffIcon;
+                _booleanItem1.OffImage = _booleanItem2.OffImage;
+                break;
         }
 
         return result;

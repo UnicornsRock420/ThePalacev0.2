@@ -59,7 +59,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
 
         foreach (var layer in _layerTypes)
-            _uiLayers.TryAdd(layer, new LayerScreen(layer));
+            _uiLayers.TryAdd(layer, new LayerScreen(this, layer));
 
         var iptTracking = new IptTracking();
         ScriptTag = iptTracking;
@@ -429,10 +429,15 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         _ => true
                     };
 
-                    if (ribbonItem is StandardItem _standardItem)
-                        item.Image = _standardItem.Image;
-                    else if (ribbonItem is BooleanItem _booleanItem)
-                        item.Image = _booleanItem.State ? _booleanItem.OnImage : _booleanItem.OffImage;
+                    switch (ribbonItem)
+                    {
+                        case StandardItem _standardItem:
+                            item.Image = _standardItem.Image;
+                            break;
+                        case BooleanItem _booleanItem:
+                            item.Image = _booleanItem.State ? _booleanItem.OnImage : _booleanItem.OffImage;
+                            break;
+                    }
 
                     if (item.Image != null)
                     {
@@ -1163,8 +1168,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
                 _uiLayers[LayerScreenTypes.Base].Load(
                     LayerSourceTypes.Resource,
-                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png",
-                    this);
+                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
             }
             else if (layers.Contains(LayerScreenTypes.Base))
             {
@@ -1186,16 +1190,14 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                     if (File.Exists(filePath))
                         _uiLayers[LayerScreenTypes.Base].Load(
                             LayerSourceTypes.Filesystem,
-                            filePath,
-                            this);
+                            filePath);
                 }
 
                 if (RoomInfo.Picture !=
                     _uiLayers[LayerScreenTypes.Base].Image?.Tag?.ToString())
                     _uiLayers[LayerScreenTypes.Base].Load(
                         LayerSourceTypes.Resource,
-                        "ThePalace.Media.Resources.backgrounds.clouds.jpg",
-                        this);
+                        "ThePalace.Media.Resources.backgrounds.clouds.jpg");
             }
         }
         catch (Exception ex)
@@ -1207,7 +1209,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         try
         {
-            var img = (Bitmap?)null;
             if (imgScreen.Image == null ||
                 imgScreen.Image.Width != ScreenWidth ||
                 imgScreen.Image.Height != ScreenHeight)
@@ -1220,60 +1221,60 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                 {
                 }
 
-                img = new Bitmap(ScreenWidth, ScreenHeight);
+                var img = new Bitmap(ScreenWidth, ScreenHeight);
                 img.MakeTransparent(Color.Transparent);
-            }
 
-            using (var g = Graphics.FromImage(img))
-            {
-                g.InterpolationMode =
-                    SettingsManager.Current.Get<InterpolationMode>("GUI:General:" + nameof(InterpolationMode));
-                g.PixelOffsetMode =
-                    SettingsManager.Current.Get<PixelOffsetMode>("GUI:General:" + nameof(PixelOffsetMode));
-                g.SmoothingMode =
-                    SettingsManager.Current.Get<SmoothingMode>("GUI:General:" + nameof(SmoothingMode));
-
-                g.Clear(Color.Transparent);
-
-                foreach (var layer in _layerTypes)
+                using (var g = Graphics.FromImage(img))
                 {
-                    if (!_uiLayers[layer].Visible ||
-                        _uiLayers[layer].Opacity == 0F ||
-                        _uiLayers[layer].Image == null) continue;
+                    g.InterpolationMode =
+                        SettingsManager.Current.Get<InterpolationMode>("GUI:General:" + nameof(InterpolationMode));
+                    g.PixelOffsetMode =
+                        SettingsManager.Current.Get<PixelOffsetMode>("GUI:General:" + nameof(PixelOffsetMode));
+                    g.SmoothingMode =
+                        SettingsManager.Current.Get<SmoothingMode>("GUI:General:" + nameof(SmoothingMode));
 
-                    using (var @lock = LockContext.GetLock(_uiLayers[layer]))
+                    g.Clear(Color.Transparent);
+
+                    foreach (var layer in _layerTypes)
                     {
-                        var imgAttributes = (ImageAttributes?)null;
+                        if (!_uiLayers[layer].Visible ||
+                            _uiLayers[layer].Opacity == 0F ||
+                            _uiLayers[layer].Image == null) continue;
 
-                        if (_uiLayers[layer].Opacity < 1.0F)
+                        using (var @lock = LockContext.GetLock(_uiLayers[layer]))
                         {
-                            var matrix = new ColorMatrix
+                            var imgAttributes = (ImageAttributes?)null;
+
+                            if (_uiLayers[layer].Opacity < 1.0F)
                             {
-                                Matrix33 = _uiLayers[layer].Opacity
-                            };
+                                var matrix = new ColorMatrix
+                                {
+                                    Matrix33 = _uiLayers[layer].Opacity
+                                };
 
-                            imgAttributes = new ImageAttributes();
-                            imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-                        }
+                                imgAttributes = new ImageAttributes();
+                                imgAttributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                            }
 
-                        g.DrawImage(
-                            _uiLayers[layer].Image,
-                            new Rectangle(
+                            g.DrawImage(
+                                _uiLayers[layer].Image,
+                                new Rectangle(
+                                    0, 0,
+                                    img.Width,
+                                    img.Height),
                                 0, 0,
-                                img.Width,
-                                img.Height),
-                            0, 0,
-                            _uiLayers[layer].Image.Width,
-                            _uiLayers[layer].Image.Height,
-                            GraphicsUnit.Pixel,
-                            imgAttributes);
+                                _uiLayers[layer].Image.Width,
+                                _uiLayers[layer].Image.Height,
+                                GraphicsUnit.Pixel,
+                                imgAttributes);
+                        }
                     }
+
+                    g.Save();
                 }
 
-                g.Save();
+                imgScreen.Image = img;
             }
-
-            imgScreen.Image = img;
         }
         catch (Exception ex)
         {

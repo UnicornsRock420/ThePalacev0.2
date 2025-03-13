@@ -11,8 +11,11 @@ public class LayerScreen : Disposable, ILayerScreen
     {
     }
 
-    public LayerScreen(LayerScreenTypes type)
+    public LayerScreen(
+        IDesktopSessionState sessionState,
+        LayerScreenTypes type)
     {
+        SessionState = sessionState;
         Type = type;
     }
 
@@ -36,6 +39,7 @@ public class LayerScreen : Disposable, ILayerScreen
     public float Opacity { get; set; } = 1.0F;
     public Bitmap Image { get; protected set; }
 
+    public IDesktopSessionState SessionState { get; }
     public LayerScreenTypes Type { get; }
     public int Width => Image?.Width ?? 0;
     public int Height => Image?.Height ?? 0;
@@ -43,7 +47,6 @@ public class LayerScreen : Disposable, ILayerScreen
     public void Load(
         LayerSourceTypes srcType,
         string xPath,
-        IDesktopSessionState? sessionState = null,
         int? width = null,
         int? height = null)
     {
@@ -63,6 +66,7 @@ public class LayerScreen : Disposable, ILayerScreen
                 case LayerSourceTypes.Resource:
                     using (var stream = AppDomain.CurrentDomain
                                .GetAssemblies()
+                               .Where(a => a.FullName.StartsWith("ThePalace.Media"))
                                .Where(a =>
                                {
                                    try
@@ -105,11 +109,10 @@ public class LayerScreen : Disposable, ILayerScreen
             Image.Tag = Path.GetFileName(xPath);
         }
 
-        if (Type != LayerScreenTypes.Base ||
-            sessionState == null) return;
+        if (Type != LayerScreenTypes.Base) return;
 
-        sessionState.ScreenWidth = width ?? backgroundImage.Width;
-        sessionState.ScreenHeight = height ?? backgroundImage.Height;
+        SessionState.ScreenWidth = width ?? backgroundImage.Width;
+        SessionState.ScreenHeight = height ?? backgroundImage.Height;
     }
 
     public void Unload()

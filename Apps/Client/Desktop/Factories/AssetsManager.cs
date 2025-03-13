@@ -79,7 +79,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     {
         if (string.IsNullOrWhiteSpace(resourceName)) return;
 
-        var xPath = $"ThePalace.Core.Desktop.Core.Resources.smilies.{resourceName}";
+        var xPath = $"ThePalace.Media.Resources.smilies.{resourceName}";
         var imgSmileyFaces = (Bitmap?)null;
 
         using (var imgStream = AppDomain.CurrentDomain
