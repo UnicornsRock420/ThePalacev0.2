@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.Network.Client.Network;
 using ThePalace.Core.Entities.Scripting;
@@ -15,23 +16,22 @@ namespace ThePalace.Core.Helpers.Scripting;
 
 using IptAtomList = List<IptVariable>;
 
-public static class IptscraeEngine
+public class IptscraeEngine
 {
-    internal const decimal CONST_IptVersion = (decimal)3.0;
-    internal const int CONST_gNestedAtomlistMaxDepth = 256;
-    internal const int CONST_gNestedArrayMaxDepth = 256;
-    internal const int CONST_gWhileMaxIteration = 7500;
-    internal const int CONST_gMaxPaintPenSize = 20;
-    internal const int CONST_gStackMaxSize = 1024;
-    internal const string CONST_IptEngineName = "IptscraeEngine";
-    internal const string CONST_ClientType = "IptscraeEngine";
-    private static readonly Type CONST_TYPE_STRING = typeof(string);
+    protected const decimal CONST_IptVersion = (decimal)3.0;
+    protected const int CONST_gNestedAtomlistMaxDepth = 256;
+    protected const int CONST_gNestedArrayMaxDepth = 256;
+    protected const int CONST_gWhileMaxIteration = 7500;
+    protected const int CONST_gMaxPaintPenSize = 20;
+    protected const int CONST_gStackMaxSize = 1024;
+    protected const string CONST_IptEngineName = "IptscraeEngine";
+    protected const string CONST_ClientType = "IptscraeEngine";
 
-    private static readonly IReadOnlyDictionary<string, IptEventTypes> EventTypes =
+    protected static readonly IReadOnlyDictionary<string, IptEventTypes> EventTypes =
         Enum.GetValues<IptEventTypes>()
             .ToDictionary(v => v.ToString().ToUpperInvariant(), v => v);
 
-    internal static readonly ConcurrentDictionary<string, object> IptCommands =
+    protected static readonly ConcurrentDictionary<string, object> IptCommands =
         new(new Dictionary<string, object>
         {
             #region Iptscrae Commands
@@ -39,164 +39,27 @@ public static class IptscraeEngine
             {
                 "IPTVERSION", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)CONST_IptVersion
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)CONST_IptVersion));
                 })
             },
 
             #region Iptscrae Version 1
 
-            // Start Aliases
+            #region Start Aliases
+
             { "ROOMGOTO", "GOTOROOM" },
             { "CLEARPROPS", "NAKED" },
             { "NETGOTO", "GOTOURL" },
             { "USERID", "WHOME" },
             { "CHAT", "SAY" },
             { "ID", "ME" },
-            // End Aliases
-            // Start Paint Commands
-            {
-                "LINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register3 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register4 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    //$scope.model.Screen.paintPenPos = {
-                    //    v: register3.Value,
-                    //    h: register4.Value,
-                    //};
+            #endregion End Aliases
 
-                    //$scope.encodeDrawCmd({
-                    //    v: register3.Value,
-                    //    h: register4.Value,
-                    //}, [{
-                    //    v: register1.Value - register3.Value,
-                    //    h: register2.Value - register4.Value,
-                    //}]);
-                })
-            },
-            {
-                "LINETO", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+            #region Start Sound Commands
 
-                    //$scope.encodeDrawCmd({
-                    //    v: $scope.model.Screen.paintPenPos.v,
-                    //    h: $scope.model.Screen.paintPenPos.h,
-                    //}, [{
-                    //    v: register1.Value - $scope.model.Screen.paintPenPos.v,
-                    //    h: register2.Value - $scope.model.Screen.paintPenPos.h,
-                    //}]);
-
-                    //$scope.model.Screen.paintPenPos = {
-                    //    v: register1.Value,
-                    //    h: register2.Value,
-                    //};
-                })
-            },
-            // Start Paint Commands
-            {
-                "PENPOS", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
-
-                    //$scope.model.Screen.paintPenPos = {
-                    //    v: register1.Value,
-                    //    h: register2.Value,
-                    //};
-                })
-            },
-            {
-                "PENTO", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
-
-                    //if (!$scope.model.Screen.paintPenPos) {
-                    //    $scope.model.Screen.paintPenPos = {
-                    //        v: 0,
-                    //        h: 0,
-                    //    };
-                    //}
-
-                    //var xCoord = $scope.model.Screen.paintPenPos.h + register2.Value;
-                    //var yCoord = $scope.model.Screen.paintPenPos.v + register1.Value;
-
-                    //$scope.model.Screen.paintPenPos = {
-                    //    v: yCoord,
-                    //    h: xCoord,
-                    //};
-                })
-            },
-            {
-                "PENCOLOR", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register3 = getStack(iptTracking, IptVariableTypes.Integer);
-
-                    //$scope.model.Screen.paintPenColor = {
-                    //    r: register3.Value % 256,
-                    //    g: register2.Value % 256,
-                    //    b: register1.Value % 256,
-                    //};
-                })
-            },
-            {
-                "PAINTCLEAR", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //$scope.serverSend(
-                    //    'MSG_DRAW',
-                    //    {
-                    //        Type = 'DC_Detonate',
-                    //        layer: false,
-                    //        data: null,
-                    //    });
-                })
-            },
-            {
-                "PAINTUNDO", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //$scope.serverSend(
-                    //    'MSG_DRAW',
-                    //    {
-                    //        Type = 'DC_Delete',
-                    //        layer: false,
-                    //        data: null,
-                    //    });
-                })
-            },
-            {
-                "PENBACK", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //$scope.model.Screen.paintLayer = false;
-                })
-            },
-            {
-                "PENFRONT", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //$scope.model.Screen.paintLayer = true;
-                })
-            },
-            {
-                "PENSIZE", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.Integer);
-
-                    if ((int)register.Value < 1) register.Value = 1;
-
-                    //$scope.model.Screen.paintPenSize = register.Value;
-                })
-            },
-            // End Paint Commands
-            // Start Sound Commands
             {
                 "SOUND", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -241,18 +104,19 @@ public static class IptscraeEngine
                     //$scope.model.Application.midiPlayer.stop();
                 })
             },
-            // End Sound Commands
-            // Start Math Commands
+
+            #endregion End Sound Commands
+
+            #region Start Math Commands
+
             {
                 "SINE", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)Math.Sin((int)register.Value) * 1000
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)Math.Sin((int)register.Value) * 1000));
                 })
             },
             {
@@ -260,11 +124,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)Math.Cos((int)register.Value) * 1000
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)Math.Cos((int)register.Value) * 1000));
                 })
             },
             {
@@ -272,11 +134,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)Math.Tan((int)register.Value) * 1000
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)Math.Tan((int)register.Value) * 1000));
                 })
             },
             {
@@ -284,11 +144,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)Math.Sqrt((int)register.Value) * 1000
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)Math.Sqrt((int)register.Value) * 1000));
                 })
             },
             {
@@ -296,40 +154,40 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = RndGenerator.Next((int)register.Value)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        RndGenerator.Next((int)register.Value)));
                 })
             },
             {
                 "MOD", (IptCommandFnc)((iptTracking, recursionDepth) => { Operator(iptTracking, "%", recursionDepth); })
             },
-            // End Math Commands
-            // Start Time Commands
+
+            #endregion End Math Commands
+
+            #region Start Time Commands
+
             {
                 "TICKS", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = DateTime.UtcNow.ToTicks()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        DateTime.UtcNow.ToTicks()));
                 })
             },
             {
                 "DATETIME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = DateTime.UtcNow.ToTimestamp()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        DateTime.UtcNow.ToTimestamp()));
                 })
             },
-            // End Time Commands
-            // Start Stack Commands
+
+            #endregion End Time Commands
+
+            #region Start Stack Commands
+
             {
                 "OVER", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -370,15 +228,16 @@ public static class IptscraeEngine
             {
                 "STACKDEPTH", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = iptTracking.Stack.Count
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        iptTracking.Stack.Count));
                 })
             },
-            // End Stack Commands
-            // Start Message Commands
+
+            #endregion End Stack Commands
+
+            #region Start Message Commands
+
             {
                 "ROOMMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -495,377 +354,11 @@ public static class IptscraeEngine
                     //    });
                 })
             },
-            // End Message Commands
-            // Start Prop Commands
-            {
-                "MACRO", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    // TODO:
-                })
-            },
-            {
-                "USERPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.Integer);
+            #endregion End Message Commands
 
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            if (register.Value < $scope.model.RoomInfo.UserList[j].propSpec.length) {
-                    //                var propID = $scope.model.RoomInfo.UserList[j].propSpec[register.Value].id;
-                    //
-                    //                iptTracking.Stack.Push(new IptValue {
-                    //                    Type = IptTypes.Integer,
-                    //                    Value = propID,
-                    //                });
-                    //            }
-                    //        }
-                    //
-                    //        break;
-                    //    }
-                    //}
-                })
-            },
-            {
-                "DROPPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
+            #region Start String Commands
 
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            var lastIndex = $scope.model.RoomInfo.UserList[j].propSpec.length - 1;
-                    //            var propID = $scope.model.RoomInfo.UserList[j].propSpec[lastIndex].id;
-                    //
-                    //            $scope.serverSend(
-                    //                'MSG_PROPNEW',
-                    //
-                    //                {
-                    //                    propSpec: {
-                    //                        id: propID,
-                    //			            crc: 0,
-                    //		            },
-                    //		            loc: {
-                    //                        h: register2.Value,
-                    //			            v: register1.Value,
-                    //		            },
-                    //	            });
-                    //
-                    //            if (lastIndex == 0) {
-                    //	            $scope.setProps(null);
-                    //            }
-                    //            else {
-                    //	            $scope.model.RoomInfo.UserList[j].propSpec.splice(lastIndex, 1);
-                    //
-                    //	            $scope.setProps($scope.model.RoomInfo.UserList[j].propSpec);
-                    //            }
-                    //        }
-                    //
-                    //        break;
-                    //    }
-                    //}
-                })
-            },
-            {
-                "DOFFPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            $scope.model.RoomInfo.UserList[j].propSpec.splice($scope.model.RoomInfo.UserList[j].propSpec.length - 1, 1);
-                    //
-                    //            $scope.setProps($scope.model.RoomInfo.UserList[j].propSpec.length > 0 ? $scope.model.RoomInfo.UserList[j].propSpec : null);
-                    //        }
-                    //
-                    //        break;
-                    //    }
-                    //}
-                })
-            },
-            {
-                "TOPPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        var propID = 0;
-                    //
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            propID = $scope.model.RoomInfo.UserList[j].propSpec[$scope.model.RoomInfo.UserList[j].propSpec.length - 1].id;
-                    //        }
-                    //
-                    //        iptTracking.Stack.Push(new IptValue {
-                    //            Type = IptTypes.Integer,
-                    //            Value = propID,
-                    //        });
-                    //
-                    //        break;
-                    //    }
-                    //}
-                })
-            },
-            {
-                "HASPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
-
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        var propID = 0;
-                    //
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            switch (register.Type) {
-                    //                case IptTypes.String:
-                    //		            for (var k in $scope.model.Screen.assetCache) {
-                    //                        if ($scope.model.Screen.assetCache[k].name == register.Value) {
-                    //                            propID = k;
-                    //
-                    //                            break;
-                    //                        }
-                    //                    }
-                    //
-                    //                    break;
-                    //                case IptTypes.Integer:
-                    //                    propID = register.Value;
-                    //
-                    //                    break;
-                    //            }
-                    //        }
-                    //
-                    //        iptTracking.Stack.Push(new IptValue {
-                    //            Type = IptTypes.Bool,
-                    //            Value = propID != 0 ? 1 : 0,
-                    //        });
-                    //
-                    //        break;
-                    //    }
-                    //}
-                })
-            },
-            {
-                "CLEARLOOSEPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //$scope.serverSend(
-                    //    'MSG_PROPDEL',
-                    //    {
-                    //        propNum: -1
-                    //    });
-                })
-            },
-            {
-                "ADDLOOSEPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register1 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register2 = getStack(iptTracking, IptVariableTypes.Integer);
-                    var register3 = getStack(iptTracking, IptVariableTypes.String);
-
-                    if (register1.Type != register2.Type && register1.Type != IptVariableTypes.Integer)
-                        throw new Exception($"Wrong datatype {register1.Type}...");
-
-                    switch (register3.Type)
-                    {
-                        case IptVariableTypes.String:
-                            //for (var k in $scope.model.Screen.assetCache) {
-                            //    if ($scope.model.Screen.assetCache[k].name == register3.Value) {
-                            //        $scope.serverSend(
-                            //            'MSG_PROPNEW',
-                            //
-                            //            {
-                            //                propSpec: {
-                            //                    id: k,
-                            //		            crc: 0,
-                            //	            },
-                            //	            loc: {
-                            //                    h: register2.Value,
-                            //		            v: register1.Value,
-                            //	            },
-                            //            });
-                            //
-                            //        break;
-                            //    }
-                            //}
-
-                            break;
-                        case IptVariableTypes.Integer:
-                            //$scope.serverSend(
-                            //    'MSG_PROPNEW',
-                            //
-                            //    {
-                            //        propSpec: {
-                            //            id: register3.Value,
-                            //            crc: 0,
-                            //        },
-                            //        loc: {
-                            //            h: register2.Value,
-                            //            v: register1.Value,
-                            //        },
-                            //    });
-
-                            break;
-                    }
-                })
-            },
-            {
-                "REMOVEPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
-
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //
-                    //            var propID = 0;
-                    //
-                    //            switch (register.Type) {
-                    //                case IptTypes.String:
-                    //		            for (var k in $scope.model.Screen.assetCache) {
-                    //                        if ($scope.model.Screen.assetCache[k].name == register.Value) {
-                    //                            propID = k;
-                    //
-                    //                            break;
-                    //                        }
-                    //                    }
-                    //
-                    //                    break;
-                    //                case IptTypes.Integer:
-                    //                    propID = register.Value;
-                    //
-                    //                    break;
-                    //                default: throw new Exception($"Wrong datatype {register.Type}...");
-                    //
-                    //                    break;
-                    //            }
-                    //
-                    //            if (propID != 0) {
-                    //                for (var k = 0; k < $scope.model.RoomInfo.UserList[j].propSpec.length; k++) {
-                    //                    if ($scope.model.RoomInfo.UserList[j].propSpec[k].id == propID) {
-                    //			            $scope.model.RoomInfo.UserList[j].propSpec.splice(k, 1);
-                    //
-                    //                        break;
-                    //                    }
-                    //                }
-                    //            }
-                    //        }
-                    //
-                    //        break;
-                    //    }
-                    //}
-
-                    //$scope.setProps(propSpec);
-                })
-            },
-            {
-                "DONPROP", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Integer);
-                    var propSpec = new List<AssetSpec>();
-
-                    //for (var j = 0; j < $scope.model.RoomInfo.UserList.length; j++) {
-                    //    if ($scope.model.RoomInfo.UserList[j].userID == $scope.model.UserInfo.userId) {
-                    //        if ($scope.model.RoomInfo.UserList[j].propSpec && $scope.model.RoomInfo.UserList[j].propSpec.length > 0) {
-                    //            propSpec = $scope.model.RoomInfo.UserList[j].propSpec;
-                    //        }
-                    //
-                    //        switch (register.Type) {
-                    //            case IptTypes.String:
-                    //	            for (var k in $scope.model.Screen.assetCache) {
-                    //                    if ($scope.model.Screen.assetCache[k].name == register.Value) {
-                    //                        propSpec.push({
-                    //                            id: k,
-                    //				            crc: 0,
-                    //			            });
-                    //
-                    //                        break;
-                    //                    }
-                    //                }
-                    //
-                    //                break;
-                    //            case IptTypes.Integer:
-                    //                propSpec.push({
-                    //                    id: register.Value,
-                    //		            crc: 0,
-                    //	            });
-                    //
-                    //                break;
-                    //            default: throw new Exception($"Wrong datatype {register.Type}...");
-                    //
-                    //                break;
-                    //        }
-                    //
-                    //        break;
-                    //    }
-                    //}
-
-                    //$scope.setProps(propSpec);
-                })
-            },
-            {
-                "SETPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    var register = getStack(iptTracking, IptVariableTypes.Array);
-
-                    var propSpec = new List<AssetSpec>();
-
-                    //for (var j = 0; j < register.Value.length; j++) {
-                    //    switch (register.Value[j].Type) {
-                    //        case IptTypes.String:
-                    //            for (var k in $scope.model.Screen.assetCache) {
-                    //                if ($scope.model.Screen.assetCache[k].name == register.Value[j].Value) {
-                    //                    propSpec.push({
-                    //                        id: k,
-                    //			            crc: 0,
-                    //		            });
-                    //
-                    //                    break;
-                    //                }
-                    //            }
-                    //
-                    //            break;
-                    //        case IptTypes.Integer:
-                    //            propSpec.push({
-                    //                id: register.Value[j].Value,
-                    //	            crc: 0,
-                    //            });
-                    //
-                    //            break;
-                    //        default: throw new Exception($"Wrong datatype {register.Type}...");
-                    //    }
-                    //}
-
-                    //$scope.setProps(propSpec.length ? propSpec : null);
-                })
-            },
-            {
-                "SHOWLOOSEPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    //for (var j = 0; j < $scope.model.RoomInfo.LooseProps.length; j++) {
-                    //    var prop = $scope.model.RoomInfo.LooseProps[j];
-                    //
-                    //    $scope.model.Interface.LogList.push({
-                    //        userName: this.iptEngineUsername,
-                    //        isWhisper: true,
-                    //        text: ''.concat(prop.propSpec.id, ' ', prop.loc.h, ' ', prop.loc.v, ' ADDLOOSEPROP'),
-                    //    })
-                    //}
-                })
-            },
-            {
-                "NBRUSERPROPS", (IptCommandFnc)((iptTracking, recursionDepth) =>
-                {
-                    if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
-                        metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
-
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        //Value = sessionState.UserDesc?.UserInfo?.PropSpec?.Length ?? 0,
-                    });
-                })
-            },
-            // End Prop Commands
-            // Start String Commands
             {
                 "LOWERCASE", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -873,11 +366,9 @@ public static class IptscraeEngine
 
                     var value = register.Value.ToString().ToLowerInvariant();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        Value = value
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        value));
                 })
             },
             {
@@ -888,11 +379,9 @@ public static class IptscraeEngine
 
                     var value = register.Value.ToString().ToUpperInvariant();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        Value = value
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        value));
                 })
             },
             {
@@ -901,11 +390,9 @@ public static class IptscraeEngine
                     var register1 = getStack(iptTracking, IptVariableTypes.String);
                     var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = register2.Value.ToString().IndexOf(register1.Value.ToString())
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        register2.Value.ToString().IndexOf(register1.Value.ToString())));
                 })
             },
             {
@@ -913,11 +400,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = register.Value.ToString().Length
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        register.Value.ToString().Length));
                 })
             },
             {
@@ -926,11 +411,9 @@ public static class IptscraeEngine
                     var register1 = getStack(iptTracking, IptVariableTypes.String);
                     var register2 = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool,
-                        Value = register2.Value.ToString().IndexOf(register1.Value.ToString()) != -1 ? 1 : 0
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        register2.Value.ToString().IndexOf(register1.Value.ToString()) != -1 ? 1 : 0));
                 })
             },
             {
@@ -940,11 +423,9 @@ public static class IptscraeEngine
                     var register2 = getStack(iptTracking, IptVariableTypes.Integer);
                     var register3 = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        Value = register3.Value.ToString().Substring((int)register2.Value, (int)register1.Value)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        register3.Value.ToString().Substring((int)register2.Value, (int)register1.Value)));
                 })
             },
             {
@@ -958,11 +439,9 @@ public static class IptscraeEngine
                     iptTracking.Grep = regExp.Matches(register2.Value.ToString())
                         .ToArray();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool,
-                        Value = iptTracking.Grep != null ? 1 : 0
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        iptTracking.Grep != null ? 1 : 0));
                 })
             },
             {
@@ -970,20 +449,17 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    if (iptTracking.Grep != null)
-                    {
-                        register.Value = (register.Value?.ToString() ?? string.Empty).Trim();
+                    if (iptTracking.Grep == null) return;
 
-                        for (var j = 1; j < 10; j++)
-                            register.Value = register.Value?.ToString()
-                                ?.Replace($"${j}", iptTracking.Grep[j].Value);
+                    register.Value = (register.Value?.ToString() ?? string.Empty).Trim();
 
-                        iptTracking.Stack.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = register.Value
-                        });
-                    }
+                    for (var j = 1; j < 10; j++)
+                        register.Value = register.Value?.ToString()
+                            ?.Replace($"${j}", iptTracking.Grep[j].Value);
+
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        register.Value));
                 })
             },
             {
@@ -991,33 +467,30 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Atomlist,
-                        Value = Parse(iptTracking, register.Value.ToString(), false)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Atomlist,
+                        Parse(iptTracking, register.Value.ToString(), false)));
                 })
             },
-            // End String Commands
-            // Start Boolean Commands
+
+            #endregion End String Commands
+
+            #region Start Boolean Commands
+
             {
                 "TRUE", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool,
-                        Value = 1
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        1));
                 })
             },
             {
                 "FALSE", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool,
-                        Value = 0
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        0));
                 })
             },
             {
@@ -1053,18 +526,19 @@ public static class IptscraeEngine
                         Executor(register2.Value as IptAtomList, iptTracking, recursionDepth + 1);
                 })
             },
-            // End Boolean Commands
-            // Start Array Commands
+
+            #endregion End Boolean Commands
+
+            #region Start Array Commands
+
             {
                 "ARRAY", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Array,
-                        Value = new IptAtomList((int)register.Value)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Array,
+                        new IptAtomList((int)register.Value)));
                 })
             },
             {
@@ -1110,25 +584,24 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String, IptVariableTypes.Array);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (register.Value as IptAtomList).Count
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (register.Value as IptAtomList).Count));
                 })
             },
-            // End Array Commands
-            // Start Variable Commands
+
+            #endregion End Array Commands
+
+            #region Start Variable Commands
+
             {
                 "ITOA", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Bool, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        Value = register.Value.ToString()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        register.Value.ToString()));
                 })
             },
             {
@@ -1136,11 +609,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.String);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = int.Parse(register.Value.ToString())
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        int.Parse(register.Value.ToString())));
                 })
             },
             {
@@ -1159,11 +630,9 @@ public static class IptscraeEngine
                         _ => 0
                     };
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = typeID
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        typeID));
                 })
             },
             {
@@ -1183,15 +652,16 @@ public static class IptscraeEngine
                         _ => 0
                     };
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = typeID
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        typeID));
                 })
             },
-            // End Variable Commands
-            // Start Spot Commands
+
+            #endregion End Variable Commands
+
+            #region Start Spot Commands
+
             {
                 "INSPOT", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -1413,11 +883,9 @@ public static class IptscraeEngine
                         ? (int)variable.Variable.Value
                         : 0;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = index
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        index));
                 })
             },
             {
@@ -1434,11 +902,10 @@ public static class IptscraeEngine
                     //var spots = sessionState.RoomInfo.HotSpots.ToArray();
                     //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer
-                        //Value = spots[index].Dest,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //spots[index].Dest,
+                        0));
                 })
             },
             {
@@ -1482,7 +949,7 @@ public static class IptscraeEngine
                     //if (index >= spots.Length) throw new Exception("Index out of bounds...");
 
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
-                    //Value = spots[index].Dest,
+                    //spots[index].Dest,
                 })
             },
             {
@@ -1492,7 +959,7 @@ public static class IptscraeEngine
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
-                    //Value = sessionState.RoomInfo.HotSpots.Count,
+                    //sessionState.RoomInfo.HotSpots.Count,
                 })
             },
             {
@@ -1502,7 +969,7 @@ public static class IptscraeEngine
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.Integer));
-                    //Value = sessionState.RoomInfo.HotSpots
+                    //sessionState.RoomInfo.HotSpots
                     //    .Where(s => ((HotspotTypes)s.Flags & HotspotTypes.HS_Door) == HotspotTypes.HS_Door)
                     //    .Count(),
                 })
@@ -1524,8 +991,11 @@ public static class IptscraeEngine
                     iptTracking.Stack.Push(new IptVariable(IptVariableTypes.String /*, spots[index].Name */));
                 })
             },
-            // End Spot Commands
-            // Start Functional Commands
+
+            #endregion End Spot Commands
+
+            #region Start Functional Commands
+
             {
                 "BREAK",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { iptTracking.Flags |= IptTrackingFlags.Break; })
@@ -1623,19 +1093,21 @@ public static class IptscraeEngine
                     }
                 })
             },
-            // End Functional Commands
-            // Start User Commands
+
+            #endregion End Functional Commands
+
+            #region Start User Commands
+
             {
                 "WHOME", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer
-                        //Value = sessionState.UserID,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //sessionState.UserID,
+                        0));
                 })
             },
             {
@@ -1704,11 +1176,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        //Value = sessionState.UserDesc?.UserInfo?.RoomPos?.HAxis ?? 0,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //sessionState.UserDesc?.UserInfo?.RoomPos?.HAxis ?? 0,
+                        0));
                 })
             },
             {
@@ -1717,11 +1188,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        //Value = sessionState.UserDesc?.UserInfo?.RoomPos?.VAxis ?? 0,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //sessionState.UserDesc?.UserInfo?.RoomPos?.VAxis ?? 0,
+                        0));
                 })
             },
             {
@@ -1730,11 +1200,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        //Value = sessionState.ServerName,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        //sessionState.ServerName,
+                        0));
                 })
             },
             {
@@ -1743,11 +1212,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        //Value = sessionState.RoomName,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        //sessionState.RoomName,
+                        0));
                 })
             },
             {
@@ -1756,11 +1224,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer
-                        //Value = sessionState.RoomID,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //sessionState.RoomID,
+                        0));
                 })
             },
             {
@@ -1769,11 +1236,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String
-                        //Value = sessionState.Name,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        //sessionState.Name,
+                        0));
                 })
             },
             {
@@ -1782,11 +1248,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer
-                        //Value = sessionState.RoomUsers.Count,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //sessionState.RoomUsers.Count,
+                        0));
                 })
             },
             {
@@ -1795,11 +1260,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool
-                        //Value = (sessionState.UserFlags & UserFlags.U_Moderator) != 0 ? 1 : 0,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        //(sessionState.UserFlags & UserFlags.U_Moderator) != 0 ? 1 : 0,
+                        0));
                 })
             },
             {
@@ -1808,11 +1272,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool
-                        //Value = (sessionState.UserFlags & UserFlags.U_Administrator) != 0 ? 1 : 0,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        //(sessionState.UserFlags & UserFlags.U_Administrator) != 0 ? 1 : 0,
+                        0));
                 })
             },
             {
@@ -1821,11 +1284,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Bool
-                        //Value = (sessionState.UserFlags & UserFlags.U_Guest) != 0 ? 1 : 0,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Bool,
+                        //(sessionState.UserFlags & UserFlags.U_Guest) != 0 ? 1 : 0,
+                        0));
                 })
             },
             {
@@ -1970,17 +1432,13 @@ public static class IptscraeEngine
 
                     if (user == null) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = user.RoomPos.HAxis,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        user.RoomPos.HAxis));
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = user.RoomPos.VAxis,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        user.RoomPos.VAxis));
                 })
             },
             {
@@ -1997,11 +1455,10 @@ public static class IptscraeEngine
                     //var users = sessionState.RoomUsers.Values.ToArray();
                     //if (index >= users.Length) throw new Exception("Index out of bounds...");
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer
-                        //Value = users[index].userID,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //users[index].userID,
+                        0));
                 })
             },
             {
@@ -2020,8 +1477,11 @@ public static class IptscraeEngine
                         });
                 })
             },
-            // End User Commands
-            // Start Misc Commands
+
+            #endregion End User Commands
+
+            #region Start Misc Commands
+
             {
                 "LAUNCHAPP", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -2040,13 +1500,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    var value = 1F - (int)register.Value / 100F;
-                    value = value switch
-                    {
-                        > 1F => 1F,
-                        < 0 => 0F,
-                        _ => value
-                    };
+                    var value = new Switch<float>(1F - (int)register.Value / 100F)
+                        .Case(v => v > 1F, v => 1F)
+                        .Case(v => v < 0, v => 0F)
+                        .Execute();
 
                     //sessionState.LayerOpacity(value, ScreenLayers.DimRoom);
                     //sessionState.RefreshScreen(ScreenLayers.DimRoom);
@@ -2076,11 +1533,9 @@ public static class IptscraeEngine
             {
                 "CLIENTTYPE", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.String,
-                        Value = CONST_ClientType
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.String,
+                        CONST_ClientType));
                 })
             },
             {
@@ -2132,13 +1587,15 @@ public static class IptscraeEngine
                     throw new NotImplementedException("CLEARLOG");
                 })
             },
-            // End Misc Commands
+
+            #endregion End Misc Commands
 
             #endregion
 
             #region Iptscrae Version 2
 
-            // Start Misc Commands
+            #region Start Misc Commands
+
             {
                 "ADDHEADER",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("ADDHEADER"); })
@@ -2250,11 +1707,10 @@ public static class IptscraeEngine
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
                         metaVariable.Variable.GetValue<ISessionState>() is not ISessionState sessionState) return;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        //Value = (int)sessionState.ServerPopulation,
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        //(int)sessionState.ServerPopulation,
+                        0));
                 })
             },
             {
@@ -2377,8 +1833,11 @@ public static class IptscraeEngine
                 "WHOFACE",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("WHOFACE"); })
             },
-            // End Misc Commands
-            // Start Spot Commands
+
+            #endregion End Misc Commands
+
+            #region Start Spot Commands
+
             {
                 "ADDPIC",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("ADDPIC"); })
@@ -2619,8 +2078,11 @@ public static class IptscraeEngine
                 "WEBSCRIPT",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("WEBSCRIPT"); })
             },
-            // End Spot Commands
-            // Start Prop Commands
+
+            #endregion End Spot Commands
+
+            #region Start Prop Commands
+
             {
                 "IMAGETOPROP",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("IMAGETOPROP"); })
@@ -2661,8 +2123,11 @@ public static class IptscraeEngine
                 "REMOVELOOSEPROP",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("REMOVELOOSEPROP"); })
             },
-            // End Prop Commands
-            // Start Paint Commands
+
+            #endregion End Prop Commands
+
+            #region Start Paint Commands
+
             {
                 "OVAL", (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("OVAL"); })
             },
@@ -2706,13 +2171,15 @@ public static class IptscraeEngine
                 "SHOWPAINT",
                 (IptCommandFnc)((iptTracking, recursionDepth) => { throw new NotImplementedException("SHOWPAINT"); })
             },
-            // End Paint Commands
+
+            #endregion End Paint Commands
 
             #endregion
 
             #region Iptscrae Version 3
 
-            // Start Message Commands
+            #region Start Message Commands
+
 #if DEBUG
             {
                 "DEBUGMSG", (IptCommandFnc)((iptTracking, recursionDepth) =>
@@ -2751,7 +2218,9 @@ public static class IptscraeEngine
                 })
             },
 #endif
-            // End Message Commands
+
+            #endregion End Message Commands
+
             {
                 "TRYCATCH", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
@@ -2768,11 +2237,9 @@ public static class IptscraeEngine
 
                         iptTracking.Variables["ERRORMSG"] = new IptMetaVariable
                         {
-                            Variable = new IptVariable
-                            {
-                                Type = IptVariableTypes.String,
-                                Value = ex.Message
-                            }
+                            Variable = new IptVariable(
+                                IptVariableTypes.String,
+                                ex.Message),
                         };
                         iptTracking.Variables["ERRORMSG"].Flags |= IptMetaVariableFlags.IsReadOnly;
 
@@ -2793,15 +2260,15 @@ public static class IptscraeEngine
                     iptTracking.Variables["ERRORMSG"].Flags |= IptMetaVariableFlags.IsReadOnly;
                 })
             },
-            // Start Math Commands
+
+            #region Start Math Commands
+
             {
                 "PI", (IptCommandFnc)((iptTracking, recursionDepth) =>
                 {
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)(Math.PI * 1000000)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)(Math.PI * 1000000)));
                 })
             },
             {
@@ -2809,11 +2276,9 @@ public static class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = Math.Abs((int)register.Value)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        Math.Abs((int)register.Value)));
                 })
             },
             {
@@ -2832,11 +2297,9 @@ public static class IptscraeEngine
                         .ToList();
                     var avg = values.Sum() / values.Count;
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)avg
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)avg));
                 })
             },
             {
@@ -2845,11 +2308,9 @@ public static class IptscraeEngine
                     var register1 = getStack(iptTracking, IptVariableTypes.Integer);
                     var register2 = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = Math.Pow((int)register2.Value, (int)register1.Value)
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        Math.Pow((int)register2.Value, (int)register1.Value)));
                 })
             },
             {
@@ -2867,11 +2328,9 @@ public static class IptscraeEngine
                         })
                         .ToList();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)values.Sum()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)values.Sum()));
                 })
             },
             {
@@ -2889,11 +2348,9 @@ public static class IptscraeEngine
                         })
                         .ToList();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)values.Min()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)values.Min()));
                 })
             },
             {
@@ -2911,11 +2368,9 @@ public static class IptscraeEngine
                         })
                         .ToList();
 
-                    iptTracking.Stack.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = (int)values.Max()
-                    });
+                    iptTracking.Stack.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        (int)values.Max()));
                 })
             },
             {
@@ -2937,14 +2392,15 @@ public static class IptscraeEngine
                         }
                 })
             },
-            // End Math Commands
+
+            #endregion End Math Commands
 
             #endregion
 
             #endregion
         });
 
-    internal static readonly ConcurrentDictionary<string, IptOperator> IptOperators =
+    protected static readonly ConcurrentDictionary<string, IptOperator> IptOperators =
         new(new Dictionary<string, IptOperator>
         {
             #region Iptscrae Operators
@@ -2954,11 +2410,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Unary | IptOperatorFlags.Push | IptOperatorFlags.NOT,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = ~(int)register1.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            ~(int)register1.Value)
                 }
             },
             {
@@ -2967,11 +2421,9 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Unary | IptOperatorFlags.Boolean | IptOperatorFlags.Push |
                             IptOperatorFlags.NOT,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value == 0 ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value == 0 ? 1 : 0)
                 }
             },
             {
@@ -2980,11 +2432,9 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Unary | IptOperatorFlags.Assigning | IptOperatorFlags.Math |
                             IptOperatorFlags.Add,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value + 1
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value + 1)
                 }
             },
             {
@@ -2993,11 +2443,9 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Unary | IptOperatorFlags.Assigning | IptOperatorFlags.Math |
                             IptOperatorFlags.Subtract,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value - 1
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value - 1)
                 }
             },
             {
@@ -3005,11 +2453,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Subtract,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value - (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value - (int)register2.Value)
                 }
             },
             {
@@ -3017,11 +2463,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Multiply,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value * (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value * (int)register2.Value)
                 }
             },
             {
@@ -3029,11 +2473,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Divide,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value / (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value / (int)register2.Value)
                 }
             },
             {
@@ -3041,11 +2483,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Math | IptOperatorFlags.Modulo,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value % (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value % (int)register2.Value)
                 }
             },
             {
@@ -3053,11 +2493,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Concate,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.String,
-                            Value = string.Concat(register1.Value, register2.Value)
-                        }
+                        new IptVariable(
+                            IptVariableTypes.String,
+                            string.Concat(register1.Value, register2.Value))
                 }
             },
             {
@@ -3065,11 +2503,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Boolean | IptOperatorFlags.AND,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0)
                 }
             },
             {
@@ -3077,11 +2513,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Boolean | IptOperatorFlags.OR,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value != 0 || (int)register2.Value != 0 ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value != 0 || (int)register2.Value != 0 ? 1 : 0)
                 }
             },
             {
@@ -3096,11 +2530,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Unary | IptOperatorFlags.Assigning | IptOperatorFlags.NOT,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = ~(int)register1.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            ~(int)register1.Value)
                 }
             },
             {
@@ -3108,11 +2540,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Boolean | IptOperatorFlags.OR,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value != 0 || (int)register2.Value != 0 ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value != 0 || (int)register2.Value != 0 ? 1 : 0)
                 }
             },
             {
@@ -3120,11 +2550,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Subtract,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value - (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value - (int)register2.Value)
                 }
             },
             {
@@ -3132,11 +2560,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Add,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value + (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value + (int)register2.Value)
                 }
             },
             {
@@ -3144,11 +2570,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Multiply,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value * (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value * (int)register2.Value)
                 }
             },
             {
@@ -3156,11 +2580,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Divide,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value / (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value / (int)register2.Value)
                 }
             },
             {
@@ -3168,11 +2590,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Assigning | IptOperatorFlags.Math | IptOperatorFlags.Modulo,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Integer,
-                            Value = (int)register1.Value % (int)register2.Value
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Integer,
+                            (int)register1.Value % (int)register2.Value)
                 }
             },
             {
@@ -3180,11 +2600,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.GreaterThan,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value > (int)register2.Value ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value > (int)register2.Value ? 1 : 0)
                 }
             },
             {
@@ -3193,11 +2611,9 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.GreaterThan |
                             IptOperatorFlags.EqualTo,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value >= (int)register2.Value ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value >= (int)register2.Value ? 1 : 0)
                 }
             },
             {
@@ -3205,11 +2621,9 @@ public static class IptscraeEngine
                 {
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.LessThan,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value < (int)register2.Value ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value < (int)register2.Value ? 1 : 0)
                 }
             },
             {
@@ -3218,11 +2632,9 @@ public static class IptscraeEngine
                     Flags = IptOperatorFlags.Push | IptOperatorFlags.Comparator | IptOperatorFlags.LessThan |
                             IptOperatorFlags.EqualTo,
                     OpFnc = (register1, register2) =>
-                        new IptVariable
-                        {
-                            Type = IptVariableTypes.Bool,
-                            Value = (int)register1.Value <= (int)register2.Value ? 1 : 0
-                        }
+                        new IptVariable(
+                            IptVariableTypes.Bool,
+                            (int)register1.Value <= (int)register2.Value ? 1 : 0)
                 }
             },
             {
@@ -3233,17 +2645,13 @@ public static class IptscraeEngine
                     {
                         return register1.Type switch
                         {
-                            IptVariableTypes.String => new IptVariable
-                            {
-                                Type = IptVariableTypes.Bool,
-                                Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
-                            },
+                            IptVariableTypes.String => new IptVariable(
+                                IptVariableTypes.Bool,
+                                register1.Value.ToString() != register2.Value.ToString() ? 1 : 0),
                             IptVariableTypes.Bool or
-                                IptVariableTypes.Integer => new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = (int)register1.Value != (int)register2.Value ? 1 : 0
-                                },
+                                IptVariableTypes.Integer => new IptVariable(
+                                    IptVariableTypes.Bool,
+                                    (int)register1.Value != (int)register2.Value ? 1 : 0),
                             _ => throw new Exception($"Wrong datatype {register1.Type}...")
                         };
                     }
@@ -3257,17 +2665,13 @@ public static class IptscraeEngine
                     {
                         return register1.Type switch
                         {
-                            IptVariableTypes.String => new IptVariable
-                            {
-                                Type = IptVariableTypes.Bool,
-                                Value = register1.Value.ToString() != register2.Value.ToString() ? 1 : 0
-                            },
+                            IptVariableTypes.String => new IptVariable(
+                                IptVariableTypes.Bool,
+                                register1.Value.ToString() != register2.Value.ToString() ? 1 : 0),
                             IptVariableTypes.Bool or
-                                IptVariableTypes.Integer => new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = (int)register1.Value != (int)register2.Value ? 1 : 0
-                                },
+                                IptVariableTypes.Integer => new IptVariable(
+                                    IptVariableTypes.Bool,
+                                    (int)register1.Value != (int)register2.Value ? 1 : 0),
                             _ => throw new Exception($"Wrong datatype {register1.Type}...")
                         };
                     }
@@ -3281,17 +2685,13 @@ public static class IptscraeEngine
                     {
                         return register1.Type switch
                         {
-                            IptVariableTypes.String => new IptVariable
-                            {
-                                Type = IptVariableTypes.Bool,
-                                Value = register1.Value.ToString() == register2.Value.ToString() ? 1 : 0
-                            },
+                            IptVariableTypes.String => new IptVariable(
+                                IptVariableTypes.Bool,
+                                register1.Value.ToString() == register2.Value.ToString() ? 1 : 0),
                             IptVariableTypes.Bool or
-                                IptVariableTypes.Integer => new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = (int)register1.Value == (int)register2.Value ? 1 : 0
-                                },
+                                IptVariableTypes.Integer => new IptVariable(
+                                    IptVariableTypes.Bool,
+                                    (int)register1.Value == (int)register2.Value ? 1 : 0),
                             _ => throw new Exception($"Wrong datatype {register1.Type}...")
                         };
                     }
@@ -3308,15 +2708,13 @@ public static class IptscraeEngine
                     {
                         return register1.Type switch
                         {
-                            IptVariableTypes.String => new IptVariable
-                            {
-                                Type = IptVariableTypes.String, Value = $"{register1.Value}{register2.Value}"
-                            },
+                            IptVariableTypes.String => new IptVariable(
+                                IptVariableTypes.String,
+                                $"{register1.Value}{register2.Value}"),
                             IptVariableTypes.Bool or
-                                IptVariableTypes.Integer => new IptVariable
-                                {
-                                    Type = IptVariableTypes.Integer, Value = (int)register1.Value + (int)register2.Value
-                                },
+                                IptVariableTypes.Integer => new IptVariable(
+                                    IptVariableTypes.Integer,
+                                    (int)register1.Value + (int)register2.Value),
                             _ => throw new Exception($"Wrong datatype {register1.Type}...")
                         };
                     }
@@ -3333,16 +2731,13 @@ public static class IptscraeEngine
                     {
                         return register1.Type switch
                         {
-                            IptVariableTypes.String => new IptVariable
-                            {
-                                Type = IptVariableTypes.String, Value = $"{register1.Value}{register2.Value}"
-                            },
+                            IptVariableTypes.String => new IptVariable(
+                                IptVariableTypes.String,
+                                $"{register1.Value}{register2.Value}"),
                             IptVariableTypes.Bool or
-                                IptVariableTypes.Integer => new IptVariable
-                                {
-                                    Type = IptVariableTypes.Bool,
-                                    Value = (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0
-                                },
+                                IptVariableTypes.Integer => new IptVariable(
+                                    IptVariableTypes.Bool,
+                                    (int)register1.Value != 0 && (int)register2.Value != 0 ? 1 : 0),
                             _ => throw new Exception($"Wrong datatype {register1.Type}...")
                         };
                     }
@@ -3352,7 +2747,7 @@ public static class IptscraeEngine
             #endregion
         });
 
-    internal static IptVariable getStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
+    protected static IptVariable getStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
     {
         if (iptTracking.Stack.Count < 1) throw new Exception("Stack is empty...");
 
@@ -3365,7 +2760,7 @@ public static class IptscraeEngine
         return register;
     }
 
-    internal static IptVariable popStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
+    protected static IptVariable popStack(IptTracking iptTracking, params IptVariableTypes[] constraintTypes)
     {
         if (iptTracking.Stack.Count < 1) throw new Exception("Stack is empty...");
 
@@ -3377,7 +2772,7 @@ public static class IptscraeEngine
         return register;
     }
 
-    internal static IptVariable getVariable(IptTracking iptTracking, IptVariable variable)
+    protected static IptVariable getVariable(IptTracking iptTracking, IptVariable variable)
     {
         if (variable.Type != IptVariableTypes.Variable) return variable;
 
@@ -3388,14 +2783,12 @@ public static class IptscraeEngine
             value.Variable.Type != IptVariableTypes.Shadow)
             return value.Variable;
 
-        return new IptVariable
-        {
-            Type = IptVariableTypes.Integer,
-            Value = 0
-        };
+        return new IptVariable(
+            IptVariableTypes.Integer,
+            0);
     }
 
-    internal static void setVariable(IptTracking iptTracking, IptVariable destination, IptVariable variable,
+    protected static void setVariable(IptTracking iptTracking, IptVariable destination, IptVariable variable,
         int recursionDepth = 0, IptMetaVariableFlags flags = IptMetaVariableFlags.None)
     {
         var key = destination.Value?.ToString();
@@ -3417,7 +2810,7 @@ public static class IptscraeEngine
         }
     }
 
-    internal static void Operator(IptTracking iptTracking, string opKey, int recursionDepth = 0)
+    protected static void Operator(IptTracking iptTracking, string opKey, int recursionDepth = 0)
     {
         if (!IptOperators.TryGetValue(opKey, out var op)) return;
 
@@ -3666,11 +3059,9 @@ public static class IptscraeEngine
 
                 var substr = str.Substr(tokenStart + 1, j);
 
-                result.Push(new IptVariable
-                {
-                    Type = IptVariableTypes.String,
-                    Value = substr
-                });
+                result.Push(new IptVariable(
+                    IptVariableTypes.String,
+                    substr));
 
                 j++;
             }
@@ -3726,11 +3117,9 @@ public static class IptscraeEngine
 
                 var atomlistContents = str.Substr(tokenStart + 1, j);
 
-                result.Push(new IptVariable
-                {
-                    Type = IptVariableTypes.Atomlist,
-                    Value = Parse(iptTracking, atomlistContents, false)
-                });
+                result.Push(new IptVariable(
+                    IptVariableTypes.Atomlist,
+                    Parse(iptTracking, atomlistContents, false)));
 
                 j++;
             }
@@ -3786,11 +3175,9 @@ public static class IptscraeEngine
 
                 var arrayContents = str.Substr(tokenStart + 1, j);
 
-                result.Push(new IptVariable
-                {
-                    Type = IptVariableTypes.Array,
-                    Value = Parse(iptTracking, arrayContents, false)
-                });
+                result.Push(new IptVariable(
+                    IptVariableTypes.Array,
+                    Parse(iptTracking, arrayContents, false)));
 
                 j++;
             }
@@ -3810,30 +3197,30 @@ public static class IptscraeEngine
                 {
                     var value = int.Parse(token);
 
-                    result.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Integer,
-                        Value = value
-                    });
+                    result.Push(new IptVariable(
+                        IptVariableTypes.Integer,
+                        value));
                     //j++;
                 }
                 catch
+
                 {
                     throw new Exception($"Unexpected {token}...");
                 }
             }
-            else if (new[] { '~', '!', '=', '+', '-', '*', '/', '%', '<', '>', '&', '|' }.Contains(chars[j]))
+            else if (new[]
+                     {
+                         '~', '!', '=', '+', '-', '*', '/', '%', '<', '>', '&', '|'
+                     }.Contains(chars[j]))
             {
                 if (j + 1 < chars.Length && chars[j + 1] == '=')
                 {
                     var key = $"{chars[j]}{chars[j + 1]}";
 
                     if (IptOperators.ContainsKey(key))
-                        result.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Operator,
-                            Value = key
-                        });
+                        result.Push(new IptVariable(
+                            IptVariableTypes.Operator,
+                            key));
 
                     j += 2;
                 }
@@ -3848,11 +3235,9 @@ public static class IptscraeEngine
                     var key = $"{chars[j]}{chars[j + 1]}";
 
                     if (IptOperators.ContainsKey(key))
-                        result.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Operator,
-                            Value = key
-                        });
+                        result.Push(new IptVariable(
+                            IptVariableTypes.Operator,
+                            key));
 
                     j += 2;
                 }
@@ -3861,15 +3246,14 @@ public static class IptscraeEngine
                     var key = $"{chars[j]}";
 
                     if (IptOperators.ContainsKey(key))
-                        result.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Operator,
-                            Value = key
-                        });
+                        result.Push(new IptVariable(
+                            IptVariableTypes.Operator,
+                            key));
 
                     j++;
                 }
             }
+
             else
             {
                 var tokenStart = j;
@@ -3885,27 +3269,24 @@ public static class IptscraeEngine
                 if (IptCommands.ContainsKey(commmand))
                 {
                     while (IptCommands.ContainsKey(commmand) &&
-                           IptCommands[commmand].GetType() == CONST_TYPE_STRING)
+                           IptCommands[commmand].GetType() == StringExts.Types.String)
                         commmand = IptCommands[commmand].ToString().ToUpperInvariant();
 
                     if (IptCommands.ContainsKey(commmand))
                     {
-                        result.Push(new IptVariable
-                        {
-                            Type = IptVariableTypes.Command,
-                            Value = commmand
-                        });
+                        result.Push(new IptVariable(
+                            IptVariableTypes.Command,
+                            commmand));
 
                         j++;
                     }
                 }
                 else
                 {
-                    result.Push(new IptVariable
-                    {
-                        Type = IptVariableTypes.Variable,
-                        Value = token
-                    });
+                    result.Push(new IptVariable(
+                        IptVariableTypes.Variable,
+                        token));
+
                     //j++;
                 }
             }
@@ -3916,40 +3297,30 @@ public static class IptscraeEngine
     public static void RegisterAlias(params KeyValuePair<string, string>[] aliases)
     {
         foreach (var alias in aliases)
-        {
             IptCommands.TryAdd(alias.Key, alias.Value);
-        }
     }
 
     public static void RegisterCommand(params KeyValuePair<string, IptCommandFnc>[] commands)
     {
         foreach (var cmd in commands)
-        {
             IptCommands.TryAdd(cmd.Key, cmd.Value);
-        }
     }
 
     public static void RegisterOperator(params KeyValuePair<string, IptOperator>[] operators)
     {
         foreach (var op in operators)
-        {
             IptOperators.TryAdd(op.Key, op.Value);
-        }
     }
 
     public static void UnregisterCommand(params string[] commands)
     {
         foreach (var cmd in commands)
-        {
             IptCommands.TryRemove(cmd, out var _);
-        }
     }
 
     public static void UnregisterOperator(params string[] operators)
     {
         foreach (var op in operators)
-        {
             IptOperators.TryRemove(op, out var _);
-        }
     }
 }

@@ -21,8 +21,8 @@ public class IptVariable
         Value = value;
     }
 
-    public IptVariableTypes Type { get; internal set; }
-    public object Value { get; internal set; }
+    public IptVariableTypes Type { get; protected set; }
+    public object Value { get; set; }
 
     public T GetValue<T>()
     {

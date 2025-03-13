@@ -29,7 +29,7 @@ public class BufferStream : Stream
         get => 0;
         set
         {
-            if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name));
+            if (!CanSeek) throw new NotSupportedException($"{GetType().Name} is not seekable");
 
             _read(null, 0, (int)value);
         }
@@ -169,19 +169,19 @@ public class BufferStream : Stream
 
     public override long Seek(long offset, SeekOrigin origin)
     {
-        if (!CanSeek) throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name));
+        if (!CanSeek) throw new NotSupportedException($"{GetType().Name} is not seekable");
 
         return origin switch
         {
             SeekOrigin.Begin or SeekOrigin.Current => _read(null, 0, (int)offset),
-            SeekOrigin.End => throw new NotSupportedException(string.Format("{0} is not seekable", GetType().Name)),
+            SeekOrigin.End => throw new NotSupportedException($"{GetType().Name} is not seekable"),
             _ => 0
         };
     }
 
     public override void SetLength(long value)
     {
-        if (!CanSeek) throw new NotSupportedException(string.Format("{0} length can not be changed", GetType().Name));
+        if (!CanSeek) throw new NotSupportedException($"{GetType().Name} length can not be changed");
         if (value < 1) return;
 
         using (var @lock = LockContext.GetLock(_chunks))

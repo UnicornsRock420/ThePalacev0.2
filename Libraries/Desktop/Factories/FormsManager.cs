@@ -64,7 +64,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
         if (sender is not FormBase _sender ||
             !UnregisterForm(_sender)) return;
-        
+
         FormClosed?.Invoke(_sender, e);
 
         var forms = (List<FormBase>?)null;
@@ -80,8 +80,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
                 f != app &&
                 f is IFormDialog
             ))
-            new TCF(
-                    false,
+            TCF._TryDispose(
                     TaskManager.Current,
                     app,
                     this)
@@ -94,18 +93,17 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
         using (var @lock = LockContext.GetLock(_forms))
         {
-            if (!_forms.ContainsKey(form.Name))
+            if (_forms.ContainsKey(form.Name)) return false;
+
+            if (assignFormClosedHandler)
             {
-                if (assignFormClosedHandler)
-                {
-                    form.FormClosed += _FormClosed;
-                    form.Disposed += _FormClosed;
-                }
-
-                _forms.TryAdd(form.Name, form);
-
-                return true;
+                form.FormClosed += _FormClosed;
+                form.Disposed += _FormClosed;
             }
+
+            _forms.TryAdd(form.Name, form);
+
+            return true;
         }
 
         return false;
@@ -268,19 +266,18 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
                 textBox.Multiline = cfg.Multiline;
             }
 
-            if (control != null)
-            {
-                control.Name = $"{typeof(TControl).FullName}_{Guid.NewGuid()}";
+            if (control == null) continue;
 
-                if (cfg.Click != null)
-                    control.Click += cfg.Click;
+            control.Name = $"{typeof(TControl).FullName}_{Guid.NewGuid()}";
 
-                UpdateControl(control, cfg);
+            if (cfg.Click != null)
+                control.Click += cfg.Click;
 
-                RegisterControl(parent, control);
+            UpdateControl(control, cfg);
 
-                results.Add(control);
-            }
+            RegisterControl(parent, control);
+
+            results.Add(control);
         }
 
         parent.Visible = visible;

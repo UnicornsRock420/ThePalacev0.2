@@ -33,7 +33,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
         if (IsDisposed) return null;
 
         if (type.GetInstance() is not ISessionState sessionState)
-            throw new Exception(string.Format("{0} doesn't implement the ISessionState interface...", type.Name));
+            throw new Exception($"{type.Name} doesn't implement the ISessionState interface...");
 
         _sessions.TryAdd(sessionState.Id, sessionState);
         return sessionState;

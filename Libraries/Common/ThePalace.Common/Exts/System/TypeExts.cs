@@ -109,8 +109,7 @@ public static class TypeExts
                 if (type == TimeSpanExts.Types.TimeSpan) return TypeCodeEnum.TimeSpan;
                 goto default;
             default:
-                if (type.IsEnum) return TypeCodeEnum.Enum;
-                return result;
+                return type.IsEnum ? TypeCodeEnum.Enum : result;
         }
     }
 

@@ -42,6 +42,7 @@ using ThePalace.Network.Helpers.Network;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
+using IptscraeEngine = ThePalace.Client.Desktop.Helpers.IptscraeEngine;
 using RegexConstants = ThePalace.Core.Constants.RegexConstants;
 using UserID = int;
 

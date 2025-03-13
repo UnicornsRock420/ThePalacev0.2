@@ -617,10 +617,10 @@ public class PatStream : StreamBase
                         foreach (var looseProp in r.LooseProps)
                         {
                             writer.WriteLine("\tPROP");
-                            writer.WriteLine($"\t\tPROPID 0x{string.Format("{0:X8}", looseProp.AssetSpec.Id)}");
+                            writer.WriteLine($"\t\tPROPID 0x{$"{looseProp.AssetSpec.Id:X8}"}");
 
                             if (looseProp.AssetSpec.Crc != 0)
-                                writer.WriteLine($"\t\tCRC 0x{string.Format("{0:X8}", looseProp.AssetSpec.Crc)}");
+                                writer.WriteLine($"\t\tCRC 0x{$"{looseProp.AssetSpec.Crc:X8}"}");
 
                             writer.WriteLine($"\t\tLOC {looseProp.Loc.HAxis},{looseProp.Loc.VAxis}");
                             writer.WriteLine("\tENDPROP");
