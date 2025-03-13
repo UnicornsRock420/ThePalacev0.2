@@ -95,13 +95,6 @@ public static class AsyncTcpSocket
         });
     }
 
-    public static async Task Disconnect(this IConnectionState connectionState)
-    {
-        ArgumentNullException.ThrowIfNull(connectionState, nameof(AsyncTcpSocket) + "." + nameof(connectionState));
-
-        connectionState.Disconnect();
-    }
-
     public static async Task Listen(this IPEndPoint hostAddr, int listenBacklog = 0)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(AsyncTcpSocket) + "." + nameof(hostAddr));
@@ -196,29 +189,26 @@ public static class AsyncTcpSocket
         var connectionState = (IConnectionState?)ar.AsyncState;
         if (connectionState?.Socket == null) throw new SocketException();
 
-        if (connectionState.NetworkStream.DataAvailable)
+        var bytesReceived = 0;
+
+        connectionState.Do(() =>
         {
-            var bytesReceived = 0;
+            bytesReceived = connectionState.Socket.EndReceive(ar);
+            if (bytesReceived < 1) connectionState?.Disconnect();
+        });
 
-            connectionState.Do(() =>
-            {
-                bytesReceived = connectionState.Socket.EndReceive(ar);
-                if (bytesReceived < 1) connectionState?.Disconnect();
-            });
+        if (!connectionState.IsConnected())
+        {
+            connectionState?.Disconnect();
 
-            if (!connectionState.IsConnected())
-            {
-                connectionState?.Disconnect();
+            return;
+        }
 
-                return;
-            }
+        using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
+        {
+            connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
 
-            using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
-            {
-                connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
-
-                connectionState.LastReceived = DateTime.UtcNow;
-            }
+            connectionState.LastReceived = DateTime.UtcNow;
         }
 
         connectionState.Do(() => { connectionState.Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState); });

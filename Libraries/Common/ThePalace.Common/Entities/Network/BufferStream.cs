@@ -223,6 +223,6 @@ public class BufferStream : Stream
         /// <summary>
         ///     Actual Data
         /// </summary>
-        public byte[] Data => GetBuffer();
+        public byte[] Data => ToArray();
     }
 }

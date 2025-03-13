@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -55,6 +56,8 @@ namespace ThePalace.Client.Desktop;
 
 public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 {
+    private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
+
     #region cStr
 
     /// <summary>
@@ -112,136 +115,175 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
         jobs[ThreadQueues.Network] = TaskManager.Current.CreateJob<ActionCmd>(q =>
             {
-                var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                Task.WaitAll(
+                    TaskManager.StartMany(
+                        jobs[ThreadQueues.Network].Token,
 
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    if (!q.IsEmpty)
-                        Task.WaitAll(
-                            TaskManager.StartMany(
-                                cancellationToken.Token,
+                        #region Command Processor Sub-Task
 
-                                #region Command Processor Sub-Task
+                        async () =>
+                        {
+                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
 
-                                async () =>
-                                {
-                                    while (!cancellationToken.IsCancellationRequested)
+                            while (!cancellationToken.IsCancellationRequested)
+                            {
+                                if (q.TryDequeue(out var cmd))
+                                    switch ((NetworkCommandTypes)cmd.Flags)
                                     {
-                                        if (q.TryDequeue(out var cmd))
-                                            switch ((NetworkCommandTypes)cmd.Flags)
-                                            {
-                                                case NetworkCommandTypes.CONNECT:
-                                                    var url = cmd.Values[0] as string;
-                                                    if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
+                                        case NetworkCommandTypes.CONNECT:
+                                            var url = cmd.Values[0] as string;
+                                            if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
 
-                                                    var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQueryString);
-                                                    if (match.Count < 2) break;
+                                            var match = url.ParseUrl(
+                                                RegexConstants.ParseUrlOptions.IncludeProtocol |
+                                                RegexConstants.ParseUrlOptions.IncludeIPEndPoint |
+                                                RegexConstants.ParseUrlOptions.IncludeQueryString);
+                                            if (match.Count < 3 ||
+                                                match["Protocol"]?.ToLowerInvariant() != "palace") break;
 
-                                                    var hostname = match["Hostname"];
-                                                    var port = Convert.ToInt32(match["Port"]);
+                                            var hostname = match["Hostname"];
+                                            var port = Convert.ToInt32(match["Port"]);
 
-                                                    Current.SessionState.ConnectionState.Connect(hostname, port);
-                                                    return;
-                                                case NetworkCommandTypes.DISCONNECT:
-                                                default:
-                                                    Current.SessionState.ConnectionState.Disconnect();
-                                                    return;
-                                            }
-
-                                        cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                        if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
-                                            q.IsEmpty)
-                                            await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                            Current.SessionState.ConnectionState.Connect(hostname, port);
+                                            return;
+                                        case NetworkCommandTypes.DISCONNECT:
+                                        default:
+                                            Current.SessionState.ConnectionState.Disconnect();
+                                            return;
                                     }
-                                },
 
-                                #endregion
+                                cancellationToken.Token.ThrowIfCancellationRequested();
 
-                                #region Process BytesSend Processor Sub-Task
+                                if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
+                                    q.IsEmpty)
+                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                            }
+                        },
 
-                                async () =>
+                        #endregion
+
+                        #region Process BytesSend Processor Sub-Task
+
+                        async () =>
+                        {
+                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+
+                            while (!cancellationToken.IsCancellationRequested)
+                            {
+                                var delay = RndGenerator.Next(150, 350);
+
+                                if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                 {
-                                    while (!cancellationToken.IsCancellationRequested &&
-                                           (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                    var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                    Current.SessionState.ConnectionState.Send(msgBytes);
+
+                                    delay = RndGenerator.Next(75, 150);
+                                }
+
+                                cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                await Task.Delay(delay, cancellationToken.Token);
+                            }
+                        },
+
+                        #endregion
+
+                        #region Process BytesReceived Processor Sub-Task
+
+                        async () =>
+                        {
+                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                            var msgHeader = (MSG_Header?)null;
+                            var msgObj = (IProtocol?)null;
+                            var eventType = (string?)null;
+                            var msgType = (Type?)null;
+
+                            while (!cancellationToken.IsCancellationRequested)
+                            {
+                                var delay = RndGenerator.Next(150, 350);
+
+                                if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                {
+                                    if (msgHeader == null)
                                     {
-                                        var delay = RndGenerator.Next(150, 350);
+                                        var msgHeaderBuffer = new byte[12];
 
-                                        if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
+                                        if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
+
+                                        using (var ms = new MemoryStream(msgHeaderBuffer))
                                         {
-                                            var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                            Current.SessionState.ConnectionState.Send(msgBytes);
+                                            msgHeader = new MSG_Header();
+                                            if (msgHeader == null) throw new OutOfMemoryException(nameof(MSG_Header));
 
-                                            delay = RndGenerator.Next(75, 150);
+                                            ms.PalaceDeserialize(msgHeader, CONST_TYPE_MSG_Header);
                                         }
-
-                                        cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                        await Task.Delay(delay, cancellationToken.Token);
                                     }
-                                },
 
-                                #endregion
+                                    eventType = msgHeader.EventType.ToString();
+                                    msgType = AppDomain.CurrentDomain.GetAssemblies()
+                                        ?.Where(a => a.FullName.StartsWith("ThePalace"))
+                                        ?.SelectMany(t => t.GetTypes())
+                                        ?.Where(t => t.Name == eventType)
+                                        ?.FirstOrDefault();
+                                    if (msgType == null) throw new InvalidDataException(nameof(msgType));
 
-                                #region Process BytesReceived Processor Sub-Task
-
-                                async () =>
-                                {
-                                    while (!cancellationToken.IsCancellationRequested &&
-                                           (Current?.SessionState?.ConnectionState?.IsConnected() ?? false))
+                                    if (msgHeader != null &&
+                                        msgHeader.Length > 0 &&
+                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length > msgHeader.Length &&
+                                        msgObj == null)
                                     {
-                                        var delay = RndGenerator.Next(150, 350);
+                                        var msgBuffer = new byte[msgHeader.Length];
+                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived.Read(msgBuffer, 0, msgBuffer.Length);
+                                        if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
 
-                                        if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                        using (var ms = new MemoryStream(msgBuffer))
                                         {
-                                            var msgBytes = Current?.SessionState?.ConnectionState?.BytesReceived.Dequeue();
-                                            using (var ms = new MemoryStream(msgBytes))
+                                            if (msgHeader.Length > 0)
                                             {
-                                                var msgHeader = new MSG_Header();
-                                                ms.PalaceDeserialize(msgHeader, typeof(MSG_Header));
-
-                                                var eventType = msgHeader.EventType.ToString();
-                                                var msgType = AppDomain.CurrentDomain.GetAssemblies()
-                                                    ?.Where(a => a.FullName.StartsWith("ThePalace"))
-                                                    ?.SelectMany(t => t.GetTypes())
-                                                    ?.Where(t => t.Name == eventType)
-                                                    ?.FirstOrDefault();
-                                                if (msgType == null) throw new InvalidDataException(nameof(msgType));
-
-                                                var msgObj = (IProtocol?)msgType.GetInstance();
+                                                msgObj = (IProtocol?)msgType.GetInstance();
                                                 if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
 
                                                 ms.PalaceDeserialize(
                                                     msgObj,
                                                     msgType);
-
-                                                var boType = EventBus.Current.GetType(msgObj);
-                                                if (boType == null) throw new InvalidDataException(nameof(msgType));
-
-                                                EventBus.Current.Publish(
-                                                    Current,
-                                                    boType,
-                                                    new ProtocolEventParams
-                                                    {
-                                                        SourceID = Current?.SessionState?.UserId ?? 0,
-                                                        RefNum = msgHeader.RefNum,
-                                                        Request = msgObj
-                                                    });
                                             }
-
-                                            delay = RndGenerator.Next(75, 150);
                                         }
-
-                                        cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                        await Task.Delay(delay, cancellationToken.Token);
                                     }
                                 }
 
-                                #endregion
+                                if (msgHeader != null &&
+                                    msgType != null)
+                                {
+                                    var boType = EventBus.Current.GetType(msgType);
+                                    if (boType == null) throw new InvalidDataException(nameof(msgType));
 
-                            ), cancellationToken.Token);
-                }
+                                    EventBus.Current.Publish(
+                                        Current,
+                                        boType,
+                                        new ProtocolEventParams
+                                        {
+                                            SourceID = Current?.SessionState?.UserId ?? 0,
+                                            RefNum = msgHeader.RefNum,
+                                            Request = msgObj
+                                        });
+
+                                    msgHeader = null;
+                                    msgType = null;
+                                    msgObj = null;
+
+                                    delay = RndGenerator.Next(75, 150);
+                                }
+
+                                cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                await Task.Delay(delay, cancellationToken.Token);
+                            }
+                        }
+
+                        #endregion
+
+                    ), jobs[ThreadQueues.Network].Token);
             },
             opts: RunOptions.UseSleepInterval,
             sleepInterval: TimeSpan.FromMilliseconds(500));
