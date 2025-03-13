@@ -9,17 +9,17 @@ public partial class UserDesc : IDisposable, IStruct
 {
     [IgnoreDataMember] public ConcurrentDictionary<string, object> Extended;
 
-    public UserRec UserInfo;
+    public UserRec UserRec;
 
     public UserDesc()
     {
-        UserInfo = new UserRec();
+        UserRec = new UserRec();
         Extended = new ConcurrentDictionary<string, object>();
     }
 
     public void Dispose()
     {
-        UserInfo = null;
+        UserRec = null;
 
         Extended
             ?.Values

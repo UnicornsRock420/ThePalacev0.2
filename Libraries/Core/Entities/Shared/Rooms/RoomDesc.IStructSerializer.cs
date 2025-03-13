@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using ThePalace.Core.Entities.Core;
+﻿using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Data;
+using ThePalace.Logging.Entities;
 using AttributeExts = ThePalace.Core.Exts.AttributeExts;
 
 namespace ThePalace.Core.Entities.Shared.Rooms;
@@ -56,7 +56,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RoomRec.Header: {ex.Message}");
+            LoggerHub.Current.Error(ex);
         }
 
         #region Hotspots
@@ -143,7 +143,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RoomRec.Hotspots: {ex.Message}");
+            LoggerHub.Current.Error(ex);
         }
 
         #endregion
@@ -178,7 +178,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RoomRec.Pictures: {ex.Message}");
+            LoggerHub.Current.Error(ex);
         }
 
         #endregion
@@ -213,7 +213,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RoomRec.DrawCmds: {ex.Message}");
+            LoggerHub.Current.Error(ex);
         }
 
         #endregion
@@ -251,7 +251,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"RoomRec.LooseProps: {ex.Message}");
+            LoggerHub.Current.Error(ex);
         }
 
         #endregion

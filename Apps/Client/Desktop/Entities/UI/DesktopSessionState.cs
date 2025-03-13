@@ -152,6 +152,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region Room Info
 
+    public RoomID RoomId { get; set; }
     public RoomDesc RoomInfo { get; set; } = null;
     public ConcurrentDictionary<UserID, UserDesc> RoomUsers { get; set; } = new();
 
@@ -654,8 +655,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         {
             users = RoomUsers.Values
                 .Where(u =>
-                    !(u.UserInfo.UserId < 1 ||
-                      u.UserInfo.RoomPos == null))
+                    !(u.UserRec.UserId < 1 ||
+                      u.UserRec.RoomPos == null))
                 .ToList();
         }
 
@@ -663,8 +664,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         foreach (var u in users)
         {
-            var x = u.UserInfo.RoomPos.HAxis - CONST_INT_halfPropWidth;
-            var y = u.UserInfo.RoomPos.VAxis - CONST_INT_halfPropHeight;
+            var x = u.UserRec.RoomPos.HAxis - CONST_INT_halfPropWidth;
+            var y = u.UserRec.RoomPos.VAxis - CONST_INT_halfPropHeight;
 
             if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
             else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
@@ -681,7 +682,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             var hasAnimatedProp = false;
             var hasHeadProp = false;
 
-            var assetSpecs = u.UserInfo.PropSpec?.ToList() ?? [];
+            var assetSpecs = u.UserRec.PropSpec?.ToList() ?? [];
             if (assetSpecs.Count > 0)
                 foreach (var assetSpec in assetSpecs)
                 {
@@ -703,8 +704,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             if (!hasHeadProp)
             {
                 var index = (uint)0;
-                index += (uint)(u.UserInfo.FaceNbr % DesktopConstants.MaxNbrFaces);
-                index += (uint)(u.UserInfo.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
+                index += (uint)(u.UserRec.FaceNbr % DesktopConstants.MaxNbrFaces);
+                index += (uint)(u.UserRec.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
                 var smileyFace = AssetsManager.Current.SmileyFaces[index];
 
                 g.DrawImage(
@@ -766,18 +767,18 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         foreach (var u in users)
         {
-            if (u.UserInfo.UserId < 1 ||
-                u.UserInfo.RoomPos == null) continue;
+            if (u.UserRec.UserId < 1 ||
+                u.UserRec.RoomPos == null) continue;
 
-            var colour = DesktopConstants.NbrToColor(u.UserInfo.ColorNbr);
+            var colour = DesktopConstants.NbrToColor(u.UserRec.ColorNbr);
             using (var colourBrush = new SolidBrush(colour))
             {
-                var textSize = TextRenderer.MeasureText(u.UserInfo.Name, font);
+                var textSize = TextRenderer.MeasureText(u.UserRec.Name, font);
                 var halfNameTagWidth = textSize.Width / 2;
                 var halfNameTagHeight = textSize.Height / 2;
 
-                var x = u.UserInfo.RoomPos.HAxis - halfNameTagWidth - padding * 2;
-                var y = u.UserInfo.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
+                var x = u.UserRec.RoomPos.HAxis - halfNameTagWidth - padding * 2;
+                var y = u.UserRec.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
 
                 if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
                 else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
@@ -797,7 +798,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
                         textSize.Height + padding));
 
                 g.DrawString(
-                    u.UserInfo.Name,
+                    u.UserRec.Name,
                     font,
                     colourBrush,
                     x, y);
@@ -848,7 +849,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
         foreach (var u in users)
         {
-            if (u.UserInfo.RoomPos == null) continue;
+            if (u.UserRec.RoomPos == null) continue;
 
             if (u.Extended["MessageQueue"] is not DisposableQueue<MsgBubble> queue) continue;
 
@@ -876,8 +877,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
             var loc = msg.Origin;
 
-            var x = UserDesc.UserInfo.RoomPos.HAxis;
-            var y = UserDesc.UserInfo.RoomPos.VAxis;
+            var x = UserDesc.UserRec.RoomPos.HAxis;
+            var y = UserDesc.UserRec.RoomPos.VAxis;
 
             if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
             else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = (short)(ScreenWidth + CONST_INT_halfPropWidth);

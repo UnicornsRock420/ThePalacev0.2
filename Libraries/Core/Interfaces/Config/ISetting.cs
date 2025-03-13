@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Interfaces.Core;
+﻿namespace ThePalace.Core.Interfaces.Config;
 
 public interface ISettingBase
 {

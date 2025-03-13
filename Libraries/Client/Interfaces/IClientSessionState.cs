@@ -3,21 +3,14 @@ using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
+using ThePalace.Network.Interfaces;
 using RoomID = short;
 using UserID = int;
 
 namespace ThePalace.Common.Client.Interfaces;
 
-public interface IClientSessionState : ISessionState
+public interface IClientSessionState : IUserSessionState
 {
-    UserID UserId { get; set; }
-    UserDesc? UserDesc { get; set; }
-    RegistrationRec? RegInfo { get; set; }
-    object? SessionTag { get; set; }
-    object? ScriptTag { get; set; }
-    
-    ConcurrentDictionary<string, object> Extended { get; }
-
     RoomDesc RoomInfo { get; set; }
     ConcurrentDictionary<UserID, UserDesc> RoomUsers { get; set; }
 

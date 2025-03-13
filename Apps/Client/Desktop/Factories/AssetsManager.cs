@@ -181,8 +181,8 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
             var inUsePropIDs = sessions
                 ?.SelectMany(s => s?.RoomUsers?.Values
-                    ?.Where(u => u?.UserInfo?.PropSpec != null)
-                    ?.SelectMany(u => u.UserInfo.PropSpec))
+                    ?.Where(u => u?.UserRec?.PropSpec != null)
+                    ?.SelectMany(u => u.UserRec.PropSpec))
                 ?.Select(p => p?.Id ?? 0)
                 ?.Concat(sessions
                     ?.Where(s => s?.RoomInfo?.LooseProps != null)

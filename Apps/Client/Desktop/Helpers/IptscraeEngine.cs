@@ -5,8 +5,6 @@ using ThePalace.Core.Enums;
 
 namespace ThePalace.Client.Desktop.Helpers;
 
-using IptAtomList = List<IptVariable>;
-
 public class IptscraeEngine : ThePalace.Core.Helpers.Scripting.IptscraeEngine
 {
     static IptscraeEngine()
@@ -503,7 +501,7 @@ public class IptscraeEngine : ThePalace.Core.Helpers.Scripting.IptscraeEngine
 
                     iptTracking.Stack.Push(new IptVariable(
                         IptVariableTypes.Integer,
-                        sessionState.UserDesc?.UserInfo?.PropSpec?.Length ?? 0));
+                        sessionState.UserDesc?.UserRec?.PropSpec?.Length ?? 0));
                 }));
 
         #endregion End Prop Commands

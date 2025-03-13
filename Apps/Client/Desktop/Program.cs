@@ -33,7 +33,6 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Helpers.Scripting;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
@@ -584,13 +583,13 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         switch (e.Button)
                         {
                             case MouseButtons.Left:
-                                SessionState.UserDesc.UserInfo.RoomPos = point;
+                                SessionState.UserDesc.UserRec.RoomPos = point;
 
                                 var user = (UserDesc?)null;
                                 user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                                 if (user != null)
                                 {
-                                    user.UserInfo.RoomPos = point;
+                                    user.UserRec.RoomPos = point;
                                     user.Extended["CurrentMessage"] = null;
 
                                     if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue)
@@ -626,26 +625,26 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
                                 if ((SessionState.RoomUsers?.Count ?? 0) > 0)
                                     foreach (var roomUser in SessionState.RoomUsers.Values)
-                                        if (roomUser.UserInfo.UserId == 0 ||
-                                            roomUser.UserInfo.RoomPos == null)
+                                        if (roomUser.UserRec.UserId == 0 ||
+                                            roomUser.UserRec.RoomPos == null)
                                         {
                                             continue;
                                         }
-                                        else if (roomUser.UserInfo.UserId != SessionState.UserId &&
-                                                 point.IsPointInPolygon(roomUser.UserInfo.RoomPos.GetBoundingBox(
+                                        else if (roomUser.UserRec.UserId != SessionState.UserId &&
+                                                 point.IsPointInPolygon(roomUser.UserRec.RoomPos.GetBoundingBox(
                                                      new Size(
                                                          (int)AssetConstants.Values.DefaultPropWidth,
                                                          (int)AssetConstants.Values.DefaultPropHeight),
                                                      true)))
                                         {
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Select User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Select User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.UI_USERSELECT,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
@@ -654,85 +653,85 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                                 !SessionState.UserDesc.IsAdministrator) continue;
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Pin User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Pin User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_PIN,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Unpin User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Unpin User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_UNPIN,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Gag User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Gag User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_GAG,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Ungag User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Ungag User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_UNGAG,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Propgag User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Propgag User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_PROPGAG,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Unpropgag User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_UNPROPGAG,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
 
                                             toolStripItem =
-                                                _contextMenu.Items.Add($"Kill User: {roomUser.UserInfo.Name}");
+                                                _contextMenu.Items.Add($"Kill User: {roomUser.UserRec.Name}");
                                             if (toolStripItem != null)
                                             {
                                                 toolStripItem.Tag = new object[]
                                                 {
                                                     ContextMenuCommandTypes.CMD_KILLUSER,
-                                                    roomUser.UserInfo.UserId
+                                                    roomUser.UserRec.UserId
                                                 };
                                                 toolStripItem.Click += contextMenuItem_Click;
                                             }
@@ -842,13 +841,13 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
                         if ((SessionState.RoomUsers?.Count ?? 0) > 0)
                             foreach (var roomUser in SessionState.RoomUsers.Values)
-                                if (roomUser.UserInfo.UserId == 0 ||
-                                    roomUser.UserInfo.RoomPos == null)
+                                if (roomUser.UserRec.UserId == 0 ||
+                                    roomUser.UserRec.RoomPos == null)
                                 {
                                     continue;
                                 }
                                 else if (point.IsPointInPolygon(
-                                             roomUser.UserInfo.RoomPos.GetBoundingBox(
+                                             roomUser.UserRec.RoomPos.GetBoundingBox(
                                                  new Size(
                                                      (int)AssetConstants.Values.DefaultPropWidth,
                                                      (int)AssetConstants.Values.DefaultPropHeight),
@@ -1392,12 +1391,12 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             {
                 var value = values[1] as Core.Entities.Shared.Types.Point;
 
-                SessionState.UserDesc.UserInfo.RoomPos = value;
+                SessionState.UserDesc.UserRec.RoomPos = value;
 
                 var user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                 if (user != null)
                 {
-                    user.UserInfo.RoomPos = value;
+                    user.UserRec.RoomPos = value;
                     user.Extended["CurrentMessage"] = null;
 
                     if (user.Extended["MessageQueue"] is DisposableQueue<MsgBubble> queue) queue.Clear();

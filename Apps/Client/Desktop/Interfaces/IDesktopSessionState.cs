@@ -26,7 +26,7 @@ public interface IDesktopSessionState : IClientSessionState, IUISessionState
     HistoryManager History { get; }
     TabPage TabPage { get; set; }
 
-    void RefreshScriptEvent(ScriptEvent  scriptEvent);
+    void RefreshScriptEvent(ScriptEvent scriptEvent);
     void RefreshRibbon();
     void RefreshUI();
     void RefreshScreen(params LayerScreenTypes[] layers);

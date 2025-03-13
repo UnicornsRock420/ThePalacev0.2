@@ -58,7 +58,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     private readonly DisposableDictionary<string, FormBase> _forms = new();
     public IReadOnlyDictionary<string, FormBase> Forms => _forms.AsReadOnly();
 
-    private void _FormClosed(object sender, EventArgs e)
+    internal void _FormClosed(object sender, EventArgs e)
     {
         if (IsDisposed) return;
 
@@ -90,6 +90,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     public bool RegisterForm(FormBase form, bool assignFormClosedHandler = true)
     {
         if (IsDisposed) return false;
+        
+        ArgumentNullException.ThrowIfNull(form, nameof(form));
 
         using (var @lock = LockContext.GetLock(_forms))
         {
@@ -112,6 +114,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     public bool UnregisterForm(FormBase form)
     {
         if (IsDisposed) return false;
+        
+        ArgumentNullException.ThrowIfNull(form, nameof(form));
 
         using (var @lock = LockContext.GetLock(_forms))
         {
@@ -182,6 +186,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     public static void UpdateForm<T>(T form, FormCfg cfg)
         where T : FormBase
     {
+        ArgumentNullException.ThrowIfNull(form, nameof(form));
+        
         form.SuspendLayout();
 
         form.ClientSize = cfg.Size;
@@ -205,6 +211,9 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
     public static void RegisterControl(FormBase parent, Control control)
     {
+        ArgumentNullException.ThrowIfNull(parent, nameof(parent));
+        ArgumentNullException.ThrowIfNull(control, nameof(control));
+
         parent.Controls.Add(control);
     }
 
@@ -212,6 +221,9 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         where TForm : FormBase
         where TControl : Control
     {
+        ArgumentNullException.ThrowIfNull(parent, nameof(parent));
+        ArgumentNullException.ThrowIfNull(control, nameof(control));
+
         parent.Controls.Add(control);
     }
 
@@ -220,6 +232,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         where TControl : Control, new()
     {
         if (IsDisposed) return null;
+
+        ArgumentNullException.ThrowIfNull(parent, nameof(parent));
 
         if (parent == null ||
             (cfgs?.Length ?? 0) < 1)
@@ -290,6 +304,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
     public static void UpdateControl(Control control, ControlCfg cfg)
     {
+        ArgumentNullException.ThrowIfNull(control, nameof(control));
+
         control.Visible = cfg.Visible;
         control.TabIndex = cfg.TabIndex;
         control.TabStop = cfg.TabStop;
@@ -302,6 +318,9 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
     public static void DestroyControl(FormBase parent, Control control)
     {
+        ArgumentNullException.ThrowIfNull(parent, nameof(parent));
+        ArgumentNullException.ThrowIfNull(control, nameof(control));
+
         parent.Controls.Remove(control);
     }
 

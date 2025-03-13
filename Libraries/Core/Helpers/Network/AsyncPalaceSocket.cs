@@ -7,10 +7,9 @@ namespace ThePalace.Core.Helpers.Network;
 
 public static class AsyncPalaceSocket
 {
-    public static void Send(this ISessionState sessionState, int refNum, IProtocol obj, bool directAccess = false)
+    public static void Send(this IUserSessionState sessionState, int refNum, IProtocol obj, bool directAccess = false)
     {
-        ArgumentNullException.ThrowIfNull(sessionState?.ConnectionState,
-            nameof(AsyncPalaceSocket) + "." + nameof(sessionState));
+        ArgumentNullException.ThrowIfNull(sessionState, nameof(AsyncPalaceSocket) + "." + nameof(sessionState));
         ArgumentNullException.ThrowIfNull(obj, nameof(AsyncPalaceSocket) + "." + nameof(obj));
 
         using (var ms = new MemoryStream())
@@ -19,7 +18,7 @@ public static class AsyncPalaceSocket
                 refNum,
                 obj,
                 opts: SerializerOptions.IncludeHeader);
-            
+
             sessionState.ConnectionState.Write(
                 ms.ToArray(),
                 directAccess: directAccess);

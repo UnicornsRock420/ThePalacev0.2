@@ -1,4 +1,5 @@
-﻿using ThePalace.Network.Interfaces;
+﻿using System.Collections.Concurrent;
+using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Core.Interfaces.Core;
 
@@ -7,7 +8,7 @@ public interface ISessionState : IDisposable
     IApp<ISessionState> App { get; set; }
 
     Guid Id { get; }
-    IConnectionState? ConnectionState { get; set; }
+    ConcurrentDictionary<string, object> Extended { get; }
 
     object? SessionTag { get; set; }
 

@@ -2,9 +2,7 @@
 using System.Collections.Concurrent;
 using ThePalace.Common.Server.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Network.Interfaces;
 using RoomID = short;
 using UserID = int;
 
@@ -19,11 +17,6 @@ public class ServerSessionState : Disposable, IServerSessionState
 
     public override void Dispose()
     {
-        ConnectionState?.Dispose();
-        ConnectionState = null;
-
-        LastActivity = null;
-
         base.Dispose();
 
         GC.SuppressFinalize(this);
@@ -31,8 +24,6 @@ public class ServerSessionState : Disposable, IServerSessionState
 
     public IApp<ISessionState> App { get; set; }
     public Guid Id => Guid.NewGuid();
-    public DateTime? LastActivity { get; set; } = null;
-    public IConnectionState? ConnectionState { get; set; } = null;
 
     public object? SessionTag { get; set; } = null;
     public object? ScriptTag { get; set; } = null;
@@ -41,6 +32,6 @@ public class ServerSessionState : Disposable, IServerSessionState
 
     public string? MediaUrl { get; set; } = null;
     public string? ServerName { get; set; } = null;
-    public ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; } = [];
-    public ConcurrentDictionary<UserID, UserDesc> Users { get; set; } = [];
+    public ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; } = new();
+    public ConcurrentDictionary<UserID, IUserSessionState> Users { get; set; } = new();
 }
