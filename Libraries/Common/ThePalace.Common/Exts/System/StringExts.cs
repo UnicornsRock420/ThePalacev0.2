@@ -207,9 +207,9 @@ public static class StringExts
 
     public static byte[] FromHex(this s value)
     {
-        value = RegexConstants.REGEX_HEX_FILTER.Replace(value, s.Empty);
+        value = RegexConstants.REGEX_FILTER_HEX.Replace(value, s.Empty);
 
-        var hexBytes = RegexConstants.REGEX_HEX_SPLIT
+        var hexBytes = RegexConstants.REGEX_SPLIT_HEX
             .Split(value)
             .Where(v => !s.IsNullOrWhiteSpace(v))
             .ToArray();

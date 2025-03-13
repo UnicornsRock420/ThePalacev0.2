@@ -9,6 +9,7 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Common.Constants;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
@@ -42,7 +43,7 @@ using ThePalace.Network.Helpers;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
-using RegexConstants = ThePalace.Core.Constants.RegexConstants;
+using RegexConstants = ThePalace.Common.Constants.RegexConstants;
 using RoomID = short;
 using UserID = int;
 
@@ -127,21 +128,13 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                             {
                                                 case NetworkCommandTypes.CONNECT:
                                                     var url = cmd.Values[0] as string;
-                                                    if (url == null ||
-                                                        !RegexConstants.REGEX_PALACEURL.IsMatch(url)) return;
+                                                    if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
 
-                                                    var match = RegexConstants.REGEX_PALACEURL.Match(url);
-                                                    if (match.Groups.Count < 2) break;
+                                                    var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQueryString);
+                                                    if (match.Count < 2) break;
 
-                                                    var hostname = match.Groups[1].Value;
-                                                    var port = match.Groups.Count > 2 &&
-                                                               !string.IsNullOrWhiteSpace(match.Groups[2].Value)
-                                                        ? Convert.ToUInt16(match.Groups[2].Value)
-                                                        : (ushort)0;
-                                                    var roomID = match.Groups.Count > 3 &&
-                                                                 !string.IsNullOrWhiteSpace(match.Groups[3].Value)
-                                                        ? Convert.ToInt16(match.Groups[3].Value)
-                                                        : (RoomID)0;
+                                                    var hostname = match["Hostname"];
+                                                    var port = Convert.ToInt32(match["Port"]);
 
                                                     Current.SessionState.ConnectionState.Connect(hostname, port);
                                                     return;
@@ -1252,20 +1245,14 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         }
 
                         if (url != null &&
-                            RegexConstants.REGEX_PALACEURL.IsMatch(url))
+                            RegexConstants.REGEX_PARSE_URL.IsMatch(url))
                         {
-                            var match = RegexConstants.REGEX_PALACEURL.Match(url);
-                            if (match.Groups.Count < 2) break;
+                            var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQueryString);
+                            if (match.Count < 2) break;
 
-                            var hostname = match.Groups[1].Value;
-                            var port = match.Groups.Count > 2 &&
-                                       !string.IsNullOrWhiteSpace(match.Groups[2].Value)
-                                ? Convert.ToUInt16(match.Groups[2].Value)
-                                : (ushort)0;
-                            var roomID = match.Groups.Count > 3 &&
-                                         !string.IsNullOrWhiteSpace(match.Groups[3].Value)
-                                ? Convert.ToInt16(match.Groups[3].Value)
-                                : (short)0;
+                            var hostname = match["Hostname"];
+                            var port = Convert.ToInt32(match["Port"]);
+                            var roomID = Convert.ToInt16(match["Path"]);
 
                             if ((SessionState.ConnectionState?.IsConnected() ?? false) &&
                                 SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&

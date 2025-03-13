@@ -28,7 +28,7 @@ public class VersionAttribute : Attribute
     public VersionAttribute(
         string? version)
     {
-        Version = RegexConstants.REGEX_NONNUMERIC_FILTER.Replace(version, string.Empty);
+        Version = RegexConstants.REGEX_FILTER_NONNUMERIC.Replace(version, string.Empty);
     }
 
     public string Version { get; } = string.Empty;
