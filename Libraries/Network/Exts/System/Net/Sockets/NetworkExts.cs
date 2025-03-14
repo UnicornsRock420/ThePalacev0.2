@@ -87,6 +87,11 @@ public static class NetworkExts
         return ((IPEndPoint)handler?.RemoteEndPoint)?.Port;
     }
 
+    public static IPEndPoint? GetIPEndPoint(this Socket handler)
+    {
+        return (IPEndPoint)handler?.RemoteEndPoint;
+    }
+
     public static IPAddress Resolve(this string hostname, AddressFamily addressFamily = AddressFamily.InterNetwork)
     {
         return Dns.GetHostAddresses(hostname)

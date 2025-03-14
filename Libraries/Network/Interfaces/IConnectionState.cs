@@ -19,13 +19,12 @@ public interface IConnectionState : IDisposable
     DateTime? LastReceived { get; set; }
     DateTime? LastSent { get; set; }
 
-    byte[] Buffer { get; set; }
+    internal byte[] Buffer { get; set; }
     BufferStream? BytesReceived { get; set; }
     BufferStream? BytesSend { get; set; }
 
     internal Socket? Socket { get; set; }
     //internal NetworkStream? NetworkStream { get; set; }
-
     object? ConnectionTag { get; set; }
 
     event EventHandler ConnectionEstablished;
@@ -43,8 +42,8 @@ public interface IConnectionState : IDisposable
 
     Task Listen(IPEndPoint hostAddr, int listenBacklog = 0);
     
-    int Read(byte[] buffer, int offset = 0, int length = 0);
-    void Write(byte[] buffer, int offset = 0, int length = 0, bool directAccess = false);
+    int Receive(byte[] buffer, int offset = 0, int size = 0);
+    void Send(byte[] buffer, int offset = 0, int size = 0, bool directAccess = false);
     
     void Disconnect();
 }

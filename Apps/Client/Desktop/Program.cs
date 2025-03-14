@@ -173,7 +173,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                 {
                                     var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                    Current.SessionState.ConnectionState.Write(msgBytes);
+                                    Current.SessionState.ConnectionState.Send(msgBytes);
 
                                     delay = RndGenerator.Next(75, 150);
                                 }

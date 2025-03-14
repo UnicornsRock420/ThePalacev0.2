@@ -17,13 +17,11 @@ public class ConnectionState : EventArgs, IConnectionState
     private readonly AsyncCallback _receiveCallback;
     private readonly AsyncCallback _sendCallback;
 
-    private ManualResetEvent _acceptResetEvent = new(false);
-
     public ConnectionState()
     {
-        _acceptCallback = new(AcceptCallback);
-        _receiveCallback = new(ReceiveCallback);
-        _sendCallback = new(SendCallback);
+        _acceptCallback = new(_AcceptCallback);
+        _receiveCallback = new(_ReceiveCallback);
+        _sendCallback = new(_SendCallback);
     }
 
     ~ConnectionState()
@@ -89,6 +87,8 @@ public class ConnectionState : EventArgs, IConnectionState
         GC.SuppressFinalize(this);
     }
 
+    private ManualResetEvent _acceptResetEvent = new(false);
+
     public Guid Id { get; } = Guid.NewGuid();
     public CancellationTokenSource CancellationTokenSource { get; } = new();
     public CancellationToken CancellationToken => CancellationTokenSource.Token;
@@ -105,8 +105,8 @@ public class ConnectionState : EventArgs, IConnectionState
     public byte[] Buffer { get; set; } = new byte[(int)NetworkConstants.RAW_PACKET_BUFFER_SIZE];
 
     public Socket? Socket { get; set; }
-    //public NetworkStream? NetworkStream { get; set; }
 
+    //public NetworkStream? NetworkStream { get; set; }
     public object? ConnectionTag { get; set; }
 
     public event EventHandler ConnectionEstablished;
@@ -115,7 +115,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public event EventHandler DataReceived;
     public event EventHandler StateChanged;
 
-    private bool Do(Action cb, bool disconnectOnError = false)
+    public static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
     {
         try
         {
@@ -125,7 +125,7 @@ public class ConnectionState : EventArgs, IConnectionState
         }
         catch (TaskCanceledException ex)
         {
-            Disconnect();
+            connectionState?.Disconnect();
 
             return false;
         }
@@ -133,7 +133,7 @@ public class ConnectionState : EventArgs, IConnectionState
         {
             LoggerHub.Current.Error(ex);
 
-            Disconnect();
+            connectionState?.Disconnect();
 
             return false;
         }
@@ -141,7 +141,7 @@ public class ConnectionState : EventArgs, IConnectionState
         {
             LoggerHub.Current.Error(ex);
 
-            if (disconnectOnError) Disconnect();
+            if (disconnectOnError) connectionState?.Disconnect();
 
             return false;
         }
@@ -197,19 +197,21 @@ public class ConnectionState : EventArgs, IConnectionState
 
         Disconnect();
 
-        if (!Do(() =>
-            {
-                Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
-                Socket.Connect(hostAddr);
-                Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this);
+        if (!Do(
+                this,
+                () =>
+                {
+                    Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
+                    Socket.Connect(hostAddr);
 
-                //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
+                    Direction = SocketDirection.Outbound;
+                    //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
+                    HostAddr = hostAddr;
 
-                Direction = SocketDirection.Outbound;
-                HostAddr = hostAddr;
+                    Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this);
 
-                ConnectionEstablished?.Invoke(this, null);
-            }))
+                    ConnectionEstablished?.Invoke(this, null);
+                }))
             Disconnect();
     }
 
@@ -236,7 +238,7 @@ public class ConnectionState : EventArgs, IConnectionState
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(ConnectionState) + "." + nameof(hostAddr));
 
-        Do(() =>
+        Do(this, () =>
         {
             var listener = ConnectionManager.CreateSocket(hostAddr.AddressFamily);
             listener.Bind(hostAddr);
@@ -248,14 +250,14 @@ public class ConnectionState : EventArgs, IConnectionState
             {
                 _acceptResetEvent.Reset();
 
-                if (!Do(() => listener.BeginAccept(_acceptCallback, listener))) return;
+                if (!Do(this, () => listener.BeginAccept(_acceptCallback, listener))) return;
 
                 _acceptResetEvent.WaitOne();
             }
         });
     }
 
-    private void AcceptCallback(IAsyncResult ar)
+    private void _AcceptCallback(IAsyncResult ar)
     {
         _acceptResetEvent.Set();
 
@@ -264,62 +266,44 @@ public class ConnectionState : EventArgs, IConnectionState
 
         var handler = (Socket?)null;
 
-        if (!Do(() => handler = listener.EndAccept(ar)) ||
+        if (!Do(this, () => handler = listener.EndAccept(ar)) ||
             handler == null) throw new SocketException();
 
+        Direction = SocketDirection.Inbound;
         Socket = handler;
         //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
+        RemoteAddr = handler.GetIPEndPoint();
 
-        Do(() => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
+        Do(this, () => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
 
-        ConnectionReceived.Invoke(typeof(ConnectionState), (ConnectionState)this);
+        ConnectionReceived.Invoke(this, null);
     }
 
-    public int Read(byte[] buffer, int offset = 0, int length = 0)
+    public int Receive(byte[] buffer, int offset = 0, int size = 0)
     {
-        if (length < 1)
+        if (size < 1)
         {
-            length = buffer?.Length ?? 0;
+            size = buffer?.Length ?? 0;
         }
 
-        return BytesReceived.Read(buffer, offset, length);
+        return BytesReceived.Read(buffer, offset, size);
     }
 
-    public void Write(byte[] buffer, int offset = 0, int length = 0, bool directAccess = false)
+    private void _ReceiveCallback(IAsyncResult ar)
     {
-        if (Socket == null ||
-            !IsConnected() ||
-            (buffer?.Length ?? 0) < 1) return;
-
-        if (length < 1)
-        {
-            length = buffer?.Length ?? 0;
-        }
-
-        if (directAccess)
-        {
-            Socket?.Send(buffer, length, SocketFlags.None);
-        }
-        else
-        {
-            BytesSend?.Write(buffer, offset, length);
-        }
-    }
-
-    private void ReceiveCallback(IAsyncResult ar)
-    {
-        //var state = (IConnectionState?)ar.AsyncState;
-        //if (state == null) return;
+        var connectionState = (IConnectionState?)ar.AsyncState;
+        if (connectionState == null ||
+            connectionState != this) return;
 
         if (Socket == null ||
             !IsConnected()) throw new SocketException();
 
         var bytesReceived = 0;
 
-        if (!Do(() =>
+        if (!Do(this, () =>
             {
                 bytesReceived = Socket.EndReceive(ar);
-                if (bytesReceived < 1) bytesReceived = -1;
+                if (bytesReceived < 1) throw new SocketException();
             }))
             bytesReceived = -1;
 
@@ -338,31 +322,48 @@ public class ConnectionState : EventArgs, IConnectionState
             LastReceived = DateTime.UtcNow;
         }
 
-        Do(() => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
+        Do(this, () => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
 
         if (bytesReceived > 0)
-            DataReceived.Invoke(typeof(ConnectionState), (ConnectionState)this);
+            DataReceived.Invoke(this, null);
     }
 
-    public void Send(byte[]? data)
+    public void Send(byte[] buffer, int offset = 0, int size = 0, bool directAccess = false)
     {
-        using (var @lock = LockContext.GetLock(Socket))
+        if (Socket == null ||
+            !IsConnected() ||
+            (buffer?.Length ?? 0) < 1) return;
+
+        if (size < 1)
         {
-            Do(() => { Socket.BeginSend(data, 0, data.Length, 0, _sendCallback, this); });
+            size = buffer?.Length ?? 0;
+        }
+
+        if (directAccess)
+        {
+            using (var @lock = LockContext.GetLock(Socket))
+            {
+                Do(this, () => { Socket.BeginSend(buffer, 0, buffer.Length, 0, _sendCallback, this); });
+            }
+        }
+        else
+        {
+            Do(this, () => { BytesSend?.Write(buffer, offset, size); });
         }
     }
 
-    private void SendCallback(IAsyncResult ar)
+    private void _SendCallback(IAsyncResult ar)
     {
-        //var state = (IConnectionState?)ar.AsyncState;
-        //if (state == null) return;
+        var connectionState = (IConnectionState?)ar.AsyncState;
+        if (connectionState == null ||
+            connectionState != this) return;
 
         if (Socket == null ||
             !IsConnected()) throw new SocketException();
 
         var bytesSent = (uint)0;
 
-        Do(() =>
+        Do(this, () =>
         {
             bytesSent += (uint)Socket.EndSend(ar);
 

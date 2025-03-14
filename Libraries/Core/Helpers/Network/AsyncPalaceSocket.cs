@@ -19,7 +19,7 @@ public static class AsyncPalaceSocket
                 obj,
                 opts: SerializerOptions.IncludeHeader);
 
-            sessionState.ConnectionState.Write(
+            sessionState.ConnectionState.Send(
                 ms.ToArray(),
                 directAccess: directAccess);
         }

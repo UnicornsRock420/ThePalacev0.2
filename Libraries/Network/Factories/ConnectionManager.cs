@@ -109,8 +109,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         }
     }
 
-    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream,
-        ProtocolType protocolType = ProtocolType.Tcp)
+    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp)
     {
         return new Socket(addressFamily, socketType, protocolType);
     }
@@ -155,7 +154,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
             Direction = SocketDirection.Inbound,
             Socket = handler,
             //NetworkStream = CreateNetworkStream(handler),
-            RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0)
+            RemoteAddr = handler.GetIPEndPoint(),
         };
 
         instance ??= Current;
