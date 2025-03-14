@@ -133,7 +133,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         {
             Direction = SocketDirection.Outbound,
             Socket = handler,
-            NetworkStream = CreateNetworkStream(handler)
+            //NetworkStream = CreateNetworkStream(handler)
         };
 
         if (hostAddr != null) result.Socket.Connect(result.HostAddr = hostAddr);
@@ -154,7 +154,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         {
             Direction = SocketDirection.Inbound,
             Socket = handler,
-            NetworkStream = CreateNetworkStream(handler),
+            //NetworkStream = CreateNetworkStream(handler),
             RemoteAddr = new IPEndPoint(handler.GetIPAddress(), handler.GetPort() ?? 0)
         };
 

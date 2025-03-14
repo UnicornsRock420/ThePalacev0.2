@@ -34,7 +34,7 @@ public static class NetworkExts
     public static void DropConnection(this NetworkStream handler)
     {
         if (handler == null) return;
-        
+
         var actions = new List<Action>
         {
             handler.Close,
@@ -85,5 +85,12 @@ public static class NetworkExts
     public static int? GetPort(this Socket handler)
     {
         return ((IPEndPoint)handler?.RemoteEndPoint)?.Port;
+    }
+
+    public static IPAddress Resolve(this string hostname, AddressFamily addressFamily = AddressFamily.InterNetwork)
+    {
+        return Dns.GetHostAddresses(hostname)
+            .FirstOrDefault(addr =>
+                addr.AddressFamily == addressFamily);
     }
 }

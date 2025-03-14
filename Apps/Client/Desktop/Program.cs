@@ -40,7 +40,6 @@ using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
-using ThePalace.Network.Helpers;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
@@ -174,7 +173,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                 {
                                     var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                    Current.SessionState.ConnectionState.Send(msgBytes);
+                                    Current.SessionState.ConnectionState.Write(msgBytes);
 
                                     delay = RndGenerator.Next(75, 150);
                                 }

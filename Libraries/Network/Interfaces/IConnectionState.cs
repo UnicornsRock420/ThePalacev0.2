@@ -8,6 +8,8 @@ namespace ThePalace.Network.Interfaces;
 public interface IConnectionState : IDisposable
 {
     Guid Id { get; }
+    CancellationTokenSource CancellationTokenSource { get; }
+    CancellationToken CancellationToken { get; }
     
     SocketDirection Direction { get; set; }
 
@@ -22,9 +24,15 @@ public interface IConnectionState : IDisposable
     BufferStream? BytesSend { get; set; }
 
     internal Socket? Socket { get; set; }
-    internal NetworkStream? NetworkStream { get; set; }
+    //internal NetworkStream? NetworkStream { get; set; }
 
     object? ConnectionTag { get; set; }
+
+    event EventHandler ConnectionEstablished;
+    event EventHandler ConnectionDisconnected;
+    event EventHandler ConnectionReceived;
+    event EventHandler DataReceived;
+    event EventHandler StateChanged;
 
     bool IsConnected(int passiveIdleTimeoutInSeconds = 750);
     
@@ -32,6 +40,8 @@ public interface IConnectionState : IDisposable
     void Connect(IPAddress ipAddress, int port);
     void Connect(string hostname,  int port);
     void Connect(Uri uri);
+
+    Task Listen(IPEndPoint hostAddr, int listenBacklog = 0);
     
     int Read(byte[] buffer, int offset = 0, int length = 0);
     void Write(byte[] buffer, int offset = 0, int length = 0, bool directAccess = false);

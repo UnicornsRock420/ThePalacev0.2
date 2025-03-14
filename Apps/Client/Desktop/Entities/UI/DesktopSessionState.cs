@@ -30,7 +30,6 @@ using ThePalace.Core.Helpers.Core;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
-using ThePalace.Network.Helpers;
 using ThePalace.Network.Interfaces;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
@@ -55,8 +54,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         ]);
 
         FormsManager.Current.FormClosed += _FormClosed;
-        AsyncTcpSocket.ConnectionEstablished += _ConnectionEstablished;
-        AsyncTcpSocket.ConnectionDisconnected += _ConnectionDisconnected;
+        ConnectionState.ConnectionEstablished += _ConnectionEstablished;
+        ConnectionState.ConnectionDisconnected += _ConnectionDisconnected;
 
         foreach (var layer in _layerTypes)
             _uiLayers.TryAdd(layer, new LayerScreen(this, layer));
