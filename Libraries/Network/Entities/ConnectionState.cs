@@ -93,7 +93,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public CancellationTokenSource CancellationTokenSource { get; } = new();
     public CancellationToken CancellationToken => CancellationTokenSource.Token;
 
-    public SocketStatus Status { get; set; } = SocketStatus.Disconnected;
+    public SocketMode Mode { get; set; } = SocketMode.Disconnected;
 
     public IPEndPoint? HostAddr { get; set; }
     public IPEndPoint? RemoteAddr { get; set; }
@@ -203,7 +203,7 @@ public class ConnectionState : EventArgs, IConnectionState
                     Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
                     Socket.Connect(hostAddr);
 
-                    Status = SocketStatus.Outbound;
+                    Mode = SocketMode.Outbound;
                     //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
                     HostAddr = hostAddr;
 
@@ -235,7 +235,7 @@ public class ConnectionState : EventArgs, IConnectionState
 
     public void Disconnect()
     {
-        Status = SocketStatus.Disconnected;
+        Mode = SocketMode.Disconnected;
 
         Socket?.DropConnection();
         Socket = null;
@@ -264,7 +264,7 @@ public class ConnectionState : EventArgs, IConnectionState
             Socket.Bind(hostAddr);
             Socket.Listen(listenBacklog);
 
-            Status = SocketStatus.Listen;
+            Mode = SocketMode.Listen;
 
             ConnectionManager.Current.Register(this);
 

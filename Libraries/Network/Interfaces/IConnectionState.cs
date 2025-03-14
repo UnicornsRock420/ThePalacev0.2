@@ -11,7 +11,7 @@ public interface IConnectionState : IDisposable
     CancellationTokenSource CancellationTokenSource { get; }
     CancellationToken CancellationToken { get; }
     
-    SocketStatus Status { get; set; }
+    SocketMode Mode { get; set; }
 
     IPEndPoint? HostAddr { get; set; }
     IPEndPoint? RemoteAddr { get; set; }

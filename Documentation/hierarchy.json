@@ -14,13 +14,53 @@
       "AssetsManager": {
       },
       "Desktop": {
+        "ThreadQueues": {
+          "Core": [
+            "TaskManager.Current.Run"
+          ],
+          "Network": [
+            "Commands",
+            "BytesReceived",
+            "BytesSend"
+          ],
+          "GUI": [
+            "Commands"
+          ],
+          "Audio": [
+            "SoundFiles"
+          ],
+          "Media": [
+            ""
+          ],
+          "Assets": [
+            ""
+          ],
+          "Scripting": [
+            ""
+          ],
+          "Toast": [
+            "Dispatch"
+          ]
+        }
       },
       "Headless": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "Scripting"
+        ]
+      },
+      "Scripting": {
+        "IptscraeEngine": {
+        },
+        "JavaScript": {
+        },
+        "Python": {
+        }
       },
       "ISessionState": {
         ":IUserSessionState": {
-          "IConnectionState": {
-          }
+          "ConnectionState": null
         },
         ":IUserSessionState:IClientSessionState:IDesktopSessionState": {
         },
@@ -38,13 +78,32 @@
       "AssetsManager": {
       },
       "Desktop": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "GUI",
+          "Scripting",
+          "Toast"
+        ]
       },
       "Headless": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "Scripting"
+        ]
+      },
+      "Scripting": {
+        "IptscraeEngine": {
+        },
+        "JavaScript": {
+        },
+        "Python": {
+        }
       },
       "ISessionState": {
         ":IUserSessionState": {
-          "IConnectionState": {
-          }
+          "ConnectionState": null
         },
         ":IServerSessionState": {
           "Rooms<RoomID, RoomDesc>": {
@@ -57,8 +116,33 @@
       }
     },
     "Libraries": {
+      "Core": {
+      },
+      "Logging": {
+        "LoggerHub": {}
+      },
+      "Network": {
+        "IConnectionState": {
+          "Mode": null,
+          "HostAddr": null,
+          "RemoteAddr": null,
+          "LastReceived": null,
+          "LastSent": null,
+          "BytesReceived": null,
+          "BytesSend": null,
+          "Buffer": null,
+          "Socket": null,
+          "ConnectionTag": null
+        }
+      }
     },
     "Modules": {
+      "Database": {
+      },
+      "Media": {
+      },
+      "Storage": {
+      }
     }
   }
 }

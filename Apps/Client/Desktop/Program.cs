@@ -1005,7 +1005,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         {
                             if (text[0] == '/')
                             {
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.ScriptEngine]).Enqueue(new ActionCmd
+                                ((Job<ActionCmd>)_jobs[ThreadQueues.Scripting]).Enqueue(new ActionCmd
                                 {
                                     CmdFnc = a =>
                                     {

@@ -1,6 +1,6 @@
 ﻿namespace ThePalace.Network.Enums;
 
-public enum SocketStatus
+public enum SocketMode
 {
     Disconnected = 0,
     Listen = 1,

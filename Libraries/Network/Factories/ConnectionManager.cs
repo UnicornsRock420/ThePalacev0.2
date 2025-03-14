@@ -136,7 +136,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         var result = new ConnectionState
         {
-            Status = SocketStatus.Outbound,
+            Mode = SocketMode.Outbound,
             Socket = handler,
             //NetworkStream = CreateNetworkStream(handler)
         };
@@ -159,7 +159,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         var result = new ConnectionState
         {
-            Status = SocketStatus.Inbound,
+            Mode = SocketMode.Inbound,
             Socket = handler,
             //NetworkStream = CreateNetworkStream(handler),
             RemoteAddr = handler.GetIPEndPoint(),
