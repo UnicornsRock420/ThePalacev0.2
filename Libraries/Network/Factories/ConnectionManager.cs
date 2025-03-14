@@ -109,7 +109,10 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         }
     }
 
-    public static Socket CreateSocket(AddressFamily addressFamily, SocketType socketType = SocketType.Stream, ProtocolType protocolType = ProtocolType.Tcp)
+    public static Socket CreateSocket(
+        AddressFamily addressFamily,
+        SocketType socketType = SocketType.Stream,
+        ProtocolType protocolType = ProtocolType.Tcp)
     {
         return new Socket(addressFamily, socketType, protocolType);
     }
@@ -121,8 +124,11 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return new NetworkStream(handler);
     }
 
-    public static IConnectionState CreateConnectionState(AddressFamily addressFamily,
-        SocketType socketType = SocketType.Stream, IPEndPoint? hostAddr = null, ConnectionManager? instance = null)
+    public static IConnectionState CreateConnectionState(
+        AddressFamily addressFamily,
+        SocketType socketType = SocketType.Stream,
+        IPEndPoint? hostAddr = null,
+        ConnectionManager? instance = null)
     {
         // TODO: Check banlist record(s)
 
@@ -130,7 +136,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         var result = new ConnectionState
         {
-            Direction = SocketDirection.Outbound,
+            Status = SocketStatus.Outbound,
             Socket = handler,
             //NetworkStream = CreateNetworkStream(handler)
         };
@@ -143,7 +149,9 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return result;
     }
 
-    public static IConnectionState CreateConnectionState(Socket? handler = null, ConnectionManager? instance = null)
+    public static IConnectionState CreateConnectionState(
+        Socket? handler = null,
+        ConnectionManager? instance = null)
     {
         ArgumentNullException.ThrowIfNull(handler, nameof(ConnectionManager) + "." + nameof(handler));
 
@@ -151,7 +159,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
         var result = new ConnectionState
         {
-            Direction = SocketDirection.Inbound,
+            Status = SocketStatus.Inbound,
             Socket = handler,
             //NetworkStream = CreateNetworkStream(handler),
             RemoteAddr = handler.GetIPEndPoint(),

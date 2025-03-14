@@ -884,10 +884,10 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             var x = UserDesc.UserRec.RoomPos.HAxis;
             var y = UserDesc.UserRec.RoomPos.VAxis;
 
-            if (x < -CONST_INT_halfPropWidth) x = (short)-CONST_INT_halfPropWidth;
+            if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
             else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = (short)(ScreenWidth + CONST_INT_halfPropWidth);
 
-            if (y < -CONST_INT_halfPropHeight) y = (short)-CONST_INT_halfPropHeight;
+            if (y < -CONST_INT_halfPropHeight) y = -CONST_INT_halfPropHeight;
             else if (y > ScreenHeight + CONST_INT_halfPropHeight) y = (short)(ScreenHeight + CONST_INT_halfPropHeight);
 
             if (x < 0 ||

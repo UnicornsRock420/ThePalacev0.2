@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Media;
 using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
@@ -40,6 +41,7 @@ using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
+using ThePalace.Media.SoundPlayer;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
@@ -173,7 +175,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
                                 {
                                     var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                    Current.SessionState.ConnectionState.Send(msgBytes);
+                                    Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
 
                                     delay = RndGenerator.Next(75, 150);
                                 }
@@ -311,8 +313,8 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var mediaCmd)) return;
-
-                // TODO: Audio
+                
+                SoundManager.Current.PlaySound(mediaCmd.Path);
             },
             opts: RunOptions.UseResetEvent);
 
@@ -324,32 +326,11 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         jobs[ThreadQueues.Toast] = TaskManager.Current.CreateJob<ToastCfg>(q =>
             {
                 if (!q.IsEmpty &&
-                    q.TryDequeue(out var toastArgs))
-                {
-                    var toast = new ToastContentBuilder();
-
-                    foreach (var arg in toastArgs.Args)
-                    {
-                        var _type = arg.Value.GetType();
-                        if (_type == Int32Exts.Types.Int32)
-                            toast.AddArgument(arg.Key, (int)arg.Value);
-                        else if (_type == StringExts.Types.String)
-                            toast.AddArgument(arg.Key, (string)arg.Value);
-                        else if (_type == DoubleExts.Types.Double)
-                            toast.AddArgument(arg.Key, (double)arg.Value);
-                        else if (_type == BooleanExts.Types.Boolean)
-                            toast.AddArgument(arg.Key, (bool)arg.Value);
-                        else if (_type == FloatExts.Types.Float)
-                            toast.AddArgument(arg.Key, (float)arg.Value);
-                    }
-
-                    foreach (var txt in toastArgs.Text)
-                        toast.AddText(txt);
-
-                    toast.Show(t => { t.ExpirationTime = toastArgs.ExpirationTime; });
-                }
+                    q.TryDequeue(out var toastCfg))
+                    ToastCfg.Dispatch(toastCfg);
             },
-            opts: RunOptions.UseResetEvent);
+            opts: RunOptions.UseSleepInterval,
+            sleepInterval: TimeSpan.FromMilliseconds(750));
 #endif
 
         #endregion

@@ -1,0 +1,64 @@
+{
+  "IApp": {
+    "Client": {
+      "TaskManager": {
+      },
+      "ConnectionManager": {
+      },
+      "FormsManager": {
+      },
+      "HotKeyManager": {
+      },
+      "HistoryManager": {
+      },
+      "AssetsManager": {
+      },
+      "Desktop": {
+      },
+      "Headless": {
+      },
+      "ISessionState": {
+        ":IUserSessionState": {
+          "IConnectionState": {
+          }
+        },
+        ":IUserSessionState:IClientSessionState:IDesktopSessionState": {
+        },
+        ":IUISessionState:IDesktopSessionState": {
+        }
+      },
+      "IPlugin": {
+      }
+    },
+    "Server": {
+      "TaskManager": {
+      },
+      "ConnectionManager": {
+      },
+      "AssetsManager": {
+      },
+      "Desktop": {
+      },
+      "Headless": {
+      },
+      "ISessionState": {
+        ":IUserSessionState": {
+          "IConnectionState": {
+          }
+        },
+        ":IServerSessionState": {
+          "Rooms<RoomID, RoomDesc>": {
+          },
+          "Users<UserID, IUserSessionState>": {
+          }
+        }
+      },
+      "IPlugin": {
+      }
+    },
+    "Libraries": {
+    },
+    "Modules": {
+    }
+  }
+}
