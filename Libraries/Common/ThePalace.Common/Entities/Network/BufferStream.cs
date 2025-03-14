@@ -56,12 +56,20 @@ public class BufferStream : Stream
     {
         if ((_chunks?.Count ?? 0) < 1) return [];
 
-        _chunks.TryDequeue(out var chunk);
-        if (chunk?.Position == 0) return chunk.Data;
+        var chunk = (Chunk?)null;
+
+        using (var @lock = LockContext.GetLock(_chunks))
+        {
+            _chunks.TryDequeue(out chunk);
+        }
+
+        if (chunk == null) return [];
+
+        if (chunk.Position == 0) return chunk.Data;
 
         var count = chunk.Length - chunk.Position;
         var result = new byte[count];
-        Buffer.BlockCopy(chunk.Data, (int)chunk.Position, result, 0, (int)count);
+        Buffer.BlockCopy(chunk.Data, chunk.Position, result, 0, count);
 
         return result;
     }
@@ -91,7 +99,7 @@ public class BufferStream : Stream
             }
 
             //Determine how much of the chunk there is left to read
-            var iUnreadChunkLength = (int)(chunk.Length - chunk.Position);
+            var iUnreadChunkLength = chunk.Length - chunk.Position;
 
             //Determine how much of the unread part of the chunk we can actually read
             var iBytesToRead = Math.Min(iUnreadChunkLength, iRemainingBytesToRead);
@@ -100,7 +108,7 @@ public class BufferStream : Stream
             {
                 if ((buffer?.Length ?? 0) > 0)
                     //Read from the chunk into the buffer
-                    Buffer.BlockCopy(chunk.Data, (int)chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
+                    Buffer.BlockCopy(chunk.Data, chunk.Position, buffer, offset + iTotalBytesRead, iBytesToRead);
 
                 iTotalBytesRead += iBytesToRead;
                 iRemainingBytesToRead -= iBytesToRead;
@@ -218,6 +226,18 @@ public class BufferStream : Stream
     {
         public Chunk(byte[] buffer, int position = 0, int length = 0) : base(buffer, position, length > 0 ? length : buffer.Length, false)
         {
+        }
+
+        public new int Length
+        {
+            get => (int)base.Length;
+            set => base.SetLength(value);
+        }
+
+        public new int Position
+        {
+            get => (int)base.Position;
+            set => base.Position = value;
         }
 
         /// <summary>

@@ -13,9 +13,9 @@ namespace ThePalace.Network.Entities;
 
 public class ConnectionState : EventArgs, IConnectionState
 {
-    private readonly AsyncCallback _acceptCallback;
-    private readonly AsyncCallback _receiveCallback;
-    private readonly AsyncCallback _sendCallback;
+    internal readonly AsyncCallback _acceptCallback;
+    internal readonly AsyncCallback _receiveCallback;
+    internal readonly AsyncCallback _sendCallback;
 
     public ConnectionState()
     {
@@ -93,7 +93,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public CancellationTokenSource CancellationTokenSource { get; } = new();
     public CancellationToken CancellationToken => CancellationTokenSource.Token;
 
-    public SocketDirection Direction { get; set; }
+    public SocketStatus Status { get; set; } = SocketStatus.Disconnected;
 
     public IPEndPoint? HostAddr { get; set; }
     public IPEndPoint? RemoteAddr { get; set; }
@@ -115,7 +115,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public event EventHandler DataReceived;
     public event EventHandler StateChanged;
 
-    public static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
+    internal static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
     {
         try
         {
@@ -190,7 +190,6 @@ public class ConnectionState : EventArgs, IConnectionState
         return Socket?.Connected ?? false;
     }
 
-
     public void Connect(IPEndPoint hostAddr)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(ConnectionState) + "." + nameof(hostAddr));
@@ -204,7 +203,7 @@ public class ConnectionState : EventArgs, IConnectionState
                     Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
                     Socket.Connect(hostAddr);
 
-                    Direction = SocketDirection.Outbound;
+                    Status = SocketStatus.Outbound;
                     //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
                     HostAddr = hostAddr;
 
@@ -234,15 +233,40 @@ public class ConnectionState : EventArgs, IConnectionState
         Connect(url.Host, url.Port);
     }
 
+    public void Disconnect()
+    {
+        Status = SocketStatus.Disconnected;
+
+        Socket?.DropConnection();
+        Socket = null;
+
+        //NetworkStream?.DropConnection();
+        //NetworkStream = null;
+
+        BytesReceived?.Clear();
+        BytesSend?.Clear();
+    }
+
+    public void Shutdown()
+    {
+        _acceptResetEvent.Set();
+
+        Dispose();
+    }
+
     public async Task Listen(IPEndPoint hostAddr, int listenBacklog = 0)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(ConnectionState) + "." + nameof(hostAddr));
 
         Do(this, () =>
         {
-            var listener = ConnectionManager.CreateSocket(hostAddr.AddressFamily);
-            listener.Bind(hostAddr);
-            listener.Listen(listenBacklog);
+            Socket = ConnectionManager.CreateSocket(hostAddr.AddressFamily);
+            Socket.Bind(hostAddr);
+            Socket.Listen(listenBacklog);
+
+            Status = SocketStatus.Listen;
+
+            ConnectionManager.Current.Register(this);
 
             LoggerHub.Current.Debug("Listener Operational. Waiting for connections...");
 
@@ -250,7 +274,7 @@ public class ConnectionState : EventArgs, IConnectionState
             {
                 _acceptResetEvent.Reset();
 
-                if (!Do(this, () => listener.BeginAccept(_acceptCallback, listener))) return;
+                if (!Do(this, () => Socket.BeginAccept(_acceptCallback, this))) return;
 
                 _acceptResetEvent.WaitOne();
             }
@@ -261,32 +285,27 @@ public class ConnectionState : EventArgs, IConnectionState
     {
         _acceptResetEvent.Set();
 
-        var listener = (Socket?)ar.AsyncState;
-        if (listener == null) throw new SocketException();
+        var listenerState = (IConnectionState?)ar.AsyncState;
+        if (listenerState == null ||
+            listenerState != this) throw new SocketException();
 
         var handler = (Socket?)null;
 
-        if (!Do(this, () => handler = listener.EndAccept(ar)) ||
+        if (!Do(this, () => handler = listenerState.Socket.EndAccept(ar)) ||
             handler == null) throw new SocketException();
 
-        Direction = SocketDirection.Inbound;
-        Socket = handler;
-        //NetworkStream = ConnectionManager.CreateNetworkStream(Socket);
-        RemoteAddr = handler.GetIPEndPoint();
+        var acceptedState = ConnectionManager.CreateConnectionState(handler, ConnectionManager.Current);
 
-        Do(this, () => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
+        _BeginReceive(acceptedState);
 
-        ConnectionReceived.Invoke(this, null);
+        ConnectionReceived.Invoke(acceptedState, null);
     }
 
-    public int Receive(byte[] buffer, int offset = 0, int size = 0)
+    private void _BeginReceive(IConnectionState? connectionState)
     {
-        if (size < 1)
-        {
-            size = buffer?.Length ?? 0;
-        }
+        connectionState ??= this;
 
-        return BytesReceived.Read(buffer, offset, size);
+        Do(connectionState, () => { Socket.BeginReceive(connectionState.Buffer, 0, connectionState.Buffer.Length, 0, _receiveCallback, connectionState); });
     }
 
     private void _ReceiveCallback(IAsyncResult ar)
@@ -300,32 +319,32 @@ public class ConnectionState : EventArgs, IConnectionState
 
         var bytesReceived = 0;
 
-        if (!Do(this, () =>
+        if (!Do(connectionState, () =>
             {
-                bytesReceived = Socket.EndReceive(ar);
+                bytesReceived = connectionState.Socket.EndReceive(ar);
                 if (bytesReceived < 1) throw new SocketException();
             }))
             bytesReceived = -1;
 
         if (bytesReceived < 1 ||
-            !IsConnected())
+            !connectionState.IsConnected())
         {
-            Disconnect();
+            connectionState.Disconnect();
 
             return;
         }
 
-        using (var @lock = LockContext.GetLock(BytesReceived))
+        using (var @lock = LockContext.GetLock(connectionState.BytesReceived))
         {
-            BytesReceived.Write(Buffer.AsSpan(0, bytesReceived));
+            connectionState.BytesReceived.Write(connectionState.Buffer.AsSpan(0, bytesReceived));
 
-            LastReceived = DateTime.UtcNow;
+            connectionState.LastReceived = DateTime.UtcNow;
         }
 
-        Do(this, () => { Socket.BeginReceive(Buffer, 0, Buffer.Length, 0, _receiveCallback, this); });
+        _BeginReceive(connectionState);
 
         if (bytesReceived > 0)
-            DataReceived.Invoke(this, null);
+            DataReceived.Invoke(connectionState, null);
     }
 
     public void Send(byte[] buffer, int offset = 0, int size = 0, bool directAccess = false)
@@ -363,7 +382,7 @@ public class ConnectionState : EventArgs, IConnectionState
 
         var bytesSent = (uint)0;
 
-        Do(this, () =>
+        Do(connectionState, () =>
         {
             bytesSent += (uint)Socket.EndSend(ar);
 
@@ -372,23 +391,14 @@ public class ConnectionState : EventArgs, IConnectionState
         });
     }
 
-    public void Disconnect()
+    public int Receive(byte[] buffer, int offset = 0, int size = 0)
     {
-        Socket?.DropConnection();
-        Socket = null;
+        if (size < 1)
+        {
+            size = buffer?.Length ?? 0;
+        }
 
-        //NetworkStream?.DropConnection();
-        //NetworkStream = null;
-
-        BytesReceived?.Clear();
-        BytesSend?.Clear();
-    }
-
-    public void Shutdown()
-    {
-        _acceptResetEvent.Set();
-
-        Dispose();
+        return BytesReceived.Read(buffer, offset, size);
     }
 }
 

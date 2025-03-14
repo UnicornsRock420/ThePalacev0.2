@@ -64,13 +64,13 @@ public class AssetStream : MemoryStream, IDisposable
         if (!hasData) return null;
 
         Asset.BlockSize =
-            ((uint)Asset.AssetDesc.Size - (uint)Length > _chunkMaxSize)
-                ? ((_chunkMaxSize > (uint)Asset.AssetDesc.Size - (uint)Length)
-                    ? (uint)Asset.AssetDesc.Size - (uint)Length
-                    : (uint)_chunkMaxSize)
-                : ((uint)Asset.AssetDesc.Size - (uint)Length > 0)
-                    ? (uint)Asset.AssetDesc.Size - (uint)Length
-                    : (uint)0;
+            (Asset.AssetDesc.Size - (uint)Length > _chunkMaxSize)
+                ? ((_chunkMaxSize > Asset.AssetDesc.Size - (uint)Length)
+                    ? Asset.AssetDesc.Size - (uint)Length
+                    : _chunkMaxSize)
+                : (Asset.AssetDesc.Size - (uint)Length > 0)
+                    ? Asset.AssetDesc.Size - (uint)Length
+                    : 0;
 
         try
         {
@@ -79,7 +79,7 @@ public class AssetStream : MemoryStream, IDisposable
                 ms.WriteInt32((int)LegacyAssetTypes.RT_PROP);
                 Asset.AssetSpec.Serialize(ms);
                 ms.WriteInt32((int)Asset.BlockSize);
-                ms.WriteInt32((int)Asset.BlockOffset);
+                ms.WriteInt32(Asset.BlockOffset);
                 ms.WriteInt16((short)Asset.BlockNbr);
                 ms.WriteInt16((short)Asset.NbrBlocks);
 
