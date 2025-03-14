@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace ThePalace.Common.Constants;
 
@@ -54,57 +55,73 @@ public static partial class RegexConstants
     public static readonly Regex REGEX_ALPHANUMERIC_SINGLECHARACTER = _regex_alphanumeric_singlecharacter();
 
     [Flags]
-    public enum ParseUrlOptions : short
+    public enum ParseUrlOptions : int
     {
         None = 0,
-        IncludeProtocol = 0x0001,
-        IncludeHostname = 0x0002,
-        IncludePort = 0x0004,
-        IncludePath = 0x0008,
-        IncludeQueryString = 0x0010,
-        IncludeHashtag = 0x0020,
+
+        [Description("Protocol")] IncludeProtocol = 0x0001,
+        [Description("Hostname")] IncludeHostname = 0x0002,
+        [Description("Port")] IncludePort = 0x0004,
+        [Description("Path")] IncludePath = 0x0008,
+        [Description("QueryString")] IncludeQueryString = 0x0010,
+        [Description("Hashtag")] IncludeHashtag = 0x0020,
+
+        ModifierInvariant = 0x010000,
+        ModifierToLower = 0x020000,
+        ModifierToUpper = 0x040000,
+        ModifierTrim = 0x080000,
 
         // Aliases:
         IncludeAddress = IncludeHostname,
         IncludeIPEndPoint = IncludeHostname | IncludePort,
     }
 
+    private delegate void _parseUrl(int i);
+
     public static Dictionary<string, string?> ParseUrl(this string url, ParseUrlOptions opts = ParseUrlOptions.IncludeIPEndPoint)
     {
-        var result = new Dictionary<string, string?>();
+        if (!REGEX_PARSE_URL.IsMatch(url)) return [];
 
-        if (!REGEX_PARSE_URL.IsMatch(url)) return result;
+        var hasInv = opts.HasFlag(ParseUrlOptions.ModifierInvariant);
+        var hasToLo = opts.HasFlag(ParseUrlOptions.ModifierToLower);
+        var hasToUp = opts.HasFlag(ParseUrlOptions.ModifierToUpper);
+        var hasTrim = opts.HasFlag(ParseUrlOptions.ModifierTrim);
 
         var match = REGEX_PARSE_URL.Match(url);
+        var count = match.Groups.Count;
 
-        if ((opts & ParseUrlOptions.IncludeProtocol) == ParseUrlOptions.IncludeProtocol)
+        var result = new Dictionary<string, string?>();
+        for (var i = 1; i < 7; i++)
         {
-            result["Protocol"] = match.Groups.Count > 1 ? match.Groups[1].Value.Trim() : null;
-        }
+            var b = (ParseUrlOptions)Math.Pow(2, i);
+            if (!opts.HasFlag(b)) continue;
 
-        if ((opts & ParseUrlOptions.IncludeHostname) == ParseUrlOptions.IncludeHostname)
-        {
-            result["Hostname"] = match.Groups.Count > 2 ? match.Groups[2].Value.Trim() : null;
-        }
+            var k = b.GetDescription();
+            if (string.IsNullOrWhiteSpace(k)) continue;
 
-        if ((opts & ParseUrlOptions.IncludePort) == ParseUrlOptions.IncludePort)
-        {
-            result["Port"] = match.Groups.Count > 3 ? Convert.ToInt32(match.Groups[3].Value.Trim()).ToString() : null;
-        }
+            var v = count > i ? match.Groups[i].Value.Trim() : null;
+            if (string.IsNullOrWhiteSpace(v))
+            {
+                result[k] = null;
 
-        if ((opts & ParseUrlOptions.IncludePath) == ParseUrlOptions.IncludePath)
-        {
-            result["Path"] = match.Groups.Count > 4 ? match.Groups[4].Value.Trim() : null;
-        }
+                continue;
+            }
 
-        if ((opts & ParseUrlOptions.IncludeQueryString) == ParseUrlOptions.IncludeQueryString)
-        {
-            result["QueryString"] = match.Groups.Count > 5 ? match.Groups[5].Value.Trim() : null;
-        }
+            if (hasToLo)
+            {
+                v = hasInv ? v.ToLowerInvariant() : v.ToLower();
+            }
+            else if (hasToUp)
+            {
+                v = hasInv ? v.ToUpperInvariant() : v.ToUpper();
+            }
 
-        if ((opts & ParseUrlOptions.IncludeHashtag) == ParseUrlOptions.IncludeHashtag)
-        {
-            result["Hashtag"] = match.Groups.Count > 6 ? match.Groups[6].Value.Trim() : null;
+            if (hasTrim)
+            {
+                v = v.Trim();
+            }
+
+            result[k] = v;
         }
 
         return result;

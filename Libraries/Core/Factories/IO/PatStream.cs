@@ -7,7 +7,7 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Helpers.Core;
 
-namespace ThePalace.Core.Factories.Filesystem;
+namespace ThePalace.Core.Factories.IO;
 
 public class PatStream : StreamBase
 {

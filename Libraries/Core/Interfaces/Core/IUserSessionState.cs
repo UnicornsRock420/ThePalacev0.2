@@ -12,6 +12,5 @@ public interface IUserSessionState : ISessionState
     UserID UserId { get; set; }
     UserDesc? UserDesc { get; set; }
     RegistrationRec? RegInfo { get; set; }
-    object? SessionTag { get; set; }
     object? ScriptTag { get; set; }
 }

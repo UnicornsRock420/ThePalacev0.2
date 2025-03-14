@@ -47,13 +47,15 @@
         <None Include="Entities\Network\Unused\MSG_TIMYID.cs" />
         <None Include="Entities\Network\Unused\MSG_USERENTER.cs" />
         <None Include="Entities\Network\Unused\MSG_WMSG.cs" />
-        <None Include="Factories\Filesystem\PropPIDSStream.cs" />
-        <None Include="Factories\Filesystem\PropPROPSStream.cs" />
-        <None Include="Factories\Filesystem\PropPRPStream.cs" />
+        <None Include="Factories\IO\PropPIDSStream.cs" />
+        <None Include="Factories\IO\PropPROPSStream.cs" />
+        <None Include="Factories\IO\PropPRPStream.cs" />
         <Compile Remove="Entities\Network\Unused\MSG_SPOTINFO.cs" />
         <None Include="Entities\Network\Unused\MSG_SPOTINFO.cs" />
         <Compile Remove="Entities\Network\Unused\MSG_ROOMINFO.cs" />
         <None Include="Entities\Network\Unused\MSG_ROOMINFO.cs" />
+        <Compile Remove="Factories\IO\PropPRPStream.cs" />
+        <None Include="Factories\IO\PropPRPStream.cs" />
     </ItemGroup>
 
     <ItemGroup>

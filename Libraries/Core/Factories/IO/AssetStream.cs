@@ -4,7 +4,7 @@ using ThePalace.Core.Exts;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Constants;
 
-namespace ThePalace.Core.Factories.Filesystem;
+namespace ThePalace.Core.Factories.IO;
 
 public class AssetStream : MemoryStream, IDisposable
 {

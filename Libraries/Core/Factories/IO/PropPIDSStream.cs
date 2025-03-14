@@ -1,10 +1,11 @@
 ﻿using ThePalace.Core.Entities.Filesystem;
-using ThePalace.Core.Entities.Shared;
-using ThePalace.Core.Factories;
+using ThePalace.Core.Entities.Shared.Assets;
+using ThePalace.Core.Exts;
+using ThePalace.Core.Factories.Filesystem;
 
-namespace ThePalace.Core.Factories.Filesystem
+namespace ThePalace.Core.Factories.IO
 {
-    public partial class PropPIDSStream : StreamBase
+    public class PropPIDSStream : StreamBase
     {
         public PropPIDSStream()
         {
@@ -19,27 +20,29 @@ namespace ThePalace.Core.Factories.Filesystem
         {
             assets = new();
 
+            var sizeFilePIDSHeaderRec = ThePalace.Core.Exts.AttributeExts.GetByteSize<FilePIDSHeaderRec>();
+
             var fileSize = filePROPSReader.Filesize;
             var _fileHeader = new FilePIDSHeaderRec();
-            var data = new byte[FilePIDSHeaderRec.SizeOf];
+            var data = new byte[sizeFilePIDSHeaderRec];
             var read = 0;
 
             _fileStream.Seek(0, SeekOrigin.Begin);
 
             while (true)
             {
-                read = _fileStream.Read(data, 0, FilePIDSHeaderRec.SizeOf);
+                read = _fileStream.Read(data, 0, sizeFilePIDSHeaderRec);
 
                 if (read == 0 ||
-                    read < FilePIDSHeaderRec.SizeOf) break;
+                    read < sizeFilePIDSHeaderRec) break;
 
-                else if (read == FilePIDSHeaderRec.SizeOf)
+                else if (read == sizeFilePIDSHeaderRec)
                 {
                     var asset = (AssetRec?)null;
                     try
                     {
-                        using (var tmp = Packet.FromBytes(data))
-                            _fileHeader.Deserialize(tmp);
+                        //using (var tmp = new MemoryStream(data))
+                        //    _fileHeader.Deserialize(tmp);
 
                         if (_fileHeader.dataOffset > fileSize ||
                             _fileHeader.dataOffset + _fileHeader.dataSize > fileSize)
@@ -74,12 +77,13 @@ namespace ThePalace.Core.Factories.Filesystem
             foreach (var asset in assets)
             {
                 var dataSize = filePROPSReader.Write(asset);
-                _fileStream.Write(
-                    new FilePIDSHeaderRec(asset.AssetSpec)
-                    {
-                        dataSize = dataSize,
-                        dataOffset = dataOffset,
-                    }.Serialize());
+                //_fileStream.PalaceSerialize(
+                //    0,
+                //    new FilePIDSHeaderRec(asset.AssetSpec)
+                //    {
+                //        dataSize = dataSize,
+                //        dataOffset = dataOffset,
+                //    });
                 dataOffset += dataSize;
             }
         }

@@ -3,7 +3,6 @@ using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Interfaces.Core;
-using ThePalace.Network.Interfaces;
 using RoomID = short;
 using UserID = int;
 

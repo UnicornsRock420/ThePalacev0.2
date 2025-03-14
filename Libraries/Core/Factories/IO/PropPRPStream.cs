@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using ThePalace.Core.Enums;
-using ThePalace.Core.ExtensionMethods;
-using ThePalace.Core.Factories;
-using ThePalace.Core.Helpers;
-using ThePalace.Core.Models.Palace;
-using ThePalace.Core.Models.Protocols;
+﻿using ThePalace.Core.Entities.Filesystem;
+using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Entities.Shared.Types;
+using ThePalace.Core.Enums;
+using ThePalace.Core.Exts;
+using ThePalace.Core.Factories.IO;
 using ThePalace.Core.Helpers.Core;
-using ThePalace.Core.Utility;
 
 namespace ThePalace.Core.Factories.Filesystem
 {
     public partial class PropPRPStream : StreamBase
     {
         public PropPRPStream() { }
-        ~PropPRPStream() =>
-            Dispose();
+        ~PropPRPStream() => Dispose();
 
         public void Read(out List<AssetRec> assets)
         {

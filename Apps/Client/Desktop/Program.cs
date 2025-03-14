@@ -45,7 +45,6 @@ using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
-using RoomID = short;
 using UserID = int;
 
 #if WINDOWS10_0_17763_0_OR_GREATER
