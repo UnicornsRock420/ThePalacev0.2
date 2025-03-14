@@ -20,12 +20,30 @@ public sealed class Switch : IDisposable
         _value = value;
     }
 
+    private Switch(object value, object? defaultValue = default) : this()
+    {
+        _value = value;
+        _defaultValue = defaultValue;
+    }
+
     public Switch(object value, bool breakOnFirstTrueCondition = true) : this(value)
     {
         _breakOnFirstTrueCondition = breakOnFirstTrueCondition;
     }
 
+    public Switch(object value, object? defaultValue = default, bool breakOnFirstTrueCondition = true) : this(value, defaultValue)
+    {
+        _breakOnFirstTrueCondition = breakOnFirstTrueCondition;
+    }
+
     public Switch(object value, IEnumerable<KeyValuePair<ScCondition?, ScBlock>> caseBlocks, bool breakOnFirstTrueCondition = true) : this(value, breakOnFirstTrueCondition)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
+    public Switch(object value, IEnumerable<KeyValuePair<ScCondition?, ScBlock>> caseBlocks, object? defaultValue = default, bool breakOnFirstTrueCondition = true) : this(value,
+        defaultValue, breakOnFirstTrueCondition)
     {
         foreach (var caseBlock in caseBlocks)
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
@@ -37,7 +55,20 @@ public sealed class Switch : IDisposable
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
     }
 
+    public Switch(object value, object? defaultValue = default, params KeyValuePair<ScCondition?, ScBlock>[] caseBlocks) : this(value, defaultValue)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
     public Switch(object value, bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition?, ScBlock>[] caseBlocks) : this(value, breakOnFirstTrueCondition)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
+    public Switch(object value, object? defaultValue = default, bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition?, ScBlock>[] caseBlocks) : this(value,
+        defaultValue, breakOnFirstTrueCondition)
     {
         foreach (var caseBlock in caseBlocks)
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
@@ -62,6 +93,7 @@ public sealed class Switch : IDisposable
 
     private readonly bool _breakOnFirstTrueCondition;
     private ConcurrentDictionary<ScCondition?, object> _caseBlocks;
+    private readonly object? _defaultValue;
     private readonly object? _value;
 
     #endregion
@@ -73,9 +105,19 @@ public sealed class Switch : IDisposable
         return new Switch(value, breakOnFirstTrueCondition);
     }
 
+    public static Switch Options(object value, object? defaultValue = default, bool breakOnFirstTrueCondition = true)
+    {
+        return new Switch(value, defaultValue, breakOnFirstTrueCondition);
+    }
+
     public static Switch _Case(object value, ScCondition? condition, ScBlock block, bool breakOnFirstTrueCondition = true)
     {
         return new Switch(value, [new KeyValuePair<ScCondition?, ScBlock>(condition, block)], breakOnFirstTrueCondition);
+    }
+
+    public static Switch _Case(object value, ScCondition? condition, ScBlock block, object? defaultValue = default, bool breakOnFirstTrueCondition = true)
+    {
+        return new Switch(value, [new KeyValuePair<ScCondition?, ScBlock>(condition, block)], defaultValue, breakOnFirstTrueCondition);
     }
 
     public static Switch _Case(object value, IEnumerable<KeyValuePair<ScCondition?, ScBlock>> caseBlocks, bool breakOnFirstTrueCondition = true)
@@ -83,9 +125,19 @@ public sealed class Switch : IDisposable
         return new Switch(value, caseBlocks, breakOnFirstTrueCondition);
     }
 
+    public static Switch _Case(object value, IEnumerable<KeyValuePair<ScCondition?, ScBlock>> caseBlocks, object? defaultValue = default, bool breakOnFirstTrueCondition = true)
+    {
+        return new Switch(value, caseBlocks, defaultValue, breakOnFirstTrueCondition);
+    }
+
     public static Switch _Case(object value, bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition?, ScBlock>[] caseBlocks)
     {
         return new Switch(value, breakOnFirstTrueCondition, caseBlocks);
+    }
+
+    public static Switch _Case(object value, object? defaultValue = default, bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition?, ScBlock>[] caseBlocks)
+    {
+        return new Switch(value, defaultValue, breakOnFirstTrueCondition, caseBlocks);
     }
 
     #endregion
@@ -128,8 +180,11 @@ public sealed class Switch : IDisposable
         {
             try
             {
-                if (@case.Key != null &&
-                    !@case.Key(_value)) continue;
+                if (!(@case.Key switch
+                    {
+                        ScCondition func => func(_value),
+                        _ => false,
+                    })) continue;
 
                 match = true;
 
@@ -160,7 +215,7 @@ public sealed class Switch : IDisposable
         {
             ScBlock func => func(_value),
             _ => block,
-        };
+        } ?? _defaultValue;
         if (result != null)
             results._Results.Add(result);
 
@@ -187,6 +242,13 @@ public sealed class Switch<T> : IDisposable
     public Switch(T? value) : this()
     {
         _value = value;
+        _defaultValue = default(T);
+    }
+
+    public Switch(T? value, T? defaultValue = default(T)) : this()
+    {
+        _value = value;
+        _defaultValue = defaultValue;
     }
 
     public Switch(T? value, bool breakOnFirstTrueCondition = true) : this(value)
@@ -194,7 +256,19 @@ public sealed class Switch<T> : IDisposable
         _breakOnFirstTrueCondition = breakOnFirstTrueCondition;
     }
 
+    public Switch(T? value, T? defaultValue = default(T), bool breakOnFirstTrueCondition = true) : this(value, defaultValue)
+    {
+        _breakOnFirstTrueCondition = breakOnFirstTrueCondition;
+    }
+
     public Switch(T? value, IEnumerable<KeyValuePair<ScCondition<T>?, ScBlock<T>>> caseBlocks, bool breakOnFirstTrueCondition = true) : this(value, breakOnFirstTrueCondition)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
+    public Switch(T? value, IEnumerable<KeyValuePair<ScCondition<T>?, ScBlock<T>>> caseBlocks, T? defaultValue = default(T), bool breakOnFirstTrueCondition = true) : this(value,
+        defaultValue, breakOnFirstTrueCondition)
     {
         foreach (var caseBlock in caseBlocks)
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
@@ -206,7 +280,20 @@ public sealed class Switch<T> : IDisposable
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
     }
 
+    public Switch(T? value, T? defaultValue = default(T), params KeyValuePair<ScCondition<T>?, ScBlock<T>>[] caseBlocks) : this(value, defaultValue)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
     public Switch(T? value, bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition<T>?, ScBlock<T>>[] caseBlocks) : this(value, breakOnFirstTrueCondition)
+    {
+        foreach (var caseBlock in caseBlocks)
+            _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
+    }
+
+    public Switch(T? value, T? defaultValue = default(T), bool breakOnFirstTrueCondition = true, params KeyValuePair<ScCondition<T>?, ScBlock<T>>[] caseBlocks) : this(value,
+        defaultValue, breakOnFirstTrueCondition)
     {
         foreach (var caseBlock in caseBlocks)
             _caseBlocks.TryAdd(caseBlock.Key, caseBlock.Value);
@@ -231,6 +318,7 @@ public sealed class Switch<T> : IDisposable
 
     private readonly bool _breakOnFirstTrueCondition;
     private ConcurrentDictionary<ScCondition<T>?, object> _caseBlocks;
+    private readonly T? _defaultValue;
     private readonly T? _value;
 
     #endregion
@@ -296,8 +384,11 @@ public sealed class Switch<T> : IDisposable
         {
             try
             {
-                if (@case.Key != null &&
-                    !@case.Key(_value)) continue;
+                if (!(@case.Key switch
+                    {
+                        ScCondition<T> func => func(_value),
+                        _ => false,
+                    })) continue;
 
                 match = true;
 
@@ -328,7 +419,8 @@ public sealed class Switch<T> : IDisposable
         {
             ScBlock<T> func => func(_value),
             _ => block,
-        };
+        } ?? _defaultValue;
+
         if (result != null)
             results._Results.Add(result);
 
