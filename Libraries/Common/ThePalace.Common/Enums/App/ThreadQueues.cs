@@ -8,6 +8,6 @@ public enum ThreadQueues : short
     Audio,
     Media,
     Assets,
-    ScriptEngine,
+    Scripting,
     Toast, // Requires: WINDOWS10_0_17763_0_OR_GREATER
 }

@@ -14,8 +14,31 @@
       "AssetsManager": {
       },
       "Desktop": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "GUI",
+          "Audio",
+          "Media",
+          "Assets",
+          "Scripting",
+          "Toast"
+        ]
       },
       "Headless": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "Scripting"
+        ]
+      },
+      "Scripting": {
+        "IptscraeEngine": {
+        },
+        "JavaScript": {
+        },
+        "Python": {
+        }
       },
       "ISessionState": {
         ":IUserSessionState": {
@@ -38,8 +61,28 @@
       "AssetsManager": {
       },
       "Desktop": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "GUI",
+          "Scripting",
+          "Toast"
+        ]
       },
       "Headless": {
+        "ThreadQueues": [
+          "Core",
+          "Network",
+          "Scripting"
+        ]
+      },
+      "Scripting": {
+        "IptscraeEngine": {
+        },
+        "JavaScript": {
+        },
+        "Python": {
+        }
       },
       "ISessionState": {
         ":IUserSessionState": {
