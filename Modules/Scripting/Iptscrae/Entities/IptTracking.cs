@@ -38,7 +38,7 @@ public class IptTracking : IDisposable
     private Timer _timer = null;
     public Timer Timer => _timer ??= new()
     {
-        Interval = IptAlarm.TicksToMilliseconds<double>(1),
+        Interval = IptAlarm.TicksToMs<double>(1),
         Enabled = false,
     };
 

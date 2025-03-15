@@ -12,21 +12,18 @@ namespace ThePalace.Network.Factories;
 
 public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
 {
-    private const UserID CONST_INT_UserIDCounterMax = 9999;
+    private const UserID CONST_INT_MaxCounterLimit = 9999;
 
     private volatile ConcurrentDictionary<UserID, IConnectionState<Socket>> _connectionStates = new();
-    private UserID _userIDCounter;
+    private UserID _idCounter = 0;
     public IReadOnlyDictionary<UserID, IConnectionState<Socket>> ConnectionStates => _connectionStates.AsReadOnly();
 
-    public UserID UserId
+    public UserID GetNextId(UserID counterLimit = CONST_INT_MaxCounterLimit)
     {
-        get
-        {
-            if (_userIDCounter >= CONST_INT_UserIDCounterMax)
-                _userIDCounter = 0;
+        if (_idCounter >= counterLimit)
+            _idCounter = 0;
 
-            return ++_userIDCounter;
-        }
+        return ++_idCounter;
     }
 
     public override void Dispose()
@@ -58,7 +55,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     {
         if (IsDisposed) return 0;
 
-        var result = UserId;
+        var result = GetNextId();
 
         using (var @lock = LockContext.GetLock(_connectionStates))
         {
@@ -109,21 +106,6 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         }
     }
 
-    public static Socket CreateSocket(
-        AddressFamily addressFamily,
-        SocketType socketType = SocketType.Stream,
-        ProtocolType protocolType = ProtocolType.Tcp)
-    {
-        return new Socket(addressFamily, socketType, protocolType);
-    }
-
-    public static NetworkStream CreateNetworkStream(Socket handler)
-    {
-        ArgumentNullException.ThrowIfNull(handler, nameof(ConnectionManager) + "." + nameof(handler));
-
-        return new NetworkStream(handler);
-    }
-
     public static IConnectionState<Socket> CreateConnectionState(
         AddressFamily addressFamily,
         SocketType socketType = SocketType.Stream,
@@ -132,16 +114,15 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     {
         // TODO: Check banlist record(s)
 
-        var handler = CreateSocket(addressFamily, socketType);
-
         var result = new ConnectionState
         {
             Mode = SocketMode.Outbound,
-            Socket = handler,
-            //NetworkStream = CreateNetworkStream(handler)
+            HostAddr = hostAddr,
+            //NetworkStream = CreateNetworkStream(handler),
         };
+        result.Socket = result.CreateSocket(addressFamily, socketType);
 
-        if (hostAddr != null) result.Socket.Connect(result.HostAddr = hostAddr);
+        if (hostAddr != null) result.Socket.Connect(hostAddr);
 
         instance ??= Current;
         instance?.Register(result);
@@ -160,10 +141,10 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         var result = new ConnectionState
         {
             Mode = SocketMode.Inbound,
-            Socket = handler,
-            //NetworkStream = CreateNetworkStream(handler),
             RemoteAddr = handler.GetIPEndPoint(),
+            //NetworkStream = CreateNetworkStream(handler),
         };
+        result.Socket = handler;
 
         instance ??= Current;
         instance?.Register(result);

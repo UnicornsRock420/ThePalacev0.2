@@ -8,7 +8,7 @@ public interface IConnectionState<TSocket> : IDisposable
     where TSocket : IDisposable
 {
     bool IsLittleEndian { get; set; }
-    
+
     Guid Id { get; }
     CancellationTokenSource CancellationTokenSource { get; }
     CancellationToken CancellationToken { get; }
@@ -26,6 +26,7 @@ public interface IConnectionState<TSocket> : IDisposable
     BufferStream? BytesSend { get; set; }
 
     internal TSocket? Socket { get; set; }
+
     //internal NetworkStream? NetworkStream { get; set; }
     object? ConnectionTag { get; set; }
 
@@ -35,17 +36,21 @@ public interface IConnectionState<TSocket> : IDisposable
     event EventHandler DataReceived;
     event EventHandler StateChanged;
 
-    bool IsConnected(int passiveIdleTimeoutInSeconds = 750);
+    bool IsConnected(int passiveIdleMs = 750);
 
+    void Connect(Uri uri);
     void Connect(IPEndPoint hostAddr);
     void Connect(IPAddress ipAddress, int port);
     void Connect(string hostname, int port);
-    void Connect(Uri uri);
+
+    void Disconnect();
+    
+    void Shutdown();
 
     Task Listen(IPEndPoint hostAddr, int listenBacklog = 0);
 
-    int Receive(byte[] buffer, int offset = 0, int size = 0);
     void Send(byte[] buffer, int offset = 0, int size = 0, bool directAccess = false);
+    int Receive(byte[] buffer, int offset = 0, int size = 0);
 
-    void Disconnect();
+    TSocket CreateSocket(params object[] args);
 }

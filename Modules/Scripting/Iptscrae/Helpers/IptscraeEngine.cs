@@ -1514,7 +1514,7 @@ public class IptscraeEngine
                 {
                     var register = getStack(iptTracking, IptVariableTypes.Integer);
 
-                    Thread.Sleep(IptAlarm.TicksToMilliseconds<int>(register.Value));
+                    Thread.Sleep(IptAlarm.TicksToMs<int>(register.Value));
                 })
             },
             {

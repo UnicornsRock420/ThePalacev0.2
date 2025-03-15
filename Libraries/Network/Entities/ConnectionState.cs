@@ -149,14 +149,14 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
         }
     }
 
-    public bool IsConnected(int passiveIdleTimeoutInSeconds = 750)
+    public bool IsConnected(int passiveIdleMs = 750)
     {
-        var passiveIdleTimeout_Timespan = TimeSpan.FromSeconds(passiveIdleTimeoutInSeconds);
+        var passiveIdleTimeSpan = TimeSpan.FromSeconds(passiveIdleMs);
 
         try
         {
             if (LastReceived.HasValue &&
-                DateTime.UtcNow.Subtract(LastReceived.Value) > passiveIdleTimeout_Timespan)
+                DateTime.UtcNow.Subtract(LastReceived.Value) > passiveIdleTimeSpan)
             {
                 var result = !Socket?.Poll(1, SelectMode.SelectRead) ?? false;
 
@@ -192,6 +192,11 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
         return Socket?.Connected ?? false;
     }
 
+    public void Connect(Uri url)
+    {
+        Connect(url.Host, url.Port);
+    }
+
     public void Connect(IPEndPoint hostAddr)
     {
         ArgumentNullException.ThrowIfNull(hostAddr, nameof(ConnectionState) + "." + nameof(hostAddr));
@@ -202,7 +207,7 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
                 this,
                 () =>
                 {
-                    Socket = ConnectionManager.CreateSocket(AddressFamily.InterNetwork);
+                    Socket = CreateSocket(AddressFamily.InterNetwork);
                     Socket.Connect(hostAddr);
 
                     Mode = SocketMode.Outbound;
@@ -228,11 +233,6 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
         {
             Connect(ipAddr, port);
         }
-    }
-
-    public void Connect(Uri url)
-    {
-        Connect(url.Host, url.Port);
     }
 
     public void Disconnect()
@@ -262,7 +262,7 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
 
         Do(this, () =>
         {
-            Socket = ConnectionManager.CreateSocket(hostAddr.AddressFamily);
+            Socket = CreateSocket(hostAddr.AddressFamily);
             Socket.Bind(hostAddr);
             Socket.Listen(listenBacklog);
 
@@ -402,6 +402,22 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
 
         return BytesReceived.Read(buffer, offset, size);
     }
+
+    public Socket CreateSocket(params object[] args)
+    {
+        AddressFamily? addressFamily = args.Length > 0 && args[0] as AddressFamily? != null ? args[0] as AddressFamily? : throw new ArgumentNullException(nameof(AddressFamily));
+
+        SocketType? socketType = (args.Length > 1 && args[1] as SocketType? != null ? args[0] as SocketType? : null) ?? SocketType.Stream;
+        ProtocolType? protocolType = (args.Length > 2 && args[2] as ProtocolType? != null ? args[0] as ProtocolType? : null) ?? ProtocolType.Tcp;
+
+        return new Socket(addressFamily.Value, socketType.Value, protocolType.Value);
+    }
+
+    //public static NetworkStream CreateNetworkStream(Socket handler)
+    //{
+    //    ArgumentNullException.ThrowIfNull(handler, nameof(ConnectionManager) + "." + nameof(handler));
+    //    return new NetworkStream(handler);
+    //}
 }
 
 public class ConnectionState<TState> : ConnectionState

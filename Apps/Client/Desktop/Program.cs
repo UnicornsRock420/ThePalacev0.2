@@ -1198,7 +1198,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                     if (SettingsManager.Current.Get<string[]>("GUI:Connection:Usernames") is string[] list)
                     {
                         var usernamesList = new UniqueList<string>(50, list);
-                        
+
                         comboBoxUsernames.Items.AddRange(usernamesList
                             .Select(v => new ComboboxItem
                             {
@@ -1216,8 +1216,10 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         .Where(c => c.Name == "comboBoxAddresses")
                         .FirstOrDefault() is ComboBox comboBoxAddresses)
                 {
-                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Addresses") is string[] addressesList)
+                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Addresses") is string[] list)
                     {
+                        var addressesList = new UniqueList<string>(50, list);
+
                         comboBoxAddresses.Items.AddRange(addressesList
                             .Select(v => new ComboboxItem
                             {
