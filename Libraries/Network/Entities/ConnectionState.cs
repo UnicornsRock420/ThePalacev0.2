@@ -11,7 +11,7 @@ using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Network.Entities;
 
-public class ConnectionState : EventArgs, IConnectionState
+public class ConnectionState : EventArgs, IConnectionState<Socket>
 {
     internal readonly AsyncCallback _acceptCallback;
     internal readonly AsyncCallback _receiveCallback;
@@ -115,7 +115,7 @@ public class ConnectionState : EventArgs, IConnectionState
     public event EventHandler DataReceived;
     public event EventHandler StateChanged;
 
-    internal static bool Do(IConnectionState connectionState, Action cb, bool disconnectOnError = false)
+    internal static bool Do(IConnectionState<Socket> connectionState, Action cb, bool disconnectOnError = false)
     {
         try
         {
@@ -285,7 +285,7 @@ public class ConnectionState : EventArgs, IConnectionState
     {
         _acceptResetEvent.Set();
 
-        var listenerState = (IConnectionState?)ar.AsyncState;
+        var listenerState = (IConnectionState<Socket>?)ar.AsyncState;
         if (listenerState == null ||
             listenerState != this) throw new SocketException();
 
@@ -301,7 +301,7 @@ public class ConnectionState : EventArgs, IConnectionState
         ConnectionReceived.Invoke(acceptedState, null);
     }
 
-    private void _BeginReceive(IConnectionState? connectionState)
+    private void _BeginReceive(IConnectionState<Socket>? connectionState)
     {
         connectionState ??= this;
 
@@ -310,7 +310,7 @@ public class ConnectionState : EventArgs, IConnectionState
 
     private void _ReceiveCallback(IAsyncResult ar)
     {
-        var connectionState = (IConnectionState?)ar.AsyncState;
+        var connectionState = (IConnectionState<Socket>?)ar.AsyncState;
         if (connectionState == null ||
             connectionState != this) return;
 
@@ -373,7 +373,7 @@ public class ConnectionState : EventArgs, IConnectionState
 
     private void _SendCallback(IAsyncResult ar)
     {
-        var connectionState = (IConnectionState?)ar.AsyncState;
+        var connectionState = (IConnectionState<Socket>?)ar.AsyncState;
         if (connectionState == null ||
             connectionState != this) return;
 

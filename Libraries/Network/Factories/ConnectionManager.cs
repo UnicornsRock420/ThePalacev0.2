@@ -14,9 +14,9 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 {
     private const UserID CONST_INT_UserIDCounterMax = 9999;
 
-    private volatile ConcurrentDictionary<UserID, IConnectionState> _connectionStates = new();
+    private volatile ConcurrentDictionary<UserID, IConnectionState<Socket>> _connectionStates = new();
     private UserID _userIDCounter;
-    public IReadOnlyDictionary<UserID, IConnectionState> ConnectionStates => _connectionStates.AsReadOnly();
+    public IReadOnlyDictionary<UserID, IConnectionState<Socket>> ConnectionStates => _connectionStates.AsReadOnly();
 
     public UserID UserId
     {
@@ -54,7 +54,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         Dispose();
     }
 
-    public UserID Register(IConnectionState connectionState)
+    public UserID Register(IConnectionState<Socket> connectionState)
     {
         if (IsDisposed) return 0;
 
@@ -68,7 +68,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return result;
     }
 
-    public UserID Register(UserID id, IConnectionState connectionState)
+    public UserID Register(UserID id, IConnectionState<Socket> connectionState)
     {
         if (IsDisposed) return 0;
 
@@ -90,7 +90,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         }
     }
 
-    public void Unregister(IConnectionState connectionState)
+    public void Unregister(IConnectionState<Socket> connectionState)
     {
         if (IsDisposed) return;
 
@@ -124,7 +124,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return new NetworkStream(handler);
     }
 
-    public static IConnectionState CreateConnectionState(
+    public static IConnectionState<Socket> CreateConnectionState(
         AddressFamily addressFamily,
         SocketType socketType = SocketType.Stream,
         IPEndPoint? hostAddr = null,
@@ -149,7 +149,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return result;
     }
 
-    public static IConnectionState CreateConnectionState(
+    public static IConnectionState<Socket> CreateConnectionState(
         Socket? handler = null,
         ConnectionManager? instance = null)
     {

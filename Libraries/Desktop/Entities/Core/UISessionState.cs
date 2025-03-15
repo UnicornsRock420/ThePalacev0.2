@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Net.Sockets;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Core;
 using ThePalace.Core.Entities.Shared.Users;
@@ -16,7 +17,7 @@ public class UISessionState : SessionState, IUISessionState<IDesktopApp>
     public uint UserId { get; set; }
     public DateTime? LastActivity { get; set; }
 
-    public IConnectionState ConnectionState { get; set; }
+    public IConnectionState<Socket> ConnectionState { get; set; }
     public UserDesc UserDesc { get; set; } = new();
     public RegistrationRec RegInfo { get; set; } = new();
 

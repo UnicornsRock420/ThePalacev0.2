@@ -6,22 +6,15 @@ using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
+using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
-public interface IDesktopSessionState<TDesktopApp> : IClientSessionState<TDesktopApp>, IUISessionState<TDesktopApp>
-    where TDesktopApp : IDesktopApp
+public interface IClientDesktopSessionState<TApp> : IClientSessionState<TApp>, IDesktopSessionState<TApp>
+    where TApp : IApp
 {
     IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers { get; }
 
-    bool Visible { get; set; }
-    bool Enabled { get; set; }
-
-    double Scale { get; set; }
-    int ScreenWidth { get; set; }
-    int ScreenHeight { get; set; }
-
-    DateTime? LastActivity { get; set; }
     AssetSpec SelectedProp { get; set; }
     UserDesc SelectedUser { get; set; }
     HotspotDesc SelectedHotSpot { get; set; }
@@ -30,9 +23,7 @@ public interface IDesktopSessionState<TDesktopApp> : IClientSessionState<TDeskto
     TabPage TabPage { get; set; }
 
     void RefreshScriptEvent(ScriptEvent scriptEvent);
-    void RefreshRibbon();
-    void RefreshUI();
-    void RefreshScreen(params LayerScreenTypes[] layers);
     void LayerVisibility(bool visible, params LayerScreenTypes[] layers);
     void LayerOpacity(float opacity, params LayerScreenTypes[] layers);
+    void RefreshScreen(params LayerScreenTypes[] layers);
 }

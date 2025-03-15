@@ -498,7 +498,7 @@ public class IptscraeEngine : ThePalace.Core.Helpers.Scripting.IptscraeEngine
                 "NBRUSERPROPS", (iptTracking, recursionDepth) =>
                 {
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
-                        metaVariable.Variable.GetValue<IDesktopSessionState<IDesktopApp>>() is not IDesktopSessionState<IDesktopApp> sessionState) return;
+                        metaVariable.Variable.GetValue<IClientDesktopSessionState<IDesktopApp>>() is not IClientDesktopSessionState<IDesktopApp> sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(
                         IptVariableTypes.Integer,

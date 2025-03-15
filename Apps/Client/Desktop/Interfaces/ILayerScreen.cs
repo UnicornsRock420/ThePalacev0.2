@@ -11,7 +11,7 @@ public interface ILayerScreen : IDisposable
     float Opacity { get; set; }
     Bitmap Image { get; }
 
-    IDesktopSessionState<IDesktopApp> SessionState { get; }
+    IClientDesktopSessionState<IDesktopApp> SessionState { get; }
     LayerScreenTypes Type { get; }
     int Width { get; }
     int Height { get; }

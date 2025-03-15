@@ -3,6 +3,7 @@ using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Enums;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 
@@ -46,7 +47,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         GC.SuppressFinalize(this);
     }
 
-    public void Invoke(IptEventTypes eventType, IDesktopSessionState<IDesktopApp> sessionState, IProtocol packet,
+    public void Invoke(IptEventTypes eventType, IUserSessionState<IDesktopApp> sessionState, IProtocol packet,
         object scriptState = null)
     {
         var scriptEvent = new ScriptEvent

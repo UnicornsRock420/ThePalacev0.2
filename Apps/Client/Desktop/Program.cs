@@ -37,6 +37,7 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
@@ -287,11 +288,13 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var assetCmd)) return;
+                
+                // TODO: Assets
 
-                var assetDesc = AssetsManager.Current.GetAsset(Current.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
-                if (assetDesc is not { Image: null }) return;
+                //var assetDesc = AssetsManager.Current.GetAsset(Current.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
+                //if (assetDesc is not { Image: null }) return;
 
-                await AssetDesc.Render(assetDesc);
+                //await AssetDesc.Render(assetDesc);
             },
             opts: RunOptions.UseResetEvent);
 
@@ -393,7 +396,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     protected readonly ContextMenuStrip _contextMenu = new();
 
-    public IDesktopSessionState<IDesktopApp> SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>();
+    public IClientDesktopSessionState<IDesktopApp> SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>();
 
     protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
@@ -412,7 +415,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     public void RefreshScreen(object sender, EventArgs e)
     {
-        if (sender is not IDesktopSessionState<IDesktopApp> sessionState) return;
+        if (sender is not IClientDesktopSessionState<IDesktopApp> sessionState) return;
 
         if (e is not ScriptEvent scriptEvent) return;
 
@@ -420,7 +423,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         {
             CmdFnc = a =>
             {
-                if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+                if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                 if (a[1] is not ScriptEvent scriptEvent) return null;
 
@@ -465,7 +468,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                     ShowAppForm();
 
@@ -1011,7 +1014,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                 {
                                     CmdFnc = a =>
                                     {
-                                        if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+                                        if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                                         if (a[1] is not string text) return null;
 
@@ -1494,7 +1497,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                     sessionState.RefreshUI();
                     sessionState.RefreshRibbon();
@@ -1514,7 +1517,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                     sessionState.RefreshScreen();
                     sessionState.RefreshUI();

@@ -13,7 +13,7 @@ public class LayerScreen : Disposable, ILayerScreen
     }
 
     public LayerScreen(
-        IDesktopSessionState<IDesktopApp> sessionState,
+        IClientDesktopSessionState<IDesktopApp> sessionState,
         LayerScreenTypes type)
     {
         SessionState = sessionState;
@@ -42,7 +42,7 @@ public class LayerScreen : Disposable, ILayerScreen
     public float Opacity { get; set; } = 1.0F;
     public Bitmap Image { get; protected set; }
 
-    public IDesktopSessionState<IDesktopApp> SessionState { get; }
+    public IClientDesktopSessionState<IDesktopApp> SessionState { get; }
     public LayerScreenTypes Type { get; }
     public int Width => Image?.Width ?? 0;
     public int Height => Image?.Height ?? 0;

@@ -16,6 +16,7 @@ using ThePalace.Core.Entities.Threading;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
+using ThePalace.Core.Interfaces.Core;
 using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;
 
 namespace ThePalace.Client.Desktop.Factories;
@@ -54,7 +55,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
-        if (sender is not IDesktopSessionState<IDesktopApp> sessionState) return;
+        if (sender is not IUserSessionState<IDesktopApp> sessionState) return;
 
         if (e is not ApiEvent apiEvent) return;
 
@@ -177,7 +178,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         using (var @lock = LockContext.GetLock(Assets))
         {
             var sessions = SessionManager.Current.Sessions.Values
-                .Cast<IDesktopSessionState<IDesktopApp>>()
+                .Cast<IClientDesktopSessionState<IDesktopApp>>()
                 .ToList();
 
             var inUsePropIDs = sessions
@@ -223,7 +224,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         }
     }
 
-    public AssetDesc GetAsset(IDesktopSessionState<IDesktopApp> sessionState, AssetSpec assetSpec, bool downloadAsset = false)
+    public AssetDesc GetAsset(IClientDesktopSessionState<IDesktopApp> sessionState, AssetSpec assetSpec, bool downloadAsset = false)
     {
         var assetID = assetSpec.Id;
 

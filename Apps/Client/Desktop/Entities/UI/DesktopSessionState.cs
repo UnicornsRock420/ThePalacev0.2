@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -35,7 +36,7 @@ using UserID = int;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
+public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDesktopApp>
 {
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
@@ -123,7 +124,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
     #region User Info
 
     public UserID UserId { get; set; } = 0;
-    public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
+    public IConnectionState<Socket>? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
 
@@ -955,6 +956,27 @@ public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
         }
     }
 
+    public void LayerVisibility(bool visible, params LayerScreenTypes[] layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer == LayerScreenTypes.Base) continue;
+
+            _uiLayers[layer].Visible = visible;
+        }
+    }
+
+    public void LayerOpacity(float opacity, params LayerScreenTypes[] layers)
+    {
+        foreach (var layer in layers)
+        {
+            if (layer == LayerScreenTypes.Base) continue;
+
+            _uiLayers[layer].Opacity = opacity;
+            _uiLayers[layer].Visible = opacity != 0F;
+        }
+    }
+
     public void RefreshScreen(params LayerScreenTypes[] layers)
     {
         if (layers.Length > 0)
@@ -1085,27 +1107,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
         catch (Exception ex)
         {
             LoggerHub.Current.Error(ex);
-        }
-    }
-
-    public void LayerVisibility(bool visible, params LayerScreenTypes[] layers)
-    {
-        foreach (var layer in layers)
-        {
-            if (layer == LayerScreenTypes.Base) continue;
-
-            _uiLayers[layer].Visible = visible;
-        }
-    }
-
-    public void LayerOpacity(float opacity, params LayerScreenTypes[] layers)
-    {
-        foreach (var layer in layers)
-        {
-            if (layer == LayerScreenTypes.Base) continue;
-
-            _uiLayers[layer].Opacity = opacity;
-            _uiLayers[layer].Visible = opacity != 0F;
         }
     }
 
