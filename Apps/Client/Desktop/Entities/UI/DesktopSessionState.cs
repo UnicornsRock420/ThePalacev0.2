@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
@@ -123,7 +124,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
     #region User Info
 
     public UserID UserId { get; set; } = 0;
-    public IConnectionState? ConnectionState { get; set; } = new ConnectionState();
+    public IConnectionState<Socket>? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
 

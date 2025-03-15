@@ -1,6 +1,10 @@
 {
   "IApp": {
-    "Client": {
+    ":IClientApp": null,
+    ":IDesktopApp": {
+      "ISessionState:IUserSessionState:IDesktopSessionState<IDesktopApp>": {
+        "ConnectionState": null
+      },
       "TaskManager": {
       },
       "ConnectionManager": {
@@ -9,9 +13,9 @@
       },
       "HotKeyManager": {
       },
-      "HistoryManager": {
-      },
       "AssetsManager": {
+      },
+      "HistoryManager": {
       },
       "Desktop": {
         "ThreadQueues": {
@@ -58,22 +62,24 @@
         "Python": {
         }
       },
-      "ISessionState": {
-        ":IUserSessionState": {
-          "ConnectionState": null
-        },
-        ":IUserSessionState:IClientSessionState:IDesktopSessionState": {
-        },
-        ":IUISessionState:IDesktopSessionState": {
-        }
-      },
       "IPlugin": {
       }
     },
-    "Server": {
+    ":IServerApp": {
+      "ISessionState:IServerSessionState<IServerApp>": {
+        "ISessionState:IUserSessionState": {
+          "IConnectionState": null,
+          "Rooms<RoomID, RoomDesc>": {
+          },
+          "Users<UserID, ISessionState:IUserSessionState>": {
+          }
+        }
+      },
       "TaskManager": {
       },
       "ConnectionManager": {
+      },
+      "HotKeyManager": {
       },
       "AssetsManager": {
       },
@@ -101,17 +107,6 @@
         "Python": {
         }
       },
-      "ISessionState": {
-        ":IUserSessionState": {
-          "ConnectionState": null
-        },
-        ":IServerSessionState": {
-          "Rooms<RoomID, RoomDesc>": {
-          },
-          "Users<UserID, IUserSessionState>": {
-          }
-        }
-      },
       "IPlugin": {
       }
     },
@@ -119,7 +114,16 @@
       "Core": {
       },
       "Logging": {
-        "LoggerHub": {}
+        "LoggerHub": {
+          "Write": null,
+          "Debug": null,
+          "Info": null,
+          "Warn": null,
+          "Error": null,
+          "Console": null,
+          "Fatal": null,
+          "Verbose": null
+        }
       },
       "Network": {
         "IConnectionState": {
@@ -138,10 +142,28 @@
     },
     "Modules": {
       "Database": {
+        "Core": {
+        },
+        "MySQL": {
+        },
+        "SQLite": {
+        },
+        "PostgreSQL": {
+        },
+        "SqlServer": {
+        }
       },
       "Media": {
+        "DirectX": {
+        },
+        "GDI+": {
+        },
+        "SoundPlayer": {
+        }
       },
       "Storage": {
+        "Filesystem": {
+        }
       }
     }
   }
