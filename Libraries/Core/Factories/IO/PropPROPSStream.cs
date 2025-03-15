@@ -3,7 +3,7 @@ using ThePalace.Core.Factories.IO;
 
 namespace ThePalace.Core.Factories.Filesystem
 {
-    public partial class PropPROPSStream : StreamBase
+    public class PropPROPSStream : StreamBase
     {
         private const int INT_NAMEBLOCKSIZE = 32;
 

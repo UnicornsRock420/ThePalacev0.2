@@ -3,5 +3,5 @@
 public class Separator : ItemBase
 {
     public override string? Title => null;
-    public override string? Type => null;
+    public override string? Style => null;
 }

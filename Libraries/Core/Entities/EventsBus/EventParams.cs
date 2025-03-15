@@ -3,7 +3,7 @@ using ThePalace.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Core.Entities.EventsBus;
 
-public partial class EventParams : System.EventArgs, IEventParams
+public class EventParams : System.EventArgs, IEventParams
 {
     public EventParams()
     {

@@ -16,51 +16,24 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
     {
         Unload();
 
-        _hoverFrames?.ToList()?.ForEach(f =>
-        {
-            try
-            {
-                f?.Dispose();
-            }
-            catch
-            {
-            }
-        });
-        _hoverFrames = null;
-
         Binding = null;
 
         GC.SuppressFinalize(this);
     }
 
+    private static readonly Type CONST_TYPE_IRibbon = typeof(IRibbon);
+
     public Guid Id { get; } = Guid.NewGuid();
-
-    public virtual string? Type { get; internal set; } = null;
-    public virtual string? Title { get; set; } = null;
-    public virtual bool Enabled { get; set; } = false;
-    public virtual bool Checked { get; set; } = false;
-    public virtual bool Checkable { get; internal set; } = false;
-
     public virtual ApiBinding? Binding { get; internal set; } = null;
 
-    public virtual string? HoverKey { get; internal set; } = null;
-
-    internal int _hoverFrameIndex = 0;
-    internal virtual List<Bitmap>? _hoverFrames { get; set; } = null;
-    public virtual IReadOnlyList<Bitmap>? HoverFrames => _hoverFrames.AsReadOnly();
+    public virtual string? Title { get; set; } = null;
+    public virtual string? Style { get; set; } = null;
+    public virtual bool Enabled { get; set; } = false;
+    public virtual bool Checked { get; set; } = false;
+    public virtual bool Checkable { get; set; } = false;
 
     public void Unload()
     {
-        if ((_hoverFrames?.Count ?? 0) > 0)
-            foreach (var frame in HoverFrames)
-                try
-                {
-                    frame?.Dispose();
-                }
-                catch
-                {
-                }
-
         switch (this)
         {
             case StandardItem _standardItem:
@@ -76,7 +49,7 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
             case BooleanItem _booleanItem:
                 try
                 {
-                    _booleanItem.OnIcon?.Dispose();
+                    _booleanItem.OnHoverIcon?.Dispose();
                 }
                 catch
                 {
@@ -84,7 +57,7 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
 
                 try
                 {
-                    _booleanItem.OffIcon?.Dispose();
+                    _booleanItem.OffHoverIcon?.Dispose();
                 }
                 catch
                 {
@@ -94,90 +67,39 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
         }
     }
 
-    public void Load(Assembly assembly, string rootPath)
+    public void Load(Assembly assembly, string xPath)
     {
         Unload();
-
-        if (!string.IsNullOrWhiteSpace(HoverKey))
-            using (var hoverImage = GetIcon(assembly, $"{rootPath}.{HoverKey}"))
-            {
-                var hoverFrames = new List<Bitmap>();
-
-                var length = hoverImage.Height;
-                var count = hoverImage.Width / length;
-
-                for (var j = 0; j < count; j++)
-                {
-                    var frame = new Bitmap(length, length);
-                    frame.MakeTransparent(Color.Transparent);
-                    using (var g = Graphics.FromImage(frame))
-                    {
-                        g.Clear(Color.Transparent);
-                        g.DrawImage(
-                            hoverImage,
-                            new Rectangle(
-                                0, 0,
-                                length, length),
-                            length * j, 0,
-                            length, length,
-                            GraphicsUnit.Pixel);
-
-                        g.Save();
-                    }
-
-                    hoverFrames.Add(frame);
-                }
-
-                _hoverFrames = hoverFrames;
-            }
 
         switch (this)
         {
             case StandardItem _standardItem:
             {
+                _standardItem.Key = Path.GetFileNameWithoutExtension(xPath);
                 if (!string.IsNullOrWhiteSpace(_standardItem.Key))
                 {
-                    var path = Path.GetFileNameWithoutExtension($"{rootPath}.{_standardItem.Key}");
-                    if (!string.IsNullOrWhiteSpace(path))
-                    {
-                        var icon = GetIcon(assembly, path);
-                        _standardItem.Icon = new IconBase(new KeyValuePair<string, Bitmap>(path, icon));
-                    }
+                    _standardItem.Icon._hoverFrames = GetIcon(assembly, $"{xPath}.{_standardItem.Key}");
                 }
 
                 break;
             }
             case BooleanItem _booleanItem:
             {
-                var path = Path.GetFileNameWithoutExtension($"{rootPath}.{_booleanItem.OnIcon}");
-                if (!string.IsNullOrWhiteSpace(path))
+                _booleanItem.OnHoverKey = Path.GetFileNameWithoutExtension(xPath);
+                if (!string.IsNullOrWhiteSpace(_booleanItem.OnHoverKey))
                 {
-                    var icon = GetIcon(assembly, path);
-                    _booleanItem.OnIcon = new IconBase(new KeyValuePair<string, Bitmap>(path, icon));
+                    _booleanItem.OnHoverIcon._hoverFrames = GetIcon(assembly, $"{xPath}.{_booleanItem.OnHoverKey}");
                 }
 
-                path = Path.GetFileNameWithoutExtension($"{rootPath}.{_booleanItem.OffIcon}");
-                if (!string.IsNullOrWhiteSpace(path))
+                _booleanItem.OffHoverKey = Path.GetFileNameWithoutExtension(xPath);
+                if (!string.IsNullOrWhiteSpace(_booleanItem.OffHoverKey))
                 {
-                    var icon = GetIcon(assembly, path);
-                    _booleanItem.OffIcon = new IconBase(new KeyValuePair<string, Bitmap>(path, icon));
+                    _booleanItem.OffHoverIcon._hoverFrames = GetIcon(assembly, $"{xPath}.{_booleanItem.OffHoverKey}");
                 }
 
                 break;
             }
         }
-    }
-
-    public Bitmap NextFrame()
-    {
-        Interlocked.Increment(ref _hoverFrameIndex);
-
-        return HoverFrames[_hoverFrameIndex %= HoverFrames.Count];
-    }
-
-    public void ResetFrames()
-    {
-        _hoverFrameIndex = 0;
     }
 
     public ToolStripItem ToButton(ConcurrentDictionary<Guid, ItemBase> ribbon, ToolStrip container)
@@ -215,7 +137,7 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
                         result.Image = _standardItem.Icon.Image;
                         break;
                     case BooleanItem _booleanItem:
-                        result.Image = _booleanItem.State ? _booleanItem.OnIcon.Image : _booleanItem.OffIcon.Image;
+                        result.Image = _booleanItem.State ? _booleanItem.OnHoverIcon.Image : _booleanItem.OffHoverIcon.Image;
                         break;
                 }
 
@@ -234,19 +156,55 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
         return null;
     }
 
-    internal static Bitmap GetIcon(Assembly assembly, string resourcePath)
+    internal static ConcurrentDictionary<string, Bitmap>? GetIcon(Assembly assembly, string resourcePath)
     {
         if (string.IsNullOrWhiteSpace(resourcePath)) return null;
+
+        var hoverFrames = new Dictionary<string, Bitmap>();
+        var hoverImage = (Bitmap?)null;
 
         try
         {
             var stream = assembly.GetManifestResourceStream(resourcePath);
             if (stream == null) return null;
 
-            return new Bitmap(stream);
+            hoverImage = new Bitmap(stream);
+            if (hoverImage == null) return null;
+
+            var length = hoverImage.Height;
+            var count = hoverImage.Width / length;
+
+            for (var j = 0; j < count; j++)
+            {
+                var hoverFrame = new Bitmap(length, length);
+                if (hoverFrame == null) throw new OutOfMemoryException(nameof(ItemBase) + "." + nameof(GetIcon) + "." + nameof(hoverFrame));
+
+                hoverFrame.MakeTransparent(Color.Transparent);
+                using (var g = Graphics.FromImage(hoverFrame))
+                {
+                    g.Clear(Color.Transparent);
+                    g.DrawImage(
+                        hoverImage,
+                        new Rectangle(
+                            0, 0,
+                            length, length),
+                        length * j, 0,
+                        length, length,
+                        GraphicsUnit.Pixel);
+
+                    g.Save();
+                }
+
+                hoverFrames.Add(Path.GetFileName(resourcePath), hoverFrame);
+            }
+
+            return new(hoverFrames);
         }
-        catch
+        finally
         {
+            hoverImage?.Dispose();
+
+            hoverImage = null;
         }
 
         return null;
@@ -263,6 +221,7 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
             .GetAssemblies()
             .SelectMany(a => a.GetTypes())
             .Where(t =>
+                t.GetInterfaces().Contains(CONST_TYPE_IRibbon) &&
                 t.Namespace.StartsWith("ThePalace") &&
                 t.Name == nodeType)
             .FirstOrDefault();
@@ -278,7 +237,7 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
         return (ItemBase)Parse(nodeType).GetInstance();
     }
 
-    public static ItemBase Instance(string nodeType, string buttonType)
+    public static ItemBase Instance(string nodeType, string style)
     {
         var result = Instance(nodeType);
         if (result == null) return null;
@@ -290,15 +249,15 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
             case "UsersList":
             case "RoomsList":
             case "Sounds":
-                if (buttonType == "ddl")
+                if (style == "ddl")
                 {
-                    result.Type = buttonType;
+                    result.Style = style;
                     break;
                 }
 
                 goto default;
             default:
-                result.Type = "btn";
+                result.Style = "btn";
                 break;
         }
 
@@ -307,15 +266,13 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
 
     public static ItemBase Clone(ItemBase instance)
     {
-        return Clone(instance, instance.Type);
+        return Clone(instance, instance.Style);
     }
 
-    public static ItemBase Clone(ItemBase instance, string buttonType)
+    public static ItemBase Clone(ItemBase instance, string style)
     {
-        var result = Instance(instance.GetType().Name, buttonType);
+        var result = Instance(instance.GetType().Name, style);
         result.Title = instance.Title;
-        result.HoverKey = instance.HoverKey;
-        result._hoverFrames = instance._hoverFrames;
         switch (result)
         {
             case StandardItem _standardItem1 when
@@ -325,10 +282,10 @@ public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
                 break;
             case BooleanItem _booleanItem1 when
                 instance is BooleanItem _booleanItem2:
-                _booleanItem1.OnIcon = _booleanItem2.OnIcon;
-                _booleanItem1.OnIcon = _booleanItem2.OnIcon;
-                _booleanItem1.OffIcon = _booleanItem2.OffIcon;
-                _booleanItem1.OffIcon = _booleanItem2.OffIcon;
+                _booleanItem1.OnHoverKey = _booleanItem2.OnHoverKey;
+                _booleanItem1.OnHoverIcon = _booleanItem2.OnHoverIcon;
+                _booleanItem1.OffHoverKey = _booleanItem2.OffHoverKey;
+                _booleanItem1.OffHoverIcon = _booleanItem2.OffHoverIcon;
                 break;
         }
 

@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Entities.Filesystem;
+﻿using ThePalace.Core.Entities.IO;
 using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
@@ -8,7 +8,7 @@ using ThePalace.Core.Helpers.Core;
 
 namespace ThePalace.Core.Factories.Filesystem
 {
-    public partial class PropPRPStream : StreamBase
+    public class PropPRPStream : StreamBase
     {
         public PropPRPStream() { }
         ~PropPRPStream() => Dispose();

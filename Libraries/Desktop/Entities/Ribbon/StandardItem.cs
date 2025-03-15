@@ -2,6 +2,6 @@
 
 public abstract class StandardItem : ItemBase
 {
-    public string Key { get; set; }
-    public IconBase? Icon { get; set; }
+    public virtual string Key { get; set; }
+    public virtual IconBase? Icon { get; set; }
 }

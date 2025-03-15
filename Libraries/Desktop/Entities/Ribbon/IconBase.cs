@@ -1,7 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-using ThePalace.Common.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Common.Desktop.Entities.Ribbon;
 
@@ -12,6 +10,11 @@ public class IconBase : IDisposable
     }
 
     public IconBase(params KeyValuePair<string, Bitmap>[] hoverFrames)
+    {
+        _hoverFrames = new(hoverFrames);
+    }
+
+    public IconBase(IEnumerable<KeyValuePair<string, Bitmap>> hoverFrames)
     {
         _hoverFrames = new(hoverFrames);
     }

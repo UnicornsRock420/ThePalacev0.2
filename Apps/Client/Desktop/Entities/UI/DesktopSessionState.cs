@@ -859,7 +859,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
                             item.Image = _standardItem.Icon.Image;
                             break;
                         case BooleanItem _booleanItem:
-                            item.Image = _booleanItem.State ? _booleanItem.OnIcon.Image : _booleanItem.OffIcon.Image;
+                            item.Image = _booleanItem.State ? _booleanItem.OnHoverIcon.Image : _booleanItem.OffHoverIcon.Image;
                             break;
                     }
 

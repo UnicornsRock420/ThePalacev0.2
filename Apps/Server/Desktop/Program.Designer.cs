@@ -1,4 +1,6 @@
-﻿namespace ThePalace.Server.Desktop
+﻿using System.Windows.Forms;
+
+namespace ThePalace.Server.Desktop
 {
     public partial class Program : Form
     {

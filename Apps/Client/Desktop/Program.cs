@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Reflection;
@@ -1194,8 +1195,10 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         .Where(c => c.Name == "comboBoxUsernames")
                         .FirstOrDefault() is ComboBox comboBoxUsernames)
                 {
-                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Usernames") is string[] usernamesList)
+                    if (SettingsManager.Current.Get<string[]>("GUI:Connection:Usernames") is string[] list)
                     {
+                        var usernamesList = new UniqueList<string>(50, list);
+                        
                         comboBoxUsernames.Items.AddRange(usernamesList
                             .Select(v => new ComboboxItem
                             {
@@ -1561,7 +1564,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
-            _uiControls?.TryAdd(friendlyName, form);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)form);
     }
 
     public void RegisterForm<T>(string friendlyName, T form)
@@ -1569,7 +1572,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
-            _uiControls?.TryAdd(friendlyName, form);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)form);
     }
 
     public void UnregisterForm(string friendlyName, FormBase form)
@@ -1612,7 +1615,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryAdd(friendlyName, control);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)control);
     }
 
     public void RegisterControl<T>(string friendlyName, T control)
@@ -1620,7 +1623,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryAdd(friendlyName, control);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)control);
     }
 
     public void RegisterControl(string friendlyName, IDisposable control)
