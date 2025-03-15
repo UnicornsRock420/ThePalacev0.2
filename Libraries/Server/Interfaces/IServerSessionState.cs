@@ -6,12 +6,13 @@ using UserID = int;
 
 namespace ThePalace.Common.Server.Interfaces;
 
-public interface IServerSessionState : ISessionState
+public interface IServerSessionState<TApp> : ISessionState<TApp>
+    where TApp : IApp
 {
     object? ScriptTag { get; set; }
-    
+
     ConcurrentDictionary<string, object> Extended { get; }
-    
+
     ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; }
-    ConcurrentDictionary<UserID, IUserSessionState> Users { get; set; }
+    ConcurrentDictionary<UserID, IUserSessionState<IApp>> Users { get; set; }
 }

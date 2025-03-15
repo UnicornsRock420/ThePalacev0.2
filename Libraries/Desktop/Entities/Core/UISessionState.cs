@@ -6,10 +6,11 @@ using ThePalace.Network.Interfaces;
 
 namespace ThePalace.Common.Desktop.Entities.Core;
 
-public class UISessionState : SessionState, IUISessionState
+public class UISessionState : SessionState, IUISessionState<IDesktopApp>
 {
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
 
+    public IDesktopApp App { get; set; }
     public Guid Id => Guid.NewGuid();
 
     public uint UserId { get; set; }

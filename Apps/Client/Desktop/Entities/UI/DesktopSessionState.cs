@@ -14,10 +14,8 @@ using ThePalace.Common.Client.Constants;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Factories;
-using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Common.Enums.App;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Threading;
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.Scripting;
@@ -27,7 +25,6 @@ using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers.Core;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Interfaces;
@@ -38,7 +35,7 @@ using UserID = int;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class DesktopSessionState : Disposable, IDesktopSessionState
+public class DesktopSessionState : Disposable, IDesktopSessionState<IDesktopApp>
 {
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
@@ -47,15 +44,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     public DesktopSessionState()
     {
-        _managedResources.AddRange(
-        [
-            _uiControls,
-            _uiLayers
-        ]);
-
-        FormsManager.Current.FormClosed += _FormClosed;
-        ConnectionState.ConnectionEstablished += _ConnectionEstablished;
-        ConnectionState.ConnectionDisconnected += _ConnectionDisconnected;
+        _managedResources.Add(_uiLayers);
 
         foreach (var layer in _layerTypes)
             _uiLayers.TryAdd(layer, new LayerScreen(this, layer));
@@ -103,7 +92,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #region Object Info
 
-    public IApp<ISessionState> App { get; set; }
+    public IDesktopApp App { get; set; }
     public Guid Id { get; } = Guid.NewGuid();
     public DateTime? LastActivity { get; set; }
 
@@ -116,6 +105,8 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
     public IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers => _uiLayers.AsReadOnly();
 
     public bool Visible { get; set; } = true;
+    public bool Enabled { get; set; } = true;
+
     public double Scale { get; set; } = 1.0D;
     public int ScreenWidth { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
     public int ScreenHeight { get; set; } = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
@@ -217,240 +208,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
         }.AsReadOnly();
 
     #endregion
-
-    #region Form/Control Info
-
-    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
-    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
-
-    #endregion
-
-    #endregion
-
-    #region Methods
-
-    #region UI Methods
-
-    private void _FormClosed(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (sender is not Form form) return;
-
-        var key = _uiControls
-            .Where(c => c.Value == form)
-            .Select(c => c.Key)
-            .FirstOrDefault();
-        if (key != null)
-            _uiControls.TryRemove(key, out _);
-    }
-
-    private void _ConnectionEstablished(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (this == sender)
-            ((Job<ActionCmd>)App.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-            {
-                CmdFnc = a =>
-                {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender]
-            });
-    }
-
-    private void _ConnectionDisconnected(object sender, EventArgs e)
-    {
-        if (IsDisposed) return;
-
-        if (this == sender)
-            ((Job<ActionCmd>)App.Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
-            {
-                CmdFnc = a =>
-                {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
-
-                    sessionState.RefreshScreen();
-                    sessionState.RefreshUI();
-                    sessionState.RefreshRibbon();
-
-                    return null;
-                },
-                Values = [sender]
-            });
-    }
-
-    public void RefreshScriptEvent(ScriptEvent scriptEvent)
-    {
-        var screenLayers =
-            (from layer
-                    in CONST_EventLayerMappings
-                where layer.Key.Contains(scriptEvent.EventType)
-                select layer.Value)
-            .FirstOrDefault();
-
-        if (screenLayers.Contains(LayerScreenTypes.Base))
-            RefreshScreen(LayerScreenTypes.Base);
-
-        if (CONST_uiRefreshEvents.Contains(scriptEvent.EventType))
-        {
-            RefreshUI();
-            RefreshRibbon();
-        }
-
-        RefreshScreen(
-            !screenLayers.Contains(LayerScreenTypes.Base)
-                ? screenLayers
-                : CONST_allLayers);
-
-        switch (scriptEvent.EventType)
-        {
-            case IptEventTypes.RoomLoad:
-                History.RegisterHistory(
-                    $"{ServerName} - {RoomInfo.Name}",
-                    $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomInfo.RoomID}");
-
-                RefreshRibbon();
-
-                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptTag);
-                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptTag);
-
-                break;
-        }
-    }
-
-    public void RefreshUI()
-    {
-        var isConnected = ConnectionState.IsConnected();
-
-        var form = GetForm();
-        if (form == null) return;
-
-        if (GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
-
-        if (GetControl<Label>("labelInfo") is not Label labelInfo) return;
-
-        if (!isConnected)
-        {
-            form.Text = labelInfo.Text = @"Disconnected";
-        }
-        else
-        {
-            form.Text = $"Connected: {ServerName} - {RoomInfo.Name}";
-            labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
-        }
-
-        if (GetControl<PictureBox>("imgScreen") is PictureBox imgScreen)
-        {
-            toolStrip.Size = new Size(form.Width, form.Height);
-            toolStrip.Location = new Point(0, 0);
-
-            var width = ScreenWidth;
-            var height = ScreenHeight;
-
-            if (width < 1) width = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
-            if (height < 1) height = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
-
-            imgScreen.Size = new Size(width, height);
-            if (toolStrip.Visible &&
-                toolStrip.Dock == DockStyle.Top)
-                imgScreen.Location = new Point(0, toolStrip.Location.Y + toolStrip.Height);
-            else
-                imgScreen.Location = new Point(0, 0);
-
-            labelInfo.Size = new Size(width, 20);
-            labelInfo.Location = new Point(0, imgScreen.Location.Y + imgScreen.Height);
-
-            if (GetControl<TextBox>("txtInput") is TextBox txtInput)
-            {
-                txtInput.Size = new Size(width, 50);
-                txtInput.Location = new Point(0, labelInfo.Location.Y + labelInfo.Height);
-            }
-        }
-    }
-
-    public void RefreshRibbon()
-    {
-        var isConnected = ConnectionState.IsConnected();
-
-        if (GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
-
-        toolStrip.Items.Clear();
-
-        foreach (var ribbonItem in new ItemBase[0]) //SettingsManager.UserSettings.Ribbon
-        {
-            var nodeType = ribbonItem.GetType().Name;
-            switch (nodeType)
-            {
-                case nameof(Separator):
-                    toolStrip.Items.Add(new ToolStripSeparator
-                    {
-                        AutoSize = false,
-                        Height = toolStrip.Height
-                    });
-                    break;
-                default:
-                    var item = new ToolStripButton();
-
-                    //var binding = ApiManager.Current.ApiBindings.GetValue("toolStripDropdownlist_Click");
-                    //if (binding != null)
-                    //    item.Click += binding.Binding;
-
-                    if (ribbonItem.Checkable)
-                    {
-                        var ribbonItem2 = SettingsManager.Ribbon.GetValue(nodeType);
-                        if (ribbonItem2 != null)
-                            item.Checked = ribbonItem2.Checked;
-                    }
-
-                    var condition = nodeType switch
-                    {
-                        //case nameof(Bookmarks):
-                        //case nameof(Connection):
-                        //case nameof(LiveDirectory):
-                        //case nameof(Chatlog):
-                        //case nameof(Tabs):
-                        //    condition = true;
-                        //    break;
-                        nameof(DoorOutlines) or nameof(UserNametags) or nameof(Terminal) or nameof(SuperUser)
-                            or nameof(Draw) or nameof(UsersList) or nameof(RoomsList) or nameof(Sounds) => isConnected,
-                        nameof(GoBack) => History.History.Count > 0 && (!History.Position.HasValue ||
-                                                                        History.History.Keys.Min() !=
-                                                                        History.Position.Value),
-                        nameof(GoForward) => History.History.Count > 0 && History.Position.HasValue &&
-                                             History.History.Keys.Max() != History.Position.Value,
-                        _ => true
-                    };
-
-                    switch (ribbonItem)
-                    {
-                        case StandardItem _standardItem:
-                            item.Image = _standardItem.Image;
-                            break;
-                        case BooleanItem _booleanItem:
-                            item.Image = _booleanItem.State ? _booleanItem.OnImage : _booleanItem.OffImage;
-                            break;
-                    }
-
-                    if (item.Image != null)
-                    {
-                        item.Name = nodeType;
-                        item.Enabled = condition;
-                        item.ToolTipText = ribbonItem.Title;
-
-                        toolStrip.Items.Add(item);
-                    }
-
-                    break;
-            }
-        }
-    }
 
     #endregion
 
@@ -1030,122 +787,172 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
 
     #endregion
 
-    #region Form/Control Methods
+    #region UI Methods
 
-    public FormBase GetForm(string? friendlyName = null)
+    public void RefreshScriptEvent(ScriptEvent scriptEvent)
     {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as FormBase;
+        var screenLayers =
+            (from layer
+                    in CONST_EventLayerMappings
+                where layer.Key.Contains(scriptEvent.EventType)
+                select layer.Value)
+            .FirstOrDefault();
 
-        return _uiControls.Values
-            ?.Where(f => f is FormBase)
-            ?.FirstOrDefault() as FormBase;
+        if (screenLayers.Contains(LayerScreenTypes.Base))
+            RefreshScreen(LayerScreenTypes.Base);
+
+        if (CONST_uiRefreshEvents.Contains(scriptEvent.EventType))
+        {
+            RefreshUI();
+            RefreshRibbon();
+        }
+
+        RefreshScreen(
+            !screenLayers.Contains(LayerScreenTypes.Base)
+                ? screenLayers
+                : CONST_allLayers);
+
+        switch (scriptEvent.EventType)
+        {
+            case IptEventTypes.RoomLoad:
+                History.RegisterHistory(
+                    $"{ServerName} - {RoomInfo.Name}",
+                    $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomInfo.RoomID}");
+
+                RefreshRibbon();
+
+                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptTag);
+                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptTag);
+
+                break;
+        }
     }
 
-    public T GetForm<T>(string? friendlyName = null)
-        where T : FormBase
+    public void RefreshUI()
     {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as T;
+        var isConnected = ConnectionState.IsConnected();
 
-        return _uiControls.Values
-            ?.Where(f => f is T)
-            ?.FirstOrDefault() as T;
+        var form = App.GetForm();
+        if (form == null) return;
+
+        if (App.GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
+
+        if (App.GetControl<Label>("labelInfo") is not Label labelInfo) return;
+
+        if (!isConnected)
+        {
+            form.Text = labelInfo.Text = @"Disconnected";
+        }
+        else
+        {
+            form.Text = $"Connected: {ServerName} - {RoomInfo.Name}";
+            labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
+        }
+
+        if (App.GetControl<PictureBox>("imgScreen") is PictureBox imgScreen)
+        {
+            toolStrip.Size = new Size(form.Width, form.Height);
+            toolStrip.Location = new Point(0, 0);
+
+            var width = ScreenWidth;
+            var height = ScreenHeight;
+
+            if (width < 1) width = DesktopConstants.AspectRatio.WidescreenDef.Default.Width;
+            if (height < 1) height = DesktopConstants.AspectRatio.WidescreenDef.Default.Height;
+
+            imgScreen.Size = new Size(width, height);
+            if (toolStrip.Visible &&
+                toolStrip.Dock == DockStyle.Top)
+                imgScreen.Location = new Point(0, toolStrip.Location.Y + toolStrip.Height);
+            else
+                imgScreen.Location = new Point(0, 0);
+
+            labelInfo.Size = new Size(width, 20);
+            labelInfo.Location = new Point(0, imgScreen.Location.Y + imgScreen.Height);
+
+            if (App.GetControl<TextBox>("txtInput") is TextBox txtInput)
+            {
+                txtInput.Size = new Size(width, 50);
+                txtInput.Location = new Point(0, labelInfo.Location.Y + labelInfo.Height);
+            }
+        }
     }
 
-    public void RegisterForm(string friendlyName, FormBase form)
+    public void RefreshRibbon()
     {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryAdd(friendlyName, form);
-    }
+        var isConnected = ConnectionState.IsConnected();
 
-    public void RegisterForm<T>(string friendlyName, T form)
-        where T : FormBase
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryAdd(friendlyName, form);
-    }
+        if (App.GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
 
-    public void UnregisterForm(string friendlyName, FormBase form)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
+        toolStrip.Items.Clear();
 
-    public void UnregisterForm<T>(string friendlyName, T form)
-        where T : FormBase
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            form != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
+        foreach (var ribbonItem in new ItemBase[0]) //SettingsManager.UserSettings.Ribbon
+        {
+            var nodeType = ribbonItem.GetType().Name;
+            switch (nodeType)
+            {
+                case nameof(Separator):
+                    toolStrip.Items.Add(new ToolStripSeparator
+                    {
+                        AutoSize = false,
+                        Height = toolStrip.Height
+                    });
+                    break;
+                default:
+                    var item = new ToolStripButton();
 
-    public Control GetControl(string? friendlyName = null)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as Control;
+                    //var binding = ApiManager.Current.ApiBindings.GetValue("toolStripDropdownlist_Click");
+                    //if (binding != null)
+                    //    item.Click += binding.Binding;
 
-        return _uiControls.Values
-            ?.Where(c => c is Control)
-            ?.FirstOrDefault() as Control;
-    }
+                    if (ribbonItem.Checkable)
+                    {
+                        var ribbonItem2 = SettingsManager.Ribbon.GetValue(nodeType);
+                        if (ribbonItem2 != null)
+                            item.Checked = ribbonItem2.Checked;
+                    }
 
-    public T GetControl<T>(string? friendlyName = null)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName))
-            return _uiControls.GetValue(friendlyName) as T;
+                    var condition = nodeType switch
+                    {
+                        //case nameof(Bookmarks):
+                        //case nameof(Connection):
+                        //case nameof(LiveDirectory):
+                        //case nameof(Chatlog):
+                        //case nameof(Tabs):
+                        //    condition = true;
+                        //    break;
+                        nameof(DoorOutlines) or nameof(UserNametags) or nameof(Terminal) or nameof(SuperUser)
+                            or nameof(Draw) or nameof(UsersList) or nameof(RoomsList) or nameof(Sounds) => isConnected,
+                        nameof(GoBack) => History.History.Count > 0 && (!History.Position.HasValue ||
+                                                                        History.History.Keys.Min() !=
+                                                                        History.Position.Value),
+                        nameof(GoForward) => History.History.Count > 0 && History.Position.HasValue &&
+                                             History.History.Keys.Max() != History.Position.Value,
+                        _ => true
+                    };
 
-        return _uiControls.Values
-            ?.Where(f => f is T)
-            ?.FirstOrDefault() as T;
-    }
+                    switch (ribbonItem)
+                    {
+                        case StandardItem _standardItem:
+                            item.Image = _standardItem.Image;
+                            break;
+                        case BooleanItem _booleanItem:
+                            item.Image = _booleanItem.State ? _booleanItem.OnImage : _booleanItem.OffImage;
+                            break;
+                    }
 
-    public void RegisterControl(string friendlyName, Control control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
+                    if (item.Image != null)
+                    {
+                        item.Name = nodeType;
+                        item.Enabled = condition;
+                        item.ToolTipText = ribbonItem.Title;
 
-    public void RegisterControl<T>(string friendlyName, T control)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
+                        toolStrip.Items.Add(item);
+                    }
 
-    public void RegisterControl(string friendlyName, IDisposable control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryAdd(friendlyName, control);
-    }
-
-    public void UnregisterControl(string friendlyName, Control control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void UnregisterControl<T>(string friendlyName, T control)
-        where T : Control
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
-    }
-
-    public void UnregisterControl(string friendlyName, IDisposable control)
-    {
-        if (!string.IsNullOrWhiteSpace(friendlyName) &&
-            control != null)
-            _uiControls?.TryRemove(friendlyName, out _);
+                    break;
+            }
+        }
     }
 
     public void RefreshScreen(params LayerScreenTypes[] layers)
@@ -1204,7 +1011,7 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             LoggerHub.Current.Error(ex);
         }
 
-        if (GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
+        if (App.GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
 
         try
         {
@@ -1301,8 +1108,6 @@ public class DesktopSessionState : Disposable, IDesktopSessionState
             _uiLayers[layer].Visible = opacity != 0F;
         }
     }
-
-    #endregion
 
     #endregion
 }

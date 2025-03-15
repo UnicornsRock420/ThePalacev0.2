@@ -24,7 +24,7 @@ public static partial class RegexConstants
     public static readonly Regex REGEX_FILTER_HEX = _regex_hex_filter();
 
 
-    [GeneratedRegex(@"^([\w\d\-]+)[:][/]{2}([\w\d\.\-]+)[:]{0,1}([\d]*)[/]{0,1}([^?]*)[?]{0,1}([^#]*)[#]{0,1}(.*)",
+    [GeneratedRegex(@"^([\w\d\-^:\s]+)[:][/]{2}([\w\d\-.]+[.][\w\d\-^:\s]+)[:]{0,1}([\d^/\s]*)([/]{0,1}[\w\d%&+-=/^?\s]*)([?]{0,1}[\w\d%&+-=/^#\s]*)([#]{0,1}[\w\d%&+-=/^\s]*)$",
         RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex _regex_parse_url();
 
@@ -69,7 +69,6 @@ public static partial class RegexConstants
         ModifierInvariant = 0x010000,
         ModifierToLower = 0x020000,
         ModifierToUpper = 0x040000,
-        ModifierTrim = 0x080000,
 
         // Aliases:
         IncludeAddress = IncludeHostname,
@@ -85,7 +84,6 @@ public static partial class RegexConstants
         var hasInv = opts.HasFlag(ParseUrlOptions.ModifierInvariant);
         var hasToLo = opts.HasFlag(ParseUrlOptions.ModifierToLower);
         var hasToUp = opts.HasFlag(ParseUrlOptions.ModifierToUpper);
-        var hasTrim = opts.HasFlag(ParseUrlOptions.ModifierTrim);
 
         var match = REGEX_PARSE_URL.Match(url);
         var count = match.Groups.Count;
@@ -93,7 +91,7 @@ public static partial class RegexConstants
         var result = new Dictionary<string, string?>();
         for (var i = 1; i < 7; i++)
         {
-            var b = (ParseUrlOptions)Math.Pow(2, i);
+            var b = (ParseUrlOptions)Math.Pow(2, i - 1);
             if (!opts.HasFlag(b)) continue;
 
             var k = b.GetDescription();
@@ -106,6 +104,15 @@ public static partial class RegexConstants
 
                 continue;
             }
+            
+            v = v.Trim();
+
+            if (i > 2)
+            {
+                result[k] = v;
+
+                continue;
+            }
 
             if (hasToLo)
             {
@@ -114,11 +121,6 @@ public static partial class RegexConstants
             else if (hasToUp)
             {
                 v = hasInv ? v.ToUpperInvariant() : v.ToUpper();
-            }
-
-            if (hasTrim)
-            {
-                v = v.Trim();
             }
 
             result[k] = v;

@@ -321,7 +321,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
         parent.Controls.Remove(control);
     }
 
-    public static TResult ShowModal<TForm, TResult>(IUISessionState sessionState)
+    public static TResult ShowModal<TForm, TResult>(IUISessionState<IDesktopApp> sessionState)
         where TForm : ModalDialog<TResult>, IFormResult<TResult>, new()
     {
         using (var form = new TForm())

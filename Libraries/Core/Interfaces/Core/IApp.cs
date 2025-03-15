@@ -1,12 +1,12 @@
 using ThePalace.Common.Enums.App;
 using ThePalace.Common.Interfaces.Threading;
+using ThePalace.Core.Factories.Core;
 
 namespace ThePalace.Core.Interfaces.Core;
 
-public interface IApp<out TSessionState>
-    where TSessionState : ISessionState
+public interface IApp
 {
-    TSessionState SessionState { get; }
+    SessionManager SessionManager => SessionManager.Current;
     IReadOnlyDictionary<ThreadQueues, IJob> Jobs { get; }
 
     void Initialize();

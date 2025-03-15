@@ -3,6 +3,7 @@ using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Entities.Shared.Rooms;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Logging.Entities;
 
@@ -13,7 +14,7 @@ public class BO_PROPNEW : IEventHandler<MSG_PROPNEW>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IClientSessionState sessionState ||
+        if (sender is not IClientSessionState<IApp> sessionState ||
             @event is not ProtocolEventParams { Request: MSG_PROPNEW inboundPacket } @params ||
             inboundPacket.PropSpec.Id == 0) return null;
 

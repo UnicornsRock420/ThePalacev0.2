@@ -13,8 +13,8 @@ public class BO_PROPMOVE : IEventHandler<MSG_PROPMOVE>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IUserSessionState userState ||
-            userState.App.SessionState is not IServerSessionState serverState ||
+        if (sender is not IUserSessionState<IServerApp> userState ||
+            userState.App.ServerSessionState is not IServerSessionState<IServerApp> serverState ||
             @event is not ProtocolEventParams { Request: MSG_PROPMOVE inboundPacket } @params ||
             inboundPacket.PropNum < 0 ||
             !serverState.Rooms.TryGetValue(userState.RoomId, out var room) ||

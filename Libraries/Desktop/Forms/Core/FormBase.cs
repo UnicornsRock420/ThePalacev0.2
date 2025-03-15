@@ -10,12 +10,11 @@ public class FormBase : Form
         base.Dispose();
     }
 
-    public IUISessionState SessionState;
+    public IUISessionState<IDesktopApp> SessionState;
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
-        if (HotKeyManager.Current.Invoke(SessionState, keyData, this)) return true;
-
-        return base.ProcessCmdKey(ref msg, keyData);
+        return HotKeyManager.Current.Invoke(SessionState, keyData, this) ||
+               base.ProcessCmdKey(ref msg, keyData);
     }
 }

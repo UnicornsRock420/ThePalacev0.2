@@ -5,8 +5,8 @@ namespace ThePalace.Core.Factories.Core;
 
 public class SessionManager : SingletonDisposable<SessionManager>
 {
-    private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
-    public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
+    private readonly ConcurrentDictionary<Guid, ISessionState<IApp>> _sessions = new();
+    public IReadOnlyDictionary<Guid, ISessionState<IApp>> Sessions => _sessions.AsReadOnly();
 
     ~SessionManager()
     {
@@ -22,17 +22,18 @@ public class SessionManager : SingletonDisposable<SessionManager>
         base.Dispose();
     }
 
-    public T CreateSession<T>()
-        where T : ISessionState
+    public TSessionState CreateSession<TSessionState, TApp>()
+        where TSessionState : ISessionState<TApp>
+        where TApp : IApp
     {
-        return (T)CreateSession(typeof(T));
+        return (TSessionState)CreateSession(typeof(TSessionState));
     }
 
     public object CreateSession(Type type)
     {
         if (IsDisposed) return null;
 
-        if (type.GetInstance() is not ISessionState sessionState)
+        if (type.GetInstance() is not ISessionState<IApp> sessionState)
             throw new Exception($"{type.Name} doesn't implement the ISessionState interface...");
 
         _sessions.TryAdd(sessionState.Id, sessionState);

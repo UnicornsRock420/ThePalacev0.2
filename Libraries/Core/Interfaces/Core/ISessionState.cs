@@ -2,9 +2,14 @@
 
 namespace ThePalace.Core.Interfaces.Core;
 
-public interface ISessionState : IDisposable
+public interface ISessionState : ISessionState<IApp>
 {
-    IApp<ISessionState> App { get; set; }
+}
+
+public interface ISessionState<TApp> : IDisposable
+    where TApp : IApp
+{
+    TApp App { get; set; }
 
     Guid Id { get; }
     ConcurrentDictionary<string, object> Extended { get; }
