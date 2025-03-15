@@ -58,13 +58,13 @@ public class LockContext : IDisposable
         return _hasLock;
     }
 
-    public bool TryLock(int millisecondsTimeout = 0)
+    public bool TryLock(int timeoutMs = 0)
     {
         if (_lockObj == null ||
             _hasLock) return false;
 
-        if (millisecondsTimeout > 0)
-            Monitor.TryEnter(_lockObj, millisecondsTimeout, ref _hasLock);
+        if (timeoutMs > 0)
+            Monitor.TryEnter(_lockObj, timeoutMs, ref _hasLock);
         else
             Monitor.TryEnter(_lockObj, ref _hasLock);
 

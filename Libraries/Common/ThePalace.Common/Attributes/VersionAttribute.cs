@@ -20,9 +20,9 @@ public class VersionAttribute : Attribute
         uint hours = 0,
         uint minutes = 0,
         uint seconds = 0,
-        uint milliseconds = 0)
+        uint ms = 0)
     {
-        Version = string.Join('.', year, month, day, hours, minutes, seconds, milliseconds);
+        Version = string.Join('.', year, month, day, hours, minutes, seconds, ms);
     }
 
     public VersionAttribute(

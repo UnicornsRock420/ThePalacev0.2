@@ -11,7 +11,7 @@ public class IptAlarm
         if (delay < 0) throw new IndexOutOfRangeException(nameof(delay));
 
         AtomList = atomList;
-        Delay = TicksToMilliseconds<double>(delay);
+        Delay = TicksToMs<double>(delay);
 
         var now = DateTime.UtcNow;
         
@@ -26,7 +26,7 @@ public class IptAlarm
     public DateTime Expires { get; internal set; }
     public bool IsElapsed => DateTime.UtcNow > Expires;
 
-    public static TResult TicksToMilliseconds<TResult>(object value)
+    public static TResult TicksToMs<TResult>(object value)
         where TResult : struct
     {
         return (TResult)(object)((long)value / 6 * 100);
