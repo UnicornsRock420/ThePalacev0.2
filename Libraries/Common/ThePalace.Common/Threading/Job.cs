@@ -64,7 +64,7 @@ public class RunLog
 }
 
 public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
-    where TCmd : ICmd
+    where TCmd : class, ICmd
 {
     private const int CONST_defaultSleepInterval = 1500;
 

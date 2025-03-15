@@ -105,7 +105,7 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public Job<TCmd> CreateJob<TCmd>(Action<ConcurrentQueue<TCmd>> cmd, IJobState? jobState = null,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
-        where TCmd : ICmd
+        where TCmd : class, ICmd
     {
         if (_globalToken.IsCancellationRequested) return null;
 

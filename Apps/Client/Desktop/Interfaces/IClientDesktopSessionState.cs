@@ -1,7 +1,9 @@
-﻿using ThePalace.Client.Desktop.Entities.Core;
+﻿using System.Collections.Concurrent;
+using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Common.Client.Interfaces;
+using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.Types;
@@ -21,9 +23,11 @@ public interface IClientDesktopSessionState<TApp> : IClientSessionState<TApp>, I
 
     HistoryManager History { get; }
     TabPage TabPage { get; set; }
+    ConcurrentDictionary<Guid, ItemBase> Ribbon { get; }
 
-    void RefreshScriptEvent(ScriptEvent scriptEvent);
     void LayerVisibility(bool visible, params LayerScreenTypes[] layers);
     void LayerOpacity(float opacity, params LayerScreenTypes[] layers);
     void RefreshScreen(params LayerScreenTypes[] layers);
+    void RefreshUI();
+    void RefreshScriptEvent(ScriptEvent scriptEvent);
 }

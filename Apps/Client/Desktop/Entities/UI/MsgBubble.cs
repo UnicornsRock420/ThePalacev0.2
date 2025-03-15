@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using Windows.Foundation.Metadata;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
-using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Helpers;

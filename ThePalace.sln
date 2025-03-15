@@ -93,6 +93,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Files", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Settings", "Libraries\Settings\ThePalace.Settings.csproj", "{B67DD94E-3A4E-44F4-84D8-20943FF80E51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -195,6 +197,10 @@ Global
 		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67DD94E-3A4E-44F4-84D8-20943FF80E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67DD94E-3A4E-44F4-84D8-20943FF80E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67DD94E-3A4E-44F4-84D8-20943FF80E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67DD94E-3A4E-44F4-84D8-20943FF80E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -232,5 +238,6 @@ Global
 		{ACE95819-0B23-4E98-A7D2-4ED8127FD0CA} = {287C2C29-2017-49FD-A44B-F4BB682F516D}
 		{2A161DBD-6C45-46C0-B1C8-F3CDE954CF9D} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
 		{E13EFFCB-1BC3-41AC-BD96-E816B4FB3F5D} = {45B7EAC9-8A2A-4A87-BC23-BCA587A1C12B}
+		{B67DD94E-3A4E-44F4-84D8-20943FF80E51} = {87223E69-EE01-447D-9200-5A4F0C4472B8}
 	EndGlobalSection
 EndGlobal

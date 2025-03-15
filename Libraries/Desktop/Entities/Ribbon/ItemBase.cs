@@ -1,19 +1,15 @@
 ﻿using System.Reflection;
 using ThePalace.Common.Desktop.Entities.Core;
+using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Common.Desktop.Entities.Ribbon;
 
-public abstract class ItemBase : IDisposable
+public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
 {
-    private int _hoverFrameIndex;
-    public string Title { get; set; }
-    public virtual string Type { get; set; }
-    public ApiBinding Binding { get; set; } = null;
-    public bool Checked { get; set; } = false;
-    public virtual bool Checkable { get; } = false;
-
-    public string HoverIcon { get; set; }
-    public Bitmap[] HoverFrames { get; set; }
+    ~ItemBase()
+    {
+        Dispose();
+    }
 
     public void Dispose()
     {
@@ -21,6 +17,18 @@ public abstract class ItemBase : IDisposable
 
         GC.SuppressFinalize(this);
     }
+
+    private int _hoverFrameIndex;
+
+    public Guid Id { get; } = Guid.NewGuid();
+    public string Title { get; set; }
+    public virtual string Type { get; set; }
+    public ApiBinding Binding { get; set; } = null;
+    public bool Checked { get; set; } = false;
+    public virtual bool Enabled { get; } = false;
+
+    public string HoverIcon { get; set; }
+    public Bitmap[] HoverFrames { get; set; }
 
     public void Unload()
     {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Client.Desktop.Entities.Core;
-using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Enums;
 using ThePalace.Core.Interfaces.Core;

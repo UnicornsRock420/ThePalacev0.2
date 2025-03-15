@@ -55,7 +55,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
-        if (sender is not IUserSessionState<IDesktopApp> sessionState) return;
+        if (sender is not IUserSessionState<IApp> sessionState) return;
 
         if (e is not ApiEvent apiEvent) return;
 
@@ -249,7 +249,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
             }
 
             if (downloadAsset)
-                sessionState.Send(
+                sessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ASSETQUERY>(
                     sessionState.UserId,
                     new MSG_ASSETQUERY
                     {

@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
-using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
@@ -37,11 +36,11 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 using ThePalace.Media.SoundPlayer;
+using ThePalace.Settings.Factories;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
@@ -288,7 +287,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var assetCmd)) return;
-                
+
                 // TODO: Assets
 
                 //var assetDesc = AssetsManager.Current.GetAsset(Current.SessionState, assetCmd.AssetDesc.AssetRec.AssetSpec, true);
@@ -588,7 +587,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             Focus = true
         });
 
-        var tabIndex = 0;
+        //var tabIndex = 0;
 
         if (GetControl("toolStrip") is not ToolStrip toolStrip)
         {
@@ -610,7 +609,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 toolStrip.ImageScalingSize = new Size(38, 38);
                 toolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
                 toolStrip.RenderMode = ToolStripRenderMode.Professional;
-                toolStrip.Renderer = new CustomToolStripRenderer();
+                toolStrip.Renderer = new CustomToolStripRenderer(SessionState);
                 toolStrip.ItemClicked += toolStrip_ItemClicked;
             }
         }
@@ -657,7 +656,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         LayerScreenTypes.UserNametag,
                                         LayerScreenTypes.Messages);
 
-                                    SessionState.Send(
+                                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_USERMOVE>(
                                         SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
@@ -967,7 +966,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             txtInput = FormsManager.Current.CreateControl<FormBase, TextBox>(form, true, new ControlCfg
             {
                 Visible = true,
-                TabIndex = tabIndex++,
+                TabIndex = 0, //tabIndex++,
                 Title = string.Empty,
                 Margin = new Padding(0, 0, 0, 0),
                 BackColor = Color.FromKnownColor(KnownColor.DimGray),
@@ -1052,7 +1051,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     xTalk.Text = variable.Variable.Value.ToString();
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    SessionState.Send(
+                                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_XTALK>(
                                         SessionState.UserId,
                                         xTalk);
                             }
@@ -1286,7 +1285,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                 SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
                                 SessionState.ConnectionState.HostAddr.Port == port &&
                                 roomID != 0)
-                                SessionState.Send(
+                                SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ROOMGOTO>(
                                     SessionState.UserId,
                                     new MSG_ROOMGOTO
                                     {
@@ -1356,7 +1355,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send(
+                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_WHISPER>(
                         SessionState.UserId,
                         new MSG_WHISPER
                         {
@@ -1370,7 +1369,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send(
+                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_KILLUSER>(
                         SessionState.UserId,
                         new MSG_KILLUSER
                         {
@@ -1383,7 +1382,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (HotspotID)values[1];
 
-                    SessionState.Send(
+                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_SPOTDEL>(
                         SessionState.UserId,
                         new MSG_SPOTDEL
                         {
@@ -1429,7 +1428,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 var value = (AssetID)values[1];
 
-                SessionState.Send(
+                SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_PROPDEL>(
                     SessionState.UserId,
                     new MSG_PROPDEL
                     {
@@ -1457,7 +1456,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         LayerScreenTypes.UserNametag,
                         LayerScreenTypes.Messages);
 
-                    SessionState.Send(
+                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_USERMOVE>(
                         SessionState.UserId,
                         new MSG_USERMOVE
                         {

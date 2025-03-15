@@ -33,7 +33,7 @@ public interface IJob : IDisposable
 }
 
 public interface IJob<TCmd> : IJob, IDisposable
-    where TCmd : ICmd
+    where TCmd : class, ICmd
 {
     Action<ConcurrentQueue<TCmd>> Cmd { get; }
     new DisposableList<IJob<TCmd>> SubJobs { get; }

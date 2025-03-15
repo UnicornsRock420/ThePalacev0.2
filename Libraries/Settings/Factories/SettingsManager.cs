@@ -1,10 +1,9 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
+﻿using System.Reflection;
+using System.Windows.Forms;
 using Microsoft.Extensions.Configuration;
-using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Logging.Entities;
 
-namespace ThePalace.Common.Desktop.Factories;
+namespace ThePalace.Settings.Factories;
 
 public class SettingsManager : SingletonDisposable<SettingsManager>
 {
@@ -31,18 +30,6 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
     public override void Dispose()
     {
         if (IsDisposed) return;
-
-        foreach (var ribbonNode in Ribbon.Values)
-            try
-            {
-                ribbonNode?.Unload();
-            }
-            catch
-            {
-            }
-
-        Ribbon?.Clear();
-        Ribbon = null;
 
         base.Dispose();
 
@@ -109,7 +96,6 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
     ];
 
     private readonly IConfiguration _configuration;
-    public static ConcurrentDictionary<string, ItemBase> Ribbon { get; internal set; } = new();
 
     public void Load(Assembly assembly)
     {
@@ -131,8 +117,25 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         catch
         {
         }
-        
+
         return default;
+    }
+
+    public bool Set(string xPath, string value)
+    {
+        try
+        {
+            //_configuration
+            //    .GetSection(xPath)
+            //    .SetValue(value);
+
+            return true;
+        }
+        catch
+        {
+        }
+
+        return false;
     }
 
     public static class Localization
