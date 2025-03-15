@@ -81,7 +81,7 @@
     ":IServerApp": {
       "ISessionState:IServerSessionState<IServerApp>": {
         "ISessionState:IUserSessionState": {
-          "IConnectionState": null,
+          "IConnectionState<Socket>": null,
           "Rooms<RoomID, RoomDesc>": {
           },
           "Users<UserID, ISessionState:IUserSessionState>": {
@@ -127,19 +127,20 @@
       "Core": {
       },
       "Logging": {
-        "LoggerHub": {
-          "Write": null,
-          "Debug": null,
-          "Info": null,
-          "Warn": null,
-          "Error": null,
-          "Console": null,
-          "Fatal": null,
-          "Verbose": null
-        }
+        "LoggerHub": [
+          "Console",
+          "Debug",
+          "Trace",
+          "Verbose",
+          "Info",
+          "Warn",
+          "Error",
+          "Fatal",
+          "Write"
+        ]
       },
       "Network": {
-        "IConnectionState<Socket>": {
+        "IConnectionState<TSocket>": {
           "Mode": null,
           "HostAddr": null,
           "RemoteAddr": null,
@@ -148,7 +149,7 @@
           "BytesReceived": null,
           "BytesSend": null,
           "Buffer": null,
-          "Socket": null,
+          "<TSocket>": null,
           "ConnectionTag": null
         }
       }
@@ -172,6 +173,14 @@
         "GDI+": {
         },
         "SoundPlayer": {
+        }
+      },
+      "Scripting": {
+        "Iptscrae": {
+        },
+        "JavaScript": {
+        },
+        "Python": {
         }
       },
       "Storage": {

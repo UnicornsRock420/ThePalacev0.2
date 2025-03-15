@@ -1561,7 +1561,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
-            _uiControls?.TryAdd(friendlyName, form);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)form);
     }
 
     public void RegisterForm<T>(string friendlyName, T form)
@@ -1569,7 +1569,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             form != null)
-            _uiControls?.TryAdd(friendlyName, form);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)form);
     }
 
     public void UnregisterForm(string friendlyName, FormBase form)
@@ -1612,7 +1612,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryAdd(friendlyName, control);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)control);
     }
 
     public void RegisterControl<T>(string friendlyName, T control)
@@ -1620,7 +1620,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (!string.IsNullOrWhiteSpace(friendlyName) &&
             control != null)
-            _uiControls?.TryAdd(friendlyName, control);
+            _uiControls?.TryAdd(friendlyName, (IDisposable)control);
     }
 
     public void RegisterControl(string friendlyName, IDisposable control)

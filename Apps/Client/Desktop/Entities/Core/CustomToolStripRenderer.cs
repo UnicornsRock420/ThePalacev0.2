@@ -17,11 +17,21 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
     {
         _timer.Elapsed += (sender, e) =>
         {
-            if (_item1 != null &&
-                _item2?.HoverFrames != null)
+            if (_item1 != null)
                 try
                 {
-                    _item1.Image = _item2.NextFrame();
+                    switch (_item2)
+                    {
+                        case StandardItem _standardItem:
+                            _item1.Image = _standardItem.Icon.NextFrame();
+
+                            break;
+
+                        case BooleanItem _booleanItem:
+                            _item1.Image = (false ? _booleanItem.OnHoverIcon : _booleanItem.OffHoverIcon).NextFrame();
+
+                            break;
+                    }
                 }
                 catch
                 {
@@ -48,7 +58,7 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
         if (key == null) return;
 
         var ribbonItem = _sessionState.Ribbon.GetValue(key.Value);
-        if (ribbonItem?.HoverFrames == null) return;
+        if (ribbonItem == null) return;
 
         if (!e.Item.Selected)
         {
@@ -61,7 +71,21 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
         {
             _item1 = e.Item;
             _item2 = ribbonItem;
-            _item2.ResetFrames();
+
+            switch (_item2)
+            {
+                case StandardItem _standardItem:
+                    _standardItem.Icon.ResetFrames();
+                    
+                    break;
+                case BooleanItem _booleanItem:
+                    if (_booleanItem.State)
+                        _booleanItem.OnHoverIcon.ResetFrames();
+                    else
+                        _booleanItem.OffHoverIcon.ResetFrames();
+                    
+                    break;
+            }
 
             _timer.Start();
         }

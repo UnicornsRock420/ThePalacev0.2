@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Entities.Filesystem;
+﻿using ThePalace.Core.Entities.IO;
 using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Factories.Filesystem;
 

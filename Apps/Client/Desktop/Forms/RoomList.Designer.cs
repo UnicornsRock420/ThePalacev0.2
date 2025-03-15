@@ -1,4 +1,5 @@
-﻿using ThePalace.Common.Desktop.Forms.Core;
+﻿using System.Windows.Forms;
+using ThePalace.Common.Desktop.Forms.Core;
 
 namespace ThePalace.Client.Desktop.Forms
 {

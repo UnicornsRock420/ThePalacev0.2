@@ -1,13 +1,13 @@
 ﻿using ThePalace.Core.Attributes.Serialization;
+using ThePalace.Core.Entities.Shared.Types;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.Filesystem;
+namespace ThePalace.Core.Entities.IO;
 
 [ByteSize(16)]
-public class FilePRPHeaderRec
+public class FilePIDSHeaderRec
 {
-    public sint32 assetMapOffset;
-    public sint32 assetMapSize;
+    public AssetSpec AssetSpec;
     public sint32 dataOffset;
     public sint32 dataSize;
 }

@@ -1,11 +1,11 @@
-﻿using ThePalace.Core.Attributes.Core;
-using ThePalace.Core.Entities.Core;
+﻿using ThePalace.Common.Attributes;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.EventTypes.Client.Network
 {
     [Mnemonic("timy")]
-    public partial class MSG_TIMYID : EventParams, IProtocol
+    public class MSG_TIMYID : EventParams, IProtocol
     {
     }
 }

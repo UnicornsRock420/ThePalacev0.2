@@ -1,11 +1,11 @@
-﻿using ThePalace.Core.Attributes.Core;
-using ThePalace.Core.Entities.Core;
+﻿using ThePalace.Common.Attributes;
+using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 
 namespace ThePalace.Network.Entities.Unused
 {
     [Mnemonic("NOOP")]
-    public partial class MSG_NOOP : EventParams, IProtocol
+    public class MSG_NOOP : EventParams, IProtocol
     {
     }
 }

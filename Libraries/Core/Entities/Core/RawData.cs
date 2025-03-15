@@ -5,7 +5,7 @@ using uint8 = System.Byte;
 
 namespace ThePalace.Core.Entities.Core
 {
-    public partial class RawData : IDisposable, IData, IStruct
+    public class RawData : IDisposable, IData, IStruct
     {
         [Flags]
         public enum RawDataOptions : uint

@@ -4,5 +4,5 @@ namespace ThePalace.Client.Desktop.Entities.Ribbon;
 
 public class Bookmarks : BooleanItem
 {
-    public override string Type => "ddl";
+    public override string Style => "ddl";
 }

@@ -5,8 +5,8 @@ public abstract class BooleanItem : ItemBase
     public bool State { get; set; } = false;
     public override bool Checkable => true;
 
-    public string OnKey { get; set; }
-    public IconBase? OnIcon { get; set; }
-    public string OffKey { get; set; }
-    public IconBase? OffIcon { get; set; }
+    public string OnHoverKey { get; set; }
+    public IconBase? OnHoverIcon { get; set; }
+    public string OffHoverKey { get; set; }
+    public IconBase? OffHoverIcon { get; set; }
 }

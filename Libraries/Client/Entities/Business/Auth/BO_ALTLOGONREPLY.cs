@@ -1,11 +1,11 @@
 ﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Client.Network;
+using ThePalace.Core.Entities.Network.Server.Auth;
 using ThePalace.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Network;
+namespace ThePalace.Common.Client.Entities.Business.Network;
 
-[Mnemonic("regi")]
-public class BO_LOGON : IEventHandler<MSG_LOGON>
+[Mnemonic("rep2")]
+public class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {

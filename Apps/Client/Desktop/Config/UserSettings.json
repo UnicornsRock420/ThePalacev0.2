@@ -10,12 +10,14 @@
     {
       "Name": "Janus",
       "Version": "PC4237",
-      "Crc": "CANADA"
+      "RegCode": "CANADA",
+      "PuidCode": "ZCANADA"
     }
   ],
   "GUI": {
     "Connection": {
       "Addresses": [
+        "localhost:9998",
         "alluringhistoria.epalaces.com:9998",
         "animanic.epalaces.com:9998"
       ],
@@ -91,18 +93,14 @@
     }
   ],
   "Ribbon": [
+    "Bookmarks",
     {
-      "Bookmarks": null
+      "Connection": {
+        "Style": "ddl"
+      }
     },
-    {
-      "Connection": null
-    },
-    {
-      "LiveDirectory": null
-    },
-    {
-      "Separator": null
-    },
+    "LiveDirectory",
+    "Separator",
     {
       "GoBack": {
         "Style": "ddl"
@@ -113,9 +111,7 @@
         "Style": "ddl"
       }
     },
-    {
-      "Separator": null
-    },
+    "Separator",
     {
       "UsersList": {
         "Style": "ddl"
@@ -131,35 +127,18 @@
         "Style": "ddl"
       }
     },
-    {
-      "Draw": null
-    },
-    {
-      "Separator": null
-    },
-    {
-      "DoorOutlines": null
-    },
-    {
-      "UserNametags": null
-    },
-    {
-      "Chatlog": null
-    },
-    {
-      "Separator": null
-    },
-    {
-      "Tabs": null
-    },
-    {
-      "Terminal": null
-    },
-    {
-      "SuperUser": null
-    }
+    "Draw",
+    "Separator",
+    "DoorOutlines",
+    "UserNametags",
+    "Chatlog",
+    "Separator",
+    "Tabs",
+    "Terminal",
+    "SuperUser"
   ],
   "ConnectionStrings": {
+    "Driver": "SQLite",
     "LoggingDB": "Data Source=Logging.db;Version=3;"
   }
 }
