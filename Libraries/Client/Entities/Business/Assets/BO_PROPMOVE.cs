@@ -2,6 +2,7 @@
 using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Shared.Assets;
+using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Logging.Entities;
 
@@ -12,7 +13,7 @@ public class BO_PROPMOVE : IEventHandler<MSG_PROPMOVE>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IClientSessionState sessionState ||
+        if (sender is not IClientSessionState<IApp> sessionState ||
             @event is not ProtocolEventParams { Request: MSG_PROPMOVE inboundPacket } @params ||
             inboundPacket.PropNum < 0 ||
             inboundPacket.PropNum >= (sessionState.RoomInfo?.LooseProps?.Count ?? 0)) return null;

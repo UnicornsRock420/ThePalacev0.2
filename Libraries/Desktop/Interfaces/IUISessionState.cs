@@ -2,6 +2,7 @@
 
 namespace ThePalace.Common.Desktop.Interfaces;
 
-public interface IUISessionState : ISessionState
+public interface IUISessionState<TApp> : ISessionState<TApp>
+    where TApp : IApp
 {
 }

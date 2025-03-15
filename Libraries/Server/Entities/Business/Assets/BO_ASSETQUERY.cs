@@ -12,7 +12,7 @@ public class BO_ASSETQUERY : IEventHandler<MSG_ASSETQUERY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IUserSessionState sessionState ||
+        if (sender is not IUserSessionState<IApp> sessionState ||
             @event is not ProtocolEventParams { Request: MSG_ASSETQUERY inboundPacket } @params ||
             inboundPacket.AssetSpec.Id == 0) return null;
 

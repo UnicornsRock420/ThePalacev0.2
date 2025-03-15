@@ -1,5 +1,4 @@
-﻿using System;
-using ThePalace.Core.Exts.Palace;
+﻿using ThePalace.Core.Exts;
 using ThePalace.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
@@ -79,7 +78,7 @@ namespace ThePalace.Core.Entities.Core
                 .ToArray();
 
             if (max > 0 &&
-                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data?.RemoveRange(offset, max);
             }
@@ -122,7 +121,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._data.ReadSInt16(offset);
 
-            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, 2);
             }
@@ -145,7 +144,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._data.ReadSInt32(offset);
 
-            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, 4);
             }
@@ -168,7 +167,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._data[offset];
 
-            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveAt(offset);
             }
@@ -191,7 +190,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._data.ReadUInt16(offset);
 
-            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, 2);
             }
@@ -214,7 +213,7 @@ namespace ThePalace.Core.Entities.Core
 
             var result = this._data.ReadUInt32(offset);
 
-            if (RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, 4);
             }
@@ -278,7 +277,7 @@ namespace ThePalace.Core.Entities.Core
             }
 
             if (length > 0 &&
-                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, length);
             }
@@ -307,7 +306,7 @@ namespace ThePalace.Core.Entities.Core
                 .ToArray();
 
             if (length > 0 &&
-                RawDataOptions.PurgeReadData.IsBit<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
             {
                 this._data.RemoveRange(offset, length);
             }
@@ -354,12 +353,12 @@ namespace ThePalace.Core.Entities.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
             {
                 _position++;
             }
@@ -376,12 +375,12 @@ namespace ThePalace.Core.Entities.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
             {
                 _position += 2;
             }
@@ -398,12 +397,12 @@ namespace ThePalace.Core.Entities.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
             {
                 _position += 4;
             }
@@ -420,12 +419,12 @@ namespace ThePalace.Core.Entities.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
             {
                 _position += 2;
             }
@@ -442,12 +441,12 @@ namespace ThePalace.Core.Entities.Core
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsBit<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
             {
                 _position += 4;
             }
@@ -569,7 +568,7 @@ namespace ThePalace.Core.Entities.Core
             this._data.AddRange(source.WriteUInt32());
         }
 
-        public void WritePString(string source, int max, int size = 0, bool padding = true)
+        public void WritePString(string source, int max, int size = 0, int modulo = 0)
         {
             this._data ??= [];
 
@@ -578,7 +577,7 @@ namespace ThePalace.Core.Entities.Core
                 size = 1;
             }
 
-            this._data.AddRange(source.WritePString(max, size, padding));
+            this._data.AddRange(source.WritePString(max, size, modulo));
         }
 
         public void WriteCString(string source)

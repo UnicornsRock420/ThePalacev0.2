@@ -5,6 +5,7 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Constants;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
@@ -741,7 +742,7 @@ public class MsgBubble : Disposable, IDisposable
         helper.Stroke();
     }
 
-    public async Task<Bitmap?> Render(IDesktopSessionState sessionState) =>
+    public async Task<Bitmap?> Render(IDesktopSessionState<IDesktopApp> sessionState) =>
         await Task.Factory.StartNew(() =>
         {
             if (Text.Length < 1) return null;

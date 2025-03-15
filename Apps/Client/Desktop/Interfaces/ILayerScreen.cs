@@ -1,14 +1,17 @@
 using ThePalace.Client.Desktop.Enums;
+using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
 public interface ILayerScreen : IDisposable
 {
     bool Visible { get; set; }
+    bool Enabled { get; set; }
+
     float Opacity { get; set; }
     Bitmap Image { get; }
 
-    IDesktopSessionState SessionState { get; }
+    IDesktopSessionState<IDesktopApp> SessionState { get; }
     LayerScreenTypes Type { get; }
     int Width { get; }
     int Height { get; }

@@ -51,7 +51,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         using (var @lock = LockContext.GetLock(Assets))
         {
             var sessions = SessionManager.Current.Sessions.Values
-                .Cast<IServerSessionState>()
+                .Cast<IServerSessionState<IServerApp>>()
                 .ToList();
 
             var inUsePropIDs = new List<int>();
@@ -93,7 +93,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         }
     }
 
-    public AssetDesc GetAsset(IUserSessionState sessionState, AssetSpec assetSpec, bool downloadAsset = false)
+    public AssetDesc GetAsset(IUserSessionState<IApp> sessionState, AssetSpec assetSpec, bool downloadAsset = false)
     {
         var assetID = assetSpec.Id;
 

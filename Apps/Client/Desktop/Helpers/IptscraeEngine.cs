@@ -1,4 +1,5 @@
 ﻿using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;
@@ -497,7 +498,7 @@ public class IptscraeEngine : ThePalace.Core.Helpers.Scripting.IptscraeEngine
                 "NBRUSERPROPS", (iptTracking, recursionDepth) =>
                 {
                     if (!iptTracking.Variables.TryGetValue("SESSIONSTATE", out var metaVariable) ||
-                        metaVariable.Variable.GetValue<IDesktopSessionState>() is not IDesktopSessionState sessionState) return;
+                        metaVariable.Variable.GetValue<IDesktopSessionState<IDesktopApp>>() is not IDesktopSessionState<IDesktopApp> sessionState) return;
 
                     iptTracking.Stack.Push(new IptVariable(
                         IptVariableTypes.Integer,

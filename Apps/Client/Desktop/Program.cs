@@ -1,6 +1,5 @@
 ﻿using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Media;
 using System.Net.Sockets;
 using System.Reflection;
 using ThePalace.Client.Desktop.Entities.Core;
@@ -16,6 +15,7 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.UI;
 using ThePalace.Common.Desktop.Factories;
 using ThePalace.Common.Desktop.Forms.Core;
+using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Enums.App;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
@@ -37,7 +37,6 @@ using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Interfaces.Core;
 using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
@@ -48,17 +47,13 @@ using HotspotID = short;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
 using UserID = int;
 
-#if WINDOWS10_0_17763_0_OR_GREATER
-using Microsoft.Toolkit.Uwp.Notifications;
-#endif
-
 namespace ThePalace.Client.Desktop;
 
-public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
+public class Program : SingletonDisposable<Program>, IDesktopApp
 {
     private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
 
-    #region cStr
+    #region Program::Main()
 
     /// <summary>
     ///     The main entry point for the application.
@@ -313,7 +308,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             {
                 if (q.IsEmpty ||
                     !q.TryDequeue(out var mediaCmd)) return;
-                
+
                 SoundManager.Current.PlaySound(mediaCmd.Path);
             },
             opts: RunOptions.UseResetEvent);
@@ -339,16 +334,20 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         TaskManager.Current.Shutdown();
     }
 
+    #endregion
+
+    #region cStr
+
     public Program()
     {
         _managedResources.AddRange(
+            _uiControls,
             _contextMenu,
             SessionState);
-    }
 
-    public Program(Dictionary<ThreadQueues, IJob> jobs) : this()
-    {
-        _jobs = new(jobs);
+        FormsManager.Current.FormClosed += _FormClosed;
+        SessionState.ConnectionState.ConnectionEstablished += _ConnectionEstablished;
+        SessionState.ConnectionState.ConnectionDisconnected += _ConnectionDisconnected;
     }
 
     ~Program()
@@ -362,7 +361,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
         CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
 
-        if (SessionState.UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon)
+        if (UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon)
         {
             trayIcon.Visible = false;
 
@@ -394,7 +393,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
     protected readonly ContextMenuStrip _contextMenu = new();
 
-    public IDesktopSessionState SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState>();
+    public IDesktopSessionState<IDesktopApp> SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>();
 
     protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
@@ -404,13 +403,16 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         internal set => _jobs = new(value);
     }
 
+    private readonly DisposableDictionary<string, IDisposable> _uiControls = new();
+    public IReadOnlyDictionary<string, IDisposable> UIControls => _uiControls.AsReadOnly();
+
     #endregion
 
     #region Form Methods
 
     public void RefreshScreen(object sender, EventArgs e)
     {
-        if (sender is not IDesktopSessionState sessionState) return;
+        if (sender is not IDesktopSessionState<IDesktopApp> sessionState) return;
 
         if (e is not ScriptEvent scriptEvent) return;
 
@@ -418,7 +420,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         {
             CmdFnc = a =>
             {
-                if (a[0] is not IDesktopSessionState sessionState) return null;
+                if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
 
                 if (a[1] is not ScriptEvent scriptEvent) return null;
 
@@ -463,14 +465,14 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IDesktopSessionState sessionState) return null;
+                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
 
                     ShowAppForm();
 
-                    var form = sessionState.GetForm();
+                    var form = GetForm();
                     if (form == null) return null;
 
-                    if (sessionState.UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon) return null;
+                    if (UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon) return null;
 
                     trayIcon = new NotifyIcon
                     {
@@ -478,7 +480,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         Icon = form.Icon,
                         Visible = true
                     };
-                    sessionState.RegisterControl(nameof(NotifyIcon), trayIcon);
+                    RegisterControl(nameof(NotifyIcon), trayIcon);
 
                     trayIcon.ContextMenuStrip.Items.Add("Exit", null, (sender, e) => TaskManager.Current.Dispose());
 
@@ -503,11 +505,11 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
         });
         if (form == null) return;
 
-        SessionState.RegisterForm(nameof(Program), form);
+        RegisterForm(nameof(Program), form);
 
         form.SessionState = SessionState;
         form.FormClosed += (sender, e) =>
-            SessionState.UnregisterForm(nameof(Program), sender as FormBase);
+            UnregisterForm(nameof(Program), sender as FormBase);
 
         form.MouseMove += (sender, e) =>
         {
@@ -567,7 +569,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                 screenWidth / 2 - form.Width / 2,
                 screenHeight / 2 - form.Height / 2);
 
-            if (SessionState.GetControl("toolStrip") is ToolStrip toolStrip)
+            if (GetControl("toolStrip") is ToolStrip toolStrip)
                 toolStrip.Size = new Size(form.Width, form.Height);
 
             SessionState.RefreshUI();
@@ -585,7 +587,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
         var tabIndex = 0;
 
-        if (SessionState.GetControl("toolStrip") is not ToolStrip toolStrip)
+        if (GetControl("toolStrip") is not ToolStrip toolStrip)
         {
             toolStrip = FormsManager.Current.CreateControl<FormBase, ToolStrip>(form, true, new ControlCfg
             {
@@ -598,7 +600,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
             if (toolStrip != null)
             {
-                SessionState.RegisterControl(nameof(toolStrip), toolStrip);
+                RegisterControl(nameof(toolStrip), toolStrip);
 
                 toolStrip.Stretch = true;
                 toolStrip.GripMargin = new Padding(0);
@@ -610,7 +612,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             }
         }
 
-        if (SessionState.GetControl("imgScreen") is not PictureBox imgScreen)
+        if (GetControl("imgScreen") is not PictureBox imgScreen)
         {
             imgScreen = FormsManager.Current.CreateControl<FormBase, PictureBox>(form, true, new ControlCfg
             {
@@ -939,11 +941,11 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                     }
                 };
 
-                SessionState.RegisterControl(nameof(imgScreen), imgScreen);
+                RegisterControl(nameof(imgScreen), imgScreen);
             }
         }
 
-        if (SessionState.GetControl("labelInfo") is not Label labelInfo)
+        if (GetControl("labelInfo") is not Label labelInfo)
         {
             labelInfo = FormsManager.Current.CreateControl<FormBase, Label>(form, true, new ControlCfg
             {
@@ -954,10 +956,10 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             })?.FirstOrDefault();
 
             if (labelInfo != null)
-                SessionState.RegisterControl(nameof(labelInfo), labelInfo);
+                RegisterControl(nameof(labelInfo), labelInfo);
         }
 
-        if (SessionState.GetControl("txtInput") is not TextBox txtInput)
+        if (GetControl("txtInput") is not TextBox txtInput)
         {
             txtInput = FormsManager.Current.CreateControl<FormBase, TextBox>(form, true, new ControlCfg
             {
@@ -1009,7 +1011,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                                 {
                                     CmdFnc = a =>
                                     {
-                                        if (a[0] is not IDesktopSessionState sessionState) return null;
+                                        if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
 
                                         if (a[1] is not string text) return null;
 
@@ -1070,7 +1072,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                     ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, SessionState, null, SessionState.ScriptTag);
                 };
 
-                SessionState.RegisterControl(nameof(txtInput), txtInput);
+                RegisterControl(nameof(txtInput), txtInput);
             }
         }
 
@@ -1084,7 +1086,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
     {
         if (IsDisposed) return;
 
-        var connectionForm = SessionState.GetForm<Connection>(nameof(Connection));
+        var connectionForm = GetForm<Connection>(nameof(Connection));
         if (connectionForm == null)
         {
             connectionForm = FormsManager.Current.CreateForm<Connection>(
@@ -1101,11 +1103,11 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
             if (connectionForm == null) return;
 
             connectionForm.SessionState = SessionState;
-            connectionForm.FormClosed += (sender, e) => { SessionState.UnregisterForm(nameof(Connection), sender as FormBase); };
+            connectionForm.FormClosed += (sender, e) => { UnregisterForm(nameof(Connection), sender as FormBase); };
 
             if (connectionForm != null)
             {
-                SessionState.RegisterForm(nameof(Connection), connectionForm);
+                RegisterForm(nameof(Connection), connectionForm);
 
                 if (connectionForm.Controls
                         .Cast<Control>()
@@ -1117,7 +1119,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         if (SessionState.ConnectionState?.IsConnected() ?? false)
                             SessionState.ConnectionState.Disconnect();
 
-                        var connectionForm = SessionState.GetForm(nameof(Connection));
+                        var connectionForm = GetForm(nameof(Connection));
                         connectionForm?.Close();
                     };
                     buttonDisconnect.Visible = SessionState?.ConnectionState?.IsConnected() ?? false;
@@ -1129,7 +1131,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         .FirstOrDefault() is Button buttonConnect)
                     buttonConnect.Click += (sender, e) =>
                     {
-                        var connectionForm = SessionState.GetForm(nameof(Connection));
+                        var connectionForm = GetForm(nameof(Connection));
                         if (connectionForm != null)
                         {
                             var checkBoxNewTab = connectionForm.Controls
@@ -1181,7 +1183,7 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
                         .FirstOrDefault() is Button buttonCancel)
                     buttonCancel.Click += (sender, e) =>
                     {
-                        var connectionForm = SessionState.GetForm(nameof(Connection));
+                        var connectionForm = GetForm(nameof(Connection));
                         connectionForm?.Close();
                     };
 
@@ -1463,6 +1465,189 @@ public class Program : SingletonDisposable<Program>, IApp<IDesktopSessionState>
 
                 break;
         }
+    }
+
+    #endregion
+
+    #region UI Methods
+
+    private void _FormClosed(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (sender is not Form form) return;
+
+        var key = _uiControls
+            .Where(c => c.Value == form)
+            .Select(c => c.Key)
+            .FirstOrDefault();
+        if (key != null)
+            _uiControls.TryRemove(key, out _);
+    }
+
+    private void _ConnectionEstablished(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (this == sender)
+            ((Job<ActionCmd>)Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
+    private void _ConnectionDisconnected(object sender, EventArgs e)
+    {
+        if (IsDisposed) return;
+
+        if (this == sender)
+            ((Job<ActionCmd>)Jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
+            {
+                CmdFnc = a =>
+                {
+                    if (a[0] is not IDesktopSessionState<IDesktopApp> sessionState) return null;
+
+                    sessionState.RefreshScreen();
+                    sessionState.RefreshUI();
+                    sessionState.RefreshRibbon();
+
+                    return null;
+                },
+                Values = [sender]
+            });
+    }
+
+    // FormsManager.Current.FormClosed += _FormClosed;
+    // ConnectionState.ConnectionEstablished += _ConnectionEstablished;
+    // ConnectionState.ConnectionDisconnected += _ConnectionDisconnected;
+
+    #endregion
+
+    #region Form/Control Methods
+
+    public FormBase GetForm(string? friendlyName = null)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as FormBase;
+
+        return _uiControls.Values
+            ?.Where(f => f is FormBase)
+            ?.FirstOrDefault() as FormBase;
+    }
+
+    public T GetForm<T>(string? friendlyName = null)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as T;
+
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
+    }
+
+    public void RegisterForm(string friendlyName, FormBase form)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryAdd(friendlyName, form);
+    }
+
+    public void RegisterForm<T>(string friendlyName, T form)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryAdd(friendlyName, form);
+    }
+
+    public void UnregisterForm(string friendlyName, FormBase form)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterForm<T>(string friendlyName, T form)
+        where T : FormBase
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            form != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public Control GetControl(string? friendlyName = null)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as Control;
+
+        return _uiControls.Values
+            ?.Where(c => c is Control)
+            ?.FirstOrDefault() as Control;
+    }
+
+    public T GetControl<T>(string? friendlyName = null)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName))
+            return _uiControls.GetValue(friendlyName) as T;
+
+        return _uiControls.Values
+            ?.Where(f => f is T)
+            ?.FirstOrDefault() as T;
+    }
+
+    public void RegisterControl(string friendlyName, Control control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void RegisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void RegisterControl(string friendlyName, IDisposable control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryAdd(friendlyName, control);
+    }
+
+    public void UnregisterControl(string friendlyName, Control control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterControl<T>(string friendlyName, T control)
+        where T : Control
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
+    }
+
+    public void UnregisterControl(string friendlyName, IDisposable control)
+    {
+        if (!string.IsNullOrWhiteSpace(friendlyName) &&
+            control != null)
+            _uiControls?.TryRemove(friendlyName, out _);
     }
 
     #endregion

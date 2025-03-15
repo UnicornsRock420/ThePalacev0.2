@@ -8,7 +8,8 @@ using UserID = int;
 
 namespace ThePalace.Common.Client.Interfaces;
 
-public interface IClientSessionState : IUserSessionState
+public interface IClientSessionState<TApp> : IUserSessionState<TApp>
+    where TApp : IApp
 {
     RoomDesc RoomInfo { get; set; }
     ConcurrentDictionary<UserID, UserDesc> RoomUsers { get; set; }

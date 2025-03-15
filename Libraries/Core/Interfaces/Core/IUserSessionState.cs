@@ -5,7 +5,8 @@ using UserID = int;
 
 namespace ThePalace.Core.Interfaces.Core;
 
-public interface IUserSessionState : ISessionState
+public interface IUserSessionState<TApp> : ISessionState<TApp>
+    where TApp : IApp
 {
     IConnectionState? ConnectionState { get; set; }
     RoomID RoomId { get; set; }

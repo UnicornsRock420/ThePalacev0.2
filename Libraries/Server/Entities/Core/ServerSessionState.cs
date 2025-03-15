@@ -8,7 +8,7 @@ using UserID = int;
 
 namespace ThePalace.Common.Server.Entities.Core;
 
-public class ServerSessionState : Disposable, IServerSessionState
+public class ServerSessionState : Disposable, IServerSessionState<IServerApp>
 {
     ~ServerSessionState()
     {
@@ -22,7 +22,7 @@ public class ServerSessionState : Disposable, IServerSessionState
         GC.SuppressFinalize(this);
     }
 
-    public IApp<ISessionState> App { get; set; }
+    public IServerApp App { get; set; }
     public Guid Id => Guid.NewGuid();
 
     public object? SessionTag { get; set; } = null;
@@ -33,5 +33,5 @@ public class ServerSessionState : Disposable, IServerSessionState
     public string? MediaUrl { get; set; } = null;
     public string? ServerName { get; set; } = null;
     public ConcurrentDictionary<RoomID, RoomDesc> Rooms { get; set; } = new();
-    public ConcurrentDictionary<UserID, IUserSessionState> Users { get; set; } = new();
+    public ConcurrentDictionary<UserID, IUserSessionState<IApp>> Users { get; set; } = new();
 }

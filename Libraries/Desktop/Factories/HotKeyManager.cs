@@ -46,7 +46,7 @@ public class HotKeyManager : SingletonDisposable<HotKeyManager>
             _keyBindings.TryRemove(keys, out _);
     }
 
-    public bool Invoke(IUISessionState sessionState, Keys keys, object? sender = null, params object[] values)
+    public bool Invoke(IUISessionState<IDesktopApp> sessionState, Keys keys, object? sender = null, params object[] values)
     {
         if (IsDisposed) return false;
 
