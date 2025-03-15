@@ -18,6 +18,7 @@
         <ProjectReference Include="..\..\..\Libraries\Settings\ThePalace.Settings.csproj" />
         <ProjectReference Include="..\..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
         <ProjectReference Include="..\..\..\Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Scripting\Iptscrae\ThePalace.Scripting.Iptscrae.csproj" />
         <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
     </ItemGroup>
 

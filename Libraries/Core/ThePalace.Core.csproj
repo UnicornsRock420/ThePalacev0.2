@@ -31,8 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Compile Include="Entities\Network\Server\Network\MSG_DIYIT.cs" />
         <None Include="Entities\Network\Unused\MSG_ASSETNEW.cs" />
-        <None Include="Entities\Network\Unused\MSG_DIYIT.cs" />
         <None Include="Entities\Network\Unused\MSG_INITCONNECTION.cs" />
         <None Include="Entities\Network\Unused\MSG_NOOP.cs" />
         <None Include="Entities\Network\Unused\MSG_PICTDEL.cs" />

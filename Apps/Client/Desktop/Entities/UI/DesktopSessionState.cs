@@ -16,9 +16,7 @@ using ThePalace.Common.Desktop.Constants;
 using ThePalace.Common.Desktop.Entities.Ribbon;
 using ThePalace.Common.Desktop.Interfaces;
 using ThePalace.Common.Factories.Core;
-using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
-using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Rooms;
 using ThePalace.Core.Entities.Shared.ServerInfo;
 using ThePalace.Core.Entities.Shared.Types;
@@ -28,6 +26,9 @@ using ThePalace.Core.Helpers.Core;
 using ThePalace.Logging.Entities;
 using ThePalace.Network.Entities;
 using ThePalace.Network.Interfaces;
+using ThePalace.Scripting.Iptscrae.Attributes;
+using ThePalace.Scripting.Iptscrae.Entities;
+using ThePalace.Scripting.Iptscrae.Enums;
 using ThePalace.Settings.Factories;
 using Point = System.Drawing.Point;
 using RegexConstants = ThePalace.Common.Constants.RegexConstants;
@@ -55,7 +56,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
         iptTracking.Variables.TryAdd("SESSIONSTATE", new IptMetaVariable
         {
             Flags = IptMetaVariableFlags.All,
-            Variable = new IptVariable(IptVariableTypes.Shadow, this),
+            Variable = new IptVariable(IptVariableTypes.Hidden, this),
         });
 
         InitializeUIUserRec(UserDesc);
@@ -822,7 +823,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
                     //if (binding != null)
                     //    item.Click += binding.Binding;
 
-                    if (ribbonItem.Enabled)
+                    if (ribbonItem.Checkable)
                     {
                         var key = ribbonItem?.Id as Guid?;
                         if (key == null) return;
@@ -855,10 +856,10 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
                     switch (ribbonItem)
                     {
                         case StandardItem _standardItem:
-                            item.Image = _standardItem.Image;
+                            item.Image = _standardItem.Icon.Image;
                             break;
                         case BooleanItem _booleanItem:
-                            item.Image = _booleanItem.State ? _booleanItem.OnImage : _booleanItem.OffImage;
+                            item.Image = _booleanItem.State ? _booleanItem.OnIcon.Image : _booleanItem.OffIcon.Image;
                             break;
                     }
 

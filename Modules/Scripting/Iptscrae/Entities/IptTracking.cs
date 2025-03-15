@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using ThePalace.Core.Enums;
+using ThePalace.Scripting.Iptscrae.Enums;
 using Timer = System.Timers.Timer;
 
-namespace ThePalace.Core.Entities.Scripting;
+namespace ThePalace.Scripting.Iptscrae.Entities;
 
 using IptAlarms = List<IptAlarm>;
 using IptAtomList = List<IptVariable>;

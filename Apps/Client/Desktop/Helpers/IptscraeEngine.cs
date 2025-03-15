@@ -1,12 +1,12 @@
 ﻿using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
+using ThePalace.Scripting.Iptscrae.Entities;
+using ThePalace.Scripting.Iptscrae.Enums;
 
 namespace ThePalace.Client.Desktop.Helpers;
 
-public class IptscraeEngine : ThePalace.Core.Helpers.Scripting.IptscraeEngine
+public class IptscraeEngine : ThePalace.Scripting.Iptscrae.Helpers.IptscraeEngine
 {
     static IptscraeEngine()
     {

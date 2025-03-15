@@ -2,6 +2,6 @@
 
 public abstract class StandardItem : ItemBase
 {
-    public string Icon { get; set; }
-    public Bitmap Image { get; set; }
+    public string Key { get; set; }
+    public IconBase? Icon { get; set; }
 }

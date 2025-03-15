@@ -19,7 +19,7 @@ namespace ThePalace.Core.Factories.IO
         {
             assets = new();
 
-            var sizeFilePIDSHeaderRec = ThePalace.Core.Exts.AttributeExts.GetByteSize<FilePIDSHeaderRec>();
+            var sizeFilePIDSHeaderRec = Exts.AttributeExts.GetByteSize<FilePIDSHeaderRec>();
 
             var fileSize = filePROPSReader.Filesize;
             var _fileHeader = new FilePIDSHeaderRec();

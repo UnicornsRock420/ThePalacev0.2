@@ -162,7 +162,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (sbyte)_stream.ReadByte();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -180,7 +180,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (short)_stream.ReadUInt16();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -198,7 +198,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = _stream.ReadInt32();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -216,7 +216,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadByte();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -234,7 +234,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = _stream.ReadUInt16();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -252,7 +252,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = _stream.ReadUInt32();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -303,7 +303,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
             if (readCount < 1) throw new EndOfStreamException();
         }
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return (buffer.GetString() ?? string.Empty).TrimEnd('\0');
     }
@@ -331,7 +331,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
             stringBytes.Add(buffer[0]);
         } while (stringBytes.Count <= 0x7FFF);
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return stringBytes.GetString();
     }
@@ -359,7 +359,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadByte();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -376,7 +376,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadInt16();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -393,7 +393,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadInt32();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -410,7 +410,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadUInt16();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -427,7 +427,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         var result = (byte)_stream.ReadUInt32();
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return result;
     }
@@ -467,7 +467,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
         var buffer = new byte[length];
         _stream.Read(buffer, 0, buffer.Length);
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
 
         return buffer.GetString();
     }
@@ -528,7 +528,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
                 .Take(length)
                 .ToArray());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WriteInt16(short value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
@@ -539,7 +539,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WriteInt16());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WriteInt32(sint32 value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
@@ -550,7 +550,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WriteInt32());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WriteInt16(ushort value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
@@ -561,7 +561,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WriteUInt16());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WriteInt32(uint value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
@@ -572,7 +572,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WriteUInt32());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WritePString(string value, int max, int size = 0, int modulo = 0,
@@ -586,7 +586,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WritePString(max, size, modulo));
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     public void WriteCString(string value, RawStreamOptions opts = RawStreamOptions.IncrementPosition)
@@ -597,7 +597,7 @@ public class RawStream : EventArgs, IDisposable, IData, IStruct
 
         _stream.Write(value.WriteCString());
 
-        if (!RawStreamOptions.IncrementPosition.IsSet<RawStreamOptions, uint>(opts)) _stream.Position = _position;
+        if (!RawStreamOptions.IncrementPosition.IsSet(opts)) _stream.Position = _position;
     }
 
     #endregion

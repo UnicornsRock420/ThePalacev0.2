@@ -4,5 +4,5 @@ namespace ThePalace.Client.Desktop.Entities.Ribbon;
 
 public class Chatlog : StandardItem
 {
-    public override bool Enabled => true;
+    public override bool Checkable => true;
 }

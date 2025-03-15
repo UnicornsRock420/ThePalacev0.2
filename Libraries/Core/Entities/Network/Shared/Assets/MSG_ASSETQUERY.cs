@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Common.Attributes;
 using ThePalace.Core.Entities.EventsBus;
 using ThePalace.Core.Entities.Shared.Types;
 using ThePalace.Core.Enums;

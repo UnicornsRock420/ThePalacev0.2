@@ -89,6 +89,8 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
 
     private ManualResetEvent _acceptResetEvent = new(false);
 
+    public bool IsLittleEndian { get; set; } = true;
+
     public Guid Id { get; } = Guid.NewGuid();
     public CancellationTokenSource CancellationTokenSource { get; } = new();
     public CancellationToken CancellationToken => CancellationTokenSource.Token;

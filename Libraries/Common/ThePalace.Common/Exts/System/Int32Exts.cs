@@ -27,7 +27,7 @@ public static class Int32Exts
     public static byte[] ToUInt31(this int value)
     {
         var data = BitConverter.GetBytes(value);
-        data[3] = EnumExts.SetBit<byte, byte>(7, data[3], false);
+        data[3] = EnumExts.SetBit<byte>(7, data[3], false);
 
         return data;
     }

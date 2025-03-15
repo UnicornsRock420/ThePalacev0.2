@@ -3,9 +3,10 @@
 public abstract class BooleanItem : ItemBase
 {
     public bool State { get; set; } = false;
+    public override bool Checkable => true;
 
-    public string OnIcon { get; set; }
-    public Bitmap OnImage { get; set; }
-    public string OffIcon { get; set; }
-    public Bitmap OffImage { get; set; }
+    public string OnKey { get; set; }
+    public IconBase? OnIcon { get; set; }
+    public string OffKey { get; set; }
+    public IconBase? OffIcon { get; set; }
 }

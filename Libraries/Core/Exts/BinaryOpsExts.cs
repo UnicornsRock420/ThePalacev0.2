@@ -485,7 +485,7 @@ public static class BinaryOpsExts
             return;
         }
 
-        var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
+        var doSwap = opts.IsSet(SerializerOptions.SwapByteOrder);
 
         var members = objType.GetMembers();
 
@@ -596,16 +596,16 @@ public static class BinaryOpsExts
 
                             if (pString is EncryptedStringAttribute encryptedString)
                             {
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.DeserializeOptions.IsSet(
                                         EncryptedStringOptions.FromHex)) buffer = buffer.GetString().FromHex();
 
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.DeserializeOptions.IsSet(
                                         EncryptedStringOptions.DecryptString))
                                     buffer = buffer.DecryptBytes();
-                                else if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                else if (encryptedString.DeserializeOptions.IsSet(
                                              EncryptedStringOptions.EncryptString)) buffer = buffer.EncryptBytes();
 
-                                if (encryptedString.DeserializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.DeserializeOptions.IsSet(
                                         EncryptedStringOptions.ToHex)) buffer = buffer.ToHex().GetBytes();
                             }
 
@@ -730,7 +730,7 @@ public static class BinaryOpsExts
 
         var streamPosition = writer.Position;
 
-        var doSwap = opts.IsSet<SerializerOptions, byte>(SerializerOptions.SwapByteOrder);
+        var doSwap = opts.IsSet(SerializerOptions.SwapByteOrder);
 
         var members = objType.GetMembers();
 
@@ -866,16 +866,16 @@ public static class BinaryOpsExts
 
                             if (pString is EncryptedStringAttribute encryptedString)
                             {
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.SerializeOptions.IsSet(
                                         EncryptedStringOptions.FromHex)) buffer = buffer.GetString().FromHex();
 
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.SerializeOptions.IsSet(
                                         EncryptedStringOptions.DecryptString))
                                     buffer = buffer.DecryptBytes();
-                                else if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                else if (encryptedString.SerializeOptions.IsSet(
                                              EncryptedStringOptions.EncryptString)) buffer = buffer.EncryptBytes();
 
-                                if (encryptedString.SerializeOptions.IsSet<EncryptedStringOptions, short>(
+                                if (encryptedString.SerializeOptions.IsSet(
                                         EncryptedStringOptions.ToHex)) buffer = buffer.ToHex().GetBytes();
                             }
 
@@ -977,7 +977,7 @@ public static class BinaryOpsExts
 
         if ((msgBytes?.Length ?? 0) < 1) msgBytes = null;
 
-        if (opts.IsSet<SerializerOptions, byte>(SerializerOptions.IncludeHeader))
+        if (opts.IsSet(SerializerOptions.IncludeHeader))
         {
             var hdr = new MSG_Header
             {

@@ -59,7 +59,7 @@ public static class ByteExts
     {
         if ((value?.Length ?? 0) < sizeof(uint)) return 0;
 
-        value[3] = EnumExts.SetBit<byte, byte>(7, value[3], false);
+        value[3] = EnumExts.SetBit<byte>(7, value[3], false);
         return BitConverter.ToUInt32(value, offset);
     }
 

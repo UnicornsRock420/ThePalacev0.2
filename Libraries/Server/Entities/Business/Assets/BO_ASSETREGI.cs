@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Common.Attributes;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Assets;
 using ThePalace.Core.Factories.IO;

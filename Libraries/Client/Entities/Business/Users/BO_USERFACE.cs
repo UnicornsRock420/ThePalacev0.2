@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Common.Attributes;
 using ThePalace.Core.Entities.Network.Shared.Users;
 using ThePalace.Core.Interfaces.EventsBus;
 

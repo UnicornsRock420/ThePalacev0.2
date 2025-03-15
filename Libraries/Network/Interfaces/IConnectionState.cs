@@ -7,6 +7,8 @@ namespace ThePalace.Network.Interfaces;
 public interface IConnectionState<TSocket> : IDisposable
     where TSocket : IDisposable
 {
+    bool IsLittleEndian { get; set; }
+    
     Guid Id { get; }
     CancellationTokenSource CancellationTokenSource { get; }
     CancellationToken CancellationToken { get; }

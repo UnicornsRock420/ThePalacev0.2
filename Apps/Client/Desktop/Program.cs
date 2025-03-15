@@ -19,7 +19,6 @@ using ThePalace.Common.Enums.App;
 using ThePalace.Common.Helpers;
 using ThePalace.Common.Interfaces.Threading;
 using ThePalace.Common.Threading;
-using ThePalace.Core.Attributes.Core;
 using ThePalace.Core.Constants;
 using ThePalace.Core.Entities.EventsBus.EventArgs;
 using ThePalace.Core.Entities.Network.Client.Network;
@@ -29,10 +28,8 @@ using ThePalace.Core.Entities.Network.Shared.Assets;
 using ThePalace.Core.Entities.Network.Shared.Communications;
 using ThePalace.Core.Entities.Network.Shared.Network;
 using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Users;
 using ThePalace.Core.Entities.Threading;
-using ThePalace.Core.Enums;
 using ThePalace.Core.Exts;
 using ThePalace.Core.Factories.Core;
 using ThePalace.Core.Helpers.Network;
@@ -40,6 +37,9 @@ using ThePalace.Core.Interfaces.EventsBus;
 using ThePalace.Core.Interfaces.Network;
 using ThePalace.Logging.Entities;
 using ThePalace.Media.SoundPlayer;
+using ThePalace.Scripting.Iptscrae.Attributes;
+using ThePalace.Scripting.Iptscrae.Entities;
+using ThePalace.Scripting.Iptscrae.Enums;
 using ThePalace.Settings.Factories;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
@@ -130,11 +130,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                             if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
 
                                             var match = url.ParseUrl(
-                                                RegexConstants.ParseUrlOptions.IncludeProtocol |
-                                                RegexConstants.ParseUrlOptions.IncludeIPEndPoint |
-                                                RegexConstants.ParseUrlOptions.IncludeQueryString);
+                                                RegexConstants.ParseUrlOptions.IncludeBaseUrl |
+                                                RegexConstants.ParseUrlOptions.IncludePath |
+                                                RegexConstants.ParseUrlOptions.ModifierToLowerInvariant);
                                             if (match.Count < 3 ||
-                                                match["Protocol"]?.ToLowerInvariant() != "palace") break;
+                                                match["Protocol"] != "palace") break;
 
                                             var hostname = match["Hostname"];
                                             var port = Convert.ToInt32(match["Port"]);
@@ -1274,7 +1274,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         if (url != null &&
                             RegexConstants.REGEX_PARSE_URL.IsMatch(url))
                         {
-                            var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQueryString);
+                            var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQuery);
                             if (match.Count < 2) break;
 
                             var hostname = match["Hostname"];

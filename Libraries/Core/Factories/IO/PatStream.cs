@@ -565,7 +565,7 @@ public class PatStream : StreamBase
             if (printHeader)
             {
                 var entrance = rooms
-                    .Where(r => RoomFlags.DropZone.IsSet<RoomFlags, RoomFlags, short>(r.RoomInfo.RoomFlags))
+                    .Where(r => RoomFlags.DropZone.IsSet(r.RoomInfo.RoomFlags))
                     .OrderBy(r => r.RoomInfo.RoomID)
                     .FirstOrDefault();
 

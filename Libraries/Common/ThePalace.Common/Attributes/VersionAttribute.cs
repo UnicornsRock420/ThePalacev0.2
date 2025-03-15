@@ -1,6 +1,6 @@
 ﻿using ThePalace.Common.Constants;
 
-namespace ThePalace.Core.Attributes.Core;
+namespace ThePalace.Common.Attributes;
 
 public class VersionAttribute : Attribute
 {

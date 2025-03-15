@@ -3,14 +3,14 @@ using System.Text.RegularExpressions;
 using ThePalace.Common.Factories.Core;
 using ThePalace.Common.Helpers;
 using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Scripting;
 using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Enums;
 using ThePalace.Core.Helpers.Network;
 using ThePalace.Core.Interfaces.Core;
 using ThePalace.Logging.Entities;
+using ThePalace.Scripting.Iptscrae.Entities;
+using ThePalace.Scripting.Iptscrae.Enums;
 
-namespace ThePalace.Core.Helpers.Scripting;
+namespace ThePalace.Scripting.Iptscrae.Helpers;
 
 using IptAtomList = List<IptVariable>;
 
@@ -2778,7 +2778,7 @@ public class IptscraeEngine
         if (string.IsNullOrWhiteSpace(key)) throw new NullReferenceException();
 
         if (iptTracking.Variables.TryGetValue(key, out var value) &&
-            value.Variable.Type != IptVariableTypes.Shadow)
+            value.Variable.Type != IptVariableTypes.Hidden)
             return value.Variable;
 
         return new IptVariable(
@@ -2907,11 +2907,11 @@ public class IptscraeEngine
             switch (AtomList[j].Type)
             {
                 case IptVariableTypes.Command:
-                    iptTracking.Flags.SetBit<IptTrackingFlags, byte>(IptTrackingFlags.Return, false);
+                    iptTracking.Flags.SetBit(IptTrackingFlags.Return, false);
 
                     ((IptCommandFnc)IptCommands[key])(iptTracking, recursionDepth);
 
-                    if (IptTrackingFlags.Return.IsSet<IptTrackingFlags, byte>(iptTracking.Flags)) return;
+                    if (IptTrackingFlags.Return.IsSet(iptTracking.Flags)) return;
 
                     break;
                 case IptVariableTypes.Operator:

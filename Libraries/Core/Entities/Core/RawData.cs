@@ -24,22 +24,22 @@ namespace ThePalace.Core.Entities.Core
         public static explicit operator RawData(uint8[] v) => new(v);
         public static explicit operator RawData(char[] v) => new(v);
         public RawData() =>
-            this._data = [];
+            _data = [];
         public RawData(IEnumerable<uint8>? data = null) =>
-            this._data = new List<uint8>(data ?? []);
+            _data = new List<uint8>(data ?? []);
         public RawData(IEnumerable<char>? data = null) =>
-            this._data = new List<uint8>(data?.GetBytes() ?? []);
+            _data = new List<uint8>(data?.GetBytes() ?? []);
         public RawData(params uint8[] data) =>
-            this._data = new List<uint8>(data ?? []);
+            _data = new List<uint8>(data ?? []);
         public RawData(params char[] data) =>
-            this._data = new List<uint8>(data?.GetBytes() ?? []);
+            _data = new List<uint8>(data?.GetBytes() ?? []);
 
-        ~RawData() => this.Dispose();
+        ~RawData() => Dispose();
 
         public virtual void Dispose()
         {
-            this._data?.Clear();
-            this._data = null;
+            _data?.Clear();
+            _data = null;
 
             GC.SuppressFinalize(this);
         }
@@ -58,29 +58,29 @@ namespace ThePalace.Core.Entities.Core
         protected List<uint8>? _data;
         public virtual uint8[]? Data
         {
-            get => this._data?.ToArray() ?? [];
-            set => this._data = new List<uint8>(value ?? []);
+            get => _data?.ToArray() ?? [];
+            set => _data = new List<uint8>(value ?? []);
         }
 
         public virtual sint32 Count =>
-            this._data?.Count ?? 0;
+            _data?.Count ?? 0;
         public virtual sint32 Length =>
-            this._data?.Count ?? 0;
+            _data?.Count ?? 0;
 
         #region Read Methods
         public uint8[]? GetData(int max = 0, int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return null;
+            if ((_data?.Count ?? 0) < 1) return null;
 
-            var result = this._data
+            var result = _data
                 .ToArray()
                 .GetRange(max, offset)
                 .ToArray();
 
             if (max > 0 &&
-                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data?.RemoveRange(offset, max);
+                _data?.RemoveRange(offset, max);
             }
 
             return result;
@@ -88,7 +88,7 @@ namespace ThePalace.Core.Entities.Core
 
         public sbyte ReadSByte(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -99,16 +99,16 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = (sbyte)this._data[offset];
+            var result = (sbyte)_data[offset];
 
-            this._data.RemoveAt(offset);
+            _data.RemoveAt(offset);
 
             return result;
         }
 
         public short ReadSInt16(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -119,11 +119,11 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = this._data.ReadSInt16(offset);
+            var result = _data.ReadSInt16(offset);
 
-            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, 2);
+                _data.RemoveRange(offset, 2);
             }
 
             return result;
@@ -131,7 +131,7 @@ namespace ThePalace.Core.Entities.Core
 
         public sint32 ReadSInt32(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -142,11 +142,11 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = this._data.ReadSInt32(offset);
+            var result = _data.ReadSInt32(offset);
 
-            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, 4);
+                _data.RemoveRange(offset, 4);
             }
 
             return result;
@@ -154,7 +154,7 @@ namespace ThePalace.Core.Entities.Core
 
         public byte ReadByte(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -165,11 +165,11 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = this._data[offset];
+            var result = _data[offset];
 
-            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveAt(offset);
+                _data.RemoveAt(offset);
             }
 
             return result;
@@ -177,7 +177,7 @@ namespace ThePalace.Core.Entities.Core
 
         public ushort ReadUInt16(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -188,11 +188,11 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = this._data.ReadUInt16(offset);
+            var result = _data.ReadUInt16(offset);
 
-            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, 2);
+                _data.RemoveRange(offset, 2);
             }
 
             return result;
@@ -200,7 +200,7 @@ namespace ThePalace.Core.Entities.Core
 
         public uint ReadUInt32(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
@@ -211,11 +211,11 @@ namespace ThePalace.Core.Entities.Core
                 return 0;
             }
 
-            var result = this._data.ReadUInt32(offset);
+            var result = _data.ReadUInt32(offset);
 
-            if (RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+            if (RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, 4);
+                _data.RemoveRange(offset, 4);
             }
 
             return result;
@@ -223,7 +223,7 @@ namespace ThePalace.Core.Entities.Core
 
         public string? ReadPString(int max, int size = 0, int offset = 0, int delta = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return null;
+            if ((_data?.Count ?? 0) < 1) return null;
 
             if (offset < 1)
             {
@@ -263,7 +263,7 @@ namespace ThePalace.Core.Entities.Core
                 length = max;
             }
 
-            var data = this._data
+            var data = _data
                 .ToList()
                 .Skip(offset)
                 .Take(length)
@@ -277,9 +277,9 @@ namespace ThePalace.Core.Entities.Core
             }
 
             if (length > 0 &&
-                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, length);
+                _data.RemoveRange(offset, length);
             }
 
             return (data.GetString() ?? string.Empty).TrimEnd('\0');
@@ -287,28 +287,28 @@ namespace ThePalace.Core.Entities.Core
 
         public string? ReadCString(int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
-            if ((this._data?.Count ?? 0) < 1) return null;
+            if ((_data?.Count ?? 0) < 1) return null;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            var length = this._data
+            var length = _data
                 .Skip(offset)
                 .ToList()
                 .IndexOf(0);
 
-            var data = this._data
+            var data = _data
                 .ToList()
                 .Skip(offset)
                 .Take(length)
                 .ToArray();
 
             if (length > 0 &&
-                RawDataOptions.PurgeReadData.IsSet<RawDataOptions, byte>(opts))
+                RawDataOptions.PurgeReadData.IsSet(opts))
             {
-                this._data.RemoveRange(offset, length);
+                _data.RemoveRange(offset, length);
             }
 
             return data.GetString();
@@ -318,7 +318,7 @@ namespace ThePalace.Core.Entities.Core
         #region Peek Methods
         public int Seek(int offset = 0, SeekOrigin origin = SeekOrigin.Begin)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             switch (origin)
             {
@@ -346,117 +346,117 @@ namespace ThePalace.Core.Entities.Core
 
         public byte PeekByte(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet(opts))
             {
                 _position++;
             }
 
-            return this._data[offset];
+            return _data[offset];
         }
 
         public short PeekSInt16(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet(opts))
             {
                 _position += 2;
             }
 
-            return this._data.ReadSInt16(offset);
+            return _data.ReadSInt16(offset);
         }
 
         public sint32 PeekSInt32(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet(opts))
             {
                 _position += 4;
             }
 
-            return this._data.ReadSInt32(offset);
+            return _data.ReadSInt32(offset);
         }
 
         public ushort PeekUInt16(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet(opts))
             {
                 _position += 2;
             }
 
-            return this._data.ReadUInt16(offset);
+            return _data.ReadUInt16(offset);
         }
 
         public uint PeekUInt32(int offset = 0, RawDataOptions opts = RawDataOptions.All)
         {
-            if ((this._data?.Count ?? 0) < 1) return 0;
+            if ((_data?.Count ?? 0) < 1) return 0;
 
             if (offset < 1)
             {
                 offset = 0;
             }
 
-            if (RawDataOptions.UsePosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.UsePosition.IsSet(opts))
             {
                 offset += _position;
             }
 
-            if (RawDataOptions.IncrementPosition.IsSet<RawDataOptions, uint>(opts))
+            if (RawDataOptions.IncrementPosition.IsSet(opts))
             {
                 _position += 4;
             }
 
-            return this._data.ReadUInt32(offset);
+            return _data.ReadUInt32(offset);
         }
 
         public string? PeekPString(int max, int size = 0, int offset = 0)
         {
-            if ((this._data?.Count ?? 0) < 1) return null;
+            if ((_data?.Count ?? 0) < 1) return null;
 
             if (offset < 1)
             {
@@ -491,7 +491,7 @@ namespace ThePalace.Core.Entities.Core
                 length = max;
             }
 
-            var data = this._data.ToList()
+            var data = _data.ToList()
                 .Skip(offset + size)
                 .Take(length)
                 .ToArray();
@@ -503,38 +503,38 @@ namespace ThePalace.Core.Entities.Core
 
         #region Write Methods
         public void SetData(IEnumerable<uint8>? data = null) =>
-            this._data = new List<uint8>(data ?? []);
+            _data = new List<uint8>(data ?? []);
         public void SetData(uint8[]? data = null) =>
-            this._data = new List<uint8>(data ?? []);
+            _data = new List<uint8>(data ?? []);
 
         public void AppendBytes(uint8[]? data = null)
         {
             if (Count < 1)
             {
-                this._data = new List<uint8>(data);
+                _data = new List<uint8>(data);
 
                 return;
             }
 
-            this._data.AddRange(data);
+            _data.AddRange(data);
         }
 
         public void WriteByte(byte value)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.Add(value);
+            _data.Add(value);
         }
 
         public void WriteBytes(byte[] value, int max = 0, int offset = 0)
         {
-            this._data ??= [];
+            _data ??= [];
 
             if (max < 1 &&
                 offset < 1)
-                this._data.AddRange(value);
+                _data.AddRange(value);
             else
-                this._data.AddRange(value
+                _data.AddRange(value
                     .Skip(offset)
                     .Take(max)
                     .ToList());
@@ -542,64 +542,64 @@ namespace ThePalace.Core.Entities.Core
 
         public void WriteInt16(short value)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.AddRange(value.WriteInt16());
+            _data.AddRange(value.WriteInt16());
         }
 
         public void WriteInt32(sint32 value)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.AddRange(value.WriteInt32());
+            _data.AddRange(value.WriteInt32());
         }
 
         public void WriteInt16(ushort source)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.AddRange(source.WriteUInt16());
+            _data.AddRange(source.WriteUInt16());
         }
 
         public void WriteInt32(uint source)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.AddRange(source.WriteUInt32());
+            _data.AddRange(source.WriteUInt32());
         }
 
         public void WritePString(string source, int max, int size = 0, int modulo = 0)
         {
-            this._data ??= [];
+            _data ??= [];
 
             if (size < 1)
             {
                 size = 1;
             }
 
-            this._data.AddRange(source.WritePString(max, size, modulo));
+            _data.AddRange(source.WritePString(max, size, modulo));
         }
 
         public void WriteCString(string source)
         {
-            this._data ??= [];
+            _data ??= [];
 
-            this._data.AddRange(source.WriteCString());
+            _data.AddRange(source.WriteCString());
         }
         #endregion
 
         #region Helper Methods
         public void Clear()
         {
-            if (this._data == null)
-                this._data = [];
+            if (_data == null)
+                _data = [];
             else
-                this._data.Clear();
+                _data.Clear();
         }
 
         public void DropBytes(int length = 0, int offset = 0)
         {
-            if ((this._data?.Count ?? 0) < 1) return;
+            if ((_data?.Count ?? 0) < 1) return;
 
             if (offset < 1)
             {
@@ -610,7 +610,7 @@ namespace ThePalace.Core.Entities.Core
             {
                 if (offset < 1)
                 {
-                    this._data.Clear();
+                    _data.Clear();
 
                     return;
                 }
@@ -618,16 +618,16 @@ namespace ThePalace.Core.Entities.Core
                 length = Count - offset;
             }
 
-            this._data.RemoveRange(offset, length);
+            _data.RemoveRange(offset, length);
         }
 
         public void PadBytes(int mod)
         {
-            this._data ??= [];
+            _data ??= [];
 
             for (var j = Count % mod; j > 0; j--)
             {
-                this._data.Add(0);
+                _data.Add(0);
             }
         }
 
@@ -639,11 +639,11 @@ namespace ThePalace.Core.Entities.Core
 
         public void AlignBytes(int mod)
         {
-            this._data ??= [];
+            _data ??= [];
 
             for (var j = mod - Count % mod; j > 0; j--)
             {
-                this._data.Add(0);
+                _data.Add(0);
             }
         }
 

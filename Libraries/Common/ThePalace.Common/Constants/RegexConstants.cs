@@ -24,7 +24,8 @@ public static partial class RegexConstants
     public static readonly Regex REGEX_FILTER_HEX = _regex_hex_filter();
 
 
-    [GeneratedRegex(@"^([\w\d\-^:\s]+)[:][/]{2}([\w\d\-.]+[.][\w\d\-^:\s]+)[:]{0,1}([\d^/\s]*)([/]{0,1}[\w\d%&+-=/^?\s]*)([?]{0,1}[\w\d%&+-=/^#\s]*)([#]{0,1}[\w\d%&+-=/^\s]*)$",
+    [GeneratedRegex(
+        @"^([\w\d\-^:\s]*)[:]{0,1}[/]{0,2}([\w\d\-.]+[.][\w\d\-^:\s]+)[:]{0,1}([\d^/\s]*)([/]{0,1}[\w\d%&+-=_/^?\s]*)([?]{0,1}[\w\d%&+-=_/^#\s]*)([#]{0,1}[\w\d%&+-=_/^\s]*)$",
         RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex _regex_parse_url();
 
@@ -63,7 +64,7 @@ public static partial class RegexConstants
         [Description("Hostname")] IncludeHostname = 0x0002,
         [Description("Port")] IncludePort = 0x0004,
         [Description("Path")] IncludePath = 0x0008,
-        [Description("QueryString")] IncludeQueryString = 0x0010,
+        [Description("Query")] IncludeQuery = 0x0010,
         [Description("Hashtag")] IncludeHashtag = 0x0020,
 
         ModifierInvariant = 0x010000,
@@ -73,6 +74,10 @@ public static partial class RegexConstants
         // Aliases:
         IncludeAddress = IncludeHostname,
         IncludeIPEndPoint = IncludeHostname | IncludePort,
+        IncludeBaseUrl = IncludeProtocol | IncludeHostname | IncludePort,
+
+        ModifierToLowerInvariant = ModifierToLower | ModifierInvariant,
+        ModifierToUpperInvariant = ModifierToUpper | ModifierInvariant,
     }
 
     private delegate void _parseUrl(int i);
@@ -104,7 +109,7 @@ public static partial class RegexConstants
 
                 continue;
             }
-            
+
             v = v.Trim();
 
             if (i > 2)

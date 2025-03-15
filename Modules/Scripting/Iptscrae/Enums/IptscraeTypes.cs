@@ -1,6 +1,7 @@
-﻿using ThePalace.Core.Attributes.Core;
+﻿using ThePalace.Common.Attributes;
+using ThePalace.Scripting.Iptscrae.Attributes;
 
-namespace ThePalace.Core.Enums;
+namespace ThePalace.Scripting.Iptscrae.Enums;
 
 public enum IptEventTypes : short
 {
@@ -91,24 +92,27 @@ public enum IptEventTypes : short
     [Version(3)] Main
 }
 
-public enum IptVariableTypes
+[Flags]
+public enum IptVariableTypes : ushort
 {
-    Shadow, //Hidden
-    Bool,
-    Integer,
-    Decimal,
-    String,
-    Array,
-    Atomlist,
-    Operator,
-    Command,
-    Variable,
-    Object,
-    Disposable
+    None = 0,
+    Hidden = 0x8000,
+    Shadow = 0x8000,
+    Bool = 0x0001,
+    Integer = 0x0002,
+    Decimal = 0x0004,
+    String = 0x0008,
+    Array = 0x0010,
+    Atomlist = 0x0020,
+    Operator = 0x0040,
+    Command = 0x0080,
+    Variable = 0x0100,
+    Object = 0x0200,
+    Disposable = 0x0400
 }
 
 [Flags]
-public enum IptOperatorFlags
+public enum IptOperatorFlags : uint
 {
     None = 0x00000000,
     Unary = 0x00000001,
@@ -135,7 +139,7 @@ public enum IptOperatorFlags
 }
 
 [Flags]
-public enum IptMetaVariableFlags
+public enum IptMetaVariableFlags : ushort
 {
     None = 0,
     IsGlobal = 0x01,
@@ -145,7 +149,7 @@ public enum IptMetaVariableFlags
 }
 
 [Flags]
-public enum IptTrackingFlags
+public enum IptTrackingFlags : ushort
 {
     None = 0,
     Break = 0x01,

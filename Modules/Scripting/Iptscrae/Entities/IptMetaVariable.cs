@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Enums;
+﻿using ThePalace.Scripting.Iptscrae.Enums;
 
-namespace ThePalace.Core.Entities.Scripting;
+namespace ThePalace.Scripting.Iptscrae.Entities;
 
 public class IptMetaVariable
 {

@@ -11,13 +11,16 @@ public interface IRibbon<TRibbon>
     where TRibbon : ItemBase
 {
     Guid Id { get; }
-    
-    string? Title { get; set; }
-    string? Type { get; set; }
-    ApiBinding? Binding { get; set; }
-    bool Checked { get; set; }
-    bool Enabled { get; }
 
-    string? HoverIcon { get; set; }
-    Bitmap[]? HoverFrames { get; set; }
+    string? Type { get; }
+    string? Title { get; set; }
+    bool Enabled { get; set; }
+    bool Checked { get; set; }
+    bool Checkable { get; }
+
+    ApiBinding? Binding { get; }
+
+    string? HoverKey { get; }
+
+    IReadOnlyList<Bitmap>? HoverFrames { get; }
 }

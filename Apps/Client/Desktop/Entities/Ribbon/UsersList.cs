@@ -4,5 +4,5 @@ namespace ThePalace.Client.Desktop.Entities.Ribbon;
 
 public class UsersList : StandardItem
 {
-    public override bool Enabled => true;
+    public override bool Checkable => true;
 }
