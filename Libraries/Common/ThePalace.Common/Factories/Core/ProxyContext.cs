@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text.RegularExpressions;
 using ThePalace.Common.Entities.EventArgs;
 
 namespace ThePalace.Common.Factories.Core;
@@ -278,11 +279,26 @@ public class ProxyContext : DynamicObject, IDisposable
         }
     }
 
+    private static string SanitizeName(string? name)
+    {
+        name = name?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+
+        name = CONST_REGEX_Filter_LegalNames.Replace(name, "_");
+        return CONST_REGEX_Sequence.Aggregate(name, (current, regex) => regex.Replace(current, string.Empty));
+    }
+
+    private static readonly Regex CONST_REGEX_Filter_LegalNames = new Regex(@"[^\w\d_]+", RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex CONST_REGEX_Trim_StringStart = new Regex(@"^[\d_]+", RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex CONST_REGEX_Trim_StringEnd = new Regex(@"[_]+$", RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex[] CONST_REGEX_Sequence = [CONST_REGEX_Trim_StringStart, CONST_REGEX_Trim_StringEnd];
+
     private AssemblyName _asmName;
     private AssemblyBuilder _asmBuilder;
     private ModuleBuilder _modBuilder;
 
-    private static void CreateAssembly(
+    private static void CreateAssemblyBuilder(
         string? assemblyName,
         out AssemblyName asmName,
         out AssemblyBuilder asmBuilder)
@@ -293,7 +309,7 @@ public class ProxyContext : DynamicObject, IDisposable
         asmBuilder = AssemblyBuilder.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Run);
     }
 
-    private static void CreateModule(
+    private static void CreateModuleBuilder(
         AssemblyName asmName,
         AssemblyBuilder asmBuilder,
         out ModuleBuilder modBuilder)
@@ -301,7 +317,7 @@ public class ProxyContext : DynamicObject, IDisposable
         modBuilder = asmBuilder.DefineDynamicModule(asmName.Name);
     }
 
-    private static TypeBuilder CreateType(
+    private static TypeBuilder CreateTypeBuilder(
         ModuleBuilder modBuilder,
         Type sourceType,
         Type? parentType = null,
@@ -321,16 +337,148 @@ public class ProxyContext : DynamicObject, IDisposable
             interfaces);
     }
 
-    private static ConstructorBuilder CreateConstructor(
-        TypeBuilder typeBuilder,
+    private static ConstructorBuilder CreateConstructorBuilder(
+        TypeBuilder tb,
         MethodAttributes attribs =
             MethodAttributes.Public |
             MethodAttributes.SpecialName |
-            MethodAttributes.RTSpecialName)
+            MethodAttributes.RTSpecialName,
+        params Type[]? parameterTypes)
     {
-        return typeBuilder.DefineConstructor(
+        return tb.DefineConstructor(
             attribs,
             CallingConventions.Standard,
-            Type.EmptyTypes);
+            parameterTypes ?? Type.EmptyTypes);
+    }
+
+    private static MethodBuilder CreateMethodBuilder(
+        TypeBuilder tb,
+        string methodName,
+        Type returnType,
+        MethodAttributes attribs =
+            MethodAttributes.Public |
+            MethodAttributes.SpecialName |
+            MethodAttributes.HideBySig,
+        params Type[]? parameterTypes)
+    {
+        if (attribs.HasFlag(MethodAttributes.Public))
+        {
+            attribs &= ~MethodAttributes.Private;
+        }
+
+        var _methodName = new List<string> { SanitizeName(methodName) };
+
+        if (attribs.HasFlag(MethodAttributes.Private))
+        {
+            _methodName.Insert(0, "_");
+        }
+
+        return tb.DefineMethod(
+            string.Concat(_methodName),
+            attribs,
+            returnType,
+            parameterTypes ?? Type.EmptyTypes);
+    }
+
+    private static FieldBuilder CreateFieldBuilder(
+        TypeBuilder tb,
+        string fieldName,
+        Type fieldType,
+        FieldAttributes attribs =
+            FieldAttributes.Public)
+    {
+        if (attribs.HasFlag(FieldAttributes.Public))
+        {
+            attribs &= ~FieldAttributes.Private;
+        }
+
+        var _fieldName = new List<string> { SanitizeName(fieldName) };
+
+        if (attribs.HasFlag(FieldAttributes.Private))
+        {
+            _fieldName.Insert(0, "_");
+        }
+
+        return tb.DefineField(string.Concat(_fieldName), fieldType, attribs);
+    }
+
+    private static PropertyBuilder CreatePropertyBuilder(
+        TypeBuilder tb,
+        string propertyName,
+        Type propertyType,
+        PropertyAttributes attribs =
+            PropertyAttributes.HasDefault,
+        bool isPrivate = false)
+    {
+        var _propertyName = new List<string> { SanitizeName(propertyName) };
+
+        if (isPrivate)
+        {
+            _propertyName.Insert(0, "_");
+        }
+
+        return tb.DefineProperty(string.Concat(_propertyName), attribs, propertyType, null);
+    }
+
+    private static void CreateProperty(
+        TypeBuilder tb,
+        string propertyName,
+        Type propertyType,
+        MethodAttributes attribs =
+            MethodAttributes.Public |
+            MethodAttributes.SpecialName |
+            MethodAttributes.HideBySig,
+        params Type[]? parameterTypes)
+    {
+        if (attribs.HasFlag(MethodAttributes.Public))
+        {
+            attribs &= ~MethodAttributes.Private;
+        }
+
+        var _propertyName = new List<string> { propertyName };
+
+        if (attribs.HasFlag(MethodAttributes.Private))
+        {
+            _propertyName.Insert(0, "_");
+        }
+
+        var fieldBuilder = tb.DefineField(string.Concat(_propertyName), propertyType, FieldAttributes.Private);
+        var propertyBuilder = tb.DefineProperty(string.Concat(_propertyName), PropertyAttributes.HasDefault, propertyType, null);
+        var getPropMthdBldr = tb.DefineMethod(
+            "get_" + propertyName,
+            MethodAttributes.Public |
+            MethodAttributes.SpecialName |
+            MethodAttributes.HideBySig,
+            propertyType,
+            parameterTypes ?? Type.EmptyTypes);
+        var getIl = getPropMthdBldr.GetILGenerator();
+
+        getIl.Emit(OpCodes.Ldarg_0);
+        getIl.Emit(OpCodes.Ldfld, fieldBuilder);
+        getIl.Emit(OpCodes.Ret);
+
+        var setPropMthdBldr =
+            tb.DefineMethod(
+                "set_" + propertyName,
+                MethodAttributes.Public |
+                MethodAttributes.SpecialName |
+                MethodAttributes.HideBySig,
+                null, [propertyType]);
+
+        var setIl = setPropMthdBldr.GetILGenerator();
+        var modifyProperty = setIl.DefineLabel();
+        var exitSet = setIl.DefineLabel();
+
+        setIl.MarkLabel(modifyProperty);
+        setIl.Emit(OpCodes.Ldarg_0);
+        setIl.Emit(OpCodes.Ldarg_1);
+        setIl.Emit(OpCodes.Stfld, fieldBuilder);
+
+        setIl.Emit(OpCodes.Nop);
+        setIl.MarkLabel(exitSet);
+        setIl.Emit(OpCodes.Ret);
+
+        propertyBuilder.SetGetMethod(getPropMthdBldr);
+        propertyBuilder.SetSetMethod(setPropMthdBldr);
     }
 }
