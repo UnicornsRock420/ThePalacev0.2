@@ -2,7 +2,7 @@
 
 namespace ThePalace.Common.Entities.EventArgs;
 
-public class PropertyChangedEventArgs : System.EventArgs
+public class FieldChangedEventArgs : System.EventArgs
 {
     public MemberInfo? Member { get; internal set; }
     public string? Name => Member?.Name;

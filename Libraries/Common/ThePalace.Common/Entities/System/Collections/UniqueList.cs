@@ -128,18 +128,31 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
         {
         }
 
-        while (_list.Count >= _maxCapacity)
+        var count = _list.Count;
+
+        while (count >= _maxCapacity)
             try
             {
-                _list?.RemoveAt(_list.Count - 1);
+                _list?.RemoveAt(count - 1);
+
+                count = _list.Count;
             }
             catch
             {
             }
 
+        if (index >= count)
+        {
+            _list.Add(item);
+
+            return;
+        }
+
+        if (index < 0) index = count + index;
+
         try
         {
-            _list?.Insert(0, item);
+            _list?.Insert(index % count, item);
         }
         catch
         {
