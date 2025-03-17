@@ -137,18 +137,21 @@ public class ProxyContext : DynamicObject, IProxyContext
         if (_proxies.TryGetValue(
                 sourceType,
                 out var proxyInfo))
-            return (T)Activator.CreateInstance(
-                proxyInfo.ProxyType,
-                args);
+            return (T)Instance(proxyInfo.ProxyType, args);
 
         proxyInfo = Build<T>();
         if (proxyInfo == null) throw new NullReferenceException(string.Concat([nameof(ProxyContext) + "." + nameof(Create), "<", sourceType.Name, ">"]));
 
         _proxies.TryAdd(sourceType, proxyInfo);
 
-        return (T)Activator.CreateInstance(
-            proxyInfo.ProxyType,
-            args);
+        return (T)Instance(proxyInfo.ProxyType, args);
+    }
+
+    protected static object Instance(
+        Type type,
+        params object[]? args)
+    {
+        return Activator.CreateInstance(type, args);
     }
 
     protected static ProxyInfo Build<T>(ProxyOptions opts = ProxyOptions.CloneDefault)
