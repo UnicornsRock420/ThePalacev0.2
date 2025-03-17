@@ -892,55 +892,55 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     imgScreen.Cursor = Cursors.Default;
 
-                    if (SessionState.ConnectionState.IsConnected())
-                    {
-                        var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                    if (!SessionState.ConnectionState.IsConnected()) return;
 
-                        if ((SessionState.RoomUsers?.Count ?? 0) > 0)
-                            foreach (var roomUser in SessionState.RoomUsers.Values)
-                                if (roomUser.UserRec.UserId == 0 ||
-                                    roomUser.UserRec.RoomPos == null)
-                                {
-                                    continue;
-                                }
-                                else if (point.IsPointInPolygon(
-                                             roomUser.UserRec.RoomPos.GetBoundingBox(
-                                                 new Size(
-                                                     (int)AssetConstants.Values.DefaultPropWidth,
-                                                     (int)AssetConstants.Values.DefaultPropHeight),
-                                                 true)))
-                                {
-                                    imgScreen.Cursor = Cursors.Hand;
-                                    break;
-                                }
+                    var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
-                        if ((SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
-                            foreach (var looseProp in SessionState.RoomInfo.LooseProps)
+                    if ((SessionState.RoomUsers?.Count ?? 0) > 0)
+                        foreach (var roomUser in SessionState.RoomUsers.Values)
+                            if (roomUser.UserRec.UserId == 0 ||
+                                roomUser.UserRec.RoomPos == null)
                             {
-                                if (looseProp.Loc == null) continue;
-
-                                var prop = AssetsManager.Current.Assets.GetValueLocked(looseProp.AssetSpec.Id);
-                                if (prop == null) continue;
-
-                                if (point.IsPointInPolygon(
-                                        looseProp.Loc.GetBoundingBox(
-                                            new Size(
-                                                prop.Width,
-                                                prop.Height),
-                                            true)))
-                                {
-                                    imgScreen.Cursor = Cursors.Hand;
-                                    break;
-                                }
+                                continue;
+                            }
+                            else if (point.IsPointInPolygon(
+                                         roomUser.UserRec.RoomPos.GetBoundingBox(
+                                             new Size(
+                                                 (int)AssetConstants.Values.DefaultPropWidth,
+                                                 (int)AssetConstants.Values.DefaultPropHeight),
+                                             true)))
+                            {
+                                imgScreen.Cursor = Cursors.Hand;
+                                break;
                             }
 
-                        if ((SessionState.RoomInfo?.HotSpots?.Count ?? 0) > 0)
-                            foreach (var hotSpot in SessionState.RoomInfo.HotSpots)
-                                if (point.IsPointInPolygon(hotSpot.Vortexes.ToArray()))
-                                {
-                                    imgScreen.Cursor = Cursors.Hand;
-                                    break;
-                                }
+                    if ((SessionState.RoomInfo?.LooseProps?.Count ?? 0) > 0)
+                        foreach (var looseProp in SessionState.RoomInfo.LooseProps)
+                        {
+                            if (looseProp.Loc == null) continue;
+
+                            var prop = AssetsManager.Current.Assets.GetValueLocked(looseProp.AssetSpec.Id);
+                            if (prop == null) continue;
+
+                            if (point.IsPointInPolygon(
+                                    looseProp.Loc.GetBoundingBox(
+                                        new Size(
+                                            prop.Width,
+                                            prop.Height),
+                                        true)))
+                            {
+                                imgScreen.Cursor = Cursors.Hand;
+                                break;
+                            }
+                        }
+
+                    if ((SessionState.RoomInfo?.HotSpots?.Count ?? 0) <= 0) return;
+
+                    foreach (var hotSpot in SessionState.RoomInfo.HotSpots
+                                 .Where(hotSpot => point.IsPointInPolygon(hotSpot.Vortexes.ToArray())))
+                    {
+                        imgScreen.Cursor = Cursors.Hand;
+                        break;
                     }
                 };
 
@@ -1017,14 +1017,19 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                                         if (a[1] is not string text) return null;
+                                        
+                                        var iptTracking = sessionState.ScriptTag as IptTracking;
 
                                         try
                                         {
-                                            var atomlist = IptscraeEngine.Parse(
-                                                sessionState.ScriptTag as IptTracking,
-                                                text,
-                                                false);
-                                            IptscraeEngine.Executor(atomlist, sessionState.ScriptTag as IptTracking);
+                                            var atomlist =
+                                                IptscraeEngine.Parse(
+                                                    iptTracking,
+                                                    text,
+                                                    false);
+                                            IptscraeEngine.Executor(
+                                                atomlist,
+                                                iptTracking);
                                         }
                                         catch (Exception ex)
                                         {
@@ -1252,83 +1257,84 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         var name = e?.ClickedItem?.Name;
 
-        if (!string.IsNullOrWhiteSpace(name))
-            switch (name)
-            {
-                case nameof(GoBack):
-                case nameof(GoForward):
-                    if (SessionState.ConnectionState.IsConnected() &&
-                        SessionState.History.History.Count > 0)
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        switch (name)
+        {
+            case nameof(GoBack):
+            case nameof(GoForward):
+                if (SessionState.ConnectionState.IsConnected() &&
+                    SessionState.History.History.Count > 0)
+                {
+                    var url = (string?)null;
+
+                    switch (name)
                     {
-                        var url = (string?)null;
-
-                        switch (name)
-                        {
-                            case nameof(GoBack):
-                                if (!SessionState.History.Position.HasValue ||
-                                    SessionState.History.History.Keys.Min() != SessionState.History.Position.Value)
-                                    url = SessionState.History.Back();
-                                break;
-                            case nameof(GoForward):
-                                if (SessionState.History.Position.HasValue &&
-                                    SessionState.History.History.Keys.Max() != SessionState.History.Position.Value)
-                                    url = SessionState.History.Forward();
-                                break;
-                        }
-
-                        if (url != null &&
-                            RegexConstants.REGEX_PARSE_URL.IsMatch(url))
-                        {
-                            var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQuery);
-                            if (match.Count < 2) break;
-
-                            var hostname = match["Hostname"];
-                            var port = Convert.ToInt32(match["Port"]);
-                            var roomID = Convert.ToInt16(match["Path"]);
-
-                            if ((SessionState.ConnectionState?.IsConnected() ?? false) &&
-                                SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
-                                SessionState.ConnectionState.HostAddr.Port == port &&
-                                roomID != 0)
-                                SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ROOMGOTO>(
-                                    SessionState.UserId,
-                                    new MSG_ROOMGOTO
-                                    {
-                                        Dest = roomID
-                                    });
-                            else
-                                ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
-                                {
-                                    Flags = (int)NetworkCommandTypes.CONNECT,
-                                    Values = [url]
-                                });
-                        }
+                        case nameof(GoBack):
+                            if (!SessionState.History.Position.HasValue ||
+                                SessionState.History.History.Keys.Min() != SessionState.History.Position.Value)
+                                url = SessionState.History.Back();
+                            break;
+                        case nameof(GoForward):
+                            if (SessionState.History.Position.HasValue &&
+                                SessionState.History.History.Keys.Max() != SessionState.History.Position.Value)
+                                url = SessionState.History.Forward();
+                            break;
                     }
 
-                    break;
-                case nameof(Entities.Ribbon.Connection):
-                    ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(SessionState, null);
-                    break;
-                case nameof(Chatlog):
-                    ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(SessionState, null);
-                    break;
-                case nameof(UsersList):
-                    ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(SessionState, null);
-                    break;
-                case nameof(RoomsList):
-                    ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(SessionState, null);
-                    break;
-                case nameof(Bookmarks):
-                case nameof(LiveDirectory):
-                case nameof(DoorOutlines):
-                case nameof(UserNametags):
-                case nameof(Tabs):
-                case nameof(Terminal):
-                case nameof(SuperUser):
-                case nameof(Draw):
-                case nameof(Sounds):
-                    break;
-            }
+                    if (url != null &&
+                        RegexConstants.REGEX_PARSE_URL.IsMatch(url))
+                    {
+                        var match = url.ParseUrl(RegexConstants.ParseUrlOptions.IncludeIPEndPoint | RegexConstants.ParseUrlOptions.IncludeQuery);
+                        if (match.Count < 2) break;
+
+                        var hostname = match["Hostname"];
+                        var port = Convert.ToInt32(match["Port"]);
+                        var roomID = Convert.ToInt16(match["Path"]);
+
+                        if ((SessionState.ConnectionState?.IsConnected() ?? false) &&
+                            SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
+                            SessionState.ConnectionState.HostAddr.Port == port &&
+                            roomID != 0)
+                            SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ROOMGOTO>(
+                                SessionState.UserId,
+                                new MSG_ROOMGOTO
+                                {
+                                    Dest = roomID
+                                });
+                        else
+                            ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
+                            {
+                                Flags = (int)NetworkCommandTypes.CONNECT,
+                                Values = [url]
+                            });
+                    }
+                }
+
+                break;
+            case nameof(Entities.Ribbon.Connection):
+                ApiManager.Current.ApiBindings.GetValue("ShowConnectionForm")?.Binding(SessionState, null);
+                break;
+            case nameof(Chatlog):
+                ApiManager.Current.ApiBindings.GetValue("ShowLogForm")?.Binding(SessionState, null);
+                break;
+            case nameof(UsersList):
+                ApiManager.Current.ApiBindings.GetValue("ShowUserListForm")?.Binding(SessionState, null);
+                break;
+            case nameof(RoomsList):
+                ApiManager.Current.ApiBindings.GetValue("ShowRoomListForm")?.Binding(SessionState, null);
+                break;
+            case nameof(Bookmarks):
+            case nameof(LiveDirectory):
+            case nameof(DoorOutlines):
+            case nameof(UserNametags):
+            case nameof(Tabs):
+            case nameof(Terminal):
+            case nameof(SuperUser):
+            case nameof(Draw):
+            case nameof(Sounds):
+                break;
+        }
     }
 
     private void toolStripDropdownlist_Click(object sender = null, EventArgs e = null)
