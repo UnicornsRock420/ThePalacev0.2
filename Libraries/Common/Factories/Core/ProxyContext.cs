@@ -129,6 +129,28 @@ public class ProxyContext : DynamicObject, IProxyContext
 
     #region Proxy Methods
 
+    public static T Create<T>(params object[]? args)
+        where T : class, new()
+    {
+        var sourceType = typeof(T);
+
+        if (_proxies.TryGetValue(
+                sourceType,
+                out var proxyInfo))
+            return (T)Activator.CreateInstance(
+                proxyInfo.ProxyType,
+                args);
+
+        proxyInfo = Build<T>();
+        if (proxyInfo == null) throw new NullReferenceException(string.Concat([nameof(ProxyContext) + "." + nameof(Create), "<", sourceType.Name, ">"]));
+
+        _proxies.TryAdd(sourceType, proxyInfo);
+
+        return (T)Activator.CreateInstance(
+            proxyInfo.ProxyType,
+            args);
+    }
+
     protected static ProxyInfo Build<T>(ProxyOptions opts = ProxyOptions.CloneDefault)
     {
         return Build(typeof(T), opts);
@@ -140,7 +162,7 @@ public class ProxyContext : DynamicObject, IProxyContext
 
         var flags = new List<BindingFlags>();
         var nfo = new List<MemberInfo>();
-        
+
         if (opts.HasFlag(ProxyOptions.ClonePublic)) flags.Add(BindingFlags.Public);
         if (opts.HasFlag(ProxyOptions.ClonePrivate)) flags.Add(BindingFlags.NonPublic);
         if (opts.HasFlag(ProxyOptions.CloneInstance)) flags.Add(BindingFlags.Instance);
@@ -153,6 +175,7 @@ public class ProxyContext : DynamicObject, IProxyContext
             nfo.AddRange(sourceType.GetProperties(flag));
             nfo.AddRange(sourceType.GetMethods(flag));
         }
+
         nfo = nfo.DistinctBy(m => m.Name).ToList();
 
         var typeBuilder = (TypeBuilder?)CreateTypeBuilder(
@@ -218,8 +241,6 @@ public class ProxyContext : DynamicObject, IProxyContext
                 typeBuilder,
                 opts);
             if (proxyInfo == null) throw new OutOfMemoryException(string.Concat([nameof(ProxyContext) + "." + nameof(Build) + ".", sourceType.Name]));
-
-            _proxies.TryAdd(sourceType, proxyInfo);
 
             return proxyInfo;
         }
