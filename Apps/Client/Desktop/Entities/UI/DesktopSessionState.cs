@@ -835,22 +835,30 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
 
                     var condition = nodeType switch
                     {
-                        //case nameof(Bookmarks):
-                        //case nameof(Connection):
-                        //case nameof(LiveDirectory):
-                        //case nameof(Chatlog):
-                        //case nameof(Tabs):
-                        //    condition = true;
-                        //    break;
-                        
-                        nameof(DoorOutlines) or nameof(UserNametags) or nameof(Terminal) or nameof(SuperUser)
-                            or nameof(Draw) or nameof(UsersList) or nameof(RoomsList) or nameof(Sounds) => isConnected,
-                        nameof(GoBack) => History.History.Count > 0 && (!History.Position.HasValue ||
-                                                                        History.History.Keys.Min() !=
-                                                                        History.Position.Value),
-                        nameof(GoForward) => History.History.Count > 0 && History.Position.HasValue &&
+                        nameof(DoorOutlines) or
+                            nameof(UserNametags) or
+                            nameof(Terminal) or
+                            nameof(SuperUser) or
+                            nameof(Draw) or
+                            nameof(UsersList) or
+                            nameof(RoomsList) or
+                            nameof(Sounds) => isConnected,
+
+                        nameof(GoBack) => History.History.Count > 0 &&
+                                          (!History.Position.HasValue ||
+                                           History.History.Keys.Min() !=
+                                           History.Position.Value),
+
+                        nameof(GoForward) => History.History.Count > 0 &&
+                                             History.Position.HasValue &&
                                              History.History.Keys.Max() != History.Position.Value,
-                        _ => true
+
+                        // nameof(Bookmarks) or
+                        //     nameof(Connection) or
+                        //     nameof(LiveDirectory) or
+                        //     nameof(Chatlog) or
+                        //     nameof(Tabs) or
+                        _ => true,
                     };
 
                     switch (ribbonItem)
