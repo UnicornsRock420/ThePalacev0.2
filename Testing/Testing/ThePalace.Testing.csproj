@@ -25,4 +25,9 @@
         <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Factories\ProxyContext.cs" />
+      <None Include="Factories\ProxyContext.cs" />
+    </ItemGroup>
+
 </Project>

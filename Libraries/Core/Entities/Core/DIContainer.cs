@@ -41,7 +41,7 @@ public class DIContainer
         return Container?.Resolve<TType>();
     }
 
-    #region cStr
+    #region ctors
 
     public DIContainer()
     {

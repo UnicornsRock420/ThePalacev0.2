@@ -42,7 +42,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
 
-    #region cStr
+    #region ctors
 
     public DesktopSessionState()
     {
@@ -925,7 +925,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
 
                 _uiLayers[LayerScreenTypes.Base].Load(
                     LayerSourceTypes.Resource,
-                    "ThePalace.Media.Resources.backgrounds.aephixcorelogo.png");
+                    "Lib.Media.Resources.backgrounds.aephixcorelogo.png");
             }
             else if (layers.Contains(LayerScreenTypes.Base))
             {
@@ -954,7 +954,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
                     _uiLayers[LayerScreenTypes.Base].Image?.Tag?.ToString())
                     _uiLayers[LayerScreenTypes.Base].Load(
                         LayerSourceTypes.Resource,
-                        "ThePalace.Media.Resources.backgrounds.clouds.jpg");
+                        "Lib.Media.Resources.backgrounds.clouds.jpg");
             }
         }
         catch (Exception ex)

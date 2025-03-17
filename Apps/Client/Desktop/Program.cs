@@ -52,6 +52,7 @@ namespace ThePalace.Client.Desktop;
 
 public class Program : SingletonDisposable<Program>, IDesktopApp
 {
+    private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
     private static readonly Type CONST_TYPE_MSG_Header = typeof(MSG_Header);
 
     #region Program::Main()
@@ -62,7 +63,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     [STAThread]
     public static void Main()
     {
-        var filePath = Path.Combine(Environment.CurrentDirectory, "ThePalace.Media.dll");
+        var filePath = Path.Combine(Environment.CurrentDirectory, "Lib.Media.dll");
         if (File.Exists(filePath))
             Assembly.LoadFile(filePath);
 
@@ -75,7 +76,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             .Where(a => a.FullName?.StartsWith("Lib.Common.Client") == true)
             .SelectMany(a => a.GetTypes())
             .Where(t =>
-                t.GetInterfaces().Contains(typeof(IEventHandler)) &&
+                t.GetInterfaces().Contains(CONST_TYPE_IEventHandler) &&
                 t.Namespace?.StartsWith("Lib.Common.Client.Entities.Business") == true)
             .ToArray());
 
@@ -339,10 +340,12 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     #endregion
 
-    #region cStr
+    #region ctors
 
     public Program()
     {
+        SessionState = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>(this);
+
         _managedResources.AddRange(
             _uiControls,
             _contextMenu,
@@ -396,7 +399,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     protected readonly ContextMenuStrip _contextMenu = new();
 
-    public IClientDesktopSessionState<IDesktopApp> SessionState { get; protected set; } = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>();
+    public IClientDesktopSessionState<IDesktopApp> SessionState { get; protected set; }
 
     protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
@@ -1017,7 +1020,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
 
                                         if (a[1] is not string text) return null;
-                                        
+
                                         var iptTracking = sessionState.ScriptTag as IptTracking;
 
                                         try

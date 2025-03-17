@@ -22,19 +22,28 @@ public class SessionManager : SingletonDisposable<SessionManager>
         base.Dispose();
     }
 
-    public TSessionState CreateSession<TSessionState, TApp>()
+    public TSessionState? CreateSession<TSessionState, TApp>(TApp app)
         where TSessionState : ISessionState<TApp>
         where TApp : IApp
     {
-        return (TSessionState)CreateSession(typeof(TSessionState));
+        if (IsDisposed) return default(TSessionState);
+        
+        ArgumentNullException.ThrowIfNull(app, nameof(app));
+
+        return (TSessionState)CreateSession(typeof(TSessionState), app);
     }
 
-    public object CreateSession(Type type)
+    public object? CreateSession(Type type, IApp app)
     {
         if (IsDisposed) return null;
+        
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+        ArgumentNullException.ThrowIfNull(app, nameof(app));
 
         if (type.GetInstance() is not ISessionState<IApp> sessionState)
             throw new Exception($"{type.Name} doesn't implement the ISessionState interface...");
+        
+        sessionState.App = app;
 
         _sessions.TryAdd(sessionState.Id, sessionState);
         return sessionState;

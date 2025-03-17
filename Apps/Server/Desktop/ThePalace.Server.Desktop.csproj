@@ -13,11 +13,18 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Documentation\Media\ThePalace.Media.csproj"/>
+        <ProjectReference Include="..\..\..\Documentation\Media\Lib.Media.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Common\Lib.Common.csproj" />
         <ProjectReference Include="..\..\..\Libraries\Core\Lib.Core.csproj" />
         <ProjectReference Include="..\..\..\Libraries\Desktop\Lib.Common.Desktop.csproj" />
         <ProjectReference Include="..\..\..\Libraries\Logging\Lib.Logging.csproj" />
         <ProjectReference Include="..\..\..\Libraries\Network\Lib.Network.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Server\Lib.Common.Server.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Settings\Lib.Settings.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Scripting\Iptscrae\Mod.Scripting.Iptscrae.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Scripting\JavaScript\Mod.Scripting.JavaScript.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Scripting\Python\Mod.Scripting.Python.csproj" />
+        <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\Mod.Storage.Filesystem.csproj" />
         <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
     </ItemGroup>
 

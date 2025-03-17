@@ -2,7 +2,7 @@
 
 public sealed class TCF : IDisposable
 {
-    #region cStr
+    #region ctors
 
     private TCF()
     {

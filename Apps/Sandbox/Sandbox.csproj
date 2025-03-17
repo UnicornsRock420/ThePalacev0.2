@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Documentation\Media\ThePalace.Media.csproj"/>
+        <ProjectReference Include="..\..\Documentation\Media\Lib.Media.csproj" />
         <ProjectReference Include="..\..\Libraries\Client\Lib.Common.Client.csproj" />
         <ProjectReference Include="..\..\Libraries\Common\Lib.Common.csproj" />
         <ProjectReference Include="..\..\Libraries\Core\Lib.Core.csproj" />

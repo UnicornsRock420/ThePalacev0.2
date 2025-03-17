@@ -16,7 +16,7 @@ public enum ProxyOptions : uint
     CloneInstance = 0x0000000001,
     CloneStatic = 0x0000000002,
     ClonePublic = 0x0000000004,
-    ClonePrivate = 0x0000000008,
+    CloneNonPublic = 0x0000000008,
     CloneFields = 0x0000000010,
     CloneProperties = 0x000000020,
     CloneMethods = 0x0000000040,
@@ -72,7 +72,7 @@ public class ProxyContext : DynamicObject, IProxyContext
 
     #endregion
 
-    #region cStrs
+    #region ctors
 
     static ProxyContext()
     {
@@ -167,16 +167,22 @@ public class ProxyContext : DynamicObject, IProxyContext
         var nfo = new List<MemberInfo>();
 
         if (opts.HasFlag(ProxyOptions.ClonePublic)) flags.Add(BindingFlags.Public);
-        if (opts.HasFlag(ProxyOptions.ClonePrivate)) flags.Add(BindingFlags.NonPublic);
+        if (opts.HasFlag(ProxyOptions.CloneNonPublic)) flags.Add(BindingFlags.NonPublic);
         if (opts.HasFlag(ProxyOptions.CloneInstance)) flags.Add(BindingFlags.Instance);
         if (opts.HasFlag(ProxyOptions.CloneStatic)) flags.Add(BindingFlags.Static);
+        
+        var doDeep = opts.HasFlag(ProxyOptions.CloneDeep);
 
         foreach (var flag in flags)
         {
-            nfo.AddRange(sourceType.GetConstructors(flag));
-            nfo.AddRange(sourceType.GetFields(flag));
-            nfo.AddRange(sourceType.GetProperties(flag));
-            nfo.AddRange(sourceType.GetMethods(flag));
+            var _flag = flag;
+            
+            if (doDeep) _flag |= BindingFlags.FlattenHierarchy;
+            
+            nfo.AddRange(sourceType.GetConstructors(_flag));
+            nfo.AddRange(sourceType.GetFields(_flag));
+            nfo.AddRange(sourceType.GetProperties(_flag));
+            nfo.AddRange(sourceType.GetMethods(_flag));
         }
 
         nfo = nfo.DistinctBy(m => m.Name).ToList();
@@ -184,7 +190,7 @@ public class ProxyContext : DynamicObject, IProxyContext
         var typeBuilder = (TypeBuilder?)CreateTypeBuilder(
             _moduleBuilder,
             sourceType.Name,
-            CONST_TYPE_ProxyContext);
+            sourceType);
         if (typeBuilder == null) return null;
 
         nfo.ForEach(m =>
@@ -192,6 +198,12 @@ public class ProxyContext : DynamicObject, IProxyContext
             switch (m)
             {
                 case ConstructorInfo ci:
+                {
+                    var paramTypes =
+                        ci.GetParameters()
+                            ?.Select(p => p.ParameterType)
+                            ?.ToArray() ?? Type.EmptyTypes;
+
                     var cb = CreateConstructorBuilder(
                         typeBuilder,
                         (ci.Attributes & ~MethodAttributes.Private)
@@ -201,9 +213,16 @@ public class ProxyContext : DynamicObject, IProxyContext
                         ci.CallingConvention,
                         ci.GetParameters()
                             ?.Select(p => p.ParameterType)
-                            ?.ToArray());
+                            ?.ToArray() ?? Type.EmptyTypes);
+                }
                     break;
                 case MethodInfo mi:
+                {
+                    var paramTypes =
+                        mi.GetParameters()
+                            ?.Select(p => p.ParameterType)
+                            ?.ToArray() ?? Type.EmptyTypes;
+
                     var mb = CreateMethodBuilder(
                         typeBuilder,
                         mi.Name,
@@ -212,9 +231,15 @@ public class ProxyContext : DynamicObject, IProxyContext
                         | MethodAttributes.Public
                         | MethodAttributes.Virtual
                         | MethodAttributes.HideBySig,
-                        mi.GetParameters()
-                            ?.Select(p => p.ParameterType)
-                            ?.ToArray());
+                        paramTypes);
+
+                    var dm = CreateDynamicMethod(
+                        mi.Name,
+                        mi.ReturnType,
+                        paramTypes);
+
+                    Bind(mi, mb, dm);
+                }
                     break;
                 case FieldInfo fi:
                     var fb = CreateFieldBuilder(
@@ -243,7 +268,7 @@ public class ProxyContext : DynamicObject, IProxyContext
                 proxyType,
                 typeBuilder,
                 opts);
-            if (proxyInfo == null) throw new OutOfMemoryException(string.Concat([nameof(ProxyContext) + "." + nameof(Build) + ".", sourceType.Name]));
+            if (proxyInfo == null) throw new OutOfMemoryException(string.Concat([nameof(ProxyContext) + "." + nameof(Build), "<", sourceType.Name, ">"]));
 
             return proxyInfo;
         }
@@ -543,7 +568,7 @@ public class ProxyContext : DynamicObject, IProxyContext
             constructorInfo.CallingConvention,
             constructorInfo.GetParameters()
                 ?.Select(p => p.ParameterType)
-                ?.ToArray());
+                ?.ToArray() ?? Type.EmptyTypes);
     }
 
     protected static ConstructorBuilder CreateConstructorBuilder(
@@ -585,7 +610,7 @@ public class ProxyContext : DynamicObject, IProxyContext
             attribs,
             methodInfo.GetParameters()
                 ?.Select(p => p.ParameterType)
-                ?.ToArray());
+                ?.ToArray() ?? Type.EmptyTypes);
     }
 
     protected static MethodBuilder CreateMethodBuilder(
@@ -598,17 +623,13 @@ public class ProxyContext : DynamicObject, IProxyContext
             MethodAttributes.HideBySig,
         params Type[]? parameterTypes)
     {
-        if (!attribs.HasFlag(MethodAttributes.Private))
-            return tb.DefineMethod(
-                methodName,
-                attribs,
-                returnType,
-                parameterTypes ?? Type.EmptyTypes);
-
-        attribs &= ~MethodAttributes.Public;
+        if (attribs.HasFlag(MethodAttributes.Private))
+        {
+            attribs &= ~MethodAttributes.Public;
+        }
 
         return tb.DefineMethod(
-            string.Concat(["_", methodName]),
+            methodName,
             attribs,
             returnType,
             parameterTypes ?? Type.EmptyTypes);
@@ -622,7 +643,7 @@ public class ProxyContext : DynamicObject, IProxyContext
             methodInfo.ReturnType,
             methodInfo.GetParameters()
                 ?.Select(p => p.ParameterType)
-                ?.ToArray());
+                ?.ToArray() ?? Type.EmptyTypes);
     }
 
     protected static DynamicMethod CreateDynamicMethod(
@@ -661,31 +682,26 @@ public class ProxyContext : DynamicObject, IProxyContext
         FieldAttributes attribs =
             FieldAttributes.Public)
     {
-        if (!attribs.HasFlag(FieldAttributes.Private))
-            return tb.DefineField(
-                fieldName,
-                fieldType,
-                attribs);
-
-        attribs &= ~FieldAttributes.Public;
+        if (attribs.HasFlag(FieldAttributes.Private))
+        {
+            attribs &= ~FieldAttributes.Public;
+        }
 
         return tb.DefineField(
-            string.Concat(["_", fieldName]),
+            string.Concat(fieldName),
             fieldType,
             attribs);
     }
 
     protected static PropertyBuilder CreatePropertyBuilder(
         TypeBuilder tb,
-        PropertyInfo propertyInfo,
-        bool isPrivate = false)
+        PropertyInfo propertyInfo)
     {
         return CreatePropertyBuilder(
             tb,
             propertyInfo.Name,
             propertyInfo.PropertyType,
-            propertyInfo.Attributes,
-            isPrivate);
+            propertyInfo.Attributes);
     }
 
     protected static PropertyBuilder CreatePropertyBuilder(
@@ -693,16 +709,38 @@ public class ProxyContext : DynamicObject, IProxyContext
         string propertyName,
         Type propertyType,
         PropertyAttributes attribs =
-            PropertyAttributes.HasDefault,
-        bool isPrivate = false)
+            PropertyAttributes.HasDefault)
     {
         return tb.DefineProperty(
-            isPrivate
-                ? string.Concat(["_", propertyName])
-                : propertyName,
+            propertyName,
             attribs,
             propertyType,
             null);
+    }
+
+    protected static void Bind(
+        ConstructorInfo constructorInfo,
+        ConstructorBuilder cb)
+    {
+    }
+
+    protected static void Bind(
+        MethodInfo methodInfo,
+        MethodBuilder mb,
+        DynamicMethod dm)
+    {
+    }
+
+    protected static void Bind(
+        FieldInfo fieldInfo,
+        FieldBuilder fb)
+    {
+    }
+
+    protected static void Bind(
+        PropertyInfo propertyInfo,
+        PropertyBuilder pb)
+    {
     }
 
     protected static void CreateProperty(
@@ -729,8 +767,7 @@ public class ProxyContext : DynamicObject, IProxyContext
             tb,
             propertyName,
             propertyType,
-            PropertyAttributes.HasDefault,
-            attribs.HasFlag(MethodAttributes.Private));
+            PropertyAttributes.HasDefault);
         var getPropertyMB =
             CreateMethodBuilder(
                 tb,

@@ -73,7 +73,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mod.Database.PostgreSQL", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Testing", "Testing\Testing\ThePalace.Testing.csproj", "{151F6E31-D055-4EE5-96DB-F6CAC7BB6826}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThePalace.Media", "Documentation\Media\ThePalace.Media.csproj", "{51F91939-0CBE-4D13-9A0C-699AAF61A935}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib.Media", "Documentation\Media\Lib.Media.csproj", "{51F91939-0CBE-4D13-9A0C-699AAF61A935}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinuxServer4.5.1", "Documentation\LinuxServer4.5.1\LinuxServer4.5.1.csproj", "{A0285139-0032-4CB0-81A8-CBA073EFF367}"
 EndProject

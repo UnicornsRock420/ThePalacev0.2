@@ -55,8 +55,8 @@ public class ProxyContext
     [TestMethod]
     public void ProxyContext_Create_Test123()
     {
-        // var test123 = Lib.Common.Factories.Core.ProxyContext.Create<Test123>();
-        // test123.IntField = 123;
+        var test123 = Lib.Common.Factories.Core.ProxyContext.Create<Test123>();
+        test123.IntField = 123;
 
         Assert.AreEqual("1", "1");
     }

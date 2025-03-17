@@ -69,7 +69,7 @@ public class LayerScreen : Disposable, ILayerScreen
                 case LayerSourceTypes.Resource:
                     using (var stream = AppDomain.CurrentDomain
                                .GetAssemblies()
-                               .Where(a => a.FullName.StartsWith("ThePalace.Media"))
+                               .Where(a => a.FullName.StartsWith("Lib.Media"))
                                .Where(a =>
                                {
                                    try

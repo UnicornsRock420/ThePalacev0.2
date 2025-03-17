@@ -8,7 +8,7 @@ public sealed class Switch : IDisposable
 
     public delegate object? ScBlock(object? value = default);
 
-    #region cStr
+    #region ctors
 
     private Switch()
     {
@@ -232,7 +232,7 @@ public sealed class Switch<T> : IDisposable
 
     public delegate T ScBlock<T>(T? value = default(T));
 
-    #region cStr
+    #region ctors
 
     private Switch()
     {
