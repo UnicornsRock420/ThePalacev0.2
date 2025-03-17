@@ -1,6 +1,6 @@
-﻿using ThePalace.Scripting.Iptscrae.Enums;
+﻿using Mod.Scripting.Iptscrae.Enums;
 
-namespace ThePalace.Scripting.Iptscrae.Entities;
+namespace Mod.Scripting.Iptscrae.Entities;
 
 public class IptOperator
 {

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Scripting.Iptscrae.Entities;
+﻿namespace Mod.Scripting.Iptscrae.Entities;
 
 using IptAtomList = List<IptVariable>;
 

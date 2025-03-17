@@ -1,5 +1,5 @@
 ﻿using Lib.Core.Interfaces.Network;
-using ThePalace.Scripting.Iptscrae.Enums;
+using Mod.Scripting.Iptscrae.Enums;
 
 namespace ThePalace.Client.Desktop.Events;
 

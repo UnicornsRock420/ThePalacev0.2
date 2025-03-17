@@ -1,7 +1,7 @@
 ﻿using Lib.Common.Attributes;
-using ThePalace.Scripting.Iptscrae.Attributes;
+using Mod.Scripting.Iptscrae.Attributes;
 
-namespace ThePalace.Scripting.Iptscrae.Enums;
+namespace Mod.Scripting.Iptscrae.Enums;
 
 public enum IptEventTypes : short
 {

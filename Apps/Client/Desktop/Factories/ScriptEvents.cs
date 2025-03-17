@@ -3,8 +3,8 @@ using Lib.Common.Desktop.Interfaces;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
 using Lib.Logging.Entities;
+using Mod.Scripting.Iptscrae.Enums;
 using ThePalace.Client.Desktop.Entities.Core;
-using ThePalace.Scripting.Iptscrae.Enums;
 
 namespace ThePalace.Client.Desktop.Factories;
 
@@ -52,7 +52,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         var scriptEvent = new ScriptEvent
         {
             EventType = eventType,
-            Packet = packet,
+            Msg = packet,
             ScriptTag = scriptState
         };
 

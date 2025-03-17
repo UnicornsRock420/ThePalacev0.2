@@ -7,10 +7,10 @@ using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
-using ThePalace.Scripting.Iptscrae.Entities;
-using ThePalace.Scripting.Iptscrae.Enums;
+using Mod.Scripting.Iptscrae.Entities;
+using Mod.Scripting.Iptscrae.Enums;
 
-namespace ThePalace.Scripting.Iptscrae.Helpers;
+namespace Mod.Scripting.Iptscrae.Helpers;
 
 using IptAtomList = List<IptVariable>;
 
