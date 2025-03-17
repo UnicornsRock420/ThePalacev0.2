@@ -1,11 +1,7 @@
-﻿using System.Reflection;
+﻿namespace ThePalace.Common.Entities.EventArgs;
 
-namespace ThePalace.Common.Entities.EventArgs;
-
-public class FieldChangedEventArgs : System.EventArgs
+public class FieldChangedEventArgs : FieldAccessedEventArgs
 {
-    public MemberInfo? Member { get; internal set; }
-    public string? Name => Member?.Name;
     public object? OldValue { get; internal set; }
     public object? NewValue { get; internal set; }
 }

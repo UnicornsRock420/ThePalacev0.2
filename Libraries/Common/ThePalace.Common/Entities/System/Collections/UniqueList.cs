@@ -2,7 +2,9 @@ namespace System.Collections;
 
 public class UniqueList<T> : Disposable, IDisposable, IList<T>
 {
-    private UniqueList() : this(50)
+    private const int CONST_INT_DefaultCapacity = 50;
+
+    private UniqueList() : this(CONST_INT_DefaultCapacity)
     {
     }
 
@@ -12,11 +14,11 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
         _list = new(_maxCapacity);
     }
 
-    public UniqueList(IEnumerable<T> items) : this(50, items?.ToArray())
+    public UniqueList(IEnumerable<T> items) : this(CONST_INT_DefaultCapacity, items?.ToArray())
     {
     }
 
-    public UniqueList(params T[] items) : this(50, items)
+    public UniqueList(params T[] items) : this(CONST_INT_DefaultCapacity, items)
     {
     }
 
@@ -50,18 +52,23 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
     private List<T> _list;
     private int _maxCapacity;
 
-    public int Count => _list.Count;
+    public int Count => _list?.Count ?? 0;
     public bool IsReadOnly => false;
 
     public void Add(T item)
     {
+        if (IsDisposed) return;
+
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
+
         Insert(0, item);
     }
 
     public bool Remove(T item)
     {
-        if (item == null ||
-            IsDisposed) return false;
+        if (IsDisposed) return false;
+
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
 
         try
         {
@@ -74,14 +81,14 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
         return false;
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<T>? GetEnumerator()
     {
-        return IsDisposed ? null : _list.GetEnumerator();
+        return IsDisposed ? null : _list?.GetEnumerator();
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
+    IEnumerator? IEnumerable.GetEnumerator()
     {
-        return IsDisposed ? null : _list.GetEnumerator();
+        return IsDisposed ? null : _list?.GetEnumerator();
     }
 
     public void Clear()
@@ -91,34 +98,38 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
         _list?.Clear();
     }
 
-    public bool Contains(T item)
+    public bool Contains(T? item)
     {
-        return item == null ||
-               IsDisposed
-            ? false
-            : _list.Contains(item);
+        if (IsDisposed) return false;
+
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
+
+        return _list?.Contains(item) ?? false;
     }
 
-    public void CopyTo(T[] array, int arrayIndex)
+    public void CopyTo(T[]? array, int arrayIndex)
     {
-        if (array == null ||
-            IsDisposed) return;
+        if (IsDisposed) return;
+
+        ArgumentNullException.ThrowIfNull(array, nameof(array));
 
         _list?.CopyTo(array, arrayIndex);
     }
 
-    public int IndexOf(T item)
+    public int IndexOf(T? item)
     {
-        if (item == null ||
-            IsDisposed) return 0;
+        if (IsDisposed) return 0;
 
-        return _list.IndexOf(item);
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
+
+        return _list?.IndexOf(item) ?? -1;
     }
 
-    public void Insert(int index, T item)
+    public void Insert(int index, T? item)
     {
-        if (item == null ||
-            IsDisposed) return;
+        if (IsDisposed) return;
+
+        ArgumentNullException.ThrowIfNull(item, nameof(item));
 
         try
         {
@@ -143,16 +154,18 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
         if (index >= count)
         {
-            _list.Add(item);
+            _list?.Add(item);
 
             return;
         }
 
-        if (index < 0) index = count + index;
+        index %= count;
+
+        if (index < 0) index += count;
 
         try
         {
-            _list?.Insert(index % count, item);
+            _list?.Insert(index, item);
         }
         catch
         {
@@ -168,9 +181,21 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public T[] ToArray() => (IsDisposed ? null : _list)?.ToArray() ?? [];
 
-    public T this[int index]
+    public T? this[int index]
     {
-        get => _list[index];
-        set => _list[index] = value;
+        get
+        {
+            if (index < 0 ||
+                index >= (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
+
+            return _list[index];
+        }
+        set
+        {
+            if (index < 0 ||
+                index >= (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
+
+            _list[index] = value;
+        }
     }
 }
