@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace ThePalace.Core.Interfaces.EventsBus;
+namespace Lib.Core.Interfaces.EventsBus;
 
 public interface IEventParams : INotification
 {

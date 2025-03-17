@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.Serialization;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Core.Interfaces.Data;
+using Lib.Common.Factories.Core;
+using Lib.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Entities.Shared.Users;
+namespace Lib.Core.Entities.Shared.Users;
 
 public partial class UserDesc : IDisposable, IStruct
 {

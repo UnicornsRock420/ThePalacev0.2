@@ -1,11 +1,11 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Interfaces.Data;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.Core;
+using Lib.Core.Interfaces.Data;
 using sint16 = short;
 using uint8 = byte;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class RoomDesc : RawStream, IStruct
 {

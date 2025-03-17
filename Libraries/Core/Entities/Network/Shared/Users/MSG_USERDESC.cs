@@ -1,14 +1,14 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
+using Lib.Core.Interfaces.Network;
 using sint16 = short;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.Network.Shared.Users;
+namespace Lib.Core.Entities.Network.Shared.Users;
 
 [DynamicSize(8 * 9 + 8, 8)]
 [Mnemonic("usrD")]

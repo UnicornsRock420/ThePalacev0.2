@@ -1,12 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Common.Desktop.Entities.UI;
-using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Threading;
-using ThePalace.Logging.Entities;
+using Lib.Common.Desktop.Entities.UI;
+using Lib.Common.Desktop.Factories.System.Windows.Forms;
+using Lib.Common.Desktop.Forms.Core;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Common.Factories.Core;
+using Lib.Common.Threading;
+using Lib.Logging.Entities;
 
-namespace ThePalace.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Factories;
 
 public class FormsManager : SingletonDisposableApplicationContext<FormsManager>, IDisposable
 {

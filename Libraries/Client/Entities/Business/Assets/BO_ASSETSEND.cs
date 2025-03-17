@@ -1,12 +1,12 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Common.Client.Interfaces;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Entities.Network.Server.Assets;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.EventsBus;
-using ThePalace.Logging.Entities;
+﻿using Lib.Common.Attributes;
+using Lib.Common.Client.Interfaces;
+using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.Network.Server.Assets;
+using Lib.Core.Interfaces.Core;
+using Lib.Core.Interfaces.EventsBus;
+using Lib.Logging.Entities;
 
-namespace ThePalace.Common.Client.Entities.Business.Assets;
+namespace Lib.Common.Client.Entities.Business.Assets;
 
 [Mnemonic("sAst")]
 public class BO_ASSETSEND : IEventHandler<MSG_ASSETSEND>

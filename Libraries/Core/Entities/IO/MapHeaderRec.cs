@@ -1,7 +1,7 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using Lib.Core.Attributes.Serialization;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.IO;
+namespace Lib.Core.Entities.IO;
 
 [ByteSize(24)]
 public class MapHeaderRec

@@ -1,4 +1,4 @@
-﻿namespace System.Windows.Forms;
+﻿namespace Lib.Common.Desktop.Factories.System.Windows.Forms;
 
 public abstract class SingletonDisposableApplicationContext<T> : DisposableApplicationContext
     where T : class, new()

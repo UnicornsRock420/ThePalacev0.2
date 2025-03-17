@@ -1,7 +1,7 @@
-﻿using ThePalace.Core.Enums;
+﻿using Lib.Core.Enums;
 using sint32 = int;
 
-namespace ThePalace.Core.Attributes.Strings;
+namespace Lib.Core.Attributes.Strings;
 
 public class EncryptedStringAttribute : PStringAttribute
 {

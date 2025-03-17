@@ -1,13 +1,13 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Helpers.Core;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Helpers.Core;
+using Lib.Core.Interfaces.Data;
 using sint32 = int;
 using uint16 = ushort;
 using uint32 = uint;
 
-namespace ThePalace.Core.Entities.Shared.Assets;
+namespace Lib.Core.Entities.Shared.Assets;
 
 [ByteSize(32)]
 public partial class AssetRec : IStruct

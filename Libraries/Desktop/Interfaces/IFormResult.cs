@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Interfaces;
+﻿namespace Lib.Common.Desktop.Interfaces;
 
 public interface IFormResult<T>
 {

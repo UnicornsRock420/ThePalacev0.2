@@ -1,7 +1,7 @@
-﻿using ThePalace.Common.Desktop.Factories;
-using ThePalace.Common.Desktop.Interfaces;
+﻿using Lib.Common.Desktop.Factories;
+using Lib.Common.Desktop.Interfaces;
 
-namespace ThePalace.Common.Desktop.Forms.Core;
+namespace Lib.Common.Desktop.Forms.Core;
 
 public class FormBase : Form
 {

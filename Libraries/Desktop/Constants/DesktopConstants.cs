@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Constants;
+﻿namespace Lib.Common.Desktop.Constants;
 
 public class DesktopConstants
 {

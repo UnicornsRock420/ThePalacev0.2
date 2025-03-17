@@ -1,8 +1,8 @@
 ﻿using System.Net.Sockets;
-using ThePalace.Core.Interfaces.Network;
-using ThePalace.Network.Interfaces;
+using Lib.Core.Interfaces.Network;
+using Lib.Network.Interfaces;
 
-namespace ThePalace.Core.Entities.EventsBus.EventArgs;
+namespace Lib.Core.Entities.EventsBus.EventArgs;
 
 public class ProtocolEventParams : EventParams
 {

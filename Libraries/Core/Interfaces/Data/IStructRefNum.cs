@@ -1,6 +1,6 @@
 ﻿using sint32 = int;
 
-namespace ThePalace.Core.Interfaces.Data;
+namespace Lib.Core.Interfaces.Data;
 
 public interface IStructRefNum : IStruct
 {

@@ -1,6 +1,6 @@
 ﻿using uint8 = byte;
 
-namespace ThePalace.Core.Interfaces.Data;
+namespace Lib.Core.Interfaces.Data;
 
 public interface IData : IDisposable
 {

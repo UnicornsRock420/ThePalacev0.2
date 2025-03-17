@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Entities.Ribbon;
+﻿namespace Lib.Common.Desktop.Entities.Ribbon;
 
 public class Separator : ItemBase
 {

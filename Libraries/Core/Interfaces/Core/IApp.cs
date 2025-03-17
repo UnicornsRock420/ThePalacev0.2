@@ -1,8 +1,8 @@
-using ThePalace.Common.Enums.App;
-using ThePalace.Common.Interfaces.Threading;
-using ThePalace.Core.Factories.Core;
+using Lib.Common.Enums.App;
+using Lib.Common.Interfaces.Threading;
+using Lib.Core.Factories.Core;
 
-namespace ThePalace.Core.Interfaces.Core;
+namespace Lib.Core.Interfaces.Core;
 
 public interface IApp
 {

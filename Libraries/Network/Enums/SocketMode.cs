@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Network.Enums;
+﻿namespace Lib.Network.Enums;
 
 public enum SocketMode
 {

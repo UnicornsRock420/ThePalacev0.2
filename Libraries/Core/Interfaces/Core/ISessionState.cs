@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace ThePalace.Core.Interfaces.Core;
+namespace Lib.Core.Interfaces.Core;
 
 public interface ISessionState : ISessionState<IApp>
 {

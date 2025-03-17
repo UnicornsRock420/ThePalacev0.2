@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Common.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Entities.UI;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Logging.Entities;
+using Lib.Common.Desktop.Entities.Core;
+using Lib.Common.Desktop.Entities.UI;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Interfaces.Core;
+using Lib.Logging.Entities;
 
-namespace ThePalace.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Factories;
 
 public delegate void HotKeyAction(ISessionState sessionState, Keys keys, object? sender = null);
 

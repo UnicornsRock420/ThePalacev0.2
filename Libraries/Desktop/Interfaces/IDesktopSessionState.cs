@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Interfaces.Core;
+﻿using Lib.Core.Interfaces.Core;
 
-namespace ThePalace.Common.Desktop.Interfaces;
+namespace Lib.Common.Desktop.Interfaces;
 
 public interface IDesktopSessionState<TDesktopApp> : IUISessionState<TDesktopApp>
     where TDesktopApp : IApp

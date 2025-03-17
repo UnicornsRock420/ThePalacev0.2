@@ -14,20 +14,26 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Documentation\Media\ThePalace.Media.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Client\ThePalace.Common.Client.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Core\ThePalace.Core.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Desktop\ThePalace.Common.Desktop.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Logging\ThePalace.Logging.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Network\ThePalace.Network.csproj"/>
-        <ProjectReference Include="..\..\Libraries\Server\ThePalace.Common.Server.csproj"/>
-        <ProjectReference Include="..\..\Modules\Database\Core\ThePalace.Database.Core.csproj"/>
-        <ProjectReference Include="..\..\Modules\Database\MySQL\ThePalace.Database.MySQL.csproj"/>
-        <ProjectReference Include="..\..\Modules\Database\PostgreSQL\ThePalace.Database.PostgreSQL.csproj"/>
-        <ProjectReference Include="..\..\Modules\Database\Sqlite\ThePalace.Database.Sqlite.csproj"/>
-        <ProjectReference Include="..\..\Modules\Database\SqlServer\ThePalace.Database.SqlServer.csproj"/>
+        <ProjectReference Include="..\..\Libraries\Client\Lib.Common.Client.csproj" />
+        <ProjectReference Include="..\..\Libraries\Common\Lib.Common.csproj" />
+        <ProjectReference Include="..\..\Libraries\Core\Lib.Core.csproj" />
+        <ProjectReference Include="..\..\Libraries\Desktop\Lib.Common.Desktop.csproj" />
+        <ProjectReference Include="..\..\Libraries\Logging\Lib.Logging.csproj" />
+        <ProjectReference Include="..\..\Libraries\Network\Lib.Network.csproj" />
+        <ProjectReference Include="..\..\Libraries\Server\Lib.Common.Server.csproj" />
+        <ProjectReference Include="..\..\Modules\Database\Core\Mod.Database.Core.csproj" />
+        <ProjectReference Include="..\..\Modules\Database\MySQL\Mod.Database.MySQL.csproj" />
+        <ProjectReference Include="..\..\Modules\Database\PostgreSQL\Mod.Database.PostgreSQL.csproj" />
+        <ProjectReference Include="..\..\Modules\Database\Sqlite\Mod.Database.Sqlite.csproj" />
+        <ProjectReference Include="..\..\Modules\Database\SqlServer\Mod.Database.SqlServer.csproj" />
+        <ProjectReference Include="..\..\Modules\Media\DirectX\Mod.Media.DirectX.csproj" />
         <ProjectReference Include="..\..\Modules\Media\DirectX\ThePalace.Media.DirectX.csproj"/>
+        <ProjectReference Include="..\..\Modules\Media\GDI+\Mod.Media.GDI+.csproj" />
         <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
         <ProjectReference Include="..\..\Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj"/>
+        <ProjectReference Include="..\..\Modules\Scripting\JavaScript\Mod.Scripting.JavaScript.csproj" />
+        <ProjectReference Include="..\..\Modules\Scripting\Python\Mod.Scripting.Python.csproj" />
+        <ProjectReference Include="..\..\Modules\Storage\Filesystem\Mod.Storage.Filesystem.csproj" />
         <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
         <ProjectReference Include="..\Client\Desktop\ThePalace.Client.Desktop.csproj"/>
         <ProjectReference Include="..\Client\Headless\ThePalace.Client.Headless.csproj"/>

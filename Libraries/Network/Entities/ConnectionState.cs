@@ -1,15 +1,15 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Entities.Network;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Logging.Entities;
-using ThePalace.Network.Constants;
-using ThePalace.Network.Enums;
-using ThePalace.Network.Exts.System.Net.Sockets;
-using ThePalace.Network.Factories;
-using ThePalace.Network.Interfaces;
+using Lib.Common.Entities.Network;
+using Lib.Common.Factories.Core;
+using Lib.Logging.Entities;
+using Lib.Network.Constants;
+using Lib.Network.Enums;
+using Lib.Network.Exts.System.Net.Sockets;
+using Lib.Network.Factories;
+using Lib.Network.Interfaces;
 
-namespace ThePalace.Network.Entities;
+namespace Lib.Network.Entities;
 
 public class ConnectionState : EventArgs, IConnectionState<Socket>
 {

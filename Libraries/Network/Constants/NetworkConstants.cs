@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Network.Constants;
+﻿namespace Lib.Network.Constants;
 
 public enum NetworkConstants
 {

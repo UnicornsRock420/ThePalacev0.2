@@ -2,7 +2,7 @@
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 
-namespace ThePalace.Network.Exts.System.Net.Sockets;
+namespace Lib.Network.Exts.System.Net.Sockets;
 
 public static class NetworkExts
 {

@@ -1,5 +1,5 @@
-﻿using Microsoft.Toolkit.Uwp.Notifications;
-using ThePalace.Common.Interfaces.Threading;
+﻿using Lib.Common.Interfaces.Threading;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 

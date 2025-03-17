@@ -1,4 +1,4 @@
-﻿using ThePalace.Common.Desktop.Forms.Core;
+﻿using Lib.Common.Desktop.Forms.Core;
 
 namespace ThePalace.Client.Desktop.Forms;
 

@@ -1,5 +1,5 @@
+using Lib.Common.Desktop.Interfaces;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Common.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 

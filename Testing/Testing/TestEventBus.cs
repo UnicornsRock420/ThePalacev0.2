@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Client.Entities.Business.ServerInfo;
-using ThePalace.Common.Helpers;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Client.Entities.Business.ServerInfo;
+using Lib.Common.Helpers;
+using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Factories.Core;
+using Lib.Core.Interfaces.EventsBus;
 
 namespace ThePalace.Testing;
 
@@ -19,13 +19,13 @@ public class TestEventBus
 
         var types = AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(a => { return a.FullName?.Contains("ThePalace.Common.Server") == true; })
+            .Where(a => { return a.FullName?.Contains("Lib.Common.Server") == true; })
             .SelectMany(a => a.GetTypes())
             .Where(t =>
             {
                 return
                     t.GetInterfaces().Contains(typeof(IEventHandler)) &&
-                    t.Namespace?.StartsWith("ThePalace.Common.Server.Entities.Business") == true;
+                    t.Namespace?.StartsWith("Lib.Common.Server.Entities.Business") == true;
             })
             .ToArray();
 

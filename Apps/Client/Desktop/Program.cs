@@ -3,6 +3,35 @@ using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Reflection;
+using Lib.Common.Constants;
+using Lib.Common.Desktop.Constants;
+using Lib.Common.Desktop.Entities.UI;
+using Lib.Common.Desktop.Factories;
+using Lib.Common.Desktop.Forms.Core;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Common.Enums.App;
+using Lib.Common.Helpers;
+using Lib.Common.Interfaces.Threading;
+using Lib.Common.Threading;
+using Lib.Core.Constants;
+using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.Network.Client.Network;
+using Lib.Core.Entities.Network.Client.Rooms;
+using Lib.Core.Entities.Network.Client.Users;
+using Lib.Core.Entities.Network.Shared.Assets;
+using Lib.Core.Entities.Network.Shared.Communications;
+using Lib.Core.Entities.Network.Shared.Network;
+using Lib.Core.Entities.Network.Shared.Users;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Entities.Threading;
+using Lib.Core.Exts;
+using Lib.Core.Factories.Core;
+using Lib.Core.Helpers.Network;
+using Lib.Core.Interfaces.EventsBus;
+using Lib.Core.Interfaces.Network;
+using Lib.Logging.Entities;
+using Lib.Settings.Factories;
+using Mod.Media.SoundPlayer;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.UI;
@@ -10,42 +39,13 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Common.Constants;
-using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Desktop.Entities.UI;
-using ThePalace.Common.Desktop.Factories;
-using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Common.Enums.App;
-using ThePalace.Common.Helpers;
-using ThePalace.Common.Interfaces.Threading;
-using ThePalace.Common.Threading;
-using ThePalace.Core.Constants;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Network.Client.Rooms;
-using ThePalace.Core.Entities.Network.Client.Users;
-using ThePalace.Core.Entities.Network.Shared.Assets;
-using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Entities.Threading;
-using ThePalace.Core.Exts;
-using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Interfaces.EventsBus;
-using ThePalace.Core.Interfaces.Network;
-using ThePalace.Logging.Entities;
-using ThePalace.Media.SoundPlayer;
 using ThePalace.Scripting.Iptscrae.Attributes;
 using ThePalace.Scripting.Iptscrae.Entities;
 using ThePalace.Scripting.Iptscrae.Enums;
-using ThePalace.Settings.Factories;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
-using RegexConstants = ThePalace.Common.Constants.RegexConstants;
+using RegexConstants = Lib.Common.Constants.RegexConstants;
 using UserID = int;
 
 namespace ThePalace.Client.Desktop;
@@ -72,11 +72,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
         EventBus.Current.Subscribe(AppDomain.CurrentDomain
             .GetAssemblies()
-            .Where(a => a.FullName?.StartsWith("ThePalace.Common.Client") == true)
+            .Where(a => a.FullName?.StartsWith("Lib.Common.Client") == true)
             .SelectMany(a => a.GetTypes())
             .Where(t =>
                 t.GetInterfaces().Contains(typeof(IEventHandler)) &&
-                t.Namespace?.StartsWith("ThePalace.Common.Client.Entities.Business") == true)
+                t.Namespace?.StartsWith("Lib.Common.Client.Entities.Business") == true)
             .ToArray());
 
         var jobs = new Dictionary<ThreadQueues, IJob>();
@@ -635,7 +635,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                     }
                     else
                     {
-                        var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                        var point = new Lib.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
                         switch (e.Button)
                         {
@@ -894,7 +894,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                     if (!SessionState.ConnectionState.IsConnected()) return;
 
-                    var point = new Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                    var point = new Lib.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
 
                     if ((SessionState.RoomUsers?.Count ?? 0) > 0)
                         foreach (var roomUser in SessionState.RoomUsers.Values)
@@ -1450,7 +1450,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 break;
             case ContextMenuCommandTypes.CMD_USERMOVE:
             {
-                var value = values[1] as Core.Entities.Shared.Types.Point;
+                var value = values[1] as Lib.Core.Entities.Shared.Types.Point;
 
                 SessionState.UserDesc.UserRec.RoomPos = value;
 

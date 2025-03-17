@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Enums;
+using Lib.Core.Enums;
 
-namespace ThePalace.Core.Entities.Shared.Users;
+namespace Lib.Core.Entities.Shared.Users;
 
 public partial class UserDesc
 {

@@ -1,6 +1,6 @@
 ﻿using sint32 = int;
 
-namespace ThePalace.Core.Attributes.Serialization;
+namespace Lib.Core.Attributes.Serialization;
 
 public class BitSizeAttribute(int bitSize) : Attribute
 {

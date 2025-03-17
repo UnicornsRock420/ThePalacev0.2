@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Interfaces.Service;
+﻿namespace Lib.Core.Interfaces.Service;
 
 public interface IAsyncGenericService<TRequest, TWhere> : IAsyncService<TRequest, TWhere>
 {

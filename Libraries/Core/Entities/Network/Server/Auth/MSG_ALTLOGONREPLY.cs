@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Server.Auth;
+namespace Lib.Core.Entities.Network.Server.Auth;
 
 [Mnemonic("rep2")]
 public class MSG_ALTLOGONREPLY : EventParams, IProtocolS2C

@@ -1,12 +1,12 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Helpers;
-using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Logging.Entities;
+using Lib.Common.Factories.Core;
+using Lib.Common.Helpers;
+using Lib.Core.Entities.Network.Client.Network;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Helpers.Network;
+using Lib.Core.Interfaces.Core;
+using Lib.Logging.Entities;
 using ThePalace.Scripting.Iptscrae.Entities;
 using ThePalace.Scripting.Iptscrae.Enums;
 

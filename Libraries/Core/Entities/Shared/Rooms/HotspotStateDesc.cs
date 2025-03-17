@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using Lib.Core.Attributes.Serialization;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 [ByteSize(8)]
 public partial class HotspotStateDesc

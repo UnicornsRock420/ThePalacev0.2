@@ -1,10 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Interfaces.Core;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Interfaces.Core;
 using RoomID = short;
 using UserID = int;
 
-namespace ThePalace.Common.Server.Interfaces;
+namespace Lib.Common.Server.Interfaces;
 
 public interface IServerSessionState<TApp> : ISessionState<TApp>
     where TApp : IApp

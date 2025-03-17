@@ -1,6 +1,6 @@
-using ThePalace.Common.Interfaces.Threading;
+using Lib.Common.Interfaces.Threading;
 
-namespace ThePalace.Core.Entities.Threading;
+namespace Lib.Core.Entities.Threading;
 
 public class MediaCmd(string path) : ICmd
 {

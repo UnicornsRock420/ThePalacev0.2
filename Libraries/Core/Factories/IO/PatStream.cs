@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Text;
 using System.Text.RegularExpressions;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
-using ThePalace.Core.Helpers.Core;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Exts;
+using Lib.Core.Helpers.Core;
 
-namespace ThePalace.Core.Factories.IO;
+namespace Lib.Core.Factories.IO;
 
 public class PatStream : StreamBase
 {

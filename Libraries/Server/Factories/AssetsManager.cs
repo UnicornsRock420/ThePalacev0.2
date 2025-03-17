@@ -1,15 +1,15 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Common.Server.Interfaces;
-using ThePalace.Core.Entities.Network.Shared.Assets;
-using ThePalace.Core.Entities.Shared.Assets;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Factories.Core;
-using ThePalace.Core.Helpers.Network;
-using ThePalace.Core.Interfaces.Core;
+using Lib.Common.Factories.Core;
+using Lib.Common.Server.Interfaces;
+using Lib.Core.Entities.Network.Shared.Assets;
+using Lib.Core.Entities.Shared.Assets;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Factories.Core;
+using Lib.Core.Helpers.Network;
+using Lib.Core.Interfaces.Core;
 
-namespace ThePalace.Common.Server.Factories;
+namespace Lib.Common.Server.Factories;
 
 public class AssetsManager : SingletonDisposable<AssetsManager>
 {

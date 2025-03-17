@@ -1,11 +1,11 @@
-﻿using ThePalace.Common.Client.Constants;
-using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Network.Server.ServerInfo;
-using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Helpers.Core;
+﻿using Lib.Common.Client.Constants;
+using Lib.Core.Entities.Network.Client.Network;
+using Lib.Core.Entities.Network.Server.ServerInfo;
+using Lib.Core.Entities.Network.Shared.Users;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Enums;
+using Lib.Core.Helpers.Core;
 using sint16 = short;
 
 namespace ThePalace.Testing;

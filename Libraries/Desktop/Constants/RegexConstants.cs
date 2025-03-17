@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ThePalace.Common.Desktop.Constants;
+namespace Lib.Common.Desktop.Constants;
 
 public static partial class RegexConstants
 {

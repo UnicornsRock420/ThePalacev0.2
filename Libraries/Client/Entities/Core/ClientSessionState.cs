@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
-using ThePalace.Common.Client.Interfaces;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Entities.Shared.ServerInfo;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Network.Interfaces;
+using Lib.Common.Client.Interfaces;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Entities.Shared.ServerInfo;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Network.Interfaces;
 
-namespace ThePalace.Common.Client.Entities.Core;
+namespace Lib.Common.Client.Entities.Core;
 
 public class ClientSessionState : Disposable, IClientSessionState<IClientApp>
 {

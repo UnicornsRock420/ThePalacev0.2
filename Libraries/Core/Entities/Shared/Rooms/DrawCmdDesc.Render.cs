@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
 using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Enums;
-using Point = ThePalace.Core.Entities.Shared.Types.Point;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Enums;
+using Point = Lib.Core.Entities.Shared.Types.Point;
 using sint16 = short;
 using uint8 = byte;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class DrawCmdDesc
 {

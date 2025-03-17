@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Interfaces.Threading;
-using ThePalace.Core.Interfaces.Data;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Interfaces.Threading;
+using Lib.Core.Interfaces.Data;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Core.Interfaces.Network;
+namespace Lib.Core.Interfaces.Network;
 
 public interface IProtocol : IStruct, ICmd, IEventParams
 {

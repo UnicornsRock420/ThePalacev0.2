@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Client.Media;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Client.Media;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Media;
+namespace Lib.Common.Server.Entities.Business.Media;
 
 [Mnemonic("qFil")]
 public class BO_FILEQUERY : IEventHandler<MSG_FILEQUERY>

@@ -1,8 +1,8 @@
-﻿using ThePalace.Core.Attributes.Serialization;
+﻿using Lib.Core.Attributes.Serialization;
 using uint16 = ushort;
 using uint32 = uint;
 
-namespace ThePalace.Core.Enums;
+namespace Lib.Core.Enums;
 
 [Flags]
 [ByteSize(2)]

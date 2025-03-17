@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-using ThePalace.Core.Entities.Core;
+using Lib.Core.Entities.Core;
 
-namespace ThePalace.Core.Factories.Core;
+namespace Lib.Core.Factories.Core;
 
 public class PluginManager : SingletonDisposable<PluginManager>
 {

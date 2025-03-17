@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Common.Desktop.Entities.Core;
+using Lib.Common.Desktop.Entities.Core;
 
-namespace ThePalace.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Factories;
 
 public class ApiManager : SingletonDisposable<ApiManager>
 {

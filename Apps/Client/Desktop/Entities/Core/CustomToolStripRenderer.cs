@@ -1,6 +1,6 @@
-﻿using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Common.Desktop.Entities.Ribbon;
-using ThePalace.Common.Desktop.Interfaces;
+﻿using Lib.Common.Desktop.Entities.Ribbon;
+using Lib.Common.Desktop.Interfaces;
+using ThePalace.Client.Desktop.Interfaces;
 using Timer = System.Timers.Timer;
 
 namespace ThePalace.Client.Desktop.Entities.Core;

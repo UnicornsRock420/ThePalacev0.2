@@ -1,6 +1,10 @@
-﻿using ThePalace.Core.Entities.IO;
+﻿using Lib.Core.Entities.IO;
+using Lib.Core.Entities.Shared.Assets;
+using Lib.Core.Factories.IO;
+using ThePalace.Core.Entities.IO;
 using ThePalace.Core.Entities.Shared.Assets;
 using ThePalace.Core.Factories.Filesystem;
+using AttributeExts = Lib.Core.Exts.AttributeExts;
 
 namespace ThePalace.Core.Factories.IO
 {
@@ -19,7 +23,7 @@ namespace ThePalace.Core.Factories.IO
         {
             assets = new();
 
-            var sizeFilePIDSHeaderRec = Exts.AttributeExts.GetByteSize<FilePIDSHeaderRec>();
+            var sizeFilePIDSHeaderRec = AttributeExts.GetByteSize<FilePIDSHeaderRec>();
 
             var fileSize = filePROPSReader.Filesize;
             var _fileHeader = new FilePIDSHeaderRec();

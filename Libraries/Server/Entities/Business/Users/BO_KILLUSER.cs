@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Network.Client.Users;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.Network.Client.Users;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Users;
+namespace Lib.Common.Server.Entities.Business.Users;
 
 [ByteSize(4)]
 [Mnemonic("kill")]

@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-using ThePalace.Common.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Interfaces;
+using Lib.Common.Desktop.Entities.Core;
+using Lib.Common.Desktop.Interfaces;
 
-namespace ThePalace.Common.Desktop.Entities.Ribbon;
+namespace Lib.Common.Desktop.Entities.Ribbon;
 
 public abstract class ItemBase : IDisposable, IRibbon<ItemBase>
 {

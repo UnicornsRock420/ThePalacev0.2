@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using System.Net.Sockets;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Network.Interfaces;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Entities.Core;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Network.Interfaces;
 
-namespace ThePalace.Common.Desktop.Entities.Core;
+namespace Lib.Common.Desktop.Entities.Core;
 
 public class UISessionState : SessionState, IUISessionState<IDesktopApp>
 {

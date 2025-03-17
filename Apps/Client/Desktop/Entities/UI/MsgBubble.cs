@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Text.RegularExpressions;
 using Windows.Foundation.Metadata;
+using Lib.Common.Desktop.Constants;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Common.Helpers;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Helpers;
-using ThePalace.Common.Desktop.Constants;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Common.Helpers;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
@@ -219,7 +219,7 @@ public class MsgBubble : Disposable, IDisposable
 
         #region Word(s) & Line Formatting
 
-        var words = Common.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
+        var words = Lib.Common.Constants.RegexConstants.REGEX_WHITESPACE_SINGLELINE.Split(text).ToList();
         var lines = new List<string>();
         var line = new List<string>();
 

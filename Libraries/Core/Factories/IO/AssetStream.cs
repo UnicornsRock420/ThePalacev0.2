@@ -1,10 +1,10 @@
-﻿using ThePalace.Core.Entities.Shared.Assets;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
-using ThePalace.Logging.Entities;
-using ThePalace.Network.Constants;
+﻿using Lib.Core.Entities.Shared.Assets;
+using Lib.Core.Enums;
+using Lib.Core.Exts;
+using Lib.Logging.Entities;
+using Lib.Network.Constants;
 
-namespace ThePalace.Core.Factories.IO;
+namespace Lib.Core.Factories.IO;
 
 public class AssetStream : MemoryStream, IDisposable
 {

@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Entities.Core;
+﻿namespace Lib.Core.Entities.Core;
 
 public class BanRec
 {

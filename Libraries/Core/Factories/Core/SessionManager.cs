@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Core.Interfaces.Core;
+using Lib.Core.Interfaces.Core;
 
-namespace ThePalace.Core.Factories.Core;
+namespace Lib.Core.Factories.Core;
 
 public class SessionManager : SingletonDisposable<SessionManager>
 {

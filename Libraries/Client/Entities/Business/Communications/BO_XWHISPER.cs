@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Shared.Communications;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Communications;
+namespace Lib.Common.Client.Entities.Business.Communications;
 
 [Mnemonic("xwis")]
 public class BO_XWHISPER : IEventHandler<MSG_XWHISPER>

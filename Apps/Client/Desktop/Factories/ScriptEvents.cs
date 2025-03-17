@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Interfaces.Core;
+using Lib.Core.Interfaces.Network;
+using Lib.Logging.Entities;
 using ThePalace.Client.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.Network;
-using ThePalace.Logging.Entities;
 using ThePalace.Scripting.Iptscrae.Enums;
 
 namespace ThePalace.Client.Desktop.Factories;

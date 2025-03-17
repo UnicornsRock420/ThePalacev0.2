@@ -1,10 +1,10 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Shared.Assets;
+namespace Lib.Core.Entities.Network.Shared.Assets;
 
 [Mnemonic("prPn")]
 [ByteSize(12)]

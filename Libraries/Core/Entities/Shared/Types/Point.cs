@@ -1,10 +1,10 @@
-﻿using ThePalace.Common.Helpers;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Common.Helpers;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
 using sint16 = short;
 
-namespace ThePalace.Core.Entities.Shared.Types;
+namespace Lib.Core.Entities.Shared.Types;
 
 [ByteSize(4)]
 public class Point : IStructSerializer

@@ -1,13 +1,13 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
 using RoomID = short;
 using sint32 = int;
 using uint16 = ushort;
 using uint32 = uint;
 
-namespace ThePalace.Core.Entities.Shared.Users;
+namespace Lib.Core.Entities.Shared.Users;
 
 [ByteSize(128)]
 public class RegistrationRec : IStruct

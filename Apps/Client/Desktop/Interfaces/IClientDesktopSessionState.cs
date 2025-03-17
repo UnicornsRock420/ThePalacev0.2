@@ -1,14 +1,14 @@
 ﻿using System.Collections.Concurrent;
+using Lib.Common.Client.Interfaces;
+using Lib.Common.Desktop.Entities.Ribbon;
+using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Interfaces.Core;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
-using ThePalace.Common.Client.Interfaces;
-using ThePalace.Common.Desktop.Entities.Ribbon;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Core.Interfaces.Core;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 

@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Network;
+using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Server.Users;
+namespace Lib.Core.Entities.Network.Server.Users;
 
 [Mnemonic("uSta")]
 public class MSG_USERSTATUS : EventParams, IProtocolS2C

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace ThePalace.Common.Desktop.Entities.Ribbon;
+namespace Lib.Common.Desktop.Entities.Ribbon;
 
 public class IconBase : IDisposable
 {

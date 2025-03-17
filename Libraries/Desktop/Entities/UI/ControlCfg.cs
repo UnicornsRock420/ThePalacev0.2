@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms.Design.Behavior;
 
-namespace ThePalace.Common.Desktop.Entities.UI;
+namespace Lib.Common.Desktop.Entities.UI;
 
 public delegate EventHandler Event(object sender, EventArgs e);
 

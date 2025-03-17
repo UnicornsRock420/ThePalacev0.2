@@ -1,8 +1,8 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared.Types;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.Shared.Types;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.IO;
+namespace Lib.Core.Entities.IO;
 
 [ByteSize(16)]
 public class FilePIDSHeaderRec

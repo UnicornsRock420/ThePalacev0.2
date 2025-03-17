@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Shared.Rooms;
+namespace Lib.Core.Entities.Network.Shared.Rooms;
 
 [Mnemonic("draw")]
 public class MSG_DRAW : EventParams, IProtocolC2S, IProtocolS2C

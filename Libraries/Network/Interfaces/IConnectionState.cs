@@ -1,8 +1,8 @@
 ﻿using System.Net;
-using ThePalace.Common.Entities.Network;
-using ThePalace.Network.Enums;
+using Lib.Common.Entities.Network;
+using Lib.Network.Enums;
 
-namespace ThePalace.Network.Interfaces;
+namespace Lib.Network.Interfaces;
 
 public interface IConnectionState<TSocket> : IDisposable
     where TSocket : IDisposable

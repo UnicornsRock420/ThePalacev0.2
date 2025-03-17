@@ -1,11 +1,11 @@
 ﻿using Autofac;
 using Autofac.Core;
 using Autofac.Core.Resolving.Pipeline;
+using Lib.Logging.Entities;
 using Microsoft.Extensions.Configuration;
-using ThePalace.Logging.Entities;
 using ILogger = Serilog.ILogger;
 
-namespace ThePalace.Core.Entities.Core;
+namespace Lib.Core.Entities.Core;
 
 public class DIContainer
 {

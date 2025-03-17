@@ -1,6 +1,6 @@
-﻿using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Common.Desktop.Interfaces;
-using ThePalace.Core.Entities.Shared.Types;
+﻿using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Entities.Shared.Types;
+using ThePalace.Client.Desktop.Interfaces;
 using ThePalace.Scripting.Iptscrae.Entities;
 using ThePalace.Scripting.Iptscrae.Enums;
 

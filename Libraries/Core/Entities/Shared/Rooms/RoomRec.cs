@@ -1,11 +1,11 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
 using RoomID = short;
 using sint16 = short;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 [ByteSize(40)]
 public class RoomRec : IStruct

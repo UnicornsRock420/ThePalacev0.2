@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
-using ThePalace.Core.Enums;
+using Lib.Core.Enums;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class RoomDesc
 {

@@ -1,6 +1,6 @@
-using ThePalace.Core.Interfaces.Core;
+using Lib.Core.Interfaces.Core;
 
-namespace ThePalace.Common.Client.Interfaces;
+namespace Lib.Common.Client.Interfaces;
 
 public interface IClientApp : IApp
 {

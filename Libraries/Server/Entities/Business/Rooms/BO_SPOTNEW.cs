@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Client.Rooms;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Client.Rooms;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Rooms;
+namespace Lib.Common.Server.Entities.Business.Rooms;
 
 [Mnemonic("opSn")]
 public class BO_SPOTNEW : IEventHandler<MSG_SPOTNEW>

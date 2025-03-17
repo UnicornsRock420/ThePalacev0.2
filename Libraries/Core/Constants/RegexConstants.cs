@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Constants;
+﻿namespace Lib.Core.Constants;
 
 public static class RegexConstants
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Runtime.Serialization;
-using ThePalace.Core.Entities.Shared.Rooms;
+using Lib.Core.Entities.Shared.Rooms;
 
 namespace ThePalace.Client.Desktop.Entities.Shared.Assets;
 

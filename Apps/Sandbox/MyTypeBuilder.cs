@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Reflection.Emit;
-using Label = System.Reflection.Emit.Label;
 
 namespace Sandbox;
 

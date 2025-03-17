@@ -1,10 +1,10 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 using HotSpotID = short;
 using RoomID = short;
 
-namespace ThePalace.Core.Entities.Network.Shared.Rooms;
+namespace Lib.Core.Entities.Network.Shared.Rooms;
 
 [Mnemonic("unlo")]
 public class MSG_DOORUNLOCK : EventParams, IProtocolC2S, IProtocolS2C

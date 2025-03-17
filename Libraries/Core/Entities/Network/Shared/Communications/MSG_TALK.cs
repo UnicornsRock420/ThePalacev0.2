@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Shared.Communications;
+namespace Lib.Core.Entities.Network.Shared.Communications;
 
 [Mnemonic("talk")]
 public class MSG_TALK : EventParams, IProtocolC2S, IProtocolS2C, IProtocolEcho, ICommunications

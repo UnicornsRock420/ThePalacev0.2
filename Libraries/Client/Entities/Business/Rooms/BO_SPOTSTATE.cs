@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Rooms;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Shared.Rooms;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Rooms;
+namespace Lib.Common.Client.Entities.Business.Rooms;
 
 [Mnemonic("sSta")]
 public class BO_SPOTSTATE : IEventHandler<MSG_SPOTSTATE>

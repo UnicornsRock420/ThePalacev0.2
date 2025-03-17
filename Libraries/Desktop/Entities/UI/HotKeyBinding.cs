@@ -1,6 +1,6 @@
-﻿using ThePalace.Common.Desktop.Entities.Core;
+﻿using Lib.Common.Desktop.Entities.Core;
 
-namespace ThePalace.Common.Desktop.Entities.UI;
+namespace Lib.Common.Desktop.Entities.UI;
 
 public class HotKeyBinding
 {

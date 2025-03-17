@@ -1,4 +1,4 @@
-﻿using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Core.Interfaces.Network;
 using ThePalace.Scripting.Iptscrae.Enums;
 
 namespace ThePalace.Client.Desktop.Entities.Core;

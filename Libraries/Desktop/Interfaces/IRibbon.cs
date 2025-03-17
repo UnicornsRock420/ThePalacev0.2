@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using ThePalace.Common.Desktop.Entities.Core;
-using ThePalace.Common.Desktop.Entities.Ribbon;
+using Lib.Common.Desktop.Entities.Core;
+using Lib.Common.Desktop.Entities.Ribbon;
 
-namespace ThePalace.Common.Desktop.Interfaces;
+namespace Lib.Common.Desktop.Interfaces;
 
 public interface IRibbon : IRibbon<ItemBase>
 {

@@ -1,14 +1,14 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
-using ThePalace.Common.Factories.Core;
-using ThePalace.Network.Enums;
-using ThePalace.Network.Exts.System.Net.Sockets;
-using ThePalace.Network.Interfaces;
-using ConnectionState = ThePalace.Network.Entities.ConnectionState;
+using Lib.Common.Factories.Core;
+using Lib.Network.Enums;
+using Lib.Network.Exts.System.Net.Sockets;
+using Lib.Network.Interfaces;
+using ConnectionState = Lib.Network.Entities.ConnectionState;
 using UserID = int;
 
-namespace ThePalace.Network.Factories;
+namespace Lib.Network.Factories;
 
 public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
 {

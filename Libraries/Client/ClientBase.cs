@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Client;
+﻿namespace Lib.Common.Client;
 
 public class ClientBase
 {

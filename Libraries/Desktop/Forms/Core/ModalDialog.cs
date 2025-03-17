@@ -1,6 +1,6 @@
-﻿using ThePalace.Common.Desktop.Interfaces;
+﻿using Lib.Common.Desktop.Interfaces;
 
-namespace ThePalace.Common.Desktop.Forms.Core;
+namespace Lib.Common.Desktop.Forms.Core;
 
 public class ModalDialog<T> : FormBase, IFormResult<T>
 {

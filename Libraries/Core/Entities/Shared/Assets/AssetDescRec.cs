@@ -1,12 +1,12 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Enums;
+using Lib.Core.Exts;
+using Lib.Core.Interfaces.Data;
 using uint16 = ushort;
 using uint32 = uint;
 
-namespace ThePalace.Core.Entities.Shared.Assets;
+namespace Lib.Core.Entities.Shared.Assets;
 
 [ByteSize(40)]
 public class AssetDescRec : IStruct

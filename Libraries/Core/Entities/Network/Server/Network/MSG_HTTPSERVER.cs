@@ -1,10 +1,10 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Server.Network;
+namespace Lib.Core.Entities.Network.Server.Network;
 
 [DynamicSize]
 [Mnemonic("HTTP")]

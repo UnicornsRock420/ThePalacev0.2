@@ -1,8 +1,8 @@
-using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Interfaces.Data;
-using ThePalace.Media.SoundPlayer;
-using static ThePalace.Media.SoundPlayer.SoundManager;
+using Lib.Core.Entities.Core;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Interfaces.Data;
+using Mod.Media.SoundPlayer;
+using static Mod.Media.SoundPlayer.SoundManager;
 
 namespace Sandbox;
 

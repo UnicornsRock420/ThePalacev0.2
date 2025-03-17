@@ -1,7 +1,7 @@
-using ThePalace.Common.Desktop.Forms.Core;
-using ThePalace.Core.Interfaces.Core;
+using Lib.Common.Desktop.Forms.Core;
+using Lib.Core.Interfaces.Core;
 
-namespace ThePalace.Common.Desktop.Interfaces;
+namespace Lib.Common.Desktop.Interfaces;
 
 public interface IDesktopApp : IApp
 {

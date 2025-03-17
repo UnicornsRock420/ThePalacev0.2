@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Interfaces.EventsBus;
+﻿namespace Lib.Core.Interfaces.EventsBus;
 
 public interface IEventsBus : IDisposable
 {

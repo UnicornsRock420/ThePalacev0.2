@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using ILogger = Serilog.ILogger;
 
-namespace ThePalace.Logging.Entities;
+namespace Lib.Logging.Entities;
 
 public class LoggerHub : Singleton<LoggerHub>, ILogger
 {

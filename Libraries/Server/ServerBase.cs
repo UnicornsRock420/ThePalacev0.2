@@ -1,7 +1,7 @@
-﻿using ThePalace.Common.Server.Interfaces;
-using ThePalace.Core.Entities.Shared.Rooms;
+﻿using Lib.Common.Server.Interfaces;
+using Lib.Core.Entities.Shared.Rooms;
 
-namespace ThePalace.Common.Server;
+namespace Lib.Common.Server;
 
 public class ServerBase
 {

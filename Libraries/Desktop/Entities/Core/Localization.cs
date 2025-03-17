@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Entities.Core;
+﻿namespace Lib.Common.Desktop.Entities.Core;
 
 public class LocalizationNoun
 {

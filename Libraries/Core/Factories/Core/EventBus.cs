@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using ThePalace.Core.Interfaces.EventsBus;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Core.Factories.Core;
+namespace Lib.Core.Factories.Core;
 
 public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 {

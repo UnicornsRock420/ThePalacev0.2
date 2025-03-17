@@ -1,11 +1,11 @@
-﻿using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
-using ThePalace.Logging.Entities;
-using AttributeExts = ThePalace.Core.Exts.AttributeExts;
+﻿using Lib.Core.Entities.Core;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
+using Lib.Logging.Entities;
+using AttributeExts = Lib.Core.Exts.AttributeExts;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class RoomDesc : IDisposable, IStructSerializer
 {

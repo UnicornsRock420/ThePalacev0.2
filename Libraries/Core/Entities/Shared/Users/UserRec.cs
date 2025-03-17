@@ -1,12 +1,12 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Interfaces.Data;
 using RoomID = short;
 using sint16 = short;
 using UserID = int;
 
-namespace ThePalace.Core.Entities.Shared.Users;
+namespace Lib.Core.Entities.Shared.Users;
 
 public class UserRec : IDisposable, IStruct
 {

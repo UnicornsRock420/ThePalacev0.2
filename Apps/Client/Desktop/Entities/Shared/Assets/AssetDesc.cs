@@ -2,14 +2,14 @@
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
-using ThePalace.Core.Constants;
-using ThePalace.Logging.Entities;
-using Point = ThePalace.Core.Entities.Shared.Types.Point;
+using Lib.Core.Constants;
+using Lib.Logging.Entities;
+using Point = Lib.Core.Entities.Shared.Types.Point;
 using sint16 = short;
 
 namespace ThePalace.Client.Desktop.Entities.Shared.Assets;
 
-public class AssetDesc : ThePalace.Core.Entities.Shared.Assets.AssetDesc
+public class AssetDesc : Lib.Core.Entities.Shared.Assets.AssetDesc
 {
     [IgnoreDataMember] public string? Format;
 

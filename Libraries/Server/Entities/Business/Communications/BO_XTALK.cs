@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Network.Shared.Communications;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.Network.Shared.Communications;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.Communications;
+namespace Lib.Common.Server.Entities.Business.Communications;
 
 [DynamicSize(258, 256)]
 [Mnemonic("xtlk")]

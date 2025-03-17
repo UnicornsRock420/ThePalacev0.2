@@ -1,10 +1,10 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
 using AssetID = int;
 using uint32 = uint;
 
-namespace ThePalace.Core.Entities.Shared.Types;
+namespace Lib.Core.Entities.Shared.Types;
 
 [ByteSize(8)]
 public class AssetSpec : IStructSerializer

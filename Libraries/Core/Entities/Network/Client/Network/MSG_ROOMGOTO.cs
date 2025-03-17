@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 using RoomID = short;
 
-namespace ThePalace.Core.Entities.Network.Client.Network;
+namespace Lib.Core.Entities.Network.Client.Network;
 
 [Mnemonic("navR")]
 public class MSG_ROOMGOTO : EventParams, IProtocolC2S

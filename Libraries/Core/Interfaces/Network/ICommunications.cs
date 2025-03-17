@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Interfaces.Network;
+namespace Lib.Core.Interfaces.Network;
 
 public interface ICommunications : IStruct
 {

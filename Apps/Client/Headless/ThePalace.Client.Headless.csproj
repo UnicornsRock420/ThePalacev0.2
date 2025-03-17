@@ -13,10 +13,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Documentation\Media\ThePalace.Media.csproj"/>
-        <ProjectReference Include="..\..\..\Libraries\Client\ThePalace.Common.Client.csproj"/>
-        <ProjectReference Include="..\..\..\Libraries\Core\ThePalace.Core.csproj"/>
-        <ProjectReference Include="..\..\..\Libraries\Logging\ThePalace.Logging.csproj"/>
-        <ProjectReference Include="..\..\..\Libraries\Network\ThePalace.Network.csproj"/>
+        <ProjectReference Include="..\..\..\Libraries\Client\Lib.Common.Client.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Core\Lib.Core.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Logging\Lib.Logging.csproj" />
+        <ProjectReference Include="..\..\..\Libraries\Network\Lib.Network.csproj" />
         <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
     </ItemGroup>
 

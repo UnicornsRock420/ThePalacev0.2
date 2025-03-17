@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Common.Desktop.Entities.UI;
+﻿namespace Lib.Common.Desktop.Entities.UI;
 
 public class FormCfg : ControlCfg
 {

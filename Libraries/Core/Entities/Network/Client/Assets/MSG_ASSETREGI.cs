@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Entities.Shared.Assets;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.Shared.Assets;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Assets;
+namespace Lib.Core.Entities.Network.Client.Assets;
 
 [Mnemonic("rAst")]
 public class MSG_ASSETREGI : EventParams, IProtocolC2S

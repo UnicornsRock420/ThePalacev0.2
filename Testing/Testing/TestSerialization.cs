@@ -1,12 +1,12 @@
-﻿using ThePalace.Common.Helpers;
-using ThePalace.Core.Entities.Network.Client.Network;
-using ThePalace.Core.Entities.Network.Server.ServerInfo;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Entities.Shared.Types;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Exts;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Helpers;
+using Lib.Core.Entities.Network.Client.Network;
+using Lib.Core.Entities.Network.Server.ServerInfo;
+using Lib.Core.Entities.Network.Shared.Network;
+using Lib.Core.Entities.Network.Shared.Users;
+using Lib.Core.Entities.Shared.Types;
+using Lib.Core.Enums;
+using Lib.Core.Exts;
+using Lib.Core.Interfaces.Network;
 
 namespace ThePalace.Testing;
 

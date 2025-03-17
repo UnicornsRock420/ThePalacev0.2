@@ -1,6 +1,6 @@
-﻿using ThePalace.Core.Enums;
+﻿using Lib.Core.Enums;
 
-namespace ThePalace.Core.Entities.Shared.Assets;
+namespace Lib.Core.Entities.Shared.Assets;
 
 public partial class AssetRec
 {

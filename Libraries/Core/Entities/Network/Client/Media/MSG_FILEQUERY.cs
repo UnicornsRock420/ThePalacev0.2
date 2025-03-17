@@ -1,9 +1,9 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Client.Media;
+namespace Lib.Core.Entities.Network.Client.Media;
 
 [Mnemonic("qFil")]
 public class MSG_FILEQUERY : EventParams, IProtocolC2S

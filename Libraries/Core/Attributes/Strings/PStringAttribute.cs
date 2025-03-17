@@ -1,6 +1,6 @@
 ﻿using sint32 = int;
 
-namespace ThePalace.Core.Attributes.Strings;
+namespace Lib.Core.Attributes.Strings;
 
 public class PStringAttribute(sint32 lengthByteSize = 1, sint32 maxStringLength = 255, sint32 paddingModulo = 0)
     : Attribute

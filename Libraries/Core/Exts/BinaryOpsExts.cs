@@ -1,14 +1,14 @@
 ﻿using System.Drawing;
 using System.Reflection;
 using System.Runtime.Serialization;
-using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Helpers.Core;
-using ThePalace.Core.Interfaces.Data;
+using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Entities.Network.Shared.Network;
+using Lib.Core.Enums;
+using Lib.Core.Helpers.Core;
+using Lib.Core.Interfaces.Data;
 
-namespace ThePalace.Core.Exts;
+namespace Lib.Core.Exts;
 
 public static class BinaryOpsExts
 {

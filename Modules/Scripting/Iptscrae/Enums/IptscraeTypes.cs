@@ -1,4 +1,4 @@
-﻿using ThePalace.Common.Attributes;
+﻿using Lib.Common.Attributes;
 using ThePalace.Scripting.Iptscrae.Attributes;
 
 namespace ThePalace.Scripting.Iptscrae.Enums;

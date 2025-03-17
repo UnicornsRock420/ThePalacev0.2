@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace ThePalace.Core.Factories.IO;
+namespace Lib.Core.Factories.IO;
 
 public abstract class StreamBase : Disposable
 {

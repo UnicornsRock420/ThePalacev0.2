@@ -1,12 +1,12 @@
 ﻿using System.Drawing;
-using ThePalace.Core.Entities.Core;
-using ThePalace.Core.Entities.Network.Shared.Network;
-using ThePalace.Core.Enums;
-using ThePalace.Core.Interfaces.Data;
-using AttributeExts = ThePalace.Core.Exts.AttributeExts;
-using Point = ThePalace.Core.Entities.Shared.Types.Point;
+using Lib.Core.Entities.Core;
+using Lib.Core.Entities.Network.Shared.Network;
+using Lib.Core.Enums;
+using Lib.Core.Interfaces.Data;
+using AttributeExts = Lib.Core.Exts.AttributeExts;
+using Point = Lib.Core.Entities.Shared.Types.Point;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class DrawCmdDesc : RawStream, IStructSerializer
 {

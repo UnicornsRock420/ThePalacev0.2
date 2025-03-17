@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Server.Media;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Server.Media;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Media;
+namespace Lib.Common.Client.Entities.Business.Media;
 
 [Mnemonic("sFil")]
 public class BO_FILESEND : IEventHandler<MSG_FILESEND>

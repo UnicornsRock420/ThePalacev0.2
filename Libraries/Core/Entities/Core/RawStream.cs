@@ -1,9 +1,9 @@
-﻿using ThePalace.Core.Exts;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Exts;
+using Lib.Core.Interfaces.Data;
 using sint32 = int;
 using uint8 = byte;
 
-namespace ThePalace.Core.Entities.Core;
+namespace Lib.Core.Entities.Core;
 
 public class RawStream : EventArgs, IDisposable, IData, IStruct
 {

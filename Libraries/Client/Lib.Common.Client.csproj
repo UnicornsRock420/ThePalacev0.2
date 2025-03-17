@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Remove="Constants\RegexConstants.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="Constants\RegexConstants.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Common\Lib.Common.csproj" />
+        <ProjectReference Include="..\Core\Lib.Core.csproj" />
+        <ProjectReference Include="..\Logging\Lib.Logging.csproj" />
+        <ProjectReference Include="..\Network\Lib.Network.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Factories\"/>
+    </ItemGroup>
+
+</Project>

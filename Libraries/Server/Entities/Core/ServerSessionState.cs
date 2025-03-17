@@ -1,12 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using ThePalace.Common.Server.Interfaces;
-using ThePalace.Core.Entities.Shared.Rooms;
-using ThePalace.Core.Interfaces.Core;
+using Lib.Common.Server.Interfaces;
+using Lib.Core.Entities.Shared.Rooms;
+using Lib.Core.Interfaces.Core;
 using RoomID = short;
 using UserID = int;
 
-namespace ThePalace.Common.Server.Entities.Core;
+namespace Lib.Common.Server.Entities.Core;
 
 public class ServerSessionState : Disposable, IServerSessionState<IServerApp>
 {

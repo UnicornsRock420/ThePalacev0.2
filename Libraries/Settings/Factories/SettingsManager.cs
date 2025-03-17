@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 using System.Windows.Forms;
+using Lib.Logging.Entities;
 using Microsoft.Extensions.Configuration;
-using ThePalace.Logging.Entities;
 
-namespace ThePalace.Settings.Factories;
+namespace Lib.Settings.Factories;
 
 public class SettingsManager : SingletonDisposable<SettingsManager>
 {

@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Shared.Users;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Shared.Users;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Users;
+namespace Lib.Common.Client.Entities.Business.Users;
 
 [Mnemonic("usrC")]
 public class BO_USERCOLOR : IEventHandler<MSG_USERCOLOR>

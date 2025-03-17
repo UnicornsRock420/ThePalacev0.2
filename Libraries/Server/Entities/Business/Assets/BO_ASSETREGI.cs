@@ -1,12 +1,12 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Entities.Network.Client.Assets;
-using ThePalace.Core.Factories.IO;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.EventsBus;
-using ThePalace.Logging.Entities;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.Network.Client.Assets;
+using Lib.Core.Factories.IO;
+using Lib.Core.Interfaces.Core;
+using Lib.Core.Interfaces.EventsBus;
+using Lib.Logging.Entities;
 
-namespace ThePalace.Common.Server.Entities.Business.Assets;
+namespace Lib.Common.Server.Entities.Business.Assets;
 
 [Mnemonic("rAst")]
 public class BO_ASSETREGI : IEventHandler<MSG_ASSETREGI>

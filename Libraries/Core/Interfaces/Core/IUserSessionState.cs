@@ -1,10 +1,10 @@
 ﻿using System.Net.Sockets;
-using ThePalace.Core.Entities.Shared.Users;
-using ThePalace.Network.Interfaces;
+using Lib.Core.Entities.Shared.Users;
+using Lib.Network.Interfaces;
 using RoomID = short;
 using UserID = int;
 
-namespace ThePalace.Core.Interfaces.Core;
+namespace Lib.Core.Interfaces.Core;
 
 public interface IUserSessionState<TApp> : ISessionState<TApp>
     where TApp : IApp

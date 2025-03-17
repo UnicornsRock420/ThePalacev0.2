@@ -1,6 +1,6 @@
 ﻿using sint32 = int;
 
-namespace ThePalace.Core.Attributes.Serialization;
+namespace Lib.Core.Attributes.Serialization;
 
 public class DynamicSizeAttribute(sint32 maxByteSize = 0x7FFFF, sint32 minByteSize = 0, sint32 modulo = 0) : Attribute
 {

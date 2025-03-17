@@ -1,9 +1,9 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Entities.Shared.Types;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Entities.Shared.Types;
 using sint16 = short;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.Shared.Rooms;
+namespace Lib.Core.Entities.Shared.Rooms;
 
 [ByteSize(24)]
 public partial class LoosePropRec

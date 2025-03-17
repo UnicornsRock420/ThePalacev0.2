@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Client.Auth;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Client.Auth;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Client.Entities.Business.Auth;
+namespace Lib.Common.Client.Entities.Business.Auth;
 
 [Mnemonic("auth")]
 public class BO_AUTHENTICATE : IEventHandler<MSG_AUTHENTICATE>

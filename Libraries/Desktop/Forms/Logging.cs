@@ -1,6 +1,6 @@
-﻿using ThePalace.Common.Desktop.Forms.Core;
+﻿using Lib.Common.Desktop.Forms.Core;
 
-namespace ThePalace.Common.Desktop.Forms;
+namespace Lib.Common.Desktop.Forms;
 
 public partial class Logging : FormBase
 {

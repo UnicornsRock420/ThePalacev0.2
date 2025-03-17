@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.Network.Client.ServerInfo;
-using ThePalace.Core.Interfaces.EventsBus;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.Network.Client.ServerInfo;
+using Lib.Core.Interfaces.EventsBus;
 
-namespace ThePalace.Common.Server.Entities.Business.ServerInfo;
+namespace Lib.Common.Server.Entities.Business.ServerInfo;
 
 [Mnemonic("rLst")]
 public class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>

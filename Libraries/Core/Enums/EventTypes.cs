@@ -1,7 +1,7 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Attributes.Serialization;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Attributes.Serialization;
 
-namespace ThePalace.Core.Enums;
+namespace Lib.Core.Enums;
 
 [ByteSize(4)]
 public enum EventTypes : uint

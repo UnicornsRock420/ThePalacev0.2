@@ -1,10 +1,10 @@
-﻿using ThePalace.Core.Attributes.Serialization;
-using ThePalace.Core.Attributes.Strings;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Attributes.Serialization;
+using Lib.Core.Attributes.Strings;
+using Lib.Core.Interfaces.Data;
 using sint16 = short;
 using sint32 = int;
 
-namespace ThePalace.Core.Entities.Shared.ServerInfo;
+namespace Lib.Core.Entities.Shared.ServerInfo;
 
 [DynamicSize(40, 12)]
 public class ListRec : IStruct

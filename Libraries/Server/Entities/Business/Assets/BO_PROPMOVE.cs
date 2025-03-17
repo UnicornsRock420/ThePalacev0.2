@@ -1,12 +1,12 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Common.Server.Interfaces;
-using ThePalace.Core.Entities.EventsBus.EventArgs;
-using ThePalace.Core.Entities.Network.Shared.Assets;
-using ThePalace.Core.Interfaces.Core;
-using ThePalace.Core.Interfaces.EventsBus;
-using ThePalace.Logging.Entities;
+﻿using Lib.Common.Attributes;
+using Lib.Common.Server.Interfaces;
+using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.Network.Shared.Assets;
+using Lib.Core.Interfaces.Core;
+using Lib.Core.Interfaces.EventsBus;
+using Lib.Logging.Entities;
 
-namespace ThePalace.Common.Server.Entities.Business.Assets;
+namespace Lib.Common.Server.Entities.Business.Assets;
 
 [Mnemonic("mPrp")]
 public class BO_PROPMOVE : IEventHandler<MSG_PROPMOVE>

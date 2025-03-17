@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
 
-namespace ThePalace.Core.Entities.Core;
+namespace Lib.Core.Entities.Core;
 
 public class PluginState : AssemblyLoadContext
 {

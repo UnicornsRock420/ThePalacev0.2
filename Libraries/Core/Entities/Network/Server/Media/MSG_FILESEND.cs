@@ -1,8 +1,8 @@
-﻿using ThePalace.Common.Attributes;
-using ThePalace.Core.Entities.EventsBus;
-using ThePalace.Core.Interfaces.Network;
+﻿using Lib.Common.Attributes;
+using Lib.Core.Entities.EventsBus;
+using Lib.Core.Interfaces.Network;
 
-namespace ThePalace.Core.Entities.Network.Server.Media;
+namespace Lib.Core.Entities.Network.Server.Media;
 
 [Mnemonic("sFil")]
 public class MSG_FILESEND : EventParams, IProtocolC2S

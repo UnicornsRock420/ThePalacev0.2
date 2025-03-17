@@ -1,9 +1,9 @@
-﻿using ThePalace.Core.Exts;
-using ThePalace.Core.Interfaces.Data;
+﻿using Lib.Core.Exts;
+using Lib.Core.Interfaces.Data;
 using sint32 = System.Int32;
 using uint8 = System.Byte;
 
-namespace ThePalace.Core.Entities.Core
+namespace Lib.Core.Entities.Core
 {
     public class RawData : IDisposable, IData, IStruct
     {

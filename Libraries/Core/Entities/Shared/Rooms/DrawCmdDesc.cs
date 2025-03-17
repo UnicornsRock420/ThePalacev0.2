@@ -1,4 +1,4 @@
-﻿namespace ThePalace.Core.Entities.Shared.Rooms;
+﻿namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class DrawCmdDesc
 {
