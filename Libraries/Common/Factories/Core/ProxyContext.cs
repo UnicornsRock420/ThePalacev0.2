@@ -133,11 +133,22 @@ public class ProxyContext : DynamicObject, IProxyContext
     {
         ArgumentNullException.ThrowIfNull(sourceType, nameof(sourceType));
 
+        var flags = new List<BindingFlags>();
         var nfo = new List<MemberInfo>();
-        nfo.AddRange(sourceType.GetConstructors());
-        nfo.AddRange(sourceType.GetFields());
-        nfo.AddRange(sourceType.GetProperties());
-        nfo.AddRange(sourceType.GetMethods());
+        
+        if (opts.HasFlag(ProxyOptions.ClonePublic)) flags.Add(BindingFlags.Public);
+        if (opts.HasFlag(ProxyOptions.CloneInstance)) flags.Add(BindingFlags.Instance);
+        if (opts.HasFlag(ProxyOptions.ClonePrivate)) flags.Add(BindingFlags.NonPublic);
+        if (opts.HasFlag(ProxyOptions.CloneStatic)) flags.Add(BindingFlags.Static);
+
+        foreach (var flag in flags)
+        {
+            nfo.AddRange(sourceType.GetConstructors(flag));
+            nfo.AddRange(sourceType.GetFields(flag));
+            nfo.AddRange(sourceType.GetProperties(flag));
+            nfo.AddRange(sourceType.GetMethods(flag));
+        }
+        nfo = nfo.DistinctBy(m => m.Name).ToList();
 
         var typeBuilder = (TypeBuilder?)CreateTypeBuilder(
             _moduleBuilder,
