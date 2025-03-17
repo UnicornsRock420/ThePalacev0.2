@@ -1,17 +1,17 @@
 namespace System.Collections;
 
-public class UniqueList<T> : Disposable, IDisposable, IList<T>
+public class UniqueList<T> : IDisposable, IList<T>
 {
     private const int CONST_INT_DefaultCapacity = 50;
 
-    private UniqueList() : this(CONST_INT_DefaultCapacity)
+    private UniqueList()
     {
+        _list = new();
     }
 
-    public UniqueList(int maxCapacity)
+    public UniqueList(int maxCapacity) : this()
     {
         _maxCapacity = maxCapacity;
-        _list = new(_maxCapacity);
     }
 
     public UniqueList(IEnumerable<T> items) : this(CONST_INT_DefaultCapacity, items?.ToArray())
@@ -39,25 +39,26 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public void Dispose()
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
+
+        _isDisposed = true;
 
         _list?.Clear();
         _list = null;
-
-        base.Dispose();
 
         GC.SuppressFinalize(this);
     }
 
     private List<T> _list;
     private int _maxCapacity;
+    private bool _isDisposed;
 
     public int Count => _list?.Count ?? 0;
     public bool IsReadOnly => false;
 
     public void Add(T item)
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
 
@@ -66,7 +67,7 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public bool Remove(T item)
     {
-        if (IsDisposed) return false;
+        if (_isDisposed) return false;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
 
@@ -83,24 +84,24 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public IEnumerator<T>? GetEnumerator()
     {
-        return IsDisposed ? null : _list?.GetEnumerator();
+        return _isDisposed ? null : _list?.GetEnumerator();
     }
 
     IEnumerator? IEnumerable.GetEnumerator()
     {
-        return IsDisposed ? null : _list?.GetEnumerator();
+        return _isDisposed ? null : _list?.GetEnumerator();
     }
 
     public void Clear()
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
 
         _list?.Clear();
     }
 
     public bool Contains(T? item)
     {
-        if (IsDisposed) return false;
+        if (_isDisposed) return false;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
 
@@ -109,7 +110,7 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public void CopyTo(T[]? array, int arrayIndex)
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
 
         ArgumentNullException.ThrowIfNull(array, nameof(array));
 
@@ -118,7 +119,7 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public int IndexOf(T? item)
     {
-        if (IsDisposed) return 0;
+        if (_isDisposed) return 0;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
 
@@ -127,7 +128,7 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public void Insert(int index, T? item)
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
 
@@ -174,12 +175,12 @@ public class UniqueList<T> : Disposable, IDisposable, IList<T>
 
     public void RemoveAt(int index)
     {
-        if (IsDisposed) return;
+        if (_isDisposed) return;
 
         _list?.RemoveAt(index);
     }
 
-    public T[] ToArray() => (IsDisposed ? null : _list)?.ToArray() ?? [];
+    public T[] ToArray() => (_isDisposed ? null : _list)?.ToArray() ?? [];
 
     public T? this[int index]
     {

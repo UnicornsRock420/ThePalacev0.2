@@ -8,9 +8,9 @@ using Lib.Core.Enums;
 using Lib.Core.Helpers.Core;
 using sint16 = short;
 
-namespace ThePalace.Testing;
+namespace ThePalace.Testing.Data;
 
-public static class TestIStruct
+public static class IStruct
 {
     public static MSG_LISTOFALLROOMS MSG_LISTOFALLROOMS =>
         new()

@@ -18,6 +18,7 @@
         <ProjectReference Include="..\..\Libraries\Core\Lib.Core.csproj" />
         <ProjectReference Include="..\..\Libraries\Logging\Lib.Logging.csproj" />
         <ProjectReference Include="..\..\Libraries\Network\Lib.Network.csproj" />
+        <ProjectReference Include="..\..\Libraries\Server\Lib.Common.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>

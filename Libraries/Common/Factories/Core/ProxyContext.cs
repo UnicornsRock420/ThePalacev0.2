@@ -81,7 +81,7 @@ public class ProxyContext : DynamicObject, IProxyContext
         _moduleBuilder ??= CreateModuleBuilder(_assemblyName, _assemblyBuilder);
     }
 
-    internal ProxyContext()
+    private ProxyContext()
     {
     }
 
@@ -92,10 +92,15 @@ public class ProxyContext : DynamicObject, IProxyContext
 
     public void Dispose()
     {
-        _proxies.Values.ToList().ForEach(p => p.Dispose());
-        _proxies.TryRemove(GetType(), out _);
+        //_proxies.TryRemove(GetType(), out _);
 
         GC.SuppressFinalize(this);
+    }
+
+    public static void StaticDispose()
+    {
+        _proxies.Values.ToList().ForEach(p => p.Dispose());
+        _proxies.Clear();
     }
 
     #endregion
@@ -137,8 +142,8 @@ public class ProxyContext : DynamicObject, IProxyContext
         var nfo = new List<MemberInfo>();
         
         if (opts.HasFlag(ProxyOptions.ClonePublic)) flags.Add(BindingFlags.Public);
-        if (opts.HasFlag(ProxyOptions.CloneInstance)) flags.Add(BindingFlags.Instance);
         if (opts.HasFlag(ProxyOptions.ClonePrivate)) flags.Add(BindingFlags.NonPublic);
+        if (opts.HasFlag(ProxyOptions.CloneInstance)) flags.Add(BindingFlags.Instance);
         if (opts.HasFlag(ProxyOptions.CloneStatic)) flags.Add(BindingFlags.Static);
 
         foreach (var flag in flags)
@@ -214,7 +219,7 @@ public class ProxyContext : DynamicObject, IProxyContext
                 opts);
             if (proxyInfo == null) throw new OutOfMemoryException(string.Concat([nameof(ProxyContext) + "." + nameof(Build) + ".", sourceType.Name]));
 
-            ProxyContext._proxies.TryAdd(sourceType, proxyInfo);
+            _proxies.TryAdd(sourceType, proxyInfo);
 
             return proxyInfo;
         }

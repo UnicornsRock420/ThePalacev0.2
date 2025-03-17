@@ -7,11 +7,12 @@ using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Enums;
 using Lib.Core.Exts;
 using Lib.Core.Interfaces.Network;
+using ThePalace.Testing.Data;
 
-namespace ThePalace.Testing;
+namespace ThePalace.Testing.Helpers;
 
 [TestClass]
-public class TestSerialization
+public class Serialization
 {
     private static readonly Type CONST_TYPE_IProtocolS2C = typeof(IProtocolS2C);
     private static readonly Type CONST_TYPE_AssetSpec = typeof(AssetSpec);
@@ -27,7 +28,7 @@ public class TestSerialization
     {
         var packetBytes = (byte[]?)null;
 
-        var srcMsg = TestIStruct.MSG_LISTOFALLROOMS;
+        var srcMsg = IStruct.MSG_LISTOFALLROOMS;
 
         var dstHdr = new MSG_Header();
         var dstMsg = (IProtocol?)null;
@@ -51,7 +52,7 @@ public class TestSerialization
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .Where(a => a.FullName.Contains("ThePalace"))
+                .Where(a => a.FullName.StartsWith("Lib."))
                 .SelectMany(t => t.GetTypes())
                 .Where(t =>
                     t.GetInterfaces().Contains(CONST_TYPE_IProtocolS2C) &&
@@ -90,7 +91,7 @@ public class TestSerialization
         var packetBytes = (byte[]?)null;
 
         var refNum = RndGenerator.Next(1337);
-        var srcMsg = TestIStruct.MSG_LOGON;
+        var srcMsg = IStruct.MSG_LOGON;
 
         var dstHdr = new MSG_Header();
         var dstMsg = (IProtocol?)null;
@@ -114,7 +115,7 @@ public class TestSerialization
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .Where(a => a.FullName.Contains("ThePalace"))
+                .Where(a => a.FullName.StartsWith("Lib."))
                 .SelectMany(t => t.GetTypes())
                 .Where(t => t.Name == eventType)
                 .FirstOrDefault();
@@ -151,7 +152,7 @@ public class TestSerialization
         var packetBytes = (byte[]?)null;
 
         var refNum = RndGenerator.Next(1337);
-        var srcMsg = TestIStruct.MSG_USERDESC;
+        var srcMsg = IStruct.MSG_USERDESC;
 
         var dstHdr = new MSG_Header();
         var dstMsg = (IProtocol?)null;
@@ -175,7 +176,10 @@ public class TestSerialization
             var eventType = dstHdr.EventType.ToString();
             dstMsgType = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .Where(a => a.FullName.Contains("ThePalace"))
+                .Where(a =>
+                {
+                    return a.FullName.StartsWith("Lib.");
+                })
                 .SelectMany(t => t.GetTypes())
                 .Where(t => t.Name == eventType)
                 .FirstOrDefault();
