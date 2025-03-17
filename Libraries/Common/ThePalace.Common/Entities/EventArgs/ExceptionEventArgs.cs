@@ -1,8 +1,12 @@
-﻿namespace ThePalace.Common.Entities.EventArgs;
+﻿using System.Reflection;
+
+namespace ThePalace.Common.Entities.EventArgs;
 
 public class ExceptionEventArgs : System.EventArgs
 {
-    public Exception? Exception { get; set; }
-    public string? Message { get; set; }
-    public string? StackTrace { get; set; }
+    public Type? ClassType { get; internal set; }
+    public MemberInfo? Member { get; internal set; }
+    public Exception? Exception { get; internal set; }
+    public string? Message => Exception?.Message;
+    public string? StackTrace => Exception?.StackTrace;
 }

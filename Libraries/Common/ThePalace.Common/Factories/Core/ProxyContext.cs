@@ -44,6 +44,8 @@ public enum ProxyOptions : uint
 
 public class ProxyContext : DynamicObject, IProxyContext
 {
+    #region SubClasses
+
     protected class ProxyInfo(
         Type sourceType,
         Type proxyType,
@@ -72,6 +74,10 @@ public class ProxyContext : DynamicObject, IProxyContext
         }
     }
 
+    #endregion
+
+    #region cStrs
+
     protected ProxyContext()
     {
     }
@@ -94,9 +100,14 @@ public class ProxyContext : DynamicObject, IProxyContext
         GC.SuppressFinalize(this);
     }
 
+    #endregion
+
+    #region Fields/Properties
+
     protected ProxyInfo _proxyInfo;
 
     protected static readonly Type CONST_TYPE_Object = typeof(object);
+    protected static readonly Type CONST_TYPE_Void = typeof(void);
 
     protected static readonly ConcurrentDictionary<Type, ProxyInfo> _proxies = new();
 
@@ -106,6 +117,15 @@ public class ProxyContext : DynamicObject, IProxyContext
 
     public static event EventHandler HookEvents; //Accessed, Changed
     public static event EventHandler HookExceptions;
+
+    #endregion
+
+    #region Proxy Methods
+
+    protected static T Build<T>(ProxyOptions opts = ProxyOptions.CloneDefault, params object[]? constructorArgs)
+    {
+        return (T)Build(typeof(T), opts, constructorArgs);
+    }
 
     protected static object Build(Type sourceType, ProxyOptions opts = ProxyOptions.CloneDefault, params object[]? constructorArgs)
     {
@@ -133,18 +153,11 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookExceptions?.Invoke(sourceType.Name, new ExceptionEventArgs
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
                 Exception = ex,
             });
         }
 
         return null;
-    }
-
-    protected static T Build<T>(ProxyOptions opts = ProxyOptions.CloneDefault, params object[]? constructorArgs)
-    {
-        return (T)Build(typeof(T), opts, constructorArgs);
     }
 
     protected static object? Do(Func<object[], object?> cb, params object[] args)
@@ -163,8 +176,6 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookExceptions?.Invoke(null, new ExceptionEventArgs
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
                 Exception = ex,
             });
         }
@@ -189,8 +200,6 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookExceptions?.Invoke(null, new ExceptionEventArgs
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
                 Exception = ex,
             });
         }
@@ -198,7 +207,7 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookEvents?.Invoke(null, new MethodInvokedEventArgs
             {
-                Member = nfo,
+                Method = nfo,
                 Args = args,
             });
         }
@@ -231,8 +240,6 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookExceptions?.Invoke(@ref, new ExceptionEventArgs
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
                 Exception = ex,
             });
         }
@@ -284,8 +291,6 @@ public class ProxyContext : DynamicObject, IProxyContext
         {
             HookExceptions?.Invoke(@ref, new ExceptionEventArgs
             {
-                Message = ex.Message,
-                StackTrace = ex.StackTrace,
                 Exception = ex,
             });
         }
@@ -317,8 +322,6 @@ public class ProxyContext : DynamicObject, IProxyContext
             {
                 HookExceptions?.Invoke(@ref, new ExceptionEventArgs
                 {
-                    Message = ex.Message,
-                    StackTrace = ex.StackTrace,
                     Exception = ex,
                 });
             }
@@ -340,16 +343,22 @@ public class ProxyContext : DynamicObject, IProxyContext
         return CONST_REGEX_Sequence.Aggregate(name, (current, regex) => regex.Replace(current, string.Empty));
     }
 
-    protected static AssemblyName CreateAssemblyName(string? name)
-    {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+    #endregion
 
-        return new AssemblyName(name);
+    #region Generate Methods
+
+    protected static AssemblyName CreateAssemblyName(string? assemblyName)
+    {
+        if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentNullException(nameof(assemblyName));
+
+        return new AssemblyName(assemblyName);
     }
 
     protected static AssemblyBuilder CreateAssemblyBuilder(AssemblyName an)
     {
-        return AssemblyBuilder.DefineDynamicAssembly(an, AssemblyBuilderAccess.Run);
+        return AssemblyBuilder.DefineDynamicAssembly(
+            an,
+            AssemblyBuilderAccess.Run);
     }
 
     protected static ModuleBuilder CreateModuleBuilder(
@@ -370,13 +379,65 @@ public class ProxyContext : DynamicObject, IProxyContext
             TypeAttributes.AnsiClass |
             TypeAttributes.BeforeFieldInit |
             TypeAttributes.AutoLayout,
-        params Type[]? interfaces)
+        Type[]? interfaces = null,
+        Dictionary<string, Type[]?> genericParams = null)
     {
-        return mb.DefineType(
+        return CreateTypeBuilder(
+            mb,
             sourceType.Name,
+            parentType ?? CONST_TYPE_Object,
+            attribs,
+            interfaces ?? Type.EmptyTypes,
+            genericParams);
+    }
+
+
+    public static TypeBuilder CreateTypeBuilder(
+        ModuleBuilder mb,
+        string className,
+        Type? parentType = null,
+        TypeAttributes attribs =
+            TypeAttributes.Public |
+            TypeAttributes.Class |
+            TypeAttributes.AutoClass |
+            TypeAttributes.AnsiClass |
+            TypeAttributes.BeforeFieldInit |
+            TypeAttributes.AutoLayout,
+        Type[]? interfaces = null,
+        Dictionary<string, Type[]?> genericParams = null)
+    {
+        var tb = mb.DefineType(
+            className,
             attribs,
             parentType ?? CONST_TYPE_Object,
             interfaces ?? Type.EmptyTypes);
+
+        if ((genericParams?.Count ?? 0) < 1) return tb;
+
+        genericParams = genericParams
+            .Where(p =>
+                !string.IsNullOrWhiteSpace(p.Key) &&
+                (p.Value?.Length ?? 0) > 0)
+            .ToDictionary(k => k.Key, v => v.Value);
+
+        var gbs =
+            tb.DefineGenericParameters(genericParams.Keys.ToArray());
+
+        // We take each generic type T : class, new()
+        foreach (var gb in gbs)
+        {
+            gb.SetGenericParameterAttributes(
+                GenericParameterAttributes.ReferenceTypeConstraint |
+                GenericParameterAttributes.DefaultConstructorConstraint);
+
+            var args = genericParams[gb.Name];
+            if ((args?.Length ?? 0) > 0)
+            {
+                gb.SetInterfaceConstraints(args);
+            }
+        }
+
+        return tb;
     }
 
     protected static ConstructorBuilder CreateConstructorBuilder(
@@ -387,6 +448,11 @@ public class ProxyContext : DynamicObject, IProxyContext
             MethodAttributes.RTSpecialName,
         params Type[]? parameterTypes)
     {
+        if (attribs.HasFlag(MethodAttributes.Private))
+        {
+            attribs &= ~MethodAttributes.Public;
+        }
+
         return tb.DefineConstructor(
             attribs,
             CallingConventions.Standard,
@@ -402,6 +468,11 @@ public class ProxyContext : DynamicObject, IProxyContext
             MethodAttributes.HideBySig,
         params Type[]? parameterTypes)
     {
+        if (attribs.HasFlag(MethodAttributes.Private))
+        {
+            attribs &= ~MethodAttributes.Public;
+        }
+
         return CreateMethodBuilder(
             tb,
             methodInfo.Name,
@@ -420,20 +491,17 @@ public class ProxyContext : DynamicObject, IProxyContext
             MethodAttributes.HideBySig,
         params Type[]? parameterTypes)
     {
-        if (attribs.HasFlag(MethodAttributes.Public))
-        {
-            attribs &= ~MethodAttributes.Private;
-        }
+        if (!attribs.HasFlag(MethodAttributes.Private))
+            return tb.DefineMethod(
+                methodName,
+                attribs,
+                returnType,
+                parameterTypes ?? Type.EmptyTypes);
 
-        var _methodName = new List<string> { SanitizeName(methodName) };
-
-        if (attribs.HasFlag(MethodAttributes.Private))
-        {
-            _methodName.Insert(0, "_");
-        }
+        attribs &= ~MethodAttributes.Public;
 
         return tb.DefineMethod(
-            string.Concat(_methodName),
+            string.Concat(["_", methodName]),
             attribs,
             returnType,
             parameterTypes ?? Type.EmptyTypes);
@@ -459,19 +527,18 @@ public class ProxyContext : DynamicObject, IProxyContext
         FieldAttributes attribs =
             FieldAttributes.Public)
     {
-        if (attribs.HasFlag(FieldAttributes.Public))
-        {
-            attribs &= ~FieldAttributes.Private;
-        }
+        if (!attribs.HasFlag(FieldAttributes.Private))
+            return tb.DefineField(
+                fieldName,
+                fieldType,
+                attribs);
 
-        var _fieldName = new List<string> { SanitizeName(fieldName) };
+        attribs &= ~FieldAttributes.Public;
 
-        if (attribs.HasFlag(FieldAttributes.Private))
-        {
-            _fieldName.Insert(0, "_");
-        }
-
-        return tb.DefineField(string.Concat(_fieldName), fieldType, attribs);
+        return tb.DefineField(
+            string.Concat(["_", fieldName]),
+            fieldType,
+            attribs);
     }
 
     protected static PropertyBuilder CreatePropertyBuilder(
@@ -497,14 +564,13 @@ public class ProxyContext : DynamicObject, IProxyContext
             PropertyAttributes.HasDefault,
         bool isPrivate = false)
     {
-        var _propertyName = new List<string> { SanitizeName(propertyName) };
-
-        if (isPrivate)
-        {
-            _propertyName.Insert(0, "_");
-        }
-
-        return tb.DefineProperty(string.Concat(_propertyName), attribs, propertyType, null);
+        return tb.DefineProperty(
+            isPrivate
+                ? string.Concat(["_", propertyName])
+                : propertyName,
+            attribs,
+            propertyType,
+            null);
     }
 
     protected static void CreateProperty(
@@ -517,9 +583,9 @@ public class ProxyContext : DynamicObject, IProxyContext
             MethodAttributes.HideBySig,
         params Type[]? parameterTypes)
     {
-        if (attribs.HasFlag(MethodAttributes.Public))
+        if (attribs.HasFlag(MethodAttributes.Private))
         {
-            attribs &= ~MethodAttributes.Private;
+            attribs &= ~MethodAttributes.Public;
         }
 
         var fieldBuilder = CreateFieldBuilder(
@@ -550,8 +616,9 @@ public class ProxyContext : DynamicObject, IProxyContext
             CreateMethodBuilder(
                 tb,
                 "set_" + propertyName,
-                propertyType,
-                attribs);
+                CONST_TYPE_Void,
+                attribs,
+                new[] { propertyType });
 
         var setIl = setPropertyMB.GetILGenerator();
         var modifyProperty = setIl.DefineLabel();
@@ -569,4 +636,6 @@ public class ProxyContext : DynamicObject, IProxyContext
         propertyBuilder.SetGetMethod(getPropertyMB);
         propertyBuilder.SetSetMethod(setPropertyMB);
     }
+
+    #endregion
 }
