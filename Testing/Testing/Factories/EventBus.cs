@@ -1,21 +1,28 @@
 ﻿using Lib.Common.Client.Entities.Business.ServerInfo;
+using Lib.Common.Client.Entities.Business.Users;
 using Lib.Common.Helpers;
+using Lib.Common.Server.Entities.Business.Auth;
 using Lib.Core.Entities.EventsBus.EventArgs;
-using Lib.Core.Factories.Core;
 using Lib.Core.Interfaces.EventsBus;
+using ThePalace.Testing.Data;
 
-namespace ThePalace.Testing;
+namespace ThePalace.Testing.Factories;
 
 [TestClass]
-public class TestEventBus
+public class EventBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
-    private static readonly EventBus CONST_EventBus = EventBus.Current;
+    private static readonly Lib.Core.Factories.Core.EventBus CONST_EventBus = Lib.Core.Factories.Core.EventBus.Current;
 
     [TestInitialize]
     public void TestInitialize()
     {
-        BO_LISTOFALLROOMS? test = null;
+        var test = new Type[]
+        {
+            typeof(BO_LISTOFALLROOMS),
+            typeof(BO_LOGON),
+            typeof(BO_USERDESC),
+        };
 
         var types = AppDomain.CurrentDomain
             .GetAssemblies()
@@ -35,7 +42,7 @@ public class TestEventBus
     [TestMethod]
     public void MSG_LISTOFALLROOMS()
     {
-        var srcMsg = TestIStruct.MSG_LISTOFALLROOMS;
+        var srcMsg = IStruct.MSG_LISTOFALLROOMS;
 
         var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
@@ -54,7 +61,7 @@ public class TestEventBus
     [TestMethod]
     public void MSG_LOGON()
     {
-        var srcMsg = TestIStruct.MSG_LOGON;
+        var srcMsg = IStruct.MSG_LOGON;
 
         var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
@@ -73,7 +80,7 @@ public class TestEventBus
     [TestMethod]
     public void MSG_USERDESC()
     {
-        var srcMsg = TestIStruct.MSG_USERDESC;
+        var srcMsg = IStruct.MSG_USERDESC;
 
         var boType = CONST_EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(

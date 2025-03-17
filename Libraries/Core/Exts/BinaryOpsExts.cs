@@ -460,8 +460,11 @@ public static class BinaryOpsExts
 
     private static readonly Type CONST_TYPE_ISTRUCT = typeof(IStruct);
 
-    private static List<MemberInfo> GetMembers(this Type type,
-        BindingFlags flags = BindingFlags.Public | BindingFlags.Instance)
+    private static List<MemberInfo> GetMembers(
+        this Type type,
+        BindingFlags flags =
+            BindingFlags.Public |
+            BindingFlags.Instance)
     {
         return type
             .GetProperties(flags)
@@ -471,7 +474,10 @@ public static class BinaryOpsExts
             .ToList();
     }
 
-    public static void PalaceDeserialize(this Stream reader, object? obj, Type? objType,
+    public static void PalaceDeserialize(
+        this Stream reader,
+        object? obj,
+        Type? objType,
         SerializerOptions opts = SerializerOptions.None)
     {
         if (obj == null ||
@@ -596,17 +602,17 @@ public static class BinaryOpsExts
 
                             if (pString is EncryptedStringAttribute encryptedString)
                             {
-                                if (encryptedString.DeserializeOptions.IsSet(
-                                        EncryptedStringOptions.FromHex)) buffer = buffer.GetString().FromHex();
+                                if (EncryptedStringOptions.FromHex.IsSet(
+                                        encryptedString.DeserializeOptions)) buffer = buffer.GetString().FromHex();
 
-                                if (encryptedString.DeserializeOptions.IsSet(
-                                        EncryptedStringOptions.DecryptString))
+                                if (EncryptedStringOptions.DecryptString.IsSet(
+                                        encryptedString.DeserializeOptions))
                                     buffer = buffer.DecryptBytes();
-                                else if (encryptedString.DeserializeOptions.IsSet(
-                                             EncryptedStringOptions.EncryptString)) buffer = buffer.EncryptBytes();
+                                else if (EncryptedStringOptions.EncryptString.IsSet(
+                                             encryptedString.DeserializeOptions)) buffer = buffer.EncryptBytes();
 
-                                if (encryptedString.DeserializeOptions.IsSet(
-                                        EncryptedStringOptions.ToHex)) buffer = buffer.ToHex().GetBytes();
+                                if (EncryptedStringOptions.ToHex.IsSet(
+                                        encryptedString.DeserializeOptions)) buffer = buffer.ToHex().GetBytes();
                             }
 
                             _cb(member, buffer.GetString());
@@ -730,7 +736,7 @@ public static class BinaryOpsExts
 
         var streamPosition = writer.Position;
 
-        var doSwap = opts.IsSet(SerializerOptions.SwapByteOrder);
+        var doSwap = SerializerOptions.SwapByteOrder.IsSet(opts);
 
         var members = objType.GetMembers();
 

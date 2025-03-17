@@ -14,6 +14,9 @@ public static class EnumExts
         bits ??= default(TEnum);
         flags ??= default(TEnum);
 
+        if ((byte)(object)flags == 0 ||
+            (byte)(object)bits == 0) return false;
+
         return flags.HasFlag(bits);
     }
 
@@ -22,6 +25,9 @@ public static class EnumExts
     {
         bits ??= default(TStruct);
         flags ??= default(TStruct);
+
+        if ((byte)(object)flags == 0 ||
+            (byte)(object)bits == 0) return false;
 
         return Unsafe.SizeOf<TStruct>() switch
         {
