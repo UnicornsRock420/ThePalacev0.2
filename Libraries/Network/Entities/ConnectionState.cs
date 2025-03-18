@@ -13,9 +13,9 @@ namespace Lib.Network.Entities;
 
 public class ConnectionState : EventArgs, IConnectionState<Socket>
 {
-    internal readonly AsyncCallback _acceptCallback;
-    internal readonly AsyncCallback _receiveCallback;
-    internal readonly AsyncCallback _sendCallback;
+    private readonly AsyncCallback _acceptCallback;
+    private readonly AsyncCallback _receiveCallback;
+    private readonly AsyncCallback _sendCallback;
 
     public ConnectionState()
     {
@@ -298,9 +298,9 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
 
         var acceptedState = ConnectionManager.CreateConnectionState(handler, ConnectionManager.Current);
 
-        _BeginReceive(acceptedState);
+        ConnectionReceived?.Invoke(acceptedState, null);
 
-        ConnectionReceived.Invoke(acceptedState, null);
+        _BeginReceive(acceptedState);
     }
 
     private void _BeginReceive(IConnectionState<Socket>? connectionState)
@@ -343,10 +343,10 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
             connectionState.LastReceived = DateTime.UtcNow;
         }
 
-        _BeginReceive(connectionState);
-
         if (bytesReceived > 0)
-            DataReceived.Invoke(connectionState, null);
+            DataReceived?.Invoke(connectionState, null);
+
+        _BeginReceive(connectionState);
     }
 
     public void Send(byte[] buffer, int offset = 0, int size = 0, bool directAccess = false)

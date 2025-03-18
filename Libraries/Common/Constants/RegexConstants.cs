@@ -25,7 +25,7 @@ public static partial class RegexConstants
 
 
     [GeneratedRegex(
-        @"^([\w\d\-^:\s]*)[:]{0,1}[/]{0,2}([\w\d\-.]+[.][\w\d\-^:\s]+)[:]{0,1}([\d^/\s]*)([/]{0,1}[\w\d%&+-=_/^?\s]*)([?]{0,1}[\w\d%&+-=_/^#\s]*)([#]{0,1}[\w\d%&+-=_/^\s]*)$",
+        @"^([\w\d\-]*)[:]{0,1}[/]{0,2}([\w\d\-.]+[.][\w\d\-]+)[:]{0,1}([\d]*)([/]{0,1}[\w\d%&+-=_/]*)([?]{0,1}[\w\d%&+-=_/]*)([#]{0,1}[\w\d%&+-=_/]*)$",
         RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Compiled)]
     private static partial Regex _regex_parse_url();
 
@@ -67,17 +67,16 @@ public static partial class RegexConstants
         [Description("Query")] IncludeQuery = 0x0010,
         [Description("Hashtag")] IncludeHashtag = 0x0020,
 
-        ModifierInvariant = 0x010000,
-        ModifierToLower = 0x020000,
-        ModifierToUpper = 0x040000,
+        [Description("Invariant")] ModifierInvariant = 0x010000,
+        [Description("ToLower")] ModifierToLower = 0x020000,
+        [Description("ToUpper")] ModifierToUpper = 0x040000,
 
         // Aliases:
-        IncludeAddress = IncludeHostname,
-        IncludeIPEndPoint = IncludeHostname | IncludePort,
-        IncludeBaseUrl = IncludeProtocol | IncludeHostname | IncludePort,
+        [Description("IPEndPoint")] IncludeIPEndPoint = IncludeHostname | IncludePort,
+        [Description("BaseUrl")] IncludeBaseUrl = IncludeProtocol | IncludeHostname | IncludePort,
 
-        ModifierToLowerInvariant = ModifierToLower | ModifierInvariant,
-        ModifierToUpperInvariant = ModifierToUpper | ModifierInvariant,
+        [Description("ToLowerInvariant")] ModifierToLowerInvariant = ModifierToLower | ModifierInvariant,
+        [Description("ToUpperInvariant")] ModifierToUpperInvariant = ModifierToUpper | ModifierInvariant,
     }
 
     private delegate void _parseUrl(int i);

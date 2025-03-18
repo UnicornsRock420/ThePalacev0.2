@@ -61,7 +61,7 @@ public class UniqueList<T> : IDisposable, IList<T>
         if (_isDisposed) return;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
-
+        
         Insert(0, item);
     }
 

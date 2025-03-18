@@ -38,14 +38,14 @@ using UserID = int;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class DesktopSessionState : Disposable, IClientDesktopSessionState
+public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 {
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
 
     #region ctors
 
-    public DesktopSessionState()
+    public ClientDesktopSessionState()
     {
         _managedResources.Add(_uiLayers);
 
@@ -75,7 +75,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState
         RegInfo.Ul2DGraphicsCaps = (Upload2DGraphicsCaps)0x01;
     }
 
-    ~DesktopSessionState()
+    ~ClientDesktopSessionState()
     {
         Dispose();
     }

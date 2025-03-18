@@ -51,6 +51,9 @@ public class RunLog
 
     public void Stop(Exception? ex = null)
     {
+        if (Finish != null ||
+            Error != null) return;
+
         if (ex == null)
         {
             Finish = DateTime.UtcNow;
@@ -90,7 +93,8 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         IJobState? jobState = null,
         RunOptions opts = RunOptions.UseSleepInterval,
         TimeSpan? sleepInterval = null,
-        ITimer? timer = null) : this()
+        ITimer? timer = null,
+        CancellationToken? token = null) : this()
     {
         ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
 
@@ -118,16 +122,20 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         if ((opts & RunOptions.UseResetEvent) == RunOptions.UseResetEvent)
             ResetEvent = new(false);
 
-        Build(Cmd = cmd);
+        Build(Cmd = cmd, token);
     }
 
-    internal Job(IJob<TCmd> parent) : this(parent.Cmd, parent.JobState, parent.Options, parent.SleepInterval,
-        parent.Timer)
+    internal Job(IJob<TCmd> parent) : this(parent.Cmd, parent.JobState, parent.Options, parent.SleepInterval, parent.Timer)
     {
         ParentId = parent.Id;
         Cmd = parent.Cmd;
         JobState = parent.JobState;
         Options = parent.Options;
+    }
+
+    ~Job()
+    {
+        Dispose();
     }
 
     public override void Dispose()
@@ -198,21 +206,15 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
         Timer = null;
         JobState = null;
-
         ResetEvent = null;
         TokenSource = null;
         Task = null;
+        Cmd = null;
 
         base.Dispose();
 
         GC.SuppressFinalize(this);
     }
-
-    ~Job()
-    {
-        Dispose();
-    }
-
 
     #region Task/Thread Properties
 
@@ -275,7 +277,6 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             }
         });
     }
-
 
     public void Build(Action<ConcurrentQueue<TCmd>>? cmd = null, CancellationToken? token = null)
     {
@@ -360,49 +361,64 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             if (doRunLog)
                 runLog = new RunLog(true);
 
-            IsRunning = true;
-
-            if (Task.Status != TaskStatus.Running)
+            switch (Task.Status)
             {
-                try
-                {
-                    Task.Start();
+                case TaskStatus.Canceled:
+                case TaskStatus.Faulted:
+                    return -1;
+                case TaskStatus.Running:
+                case TaskStatus.WaitingForChildrenToComplete:
+                    break;
+                case TaskStatus.RanToCompletion:
+                    Build(Cmd, Token);
+
+                    goto default;
+                default:
+                    try
+                    {
+                        IsRunning = true;
+
+                        Task.Start();
+
+                        if (doRunLog)
+                            runLog.Stop();
+
+                        Completions++;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (doRunLog)
+                            runLog.Stop(ex);
+                        
+                        Failures++;
+
+                        if (Errors.Count >= ErrorLimit)
+                            Errors.RemoveAt(0);
+
+                        Errors.Add(ex);
+                    }
+                    finally
+                    {
+                        if (doRunLog)
+                            runLog.Stop();
+
+                        IsRunning = false;
+                    }
+
+                    TokenSource.Token.ThrowIfCancellationRequested();
 
                     if (doRunLog)
-                        runLog.Stop();
+                    {
+                        if (RunLogs.Count >= LogLimit)
+                            RunLogs.RemoveAt(0);
 
-                    IsRunning = false;
+                        RunLogs.Add(runLog);
+                    }
 
-                    Completions++;
-                }
-                catch (Exception ex)
-                {
-                    if (doRunLog)
-                        runLog.Stop(ex);
+                    if (doRunRunOnce && runLog.Finish.HasValue) return 0;
 
-                    IsRunning = false;
-
-                    Failures++;
-
-                    if (Errors.Count >= LogLimit)
-                        Errors.RemoveAt(0);
-
-                    Errors.Add(ex);
-                }
-
-                TokenSource.Token.ThrowIfCancellationRequested();
-
-                if (doRunLog)
-                {
-                    if (RunLogs.Count >= ErrorLimit)
-                        RunLogs.RemoveAt(0);
-
-                    RunLogs.Add(runLog);
-                }
-
-                if (doRunRunOnce && runLog.Finish.HasValue) return 0;
-
-                if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
+                    if ((doRunRunOnce || doBreakOnError) && runLog.Error.HasValue) return -1;
+                    break;
             }
 
             TokenSource.Token.ThrowIfCancellationRequested();

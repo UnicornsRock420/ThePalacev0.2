@@ -63,9 +63,28 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     [STAThread]
     public static void Main()
     {
-        var filePath = Path.Combine(Environment.CurrentDirectory, "Lib.Media.dll");
-        if (File.Exists(filePath))
-            Assembly.LoadFile(filePath);
+        var libAssemblies = Directory.GetFiles(Environment.CurrentDirectory, "Lib.*.dll", SearchOption.TopDirectoryOnly).ToList();
+        AppDomain.CurrentDomain.GetAssemblies().ToList().ForEach(a =>
+        {
+            try
+            {
+                libAssemblies.Remove($"{a.FullName}.dll");
+            }
+            catch
+            {
+            }
+        });
+        libAssemblies.ForEach(p =>
+        {
+            try
+            {
+                if (File.Exists(p))
+                    Assembly.LoadFile(p);
+            }
+            catch
+            {
+            }
+        });
 
         //// To customize application configuration such as set high DPI settings or default font,
         //// see https://aka.ms/applicationconfiguration.
@@ -167,14 +186,14 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                var delay = RndGenerator.Next(150, 350);
+                                var isData = (Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0;
+                                var delay = isData ? RndGenerator.Next(35, 75) : RndGenerator.Next(250, 450);
 
-                                if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0)
+                                if (isData)
                                 {
                                     var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                    Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
-
-                                    delay = RndGenerator.Next(75, 150);
+                                    if ((msgBytes?.Length ?? 0) > 0)
+                                        Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
                                 }
 
                                 cancellationToken.Token.ThrowIfCancellationRequested();
@@ -197,15 +216,16 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                var delay = RndGenerator.Next(150, 350);
+                                var isData = (Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0;
+                                var delay = isData ? RndGenerator.Next(35, 75) : RndGenerator.Next(250, 450);
 
-                                if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0)
+                                if (isData)
                                 {
                                     if (msgHeader == null)
                                     {
                                         var msgHeaderBuffer = new byte[12];
 
-                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
+                                        var bytesRead = Current.SessionState.ConnectionState.BytesReceived.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
                                         if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
 
                                         using (var ms = new MemoryStream(msgHeaderBuffer))
@@ -219,7 +239,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                                     eventType = msgHeader.EventType.ToString();
                                     msgType = AppDomain.CurrentDomain.GetAssemblies()
-                                        ?.Where(a => a.FullName.StartsWith("ThePalace"))
+                                        ?.Where(a => a.FullName.StartsWith("Lib."))
                                         ?.SelectMany(t => t.GetTypes())
                                         ?.Where(t => t.Name == eventType)
                                         ?.FirstOrDefault();
@@ -227,11 +247,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                                     if (msgHeader != null &&
                                         msgHeader.Length > 0 &&
-                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length > msgHeader.Length &&
+                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length &&
                                         msgObj == null)
                                     {
                                         var msgBuffer = new byte[msgHeader.Length];
-                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived.Read(msgBuffer, 0, msgBuffer.Length);
+                                        var bytesRead = Current.SessionState.ConnectionState.BytesReceived.Read(msgBuffer, 0, msgBuffer.Length);
                                         if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
 
                                         using (var ms = new MemoryStream(msgBuffer))
@@ -256,7 +276,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     if (boType == null) throw new InvalidDataException(nameof(msgType));
 
                                     EventBus.Current.Publish(
-                                        Current,
+                                        Current.SessionState,
                                         boType,
                                         new ProtocolEventParams
                                         {
@@ -268,8 +288,6 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     msgHeader = null;
                                     msgType = null;
                                     msgObj = null;
-
-                                    delay = RndGenerator.Next(75, 150);
                                 }
 
                                 cancellationToken.Token.ThrowIfCancellationRequested();
@@ -344,7 +362,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     public Program()
     {
-        SessionState = SessionManager.Current.CreateSession<DesktopSessionState, IDesktopApp>(this);
+        SessionState = SessionManager.Current.CreateSession<ClientDesktopSessionState, IDesktopApp>(this);
 
         _managedResources.AddRange(
             _uiControls,
