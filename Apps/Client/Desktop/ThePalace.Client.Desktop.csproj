@@ -28,7 +28,7 @@
     <ItemGroup>
         <None Include="Events\ScriptEventArgs.cs"/>
         <None Update="Config\UserSettings.json">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="Config\AppSettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>

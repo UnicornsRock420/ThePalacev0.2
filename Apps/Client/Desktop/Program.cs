@@ -208,10 +208,17 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                         async () =>
                         {
+                            var msgTypes = AppDomain.CurrentDomain.GetAssemblies()
+                                ?.Where(a => a.FullName.StartsWith("Lib.Core"))
+                                ?.SelectMany(t => t.GetTypes()
+                                    .Where(t => t.Name.StartsWith("MSG_"))) ?? [];
+
                             var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
-                            var msgHeader = (MSG_Header?)null;
-                            var msgObj = (IProtocol?)null;
+                            var msgHeader = new MSG_Header();
+
+                            var msgHeaderBuffer = new byte[12];
                             var eventType = (string?)null;
+                            var msgObj = (IProtocol?)null;
                             var msgType = (Type?)null;
 
                             while (!cancellationToken.IsCancellationRequested)
@@ -221,50 +228,39 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                                 if (isData)
                                 {
-                                    if (msgHeader == null)
+                                    if (msgHeader.EventType == 0 &&
+                                        eventType == null &&
+                                        msgType == null)
                                     {
-                                        var msgHeaderBuffer = new byte[12];
-
-                                        var bytesRead = Current.SessionState.ConnectionState.BytesReceived.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
+                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
                                         if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
 
                                         using (var ms = new MemoryStream(msgHeaderBuffer))
                                         {
-                                            msgHeader = new MSG_Header();
-                                            if (msgHeader == null) throw new OutOfMemoryException(nameof(MSG_Header));
-
                                             ms.PalaceDeserialize(msgHeader, CONST_TYPE_MSG_Header);
                                         }
+
+                                        eventType = msgHeader.EventType.ToString()?.Trim() ?? string.Empty;
+                                        if (string.IsNullOrWhiteSpace(eventType)) throw new InvalidDataException(nameof(msgType));
+
+                                        msgType = msgTypes.FirstOrDefault(t => t.Name == eventType);
+                                        if (msgType == null) throw new InvalidDataException(nameof(msgType));
                                     }
 
-                                    eventType = msgHeader.EventType.ToString();
-                                    msgType = AppDomain.CurrentDomain.GetAssemblies()
-                                        ?.Where(a => a.FullName.StartsWith("Lib."))
-                                        ?.SelectMany(t => t.GetTypes())
-                                        ?.Where(t => t.Name == eventType)
-                                        ?.FirstOrDefault();
-                                    if (msgType == null) throw new InvalidDataException(nameof(msgType));
-
-                                    if (msgHeader != null &&
+                                    if (msgObj == null &&
                                         msgHeader.Length > 0 &&
-                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length &&
-                                        msgObj == null)
+                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length)
                                     {
                                         var msgBuffer = new byte[msgHeader.Length];
-                                        var bytesRead = Current.SessionState.ConnectionState.BytesReceived.Read(msgBuffer, 0, msgBuffer.Length);
+                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgBuffer, 0, msgBuffer.Length);
                                         if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
+
+                                        msgObj = (IProtocol?)msgType.GetInstance();
+                                        if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
 
                                         using (var ms = new MemoryStream(msgBuffer))
                                         {
-                                            if (msgHeader.Length > 0)
-                                            {
-                                                msgObj = (IProtocol?)msgType.GetInstance();
-                                                if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
-
-                                                ms.PalaceDeserialize(
-                                                    msgObj,
-                                                    msgType);
-                                            }
+                                            ms.PalaceDeserialize(msgObj, msgType);
                                         }
                                     }
                                 }
@@ -285,7 +281,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                             Request = msgObj
                                         });
 
-                                    msgHeader = null;
+                                    msgHeader.EventType = 0;
+                                    msgHeader.Length = 0;
+                                    msgHeader.RefNum = 0;
+
+                                    eventType = null;
                                     msgType = null;
                                     msgObj = null;
                                 }
@@ -1163,6 +1163,8 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         var connectionForm = GetForm(nameof(Connection));
                         if (connectionForm != null)
                         {
+                            var roomID = (short)0;
+
                             var checkBoxNewTab = connectionForm.Controls
                                 .Cast<Control>()
                                 .Where(c => c.Name == "checkBoxNewTab")
@@ -1178,13 +1180,10 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     .FirstOrDefault() is ComboBox comboBoxUsernames)
                                 SessionState.RegInfo.UserName = SessionState.RegInfo.UserName = comboBoxUsernames.Text;
 
-                            if (connectionForm.Controls
-                                    .Cast<Control>()
+                            if (connectionForm.Controls.Cast<Control>()
                                     .Where(c => c.Name == "textBoxRoomID")
                                     .FirstOrDefault() is TextBox textBoxRoomID)
                             {
-                                var roomID = (short)0;
-
                                 if (!string.IsNullOrEmpty(textBoxRoomID.Text))
                                     roomID = Convert.ToInt16(textBoxRoomID.Text);
 
@@ -1196,11 +1195,34 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     .Where(c => c.Name == "comboBoxAddresses")
                                     .FirstOrDefault() is ComboBox comboBoxAddresses &&
                                 !string.IsNullOrWhiteSpace(comboBoxAddresses.Text))
+                            {
+                                var url = roomID > 0 ? $"palace://{comboBoxAddresses.Text}/{roomID}" : $"palace://{comboBoxAddresses.Text}";
+
+                                if (SettingsManager.Current.Get<string[]>("GUI:Connection:Addresses") is string[] list)
+                                {
+                                    var addressesList = new UniqueList<string>(50, list);
+                                    addressesList.Add(comboBoxAddresses.Text);
+
+                                    SettingsManager.Current.Set<string[]>(@"Config\UserSettings.json", "GUI:Connection:Addresses", addressesList.ToArray());
+
+                                    comboBoxAddresses.Items.Clear();
+                                    comboBoxAddresses.Items.AddRange(addressesList
+                                        .Select(v => new ComboboxItem
+                                        {
+                                            Text = v,
+                                            Value = v
+                                        })
+                                        .ToArray());
+
+                                    comboBoxAddresses.Text = addressesList?.FirstOrDefault();
+                                }
+
                                 ((Job<ActionCmd>)_jobs[ThreadQueues.Network]).Enqueue(new ActionCmd
                                 {
                                     Flags = (int)NetworkCommandTypes.CONNECT,
-                                    Values = [$"palace://{comboBoxAddresses.Text}"]
+                                    Values = [url]
                                 });
+                            }
 
                             connectionForm.Close();
                         }

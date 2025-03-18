@@ -73,17 +73,16 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
 
     public Job()
     {
-        IsRunning = false;
-
         TokenSource = CancellationTokenFactory.NewToken();
         SubJobs = new();
-        Errors = [];
         Queue = new();
+        Errors = [];
 
         JobState = null;
 
         Completions = 0;
         Failures = 0;
+        IsRunning = false;
 
         _managedResources.AddRange([TokenSource]);
     }
@@ -94,10 +93,20 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
         RunOptions opts = RunOptions.UseSleepInterval,
         TimeSpan? sleepInterval = null,
         ITimer? timer = null,
-        CancellationToken? token = null) : this()
+        CancellationToken? token = null)
     {
         ArgumentNullException.ThrowIfNull(cmd, nameof(cmd));
 
+        TokenSource = CancellationTokenFactory.NewToken();
+        SubJobs = new();
+        Queue = new();
+        Errors = [];
+
+        Completions = 0;
+        Failures = 0;
+        IsRunning = false;
+
+        _managedResources.AddRange([TokenSource]);
         JobState = jobState;
         Options = opts;
 
@@ -266,11 +275,14 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
             jobs.AddRange(this?.SubJobs
                 ?.SelectMany(j => j?.SubJobs ?? []) ?? []);
 
-        jobs.ForEach(t =>
+        jobs.ForEach(j =>
         {
+            if (j?.Task?.Status != TaskStatus.Running &&
+                j?.Task?.Status != TaskStatus.WaitingForChildrenToComplete) return;
+            
             try
             {
-                t?.Dispose();
+                j?.TokenSource?.Cancel();
             }
             catch
             {
@@ -389,7 +401,7 @@ public class Job<TCmd> : Disposable, IJob<TCmd>, IDisposable
                     {
                         if (doRunLog)
                             runLog.Stop(ex);
-                        
+
                         Failures++;
 
                         if (Errors.Count >= ErrorLimit)
