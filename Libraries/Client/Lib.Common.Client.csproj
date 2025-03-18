@@ -25,8 +25,4 @@
         <ProjectReference Include="..\Network\Lib.Network.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Factories\"/>
-    </ItemGroup>
-
 </Project>

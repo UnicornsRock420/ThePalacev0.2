@@ -324,7 +324,7 @@ public class ConnectionState : EventArgs, IConnectionState<Socket>
         if (!Do(connectionState, () =>
             {
                 bytesReceived = connectionState.Socket.EndReceive(ar);
-                if (bytesReceived < 1) throw new SocketException();
+                if (bytesReceived < 1) bytesReceived = -1;
             }))
             bytesReceived = -1;
 

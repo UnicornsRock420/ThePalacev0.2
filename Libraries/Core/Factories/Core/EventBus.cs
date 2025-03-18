@@ -182,8 +182,8 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
 
     public async Task Publish(object? sender, Type eventType, IEventParams @event)
     {
-        if (eventType == null) return;
-
+        ArgumentNullException.ThrowIfNull(eventType, nameof(eventType));
+        
         var _eventType = eventType;
 
         if (!_eventType.IsGenericType)

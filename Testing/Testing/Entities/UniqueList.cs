@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace ThePalace.Testing.Factories;
+﻿namespace ThePalace.Testing.Entities;
 
 [TestClass]
 public class UniqueList

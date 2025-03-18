@@ -537,8 +537,8 @@ public static class BinaryOpsExts
                 _cb == null ||
                 _attrs.Any(a => a is IgnoreDataMemberAttribute))
             {
-                //throw new Exception(string.Format("Member (t:{0}, n:{1})", _type.Name, _name));
-                Console.WriteLine("Member (t:{0}, n:{1})", _type?.Name, _name);
+                if (!string.IsNullOrWhiteSpace(_name))
+                    Console.WriteLine("Member (t:{0}, n:{1})", _type?.Name, _name);
                 continue;
             }
 
@@ -792,8 +792,8 @@ public static class BinaryOpsExts
                 _name == null ||
                 _attrs.Any(a => a is IgnoreDataMemberAttribute))
             {
-                //throw new Exception(string.Format("Member (t:{0}, n:{1}, v:{2})", _type.Name, _name, _value));
-                Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type?.Name, _name, _value ?? default(object));
+                if (!string.IsNullOrWhiteSpace(_name))
+                    Console.WriteLine("Member (t:{0}, n:{1}, v:{2})", _type?.Name, _name, _value ?? default(object));
                 continue;
             }
 

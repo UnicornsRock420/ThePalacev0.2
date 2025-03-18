@@ -1,4 +1,4 @@
-namespace System.Collections;
+namespace System.Collections.Generic;
 
 public class UniqueList<T> : IDisposable, IList<T>
 {
@@ -6,30 +6,44 @@ public class UniqueList<T> : IDisposable, IList<T>
 
     private UniqueList()
     {
-        _list = new();
+        _Initialize(CONST_INT_DefaultCapacity);
     }
 
-    public UniqueList(int maxCapacity) : this()
+    public UniqueList(int maxCapacity)
+    {
+        _Initialize(maxCapacity);
+    }
+
+    public UniqueList(IEnumerable<T>? items)
+    {
+        _Initialize(CONST_INT_DefaultCapacity, items?.ToArray());
+    }
+
+    public UniqueList(params T[]? items)
+    {
+        _Initialize(CONST_INT_DefaultCapacity, items);
+    }
+
+    public UniqueList(int maxCapacity, IEnumerable<T>? items)
+    {
+        _Initialize(maxCapacity, items?.ToArray());
+    }
+
+    public UniqueList(int maxCapacity, params T[] items)
+    {
+        _Initialize(maxCapacity, items);
+    }
+
+    protected void _Initialize(int maxCapacity, params T[]? items)
     {
         _maxCapacity = maxCapacity;
-    }
+        _list = new(maxCapacity);
 
-    public UniqueList(IEnumerable<T> items) : this(CONST_INT_DefaultCapacity, items?.ToArray())
-    {
-    }
-
-    public UniqueList(params T[] items) : this(CONST_INT_DefaultCapacity, items)
-    {
-    }
-
-    public UniqueList(int maxCapacity, IEnumerable<T> items) : this(maxCapacity, items?.ToArray())
-    {
-    }
-
-    public UniqueList(int maxCapacity, params T[] items) : this(maxCapacity)
-    {
         if ((items?.Length ?? 0) > 0)
-            items?.ToList()?.ForEach(i => Add(i));
+            items
+                ?.Reverse()
+                ?.ToList()
+                ?.ForEach(i => Insert(0, i));
     }
 
     ~UniqueList()
@@ -61,7 +75,7 @@ public class UniqueList<T> : IDisposable, IList<T>
         if (_isDisposed) return;
 
         ArgumentNullException.ThrowIfNull(item, nameof(item));
-        
+
         Insert(0, item);
     }
 
@@ -160,9 +174,13 @@ public class UniqueList<T> : IDisposable, IList<T>
             return;
         }
 
-        index %= count;
+        if (count > 0)
+        {
+            index %= count;
 
-        if (index < 0) index += count;
+            if (index < 0) index += count;
+        } else if (index < 0)
+            index = 0;
 
         try
         {
