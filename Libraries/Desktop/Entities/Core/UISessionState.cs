@@ -7,7 +7,7 @@ using Lib.Network.Interfaces;
 
 namespace Lib.Common.Desktop.Entities.Core;
 
-public class UISessionState : SessionState, IUISessionState<IDesktopApp>
+public class UISessionState : SessionState, IUISessionState
 {
     public ConcurrentDictionary<string, object> Extended { get; set; } = new();
 

@@ -1,10 +1,9 @@
-﻿using MediatR;
+﻿using Lib.Common.Interfaces.Core;
+using MediatR;
 
 namespace Lib.Core.Interfaces.EventsBus;
 
-public interface IEventParams : INotification
+public interface IEventParams : IID, INotification
 {
-    Guid Id { get; }
-
     DateTime OccurredOn { get; }
 }

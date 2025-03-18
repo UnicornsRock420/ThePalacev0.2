@@ -1,18 +1,17 @@
-using Lib.Common.Desktop.Interfaces;
 using ThePalace.Client.Desktop.Enums;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
 public interface ILayerScreen : IDisposable
 {
+    IClientDesktopSessionState SessionState { get; }
+    LayerScreenTypes Type { get; }
+    
     bool Visible { get; set; }
     bool Enabled { get; set; }
-
     float Opacity { get; set; }
+    
     Bitmap Image { get; }
-
-    IClientDesktopSessionState<IDesktopApp> SessionState { get; }
-    LayerScreenTypes Type { get; }
     int Width { get; }
     int Height { get; }
 

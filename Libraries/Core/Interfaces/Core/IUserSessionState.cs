@@ -6,8 +6,7 @@ using UserID = int;
 
 namespace Lib.Core.Interfaces.Core;
 
-public interface IUserSessionState<TApp> : ISessionState<TApp>
-    where TApp : IApp
+public interface IUserSessionState : ISessionState
 {
     IConnectionState<Socket>? ConnectionState { get; set; }
     RoomID RoomId { get; set; }

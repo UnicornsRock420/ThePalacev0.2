@@ -2,7 +2,6 @@
 
 namespace Lib.Common.Desktop.Interfaces;
 
-public interface IUISessionState<TApp> : ISessionState<TApp>
-    where TApp : IApp
+public interface IUISessionState : ISessionState
 {
 }

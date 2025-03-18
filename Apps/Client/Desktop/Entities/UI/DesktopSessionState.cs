@@ -16,6 +16,7 @@ using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Enums;
 using Lib.Core.Helpers.Core;
+using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
 using Lib.Network.Entities;
 using Lib.Network.Interfaces;
@@ -37,7 +38,7 @@ using UserID = int;
 
 namespace ThePalace.Client.Desktop.Entities.UI;
 
-public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDesktopApp>
+public class DesktopSessionState : Disposable, IClientDesktopSessionState
 {
     private const int CONST_INT_halfPropWidth = (int)AssetConstants.Values.DefaultPropWidth / 2;
     private const int CONST_INT_halfPropHeight = (int)AssetConstants.Values.DefaultPropHeight / 2;
@@ -98,7 +99,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
 
     #region Object Info
 
-    public IDesktopApp App { get; set; }
+    public IApp App { get; set; }
     public Guid Id { get; } = Guid.NewGuid();
     public DateTime? LastActivity { get; set; }
 
@@ -800,7 +801,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
     {
         var isConnected = ConnectionState.IsConnected();
 
-        if (App.GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
+        if (((IDesktopApp)App).GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
 
         toolStrip.Items.Clear();
 
@@ -962,7 +963,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
             LoggerHub.Current.Error(ex);
         }
 
-        if (App.GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
+        if (((IDesktopApp)App).GetControl<PictureBox>("imgScreen") is not PictureBox imgScreen) return;
 
         try
         {
@@ -1082,12 +1083,14 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
     {
         var isConnected = ConnectionState.IsConnected();
 
-        var form = App.GetForm();
+        var app = (IDesktopApp)App;
+
+        var form = app.GetForm();
         if (form == null) return;
 
-        if (App.GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
+        if (app.GetControl<ToolStrip>("toolStrip") is not ToolStrip toolStrip) return;
 
-        if (App.GetControl<Label>("labelInfo") is not Label labelInfo) return;
+        if (app.GetControl<Label>("labelInfo") is not Label labelInfo) return;
 
         if (!isConnected)
         {
@@ -1099,7 +1102,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
             labelInfo.Text = $"Users ({RoomUsers.Count(u => u.Key != 0)}/{ServerPopulation})";
         }
 
-        if (App.GetControl<PictureBox>("imgScreen") is PictureBox imgScreen)
+        if (app.GetControl<PictureBox>("imgScreen") is PictureBox imgScreen)
         {
             toolStrip.Size = new Size(form.Width, form.Height);
             toolStrip.Location = new Point(0, 0);
@@ -1120,7 +1123,7 @@ public class DesktopSessionState : Disposable, IClientDesktopSessionState<IDeskt
             labelInfo.Size = new Size(width, 20);
             labelInfo.Location = new Point(0, imgScreen.Location.Y + imgScreen.Height);
 
-            if (App.GetControl<TextBox>("txtInput") is TextBox txtInput)
+            if (app.GetControl<TextBox>("txtInput") is TextBox txtInput)
             {
                 txtInput.Size = new Size(width, 50);
                 txtInput.Location = new Point(0, labelInfo.Location.Y + labelInfo.Height);

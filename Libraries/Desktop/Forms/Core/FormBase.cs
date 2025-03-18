@@ -10,7 +10,7 @@ public class FormBase : Form
         base.Dispose();
     }
 
-    public IUISessionState<IDesktopApp> SessionState;
+    public IUISessionState SessionState;
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {

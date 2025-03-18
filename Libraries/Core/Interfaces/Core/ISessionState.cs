@@ -1,17 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using Lib.Common.Interfaces.Core;
 
 namespace Lib.Core.Interfaces.Core;
 
-public interface ISessionState : ISessionState<IApp>
+public interface ISessionState : IDisposable, IID
 {
-}
+    IApp App { get; set; }
 
-public interface ISessionState<TApp> : IDisposable
-    where TApp : IApp
-{
-    TApp App { get; set; }
-
-    Guid Id { get; }
     ConcurrentDictionary<string, object> Extended { get; }
 
     object? SessionTag { get; set; }

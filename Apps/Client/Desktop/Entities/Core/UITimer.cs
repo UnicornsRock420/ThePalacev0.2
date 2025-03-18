@@ -1,5 +1,4 @@
-﻿using ITimer = Lib.Common.Interfaces.Threading.ITimer;
-using Threading_ITimer = Lib.Common.Interfaces.Threading.ITimer;
+﻿using Threading_ITimer = Lib.Common.Interfaces.Threading.ITimer;
 using Timer = System.Windows.Forms.Timer;
 
 namespace ThePalace.Client.Desktop.Entities.Core;

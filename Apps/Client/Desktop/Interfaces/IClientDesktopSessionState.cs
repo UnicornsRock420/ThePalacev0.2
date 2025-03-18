@@ -5,15 +5,13 @@ using Lib.Common.Desktop.Interfaces;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;
-using Lib.Core.Interfaces.Core;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 
-public interface IClientDesktopSessionState<TApp> : IClientSessionState<TApp>, IDesktopSessionState<TApp>
-    where TApp : IApp
+public interface IClientDesktopSessionState : IClientSessionState, IDesktopSessionState
 {
     IReadOnlyDictionary<LayerScreenTypes, ILayerScreen> UILayers { get; }
 

@@ -5,11 +5,12 @@ using Lib.Common.Client.Interfaces;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.ServerInfo;
 using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Interfaces.Core;
 using Lib.Network.Interfaces;
 
 namespace Lib.Common.Client.Entities.Core;
 
-public class ClientSessionState : Disposable, IClientSessionState<IClientApp>
+public class ClientSessionState : Disposable, IClientSessionState
 {
     public override void Dispose()
     {
@@ -20,8 +21,8 @@ public class ClientSessionState : Disposable, IClientSessionState<IClientApp>
         GC.SuppressFinalize(this);
     }
 
-    public IClientApp App { get; set; }
-    public Guid Id { get; }
+    public IApp App { get; set; }
+    public Guid Id { get; } = Guid.NewGuid();
 
     public object? SessionTag { get; set; }
     public object? ScriptTag { get; set; }

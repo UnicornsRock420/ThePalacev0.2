@@ -11,7 +11,6 @@ public interface IRibbon : IRibbon<ItemBase>
 public interface IRibbon<TRibbon>
     where TRibbon : ItemBase
 {
-    Guid Id { get; }
     ApiBinding? Binding { get; }
 
     string? Title { get; set; }

@@ -187,14 +187,14 @@ public class UniqueList<T> : IDisposable, IList<T>
         get
         {
             if (index < 0 ||
-                index >= (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
+                index > (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
 
             return _list[index];
         }
         set
         {
             if (index < 0 ||
-                index >= (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
+                index > (_list?.Count ?? 0) - 1) throw new IndexOutOfRangeException(nameof(index));
 
             _list[index] = value;
         }

@@ -14,8 +14,8 @@ public class BO_PROPNEW : IEventHandler<MSG_PROPNEW>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IUserSessionState<IServerApp> userState ||
-            userState.App.ServerSessionState is not IServerSessionState<IServerApp> serverState ||
+        if (sender is not IUserSessionState userState ||
+            ((IServerApp)userState.App).ServerSessionState is not IServerSessionState serverState ||
             @event is not ProtocolEventParams { Request: MSG_PROPNEW inboundPacket } @params ||
             !serverState.Rooms.TryGetValue(userState.RoomId, out var room)) return null;
 

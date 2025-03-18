@@ -55,7 +55,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
     private void ExecuteMacro(object sender = null, EventArgs e = null)
     {
-        if (sender is not IUserSessionState<IApp> sessionState) return;
+        if (sender is not IUserSessionState sessionState) return;
 
         if (e is not ApiEvent apiEvent) return;
 
@@ -178,7 +178,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         using (var @lock = LockContext.GetLock(Assets))
         {
             var sessions = SessionManager.Current.Sessions.Values
-                .Cast<IClientDesktopSessionState<IDesktopApp>>()
+                .Cast<IClientDesktopSessionState>()
                 .ToList();
 
             var inUsePropIDs = sessions
@@ -224,7 +224,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
         }
     }
 
-    public AssetDesc GetAsset(IClientDesktopSessionState<IDesktopApp> sessionState, AssetSpec assetSpec, bool downloadAsset = false)
+    public AssetDesc GetAsset(IClientDesktopSessionState sessionState, AssetSpec assetSpec, bool downloadAsset = false)
     {
         var assetID = assetSpec.Id;
 
@@ -249,7 +249,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
             }
 
             if (downloadAsset)
-                sessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ASSETQUERY>(
+                sessionState.Send<IClientDesktopSessionState, MSG_ASSETQUERY>(
                     sessionState.UserId,
                     new MSG_ASSETQUERY
                     {

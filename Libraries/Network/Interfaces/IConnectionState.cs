@@ -1,15 +1,15 @@
 ﻿using System.Net;
 using Lib.Common.Entities.Network;
+using Lib.Common.Interfaces.Core;
 using Lib.Network.Enums;
 
 namespace Lib.Network.Interfaces;
 
-public interface IConnectionState<TSocket> : IDisposable
+public interface IConnectionState<TSocket> : IDisposable, IID
     where TSocket : IDisposable
 {
     bool IsLittleEndian { get; set; }
 
-    Guid Id { get; }
     CancellationTokenSource CancellationTokenSource { get; }
     CancellationToken CancellationToken { get; }
 

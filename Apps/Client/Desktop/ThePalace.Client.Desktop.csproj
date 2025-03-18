@@ -18,15 +18,11 @@
         <ProjectReference Include="..\..\..\Libraries\Network\Lib.Network.csproj" />
         <ProjectReference Include="..\..\..\Libraries\Settings\Lib.Settings.csproj" />
         <ProjectReference Include="..\..\..\Modules\Media\GDI+\Mod.Media.GDI+.csproj" />
-        <ProjectReference Include="..\..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
         <ProjectReference Include="..\..\..\Modules\Media\SoundPlayer\Mod.Media.SoundPlayer.csproj" />
-        <ProjectReference Include="..\..\..\Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj" />
         <ProjectReference Include="..\..\..\Modules\Scripting\Iptscrae\Mod.Scripting.Iptscrae.csproj" />
-        <ProjectReference Include="..\..\..\Modules\Scripting\Iptscrae\ThePalace.Scripting.Iptscrae.csproj" />
         <ProjectReference Include="..\..\..\Modules\Scripting\JavaScript\Mod.Scripting.JavaScript.csproj" />
         <ProjectReference Include="..\..\..\Modules\Scripting\Python\Mod.Scripting.Python.csproj" />
         <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\Mod.Storage.Filesystem.csproj" />
-        <ProjectReference Include="..\..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

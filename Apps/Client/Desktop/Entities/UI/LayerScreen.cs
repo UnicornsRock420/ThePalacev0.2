@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using Lib.Common.Desktop.Interfaces;
 using Lib.Common.Factories.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Interfaces;
@@ -13,7 +12,7 @@ public class LayerScreen : Disposable, ILayerScreen
     }
 
     public LayerScreen(
-        IClientDesktopSessionState<IDesktopApp> sessionState,
+        IClientDesktopSessionState sessionState,
         LayerScreenTypes type)
     {
         SessionState = sessionState;
@@ -36,14 +35,14 @@ public class LayerScreen : Disposable, ILayerScreen
         GC.SuppressFinalize(this);
     }
 
+    public IClientDesktopSessionState SessionState { get; }
+    public LayerScreenTypes Type { get; }
+
     public bool Visible { get; set; } = true;
     public bool Enabled { get; set; } = true;
-
     public float Opacity { get; set; } = 1.0F;
-    public Bitmap Image { get; protected set; }
 
-    public IClientDesktopSessionState<IDesktopApp> SessionState { get; }
-    public LayerScreenTypes Type { get; }
+    public Bitmap Image { get; protected set; }
     public int Width => Image?.Width ?? 0;
     public int Height => Image?.Height ?? 0;
 

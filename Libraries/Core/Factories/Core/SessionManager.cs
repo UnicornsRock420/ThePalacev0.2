@@ -5,8 +5,8 @@ namespace Lib.Core.Factories.Core;
 
 public class SessionManager : SingletonDisposable<SessionManager>
 {
-    private readonly ConcurrentDictionary<Guid, ISessionState<IApp>> _sessions = new();
-    public IReadOnlyDictionary<Guid, ISessionState<IApp>> Sessions => _sessions.AsReadOnly();
+    private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
+    public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
 
     ~SessionManager()
     {
@@ -23,7 +23,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
     }
 
     public TSessionState? CreateSession<TSessionState, TApp>(TApp app)
-        where TSessionState : ISessionState<TApp>
+        where TSessionState : ISessionState
         where TApp : IApp
     {
         if (IsDisposed) return default(TSessionState);
@@ -40,9 +40,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
         ArgumentNullException.ThrowIfNull(type, nameof(type));
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 
-        if (type.GetInstance() is not ISessionState<IApp> sessionState)
-            throw new Exception($"{type.Name} doesn't implement the ISessionState interface...");
-        
+        var sessionState = type.GetInstance() as ISessionState;
         sessionState.App = app;
 
         _sessions.TryAdd(sessionState.Id, sessionState);

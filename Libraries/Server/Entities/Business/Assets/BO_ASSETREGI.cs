@@ -13,7 +13,7 @@ public class BO_ASSETREGI : IEventHandler<MSG_ASSETREGI>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IUserSessionState<IApp> sessionState ||
+        if (sender is not IUserSessionState sessionState ||
             @event is not ProtocolEventParams { Request: MSG_ASSETREGI inboundPacket } @params ||
             inboundPacket.AssetRec.AssetSpec.Id == 0) return null;
 

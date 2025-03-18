@@ -1,5 +1,4 @@
 ﻿using Lib.Common.Desktop.Entities.Ribbon;
-using Lib.Common.Desktop.Interfaces;
 using ThePalace.Client.Desktop.Interfaces;
 using Timer = System.Timers.Timer;
 
@@ -11,7 +10,7 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
     private volatile ItemBase _item2;
     private volatile Timer _timer = new(250);
 
-    private IClientDesktopSessionState<IDesktopApp> _sessionState;
+    private IClientDesktopSessionState _sessionState;
 
     protected CustomToolStripRenderer()
     {
@@ -43,7 +42,7 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
         };
     }
 
-    public CustomToolStripRenderer(IClientDesktopSessionState<IDesktopApp> sessionState) : this()
+    public CustomToolStripRenderer(IClientDesktopSessionState sessionState) : this()
     {
         ArgumentNullException.ThrowIfNull(sessionState, nameof(sessionState));
 

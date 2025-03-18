@@ -8,8 +8,7 @@ using UserID = int;
 
 namespace Lib.Common.Client.Interfaces;
 
-public interface IClientSessionState<TApp> : IUserSessionState<TApp>
-    where TApp : IApp
+public interface IClientSessionState : IUserSessionState
 {
     RoomDesc RoomInfo { get; set; }
     ConcurrentDictionary<UserID, UserDesc> RoomUsers { get; set; }

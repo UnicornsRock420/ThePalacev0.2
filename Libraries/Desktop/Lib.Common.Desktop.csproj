@@ -30,7 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
+        <ProjectReference Include="..\..\Modules\Media\GDI+\Mod.Media.GDI+.csproj" />
         <ProjectReference Include="..\Common\Lib.Common.csproj" />
         <ProjectReference Include="..\Core\Lib.Core.csproj" />
         <ProjectReference Include="..\Logging\Lib.Logging.csproj" />

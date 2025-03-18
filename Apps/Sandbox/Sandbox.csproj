@@ -27,14 +27,10 @@
         <ProjectReference Include="..\..\Modules\Database\Sqlite\Mod.Database.Sqlite.csproj" />
         <ProjectReference Include="..\..\Modules\Database\SqlServer\Mod.Database.SqlServer.csproj" />
         <ProjectReference Include="..\..\Modules\Media\DirectX\Mod.Media.DirectX.csproj" />
-        <ProjectReference Include="..\..\Modules\Media\DirectX\ThePalace.Media.DirectX.csproj"/>
         <ProjectReference Include="..\..\Modules\Media\GDI+\Mod.Media.GDI+.csproj" />
-        <ProjectReference Include="..\..\Modules\Media\GDI+\ThePalace.Media.GDI+.csproj"/>
-        <ProjectReference Include="..\..\Modules\Media\SoundPlayer\ThePalace.Media.SoundPlayer\ThePalace.Media.SoundPlayer.csproj"/>
         <ProjectReference Include="..\..\Modules\Scripting\JavaScript\Mod.Scripting.JavaScript.csproj" />
         <ProjectReference Include="..\..\Modules\Scripting\Python\Mod.Scripting.Python.csproj" />
         <ProjectReference Include="..\..\Modules\Storage\Filesystem\Mod.Storage.Filesystem.csproj" />
-        <ProjectReference Include="..\..\Modules\Storage\Filesystem\ThePalace.Storage.Filesystem.csproj"/>
         <ProjectReference Include="..\Client\Desktop\ThePalace.Client.Desktop.csproj"/>
         <ProjectReference Include="..\Client\Headless\ThePalace.Client.Headless.csproj"/>
         <ProjectReference Include="..\Server\Desktop\ThePalace.Server.Desktop.csproj"/>

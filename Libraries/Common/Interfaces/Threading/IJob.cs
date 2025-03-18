@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using Lib.Common.Interfaces.Core;
 using Lib.Common.Threading;
 
 namespace Lib.Common.Interfaces.Threading;
 
-public interface IJob : IDisposable
+public interface IJob : IDisposable, IID
 {
     Task Task { get; }
 
@@ -17,7 +18,6 @@ public interface IJob : IDisposable
     DisposableList<IJob> SubJobs { get; }
 
     RunOptions Options { get; set; }
-    Guid Id { get; }
     Guid? ParentId { get; }
     bool IsRunning { get; }
     int Completions { get; }

@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Lib.Network.Constants;
+﻿namespace Lib.Network.Constants;
 
 public static partial class RegexConstants
 {

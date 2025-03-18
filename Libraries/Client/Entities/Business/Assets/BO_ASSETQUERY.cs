@@ -2,7 +2,6 @@
 using Lib.Common.Client.Interfaces;
 using Lib.Core.Entities.EventsBus.EventArgs;
 using Lib.Core.Entities.Network.Shared.Assets;
-using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.EventsBus;
 using Lib.Logging.Entities;
 
@@ -13,7 +12,7 @@ public class BO_ASSETQUERY : IEventHandler<MSG_ASSETQUERY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IClientSessionState<IApp> sessionState ||
+        if (sender is not IClientSessionState sessionState ||
             @event is not ProtocolEventParams { Request: MSG_ASSETQUERY inboundPacket } @params ||
             inboundPacket.AssetSpec.Id == 0) return null;
 

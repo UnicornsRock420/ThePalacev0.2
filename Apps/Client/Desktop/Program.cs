@@ -399,7 +399,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     protected readonly ContextMenuStrip _contextMenu = new();
 
-    public IClientDesktopSessionState<IDesktopApp> SessionState { get; protected set; }
+    public IClientDesktopSessionState SessionState { get; protected set; }
 
     protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
 
@@ -418,7 +418,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     public void RefreshScreen(object sender, EventArgs e)
     {
-        if (sender is not IClientDesktopSessionState<IDesktopApp> sessionState) return;
+        if (sender is not IClientDesktopSessionState sessionState) return;
 
         if (e is not ScriptEvent scriptEvent) return;
 
@@ -426,7 +426,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         {
             CmdFnc = a =>
             {
-                if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
+                if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
                 if (a[1] is not ScriptEvent scriptEvent) return null;
 
@@ -471,7 +471,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
                     ShowAppForm();
 
@@ -660,7 +660,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         LayerScreenTypes.UserNametag,
                                         LayerScreenTypes.Messages);
 
-                                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_USERMOVE>(
+                                    SessionState.Send<IClientDesktopSessionState, MSG_USERMOVE>(
                                         SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
@@ -1017,7 +1017,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                 {
                                     CmdFnc = a =>
                                     {
-                                        if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
+                                        if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
                                         if (a[1] is not string text) return null;
 
@@ -1060,7 +1060,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     xTalk.Text = variable.Variable.Value.ToString();
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_XTALK>(
+                                    SessionState.Send<IClientDesktopSessionState, MSG_XTALK>(
                                         SessionState.UserId,
                                         xTalk);
                             }
@@ -1299,7 +1299,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                             SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
                             SessionState.ConnectionState.HostAddr.Port == port &&
                             roomID != 0)
-                            SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_ROOMGOTO>(
+                            SessionState.Send<IClientDesktopSessionState, MSG_ROOMGOTO>(
                                 SessionState.UserId,
                                 new MSG_ROOMGOTO
                                 {
@@ -1369,7 +1369,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_WHISPER>(
+                    SessionState.Send<IClientDesktopSessionState, MSG_WHISPER>(
                         SessionState.UserId,
                         new MSG_WHISPER
                         {
@@ -1383,7 +1383,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_KILLUSER>(
+                    SessionState.Send<IClientDesktopSessionState, MSG_KILLUSER>(
                         SessionState.UserId,
                         new MSG_KILLUSER
                         {
@@ -1396,7 +1396,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (HotspotID)values[1];
 
-                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_SPOTDEL>(
+                    SessionState.Send<IClientDesktopSessionState, MSG_SPOTDEL>(
                         SessionState.UserId,
                         new MSG_SPOTDEL
                         {
@@ -1442,7 +1442,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 var value = (AssetID)values[1];
 
-                SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_PROPDEL>(
+                SessionState.Send<IClientDesktopSessionState, MSG_PROPDEL>(
                     SessionState.UserId,
                     new MSG_PROPDEL
                     {
@@ -1470,7 +1470,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         LayerScreenTypes.UserNametag,
                         LayerScreenTypes.Messages);
 
-                    SessionState.Send<IDesktopApp, IClientDesktopSessionState<IDesktopApp>, MSG_USERMOVE>(
+                    SessionState.Send<IClientDesktopSessionState, MSG_USERMOVE>(
                         SessionState.UserId,
                         new MSG_USERMOVE
                         {
@@ -1510,7 +1510,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
                     sessionState.RefreshUI();
                     sessionState.RefreshRibbon();
@@ -1530,7 +1530,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 CmdFnc = a =>
                 {
-                    if (a[0] is not IClientDesktopSessionState<IDesktopApp> sessionState) return null;
+                    if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
                     sessionState.RefreshScreen();
                     sessionState.RefreshUI();

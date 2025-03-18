@@ -741,7 +741,7 @@ public class MsgBubble : Disposable, IDisposable
         helper.Stroke();
     }
 
-    public async Task<Bitmap?> Render(IDesktopSessionState<IDesktopApp> sessionState) =>
+    public async Task<Bitmap?> Render(IDesktopSessionState sessionState) =>
         await Task.Factory.StartNew(() =>
         {
             if (Text.Length < 1) return null;

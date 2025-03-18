@@ -6,7 +6,7 @@ namespace Lib.Common.Server;
 public class ServerBase
 {
     public DisposableList<RoomDesc> Rooms { get; set; } = new();
-    public DisposableList<IServerSessionState<IServerApp>> Users { get; set; } = new();
+    public DisposableList<IServerSessionState> Users { get; set; } = new();
 
     public void Run()
     {

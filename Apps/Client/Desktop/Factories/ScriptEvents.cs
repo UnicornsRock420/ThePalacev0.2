@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Lib.Common.Desktop.Interfaces;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
 using Lib.Logging.Entities;
@@ -46,7 +45,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         GC.SuppressFinalize(this);
     }
 
-    public void Invoke(IptEventTypes eventType, IUserSessionState<IDesktopApp> sessionState, IProtocol packet,
+    public void Invoke(IptEventTypes eventType, IUserSessionState sessionState, IProtocol packet,
         object scriptState = null)
     {
         var scriptEvent = new ScriptEvent

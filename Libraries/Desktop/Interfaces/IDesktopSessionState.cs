@@ -1,9 +1,6 @@
-﻿using Lib.Core.Interfaces.Core;
+﻿namespace Lib.Common.Desktop.Interfaces;
 
-namespace Lib.Common.Desktop.Interfaces;
-
-public interface IDesktopSessionState<TDesktopApp> : IUISessionState<TDesktopApp>
-    where TDesktopApp : IApp
+public interface IDesktopSessionState : IUISessionState
 {
     bool Visible { get; set; }
     bool Enabled { get; set; }
