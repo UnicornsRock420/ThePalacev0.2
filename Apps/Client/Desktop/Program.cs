@@ -186,19 +186,20 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                var isData = (Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) > 0;
-                                var delay = isData ? RndGenerator.Next(35, 75) : RndGenerator.Next(250, 450);
-
-                                if (isData)
+                                if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) < 1)
                                 {
-                                    var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                    if ((msgBytes?.Length ?? 0) > 0)
-                                        Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
+                                    await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
+
+                                    continue;
                                 }
+
+                                var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                if ((msgBytes?.Length ?? 0) > 0)
+                                    Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
 
                                 cancellationToken.Token.ThrowIfCancellationRequested();
 
-                                await Task.Delay(delay, cancellationToken.Token);
+                                await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
                             }
                         },
 
@@ -216,22 +217,26 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                             var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
                             var msgHeader = new MSG_Header();
 
-                            var msgHeaderBuffer = new byte[12];
                             var eventType = (string?)null;
                             var msgObj = (IProtocol?)null;
                             var msgType = (Type?)null;
 
                             while (!cancellationToken.IsCancellationRequested)
                             {
-                                var isData = (Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) > 0;
-                                var delay = isData ? RndGenerator.Next(35, 75) : RndGenerator.Next(250, 450);
-
-                                if (isData)
+                                if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) < 1)
                                 {
-                                    if (msgHeader.EventType == 0 &&
-                                        eventType == null &&
-                                        msgType == null)
+                                    await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
+
+                                    continue;
+                                }
+
+                                if (msgHeader.EventType == 0 &&
+                                    eventType == null &&
+                                    msgType == null)
+                                {
+                                    try
                                     {
+                                        var msgHeaderBuffer = new byte[12];
                                         var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
                                         if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
 
@@ -241,58 +246,73 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         }
 
                                         eventType = msgHeader.EventType.ToString()?.Trim() ?? string.Empty;
-                                        if (string.IsNullOrWhiteSpace(eventType)) throw new InvalidDataException(nameof(msgType));
+                                        if (msgHeader.EventType == 0 ||
+                                            string.IsNullOrWhiteSpace(eventType)) throw new InvalidDataException(nameof(eventType));
 
                                         msgType = msgTypes.FirstOrDefault(t => t.Name == eventType);
                                         if (msgType == null) throw new InvalidDataException(nameof(msgType));
                                     }
-
-                                    if (msgObj == null &&
-                                        msgHeader.Length > 0 &&
-                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length)
+                                    catch
                                     {
-                                        var msgBuffer = new byte[msgHeader.Length];
-                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgBuffer, 0, msgBuffer.Length);
-                                        if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
-
-                                        msgObj = (IProtocol?)msgType.GetInstance();
-                                        if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
-
-                                        using (var ms = new MemoryStream(msgBuffer))
-                                        {
-                                            ms.PalaceDeserialize(msgObj, msgType);
-                                        }
+                                        Current?.SessionState?.ConnectionState?.Disconnect();
                                     }
                                 }
 
-                                if (msgHeader != null &&
+                                if (msgType != null &&
+                                    msgObj == null &&
+                                    msgHeader.Length > 0 &&
+                                    Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length)
+                                {
+                                    var msgBuffer = new byte[msgHeader.Length];
+                                    var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgBuffer, 0, msgBuffer.Length);
+                                    if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
+
+                                    msgObj = (IProtocol?)msgType.GetInstance();
+                                    if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
+
+                                    using (var ms = new MemoryStream(msgBuffer))
+                                    {
+                                        ms.PalaceDeserialize(msgObj, msgType);
+                                    }
+                                }
+
+                                if (msgHeader.EventType != 0 &&
                                     msgType != null)
                                 {
-                                    var boType = EventBus.Current.GetType(msgType);
-                                    if (boType == null) throw new InvalidDataException(nameof(msgType));
+                                    try
+                                    {
+                                        var boType = EventBus.Current.GetType(msgType);
+                                        if (boType == null) throw new InvalidDataException(nameof(msgType));
 
-                                    EventBus.Current.Publish(
-                                        Current.SessionState,
-                                        boType,
-                                        new ProtocolEventParams
-                                        {
-                                            SourceID = Current?.SessionState?.UserId ?? 0,
-                                            RefNum = msgHeader.RefNum,
-                                            Request = msgObj
-                                        });
+                                        EventBus.Current.Publish(
+                                            Current.SessionState,
+                                            boType,
+                                            new ProtocolEventParams
+                                            {
+                                                SourceID = Current?.SessionState?.UserId ?? 0,
+                                                RefNum = msgHeader.RefNum,
+                                                Request = msgObj
+                                            });
+                                    }
+                                    catch
+                                    {
+                                        Current?.SessionState?.ConnectionState?.Disconnect();
+                                    }
+                                    finally
+                                    {
+                                        msgHeader.EventType = 0;
+                                        msgHeader.Length = 0;
+                                        msgHeader.RefNum = 0;
 
-                                    msgHeader.EventType = 0;
-                                    msgHeader.Length = 0;
-                                    msgHeader.RefNum = 0;
-
-                                    eventType = null;
-                                    msgType = null;
-                                    msgObj = null;
+                                        eventType = null;
+                                        msgType = null;
+                                        msgObj = null;
+                                    }
                                 }
 
                                 cancellationToken.Token.ThrowIfCancellationRequested();
 
-                                await Task.Delay(delay, cancellationToken.Token);
+                                await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
                             }
                         }
 

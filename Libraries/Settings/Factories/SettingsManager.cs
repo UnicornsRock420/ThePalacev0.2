@@ -155,7 +155,13 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
                     break;
             }
 
-            File.WriteAllText(fPath, jsonObj.ToJsonString());
+            File.WriteAllText(fPath, jsonObj.ToJsonString(new JsonSerializerOptions
+            {
+                NumberHandling = JsonNumberHandling.AllowReadingFromString,
+                AllowTrailingCommas = true,
+                WriteIndented = true,
+                MaxDepth = 24,
+            }));
 
             Build();
 
