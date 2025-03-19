@@ -7,6 +7,8 @@ public class EventParams : System.EventArgs, IEventParams
 {
     public EventParams()
     {
+        Id = Guid.NewGuid();
+        OccurredOn = DateTime.UtcNow;
     }
 
     public EventParams(
@@ -17,7 +19,7 @@ public class EventParams : System.EventArgs, IEventParams
         OccurredOn = occurredOn;
     }
 
-    [IgnoreDataMember] public Guid Id { get; } = Guid.NewGuid();
+    [IgnoreDataMember] public Guid Id { get; }
 
-    [IgnoreDataMember] public DateTime OccurredOn { get; } = DateTime.UtcNow;
+    [IgnoreDataMember] public DateTime OccurredOn { get; }
 }

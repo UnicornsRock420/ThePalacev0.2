@@ -10,7 +10,7 @@ namespace Lib.Core.Entities.Network.Shared.Rooms;
 [Mnemonic("coLs")]
 public class MSG_SPOTMOVE : EventParams, IProtocolC2S, IProtocolS2C
 {
-    public Point Pos;
     public RoomID RoomID;
     public HotSpotID SpotID;
+    public Point Pos;
 }

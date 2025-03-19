@@ -9,6 +9,8 @@ public class BO_ALTLOGONREPLY : IEventHandler<MSG_ALTLOGONREPLY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        throw new NotImplementedException();
+        // TODO
+
+        return null;
     }
 }

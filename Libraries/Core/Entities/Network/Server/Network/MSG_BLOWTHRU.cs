@@ -13,16 +13,29 @@ namespace Lib.Core.Entities.Network.Server.Network;
 [Mnemonic("blow")]
 public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolS2C
 {
-    public uint8[] Embedded;
     public uint32 PluginTag;
+    public uint8[] Embedded;
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
+        PluginTag = reader.ReadUInt32();
+
+        var buffer = new byte[reader.Length - reader.Position];
+        if (buffer.Length > 0)
+        {
+            reader.Read(buffer, 0, buffer.Length);
+            Embedded = buffer;
+        }
+
         throw new NotImplementedException();
     }
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
     {
+        writer.WriteUInt32(PluginTag);
+
+        writer.Write(Embedded);
+
         throw new NotImplementedException();
     }
 }

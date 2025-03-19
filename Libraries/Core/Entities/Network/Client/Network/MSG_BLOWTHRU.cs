@@ -14,11 +14,11 @@ namespace Lib.Core.Entities.Network.Client.Network;
 [Mnemonic("blow")]
 public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
 {
-    public uint8[] Embedded;
     public uint32 Flags;
     public uint32 NbrUsers;
-    public uint32 PluginTag;
     public UserID[] UserIDs; /* iff nbrUsers >= 0 */
+    public uint32 PluginTag;
+    public uint8[] Embedded;
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
@@ -31,8 +31,11 @@ public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
         PluginTag = reader.ReadUInt32();
 
         var buffer = new byte[reader.Length - reader.Position];
-        reader.Read(buffer, 0, buffer.Length);
-        Embedded = buffer;
+        if (buffer.Length > 0)
+        {
+            reader.Read(buffer, 0, buffer.Length);
+            Embedded = buffer;
+        }
 
         throw new NotImplementedException();
     }
