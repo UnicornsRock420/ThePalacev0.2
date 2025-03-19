@@ -3,7 +3,7 @@ using Lib.Core.Interfaces.EventsBus;
 
 namespace Lib.Core.Factories.Core;
 
-public class EventBus : SingletonDisposable<EventBus>, IEventsBus
+public class EventBus : Singleton<EventBus>, IEventsBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
@@ -14,11 +14,9 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         _handlersDictionary?.Clear();
-
-        base.Dispose();
 
         GC.SuppressFinalize(this);
     }
@@ -183,7 +181,7 @@ public class EventBus : SingletonDisposable<EventBus>, IEventsBus
     public async Task Publish(object? sender, Type eventType, IEventParams @event)
     {
         ArgumentNullException.ThrowIfNull(eventType, nameof(eventType));
-        
+
         var _eventType = eventType;
 
         if (!_eventType.IsGenericType)
