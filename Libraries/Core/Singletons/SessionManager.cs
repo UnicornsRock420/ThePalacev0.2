@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Lib.Core.Interfaces.Core;
 
-namespace Lib.Core.Singletons.EventsBus;
+namespace Lib.Core.Singletons;
 
 public class SessionManager : SingletonDisposable<SessionManager>
 {

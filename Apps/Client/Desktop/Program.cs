@@ -28,6 +28,7 @@ using Lib.Core.Exts;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.EventsBus;
 using Lib.Core.Interfaces.Network;
+using Lib.Core.Singletons;
 using Lib.Core.Singletons.EventsBus;
 using Lib.Logging.Entities;
 using Lib.Settings.Singletons;

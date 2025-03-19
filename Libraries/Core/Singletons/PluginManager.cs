@@ -2,7 +2,7 @@
 using System.Reflection;
 using Lib.Core.Entities.Core;
 
-namespace Lib.Core.Singletons.EventsBus;
+namespace Lib.Core.Singletons;
 
 public class PluginManager : SingletonDisposable<PluginManager>
 {

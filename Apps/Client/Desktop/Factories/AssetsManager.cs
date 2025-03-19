@@ -15,6 +15,7 @@ using Lib.Core.Entities.Threading;
 using Lib.Core.Enums;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.Core;
+using Lib.Core.Singletons;
 using Lib.Core.Singletons.EventsBus;
 using ThePalace.Client.Desktop.Interfaces;
 using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;

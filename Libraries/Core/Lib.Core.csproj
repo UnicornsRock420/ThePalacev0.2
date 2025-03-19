@@ -86,7 +86,6 @@
 
     <ItemGroup>
       <Folder Include="Entities\Network\Server\" />
-      <Folder Include="Singletons\" />
     </ItemGroup>
 
     <ItemGroup>
