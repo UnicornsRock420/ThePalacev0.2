@@ -153,7 +153,8 @@ public static class Cipher
     public static uint ComputeLicenseCrc(uint seed)
     {
         return ComputeCrc(
-            seed.SwapUInt32()
+            seed
+                .SwapUInt32()
                 .WriteUInt32());
     }
 

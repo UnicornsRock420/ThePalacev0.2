@@ -18,7 +18,7 @@ using Lib.Core.Enums;
 using Lib.Core.Helpers.Core;
 using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
-using Lib.Network.Entities;
+using Lib.Network.Factories;
 using Lib.Network.Interfaces;
 using Lib.Settings.Factories;
 using Mod.Scripting.Iptscrae.Attributes;
@@ -130,8 +130,12 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
     #region User Info
 
+    public IConnectionState<Socket>? ConnectionState { get; set; } =
+        ConnectionManager.CreateConnectionState(
+            AddressFamily.InterNetwork,
+            instance: ConnectionManager.Current);
+
     public UserID UserId { get; set; } = 0;
-    public IConnectionState<Socket>? ConnectionState { get; set; } = new ConnectionState();
     public UserDesc? UserDesc { get; set; } = new();
     public RegistrationRec? RegInfo { get; set; } = new();
 

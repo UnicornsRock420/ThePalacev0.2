@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Reflection;
@@ -163,8 +162,9 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                             Current.SessionState.ConnectionState.Connect(hostname, port);
                                             return;
                                         case NetworkCommandTypes.DISCONNECT:
-                                        default:
                                             Current.SessionState.ConnectionState.Disconnect();
+                                            return;
+                                        default:
                                             return;
                                     }
 

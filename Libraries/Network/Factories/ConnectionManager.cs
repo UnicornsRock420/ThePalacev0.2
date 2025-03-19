@@ -107,7 +107,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
     }
 
     public static IConnectionState<Socket> CreateConnectionState(
-        AddressFamily addressFamily,
+        AddressFamily addressFamily = AddressFamily.InterNetwork,
         SocketType socketType = SocketType.Stream,
         IPEndPoint? hostAddr = null,
         ConnectionManager? instance = null)

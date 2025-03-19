@@ -17,7 +17,7 @@ public interface IRibbon<TRibbon>
     string? Style { get; set; }
     bool Enabled { get; set; }
     bool Checked { get; set; }
-    bool Checkable { get; set; }
+    bool Checkable { get; protected set; }
 
     void Load(Assembly assembly, string xPath);
     void Unload();

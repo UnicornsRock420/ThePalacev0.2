@@ -35,6 +35,7 @@
         <ProjectReference Include="..\Core\Lib.Core.csproj" />
         <ProjectReference Include="..\Logging\Lib.Logging.csproj" />
         <ProjectReference Include="..\Network\Lib.Network.csproj" />
+        <ProjectReference Include="..\Settings\Lib.Settings.csproj" />
     </ItemGroup>
 
     <ItemGroup>

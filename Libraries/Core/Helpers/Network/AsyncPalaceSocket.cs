@@ -21,9 +21,16 @@ public static class AsyncPalaceSocket
                 msgObj,
                 opts: SerializerOptions.IncludeHeader);
 
+#if DEBUG
+            var bytes = ms.ToArray();
+            sessionState.ConnectionState.Send(
+                bytes,
+                directAccess: directAccess);
+#else
             sessionState.ConnectionState.Send(
                 ms.ToArray(),
                 directAccess: directAccess);
+#endif
         }
     }
 
