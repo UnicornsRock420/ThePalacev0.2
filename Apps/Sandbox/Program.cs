@@ -2,7 +2,8 @@ using Lib.Core.Entities.Core;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Interfaces.Data;
 using Mod.Media.SoundPlayer;
-using static Mod.Media.SoundPlayer.SoundManager;
+using Mod.Media.SoundPlayer.Singletons;
+using static Mod.Media.SoundPlayer.Singletons.SoundManager;
 
 namespace Sandbox;
 

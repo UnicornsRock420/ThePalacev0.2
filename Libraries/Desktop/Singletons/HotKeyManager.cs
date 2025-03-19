@@ -5,7 +5,7 @@ using Lib.Common.Desktop.Interfaces;
 using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
 
-namespace Lib.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Singletons;
 
 public delegate void HotKeyAction(ISessionState sessionState, Keys keys, object? sender = null);
 

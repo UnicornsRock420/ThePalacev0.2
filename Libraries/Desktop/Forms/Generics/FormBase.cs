@@ -1,7 +1,7 @@
-﻿using Lib.Common.Desktop.Factories;
-using Lib.Common.Desktop.Interfaces;
+﻿using Lib.Common.Desktop.Interfaces;
+using Lib.Common.Desktop.Singletons;
 
-namespace Lib.Common.Desktop.Forms.Core;
+namespace Lib.Common.Desktop.Forms.Generics;
 
 public class FormBase : Form
 {

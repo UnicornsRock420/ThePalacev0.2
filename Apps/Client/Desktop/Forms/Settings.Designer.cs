@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using Lib.Common.Desktop.Forms.Core;
+using Lib.Common.Desktop.Forms.Generics;
 
 namespace ThePalace.Client.Desktop.Forms
 {

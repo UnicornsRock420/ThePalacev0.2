@@ -1,6 +1,6 @@
 using Lib.Common.Enums.App;
 using Lib.Common.Interfaces.Threading;
-using Lib.Core.Factories.Core;
+using Lib.Core.Singletons.EventsBus;
 
 namespace Lib.Core.Interfaces.Core;
 

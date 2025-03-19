@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using Lib.Logging.Entities;
 using Microsoft.Extensions.Configuration;
 
-namespace Lib.Settings.Factories;
+namespace Lib.Settings.Singletons;
 
 public class SettingsManager : SingletonDisposable<SettingsManager>
 {

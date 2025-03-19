@@ -1,13 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using Lib.Common.Desktop.Entities.UI;
 using Lib.Common.Desktop.Factories.System.Windows.Forms;
-using Lib.Common.Desktop.Forms.Core;
+using Lib.Common.Desktop.Forms.Generics;
 using Lib.Common.Desktop.Interfaces;
 using Lib.Common.Factories.Core;
 using Lib.Common.Threading;
 using Lib.Logging.Entities;
 
-namespace Lib.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Singletons;
 
 public class FormsManager : SingletonDisposableApplicationContext<FormsManager>, IDisposable
 {
