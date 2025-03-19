@@ -8,7 +8,6 @@ using Lib.Core.Enums;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Singletons;
-using Lib.Core.Singletons.EventsBus;
 
 namespace Lib.Common.Server.Factories;
 

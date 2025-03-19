@@ -12,7 +12,7 @@ namespace ThePalace.Testing.Factories;
 public class EventBus
 {
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
-    private static readonly Lib.Core.Singletons.EventsBus.EventBus CONST_EventBus = Lib.Core.Singletons.EventsBus.EventBus.Current;
+    private static readonly Lib.Core.Singletons.EventBus CONST_EventBus = Lib.Core.Singletons.EventBus.Current;
 
     [TestInitialize]
     public void TestInitialize()
