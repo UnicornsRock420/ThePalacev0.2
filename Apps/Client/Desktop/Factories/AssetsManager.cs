@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using Lib.Common.Desktop.Constants;
 using Lib.Common.Desktop.Entities.Core;
 using Lib.Common.Desktop.Factories;
+using Lib.Common.Desktop.Singletons;
 using Lib.Common.Enums.App;
 using Lib.Common.Factories.Core;
 using Lib.Common.Threading;
@@ -12,9 +13,9 @@ using Lib.Core.Entities.Network.Shared.Users;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Threading;
 using Lib.Core.Enums;
-using Lib.Core.Factories.Core;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.Core;
+using Lib.Core.Singletons.EventsBus;
 using ThePalace.Client.Desktop.Interfaces;
 using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;
 

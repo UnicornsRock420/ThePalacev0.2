@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Lib.Common.Desktop.Entities.Core;
 
-namespace Lib.Common.Desktop.Factories;
+namespace Lib.Common.Desktop.Singletons;
 
 public class ApiManager : SingletonDisposable<ApiManager>
 {

@@ -1,4 +1,4 @@
-using Lib.Common.Desktop.Forms.Core;
+using Lib.Common.Desktop.Forms.Generics;
 using Lib.Core.Interfaces.Core;
 
 namespace Lib.Common.Desktop.Interfaces;

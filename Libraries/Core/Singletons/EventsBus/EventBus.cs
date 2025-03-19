@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Lib.Core.Interfaces.EventsBus;
 
-namespace Lib.Core.Factories.Core;
+namespace Lib.Core.Singletons.EventsBus;
 
 public class EventBus : Singleton<EventBus>, IEventsBus
 {

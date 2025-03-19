@@ -20,7 +20,7 @@ using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
 using Lib.Network.Factories;
 using Lib.Network.Interfaces;
-using Lib.Settings.Factories;
+using Lib.Settings.Singletons;
 using Mod.Scripting.Iptscrae.Attributes;
 using Mod.Scripting.Iptscrae.Entities;
 using Mod.Scripting.Iptscrae.Enums;

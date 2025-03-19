@@ -1,6 +1,6 @@
 ﻿using Lib.Common.Desktop.Interfaces;
 
-namespace Lib.Common.Desktop.Forms.Core;
+namespace Lib.Common.Desktop.Forms.Generics;
 
 public class FormDialog : FormBase, IFormDialog
 {

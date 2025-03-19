@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Lib.Common.Factories.Core;
 using LibVLCSharp.Shared;
 
-namespace Mod.Media.SoundPlayer;
+namespace Mod.Media.SoundPlayer.Singletons;
 
 public class SoundManager : Singleton<SoundManager>, IDisposable
 {
