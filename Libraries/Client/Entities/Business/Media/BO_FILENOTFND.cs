@@ -23,7 +23,7 @@ public class BO_FILENOTFND : IEventHandler<MSG_FILENOTFND>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_FILENOTFND));
 
         return null;
     }

@@ -25,7 +25,7 @@ public class BO_XTALK : IEventHandler<MSG_XTALK>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_XTALK));
 
         return null;
     }

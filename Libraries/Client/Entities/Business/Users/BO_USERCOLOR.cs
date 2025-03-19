@@ -23,8 +23,8 @@ public class BO_USERCOLOR : IEventHandler<MSG_USERCOLOR>
         //     {
         //     });
 
-        throw new NotImplementedException();
-
+        throw new NotImplementedException(nameof(MSG_USERCOLOR));
+        
         return null;
     }
 }

@@ -25,7 +25,7 @@ public class BO_HTTPSERVER : IEventHandler<MSG_HTTPSERVER>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_HTTPSERVER));
 
         return null;
     }

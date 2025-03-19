@@ -23,7 +23,7 @@ public class BO_SPOTMOVE : IEventHandler<MSG_SPOTMOVE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_SPOTMOVE));
 
         return null;
     }

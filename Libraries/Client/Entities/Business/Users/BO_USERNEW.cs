@@ -23,7 +23,7 @@ public class BO_USERNEW : IEventHandler<MSG_USERNEW>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERNEW));
 
         return null;
     }

@@ -23,7 +23,7 @@ public class BO_USERMOVE : IEventHandler<MSG_USERMOVE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERMOVE));
 
         return null;
     }

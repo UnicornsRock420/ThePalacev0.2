@@ -23,7 +23,7 @@ public class BO_PICTMOVE : IEventHandler<MSG_PICTMOVE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_PICTMOVE));
 
         return null;
     }

@@ -23,7 +23,7 @@ public class BO_EXTENDEDINFO : IEventHandler<MSG_EXTENDEDINFO>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_EXTENDEDINFO));
 
         return null;
     }

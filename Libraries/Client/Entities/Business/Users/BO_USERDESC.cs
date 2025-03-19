@@ -23,7 +23,7 @@ public class BO_USERDESC : IEventHandler<MSG_USERDESC>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERDESC));
 
         return null;
     }

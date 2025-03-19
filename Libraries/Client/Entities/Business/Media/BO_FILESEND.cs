@@ -23,7 +23,7 @@ public class BO_FILESEND : IEventHandler<MSG_FILESEND>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_FILESEND));
 
         return null;
     }

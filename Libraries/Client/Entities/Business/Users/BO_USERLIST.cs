@@ -23,7 +23,7 @@ public class BO_USERLIST : IEventHandler<MSG_USERLIST>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERLIST));
 
         return null;
     }

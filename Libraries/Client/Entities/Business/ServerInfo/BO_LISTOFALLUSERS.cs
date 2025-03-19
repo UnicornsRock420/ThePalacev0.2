@@ -23,7 +23,7 @@ public class BO_LISTOFALLUSERS : IEventHandler<MSG_LISTOFALLUSERS>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_LISTOFALLUSERS));
 
         return null;
     }

@@ -37,7 +37,7 @@ public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
             Embedded = buffer;
         }
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(MSG_BLOWTHRU) + "." + nameof(Deserialize));
     }
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
@@ -51,6 +51,6 @@ public class MSG_BLOWTHRU : EventParams, IStructSerializer, IProtocolC2S
 
         writer.Write(Embedded);
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(MSG_BLOWTHRU) + "." + nameof(Serialize));
     }
 }

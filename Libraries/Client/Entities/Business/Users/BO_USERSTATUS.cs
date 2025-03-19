@@ -23,7 +23,7 @@ public class BO_USERSTATUS : IEventHandler<MSG_USERSTATUS>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERSTATUS));
 
         return null;
     }

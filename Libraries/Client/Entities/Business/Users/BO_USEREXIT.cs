@@ -23,7 +23,7 @@ public class BO_USEREXIT : IEventHandler<MSG_USEREXIT>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USEREXIT));
 
         return null;
     }

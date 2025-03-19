@@ -23,7 +23,7 @@ public class BO_USERLOG : IEventHandler<MSG_USERLOG>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERLOG));
 
         return null;
     }

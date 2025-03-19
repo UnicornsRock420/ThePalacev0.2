@@ -23,7 +23,7 @@ public class BO_LOGOFF : IEventHandler<MSG_LOGOFF>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_LOGOFF));
 
         return null;
     }

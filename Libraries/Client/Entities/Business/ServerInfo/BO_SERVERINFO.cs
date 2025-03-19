@@ -23,7 +23,7 @@ public class BO_SERVERINFO : IEventHandler<MSG_SERVERINFO>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_SERVERINFO));
 
         return null;
     }

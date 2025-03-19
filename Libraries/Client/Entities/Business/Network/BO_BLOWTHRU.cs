@@ -25,7 +25,7 @@ public class BO_BLOWTHRU : IEventHandler<MSG_BLOWTHRU>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_BLOWTHRU));
 
         return null;
     }

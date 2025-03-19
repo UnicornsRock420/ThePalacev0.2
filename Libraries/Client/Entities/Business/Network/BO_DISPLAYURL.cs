@@ -23,7 +23,7 @@ public class BO_DISPLAYURL : IEventHandler<MSG_DISPLAYURL>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_DISPLAYURL));
 
         return null;
     }

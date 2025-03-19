@@ -23,7 +23,7 @@ public class BO_AUTHENTICATE : IEventHandler<MSG_AUTHENTICATE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_AUTHENTICATE));
 
         return null;
     }

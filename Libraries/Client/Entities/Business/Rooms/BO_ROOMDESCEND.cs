@@ -23,7 +23,7 @@ public class BO_ROOMDESCEND : IEventHandler<MSG_ROOMDESCEND>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_ROOMDESCEND));
 
         return null;
     }

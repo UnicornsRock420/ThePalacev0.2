@@ -23,7 +23,7 @@ public class BO_VERSION : IEventHandler<MSG_VERSION>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_VERSION));
 
         return null;
     }

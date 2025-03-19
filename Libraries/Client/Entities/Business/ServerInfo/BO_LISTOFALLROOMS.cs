@@ -25,7 +25,7 @@ public class BO_LISTOFALLROOMS : IEventHandler<MSG_LISTOFALLROOMS>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_LISTOFALLROOMS));
 
         return null;
     }

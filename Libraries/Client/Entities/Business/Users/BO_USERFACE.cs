@@ -23,7 +23,7 @@ public class BO_USERFACE : IEventHandler<MSG_USERFACE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERFACE));
 
         return null;
     }

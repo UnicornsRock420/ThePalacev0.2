@@ -23,7 +23,7 @@ public class BO_USERPROP : IEventHandler<MSG_USERPROP>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERPROP));
 
         return null;
     }

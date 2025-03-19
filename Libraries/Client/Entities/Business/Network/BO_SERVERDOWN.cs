@@ -25,7 +25,7 @@ public class BO_SERVERDOWN : IEventHandler<MSG_SERVERDOWN>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_SERVERDOWN));
 
         return null;
     }

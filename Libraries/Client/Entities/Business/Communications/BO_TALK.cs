@@ -23,7 +23,7 @@ public class BO_TALK : IEventHandler<MSG_TALK>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_TALK));
 
         return null;
     }

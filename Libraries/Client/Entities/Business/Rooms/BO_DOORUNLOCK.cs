@@ -23,7 +23,7 @@ public class BO_DOORUNLOCK : IEventHandler<MSG_DOORUNLOCK>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_DOORUNLOCK));
 
         return null;
     }

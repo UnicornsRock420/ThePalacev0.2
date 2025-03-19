@@ -25,7 +25,7 @@ public class BO_USERNAME : IEventHandler<MSG_USERNAME>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_USERNAME));
 
         return null;
     }

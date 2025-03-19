@@ -1,7 +1,7 @@
 ﻿using Lib.Core.Exts;
 using Lib.Core.Interfaces.Data;
-using sint32 = System.Int32;
-using uint8 = System.Byte;
+using sint32 = int;
+using uint8 = byte;
 
 namespace Lib.Core.Entities.Core
 {
@@ -23,14 +23,19 @@ namespace Lib.Core.Entities.Core
         public static explicit operator char[](RawData p) => p.Data?.GetChars() ?? [];
         public static explicit operator RawData(uint8[] v) => new(v);
         public static explicit operator RawData(char[] v) => new(v);
+
         public RawData() =>
             _data = [];
+
         public RawData(IEnumerable<uint8>? data = null) =>
             _data = new List<uint8>(data ?? []);
+
         public RawData(IEnumerable<char>? data = null) =>
             _data = new List<uint8>(data?.GetBytes() ?? []);
+
         public RawData(params uint8[] data) =>
             _data = new List<uint8>(data ?? []);
+
         public RawData(params char[] data) =>
             _data = new List<uint8>(data?.GetBytes() ?? []);
 
@@ -46,16 +51,21 @@ namespace Lib.Core.Entities.Core
 
         public static RawData New() =>
             new();
+
         public static RawData FromEnumerable(IEnumerable<uint8>? data = null) =>
             new(data);
+
         public static RawData FromEnumerable(IEnumerable<char>? data = null) =>
             new(data);
+
         public static RawData FromBytes(uint8[]? data = null) =>
             new(data);
+
         public static RawData FromChars(char[]? data = null) =>
             new(data);
 
         protected List<uint8>? _data;
+
         public virtual uint8[]? Data
         {
             get => _data?.ToArray() ?? [];
@@ -64,10 +74,12 @@ namespace Lib.Core.Entities.Core
 
         public virtual sint32 Count =>
             _data?.Count ?? 0;
+
         public virtual sint32 Length =>
             _data?.Count ?? 0;
 
         #region Read Methods
+
         public uint8[]? GetData(int max = 0, int offset = 0, RawDataOptions opts = RawDataOptions.PurgeReadData)
         {
             if ((_data?.Count ?? 0) < 1) return null;
@@ -94,6 +106,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 1)
             {
                 return 0;
@@ -114,6 +127,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 2)
             {
                 return 0;
@@ -137,6 +151,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 4)
             {
                 return 0;
@@ -160,6 +175,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 1)
             {
                 return 0;
@@ -183,6 +199,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 2)
             {
                 return 0;
@@ -206,6 +223,7 @@ namespace Lib.Core.Entities.Core
             {
                 offset = 0;
             }
+
             if (offset > Count - 4)
             {
                 return 0;
@@ -313,9 +331,11 @@ namespace Lib.Core.Entities.Core
 
             return data.GetString();
         }
+
         #endregion
 
         #region Peek Methods
+
         public int Seek(int offset = 0, SeekOrigin origin = SeekOrigin.Begin)
         {
             if ((_data?.Count ?? 0) < 1) return 0;
@@ -323,15 +343,15 @@ namespace Lib.Core.Entities.Core
             switch (origin)
             {
                 case SeekOrigin.End:
-                    {
-                        offset = Count - offset;
-                        break;
-                    }
+                {
+                    offset = Count - offset;
+                    break;
+                }
                 case SeekOrigin.Current:
-                    {
-                        offset += _position;
-                        break;
-                    }
+                {
+                    offset += _position;
+                    break;
+                }
             }
 
             if (offset < 0)
@@ -497,13 +517,15 @@ namespace Lib.Core.Entities.Core
                 .ToArray();
 
             return data.GetString();
-
         }
+
         #endregion
 
         #region Write Methods
+
         public void SetData(IEnumerable<uint8>? data = null) =>
             _data = new List<uint8>(data ?? []);
+
         public void SetData(uint8[]? data = null) =>
             _data = new List<uint8>(data ?? []);
 
@@ -586,9 +608,11 @@ namespace Lib.Core.Entities.Core
 
             _data.AddRange(source.WriteCString());
         }
+
         #endregion
 
         #region Helper Methods
+
         public void Clear()
         {
             if (_data == null)
@@ -647,15 +671,16 @@ namespace Lib.Core.Entities.Core
             }
         }
 
-        public void Deserialize(Stream data)
+        public virtual void Deserialize(Stream data)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(nameof(RawData) + "." + nameof(Deserialize));
         }
 
-        public byte[] Serialize()
+        public virtual byte[]? Serialize()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(nameof(RawData) + "." + nameof(Serialize));
         }
+
         #endregion
     }
 }

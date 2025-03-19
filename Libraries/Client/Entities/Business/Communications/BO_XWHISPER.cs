@@ -23,7 +23,7 @@ public class BO_XWHISPER : IEventHandler<MSG_XWHISPER>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_XWHISPER));
 
         return null;
     }

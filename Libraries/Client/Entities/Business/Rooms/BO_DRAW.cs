@@ -23,7 +23,7 @@ public class BO_DRAW : IEventHandler<MSG_DRAW>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_DRAW));
 
         return null;
     }

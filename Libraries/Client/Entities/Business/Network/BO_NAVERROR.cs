@@ -23,7 +23,7 @@ public class BO_NAVERROR : IEventHandler<MSG_NAVERROR>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_NAVERROR));
 
         return null;
     }

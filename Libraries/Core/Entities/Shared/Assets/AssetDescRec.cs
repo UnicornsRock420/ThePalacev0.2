@@ -29,6 +29,6 @@ public class AssetDescRec : IStruct
 
     public void Serialize(Stream writer, SerializerOptions opts)
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(AssetDescRec) + "." + nameof(Serialize));
     }
 }

@@ -23,7 +23,7 @@ public class BO_SPOTSTATE : IEventHandler<MSG_SPOTSTATE>
         //     {
         //     });
 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nameof(BO_SPOTSTATE));
 
         return null;
     }
