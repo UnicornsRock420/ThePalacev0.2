@@ -8,7 +8,7 @@ namespace Lib.Core.Entities.Shared.Rooms;
 [ByteSize(8)]
 public class HotspotStateRec : IStruct
 {
-    public Point PicLoc;
     public sint16 PictID;
     public sint16 Reserved;
+    public Point PicLoc;
 }

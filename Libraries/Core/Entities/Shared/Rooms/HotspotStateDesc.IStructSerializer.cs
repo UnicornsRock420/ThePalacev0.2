@@ -8,17 +8,17 @@ public partial class HotspotStateDesc : IStructSerializer
 {
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
-        StateInfo.PictID = reader.ReadInt16();
-        StateInfo.Reserved = reader.ReadInt16();
+        PictID = reader.ReadInt16();
+        Reserved = reader.ReadInt16();
 
-        StateInfo.PicLoc = new Point(reader, opts);
+        PicLoc = new Point(reader, opts);
     }
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
     {
-        writer.WriteInt16(StateInfo.PictID);
-        writer.WriteInt16(StateInfo.Reserved);
+        writer.WriteInt16(PictID);
+        writer.WriteInt16(Reserved);
 
-        StateInfo.PicLoc.Serialize(writer, opts);
+        PicLoc.Serialize(writer, opts);
     }
 }

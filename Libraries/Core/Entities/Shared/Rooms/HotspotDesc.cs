@@ -2,27 +2,22 @@
 
 namespace Lib.Core.Entities.Shared.Rooms;
 
-public class HotspotDesc : IDisposable
+public class HotspotDesc : HotspotRec, IDisposable
 {
     public string? Name;
     public string? Script;
-
-    public HotspotRec? SpotInfo;
 
     public List<HotspotStateDesc>? States;
     public List<Point>? Vortexes;
 
     public HotspotDesc()
     {
-        SpotInfo = new HotspotRec();
         States = [];
         Vortexes = [];
     }
 
     public void Dispose()
     {
-        SpotInfo = null;
-
         States?.Clear();
         States = null;
 

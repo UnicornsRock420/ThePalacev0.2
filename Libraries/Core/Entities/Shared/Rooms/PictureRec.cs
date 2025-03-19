@@ -11,9 +11,9 @@ public class PictureRec : IStruct
 {
     [IgnoreDataMember] public string? Name;
 
+    public sint32 RefCon;
     public sint16 PicID;
     public sint16 PicNameOfst;
-    public sint32 RefCon;
-    public sint16 Reserved;
     public sint16 TransColor;
+    public sint16 Reserved;
 }

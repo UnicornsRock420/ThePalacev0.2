@@ -3,12 +3,6 @@
 namespace Lib.Core.Entities.Shared.Rooms;
 
 [ByteSize(8)]
-public partial class HotspotStateDesc
+public partial class HotspotStateDesc : HotspotStateRec
 {
-    public HotspotStateRec StateInfo;
-
-    public HotspotStateDesc()
-    {
-        StateInfo = new HotspotStateRec();
-    }
 }

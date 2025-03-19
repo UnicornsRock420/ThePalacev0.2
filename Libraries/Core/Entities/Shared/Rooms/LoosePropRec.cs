@@ -8,10 +8,10 @@ namespace Lib.Core.Entities.Shared.Rooms;
 [ByteSize(24)]
 public partial class LoosePropRec
 {
+    public sint16 NextOfst;
+    public sint16 Reserved;
     public AssetSpec AssetSpec;
     public sint32 Flags;
-    public Point Loc;
-    public sint16 NextOfst;
     public sint32 RefCon;
-    public sint16 Reserved;
+    public Point Loc;
 }

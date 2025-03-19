@@ -44,15 +44,15 @@ public class AssetDesc : Lib.Core.Entities.Shared.Assets.AssetDesc
 
     public static async Task<Bitmap> Render(AssetDesc asset)
     {
-        if (asset.AssetRec.IsCustom32Bit)
+        if (asset.IsCustom32Bit)
             return RenderCustom32bit(asset);
-        if (asset.AssetRec.IsLegacy32Bit)
+        if (asset.IsLegacy32Bit)
             return RenderLegacy32bit(asset);
-        if (asset.AssetRec.IsLegacy16Bit)
+        if (asset.IsLegacy16Bit)
             return RenderLegacy16bit(asset);
-        if (asset.AssetRec.IsLegacyS20Bit)
+        if (asset.IsLegacyS20Bit)
             return RenderLegacyS20bit(asset);
-        if (asset.AssetRec.IsLegacy20Bit)
+        if (asset.IsLegacy20Bit)
             return RenderLegacy20bit(asset);
         return RenderLegacy8bit(asset);
     }

@@ -10,22 +10,17 @@ namespace Lib.Core.Entities.Shared.Users;
 
 public class UserRec : IDisposable, IStruct
 {
-    public sint16 AwayFlag;
-    public sint16 ColorNbr;
-    public sint16 FaceNbr;
-
-    [Str31] public string? Name;
-
-    public sint16 NbrProps;
-    public sint16 OpenToMsgs;
-
+    public UserID UserId;
+    public Point RoomPos;
     [ByteSize(8 * 9)] // AssetSpec(8) * Props(9)
     public AssetSpec[] PropSpec;
-
     public RoomID RoomID;
-    public Point RoomPos;
-
-    public UserID UserId;
+    public sint16 FaceNbr;
+    public sint16 ColorNbr;
+    public sint16 AwayFlag;
+    public sint16 OpenToMsgs;
+    public sint16 NbrProps;
+    [Str31] public string? Name;
 
     public UserRec()
     {

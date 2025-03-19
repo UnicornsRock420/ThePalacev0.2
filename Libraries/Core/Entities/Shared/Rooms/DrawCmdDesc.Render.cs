@@ -29,21 +29,21 @@ public partial class DrawCmdDesc
     [IgnoreDataMember]
     public DrawCmdTypes Type
     {
-        get => (DrawCmdTypes)(DrawCmdInfo.DrawCmd & 0x00FF);
-        set => DrawCmdInfo.DrawCmd = (short)((DrawCmdInfo.DrawCmd & 0xFF00) | ((short)value & 0x00FF));
+        get => (DrawCmdTypes)(DrawCmd & 0x00FF);
+        set => DrawCmd = (short)((DrawCmd & 0xFF00) | ((short)value & 0x00FF));
     }
 
     [IgnoreDataMember]
     public bool Layer
     {
-        get => (DrawCmdInfo.DrawCmd & 0x8000) != 0;
-        set => DrawCmdInfo.DrawCmd = (short)((DrawCmdInfo.DrawCmd & 0x00FF) | (value ? 0x8000 : 0x0000));
+        get => (DrawCmd & 0x8000) != 0;
+        set => DrawCmd = (short)((DrawCmd & 0x00FF) | (value ? 0x8000 : 0x0000));
     }
 
     [IgnoreDataMember]
     public bool Filled
     {
-        get => (DrawCmdInfo.DrawCmd & 0x0100) != 0;
-        set => DrawCmdInfo.DrawCmd = (short)((DrawCmdInfo.DrawCmd & 0x00FF) | (value ? 0x0100 : 0x0000));
+        get => (DrawCmd & 0x0100) != 0;
+        set => DrawCmd = (short)((DrawCmd & 0x00FF) | (value ? 0x0100 : 0x0000));
     }
 }

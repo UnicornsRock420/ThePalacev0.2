@@ -12,28 +12,23 @@ namespace Lib.Core.Entities.Shared.Users;
 [ByteSize(128)]
 public class RegistrationRec : IStruct
 {
-    public sint32 AuxFlags;
-    public uint32 Counter;
     public uint32 Crc;
-    public uint32 DemoElapsed;
-    public uint32 DemoLimit;
-    public RoomID DesiredRoom;
+    public uint32 Counter;
+    [Str31] public string? UserName;
+    [EncryptedString(1, 31, 32)] public string? WizPassword;
+    public sint32 AuxFlags;
     public uint32 PuidCRC;
     public uint32 PuidCtr;
-
-    [ByteSize(6)] public string? Reserved;
-
+    public uint32 DemoElapsed;
     public uint32 TotalElapsed;
-    public Upload2DEngineCaps Ul2DEngineCaps;
-    public Upload2DGraphicsCaps Ul2DGraphicsCaps;
-    public Upload3DEngineCaps Ul3DEngineCaps;
-    public DownloadCapabilities UlDownloadCaps;
-
+    public uint32 DemoLimit;
+    public RoomID DesiredRoom;
+    [ByteSize(6)] public string? Reserved;
     public uint16 UlRequestedProtocolVersionMajorVersion;
     public uint16 UlRequestedProtocolVersionMinorVersion;
     public UploadCapabilities UlUploadCaps;
-
-    [Str31] public string? UserName;
-
-    [EncryptedString(1, 31, 32)] public string? WizPassword;
+    public DownloadCapabilities UlDownloadCaps;
+    public Upload2DEngineCaps Ul2DEngineCaps;
+    public Upload2DGraphicsCaps Ul2DGraphicsCaps;
+    public Upload3DEngineCaps Ul3DEngineCaps;
 }

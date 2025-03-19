@@ -168,7 +168,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     {
         using (var @lock = LockContext.GetLock(Assets))
         {
-            Current.Assets.TryAdd(assetRec.AssetRec.AssetSpec.Id, assetRec);
+            Current.Assets.TryAdd(assetRec.AssetSpec.Id, assetRec);
         }
     }
 
@@ -182,8 +182,8 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
 
             var inUsePropIDs = sessions
                 ?.SelectMany(s => s?.RoomUsers?.Values
-                    ?.Where(u => u?.UserRec?.PropSpec != null)
-                    ?.SelectMany(u => u.UserRec.PropSpec))
+                    ?.Where(u => u?.PropSpec != null)
+                    ?.SelectMany(u => u.PropSpec))
                 ?.Select(p => p?.Id ?? 0)
                 ?.Concat(sessions
                     ?.Where(s => s?.RoomInfo?.LooseProps != null)
@@ -195,7 +195,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 ?.ToList() ?? [];
 
             var iQuery = Current.Assets.Values
-                .Select(a => a.AssetRec.AssetSpec.Id)
+                .Select(a => a.AssetSpec.Id)
                 .AsQueryable();
 
             if (propIDs.Length > 0)
@@ -236,8 +236,8 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 var job = (Job<AssetCmd>)sessionState.App.Jobs[ThreadQueues.Assets];
 
                 if (job.Queue?.ToList()?.Any(i =>
-                        i.AssetDesc?.AssetRec?.AssetSpec?.Id ==
-                        value?.AssetRec?.AssetSpec?.Id) ?? false) return value;
+                        i.AssetDesc?.AssetSpec?.Id ==
+                        value?.AssetSpec?.Id) ?? false) return value;
 
                 job.Enqueue(new AssetCmd
                 {

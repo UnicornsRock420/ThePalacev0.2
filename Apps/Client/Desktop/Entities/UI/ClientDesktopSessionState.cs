@@ -332,15 +332,15 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
             {
                 var nbrStates = spot.States?.Count ?? 0;
                 if (nbrStates < 1 ||
-                    spot.SpotInfo.State < 0 ||
-                    spot.SpotInfo.State >= nbrStates) continue;
+                    spot.State < 0 ||
+                    spot.State >= nbrStates) continue;
 
-                var state = spot.States[spot.SpotInfo.State];
+                var state = spot.States[spot.State];
                 if (state == null ||
-                    state.StateInfo.PictID < 1) continue;
+                    state.PictID < 1) continue;
 
                 var pictName = RoomInfo?.Pictures
-                    ?.Where(p => p.PicID == state.StateInfo.PictID)
+                    ?.Where(p => p.PicID == state.PictID)
                     ?.Select(p => p.Name)
                     ?.FirstOrDefault();
                 if (pictName == null) continue;
@@ -361,8 +361,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
                     g.DrawImage(
                         pict,
                         new Rectangle(
-                            spot.SpotInfo.Loc.HAxis - state.StateInfo.PicLoc.HAxis - pict.Width / 2,
-                            spot.SpotInfo.Loc.VAxis - state.StateInfo.PicLoc.VAxis - pict.Height / 2,
+                            spot.Loc.HAxis - state.PicLoc.HAxis - pict.Width / 2,
+                            spot.Loc.VAxis - state.PicLoc.VAxis - pict.Height / 2,
                             pict.Width,
                             pict.Height),
                         0, 0,
@@ -381,7 +381,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
     private void ScreenLayer_SpotNametag(Graphics g)
     {
         var spots = RoomInfo?.HotSpots
-            ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
+            ?.Where(h => (h.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
             ?.ToList() ?? [];
         if (spots.Count > 0)
         {
@@ -397,8 +397,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
                     var halfNameTagWidth = textSize.Width / 2;
                     var halfNameTagHeight = textSize.Height / 2;
 
-                    var x = spot.SpotInfo.Loc.HAxis - halfNameTagWidth - padding * 2;
-                    var y = spot.SpotInfo.Loc.VAxis + halfNameTagHeight * 3 - padding * 2;
+                    var x = spot.Loc.HAxis - halfNameTagWidth - padding * 2;
+                    var y = spot.Loc.VAxis + halfNameTagHeight * 3 - padding * 2;
 
                     //if (x < 0 ||
                     //    y < 0) continue;
@@ -428,8 +428,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
         {
             users = RoomUsers.Values
                 .Where(u =>
-                    !(u.UserRec.UserId < 1 ||
-                      u.UserRec.RoomPos == null))
+                    !(u.UserId < 1 ||
+                      u.RoomPos == null))
                 .ToList();
         }
 
@@ -437,8 +437,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
         foreach (var u in users)
         {
-            var x = u.UserRec.RoomPos.HAxis - CONST_INT_halfPropWidth;
-            var y = u.UserRec.RoomPos.VAxis - CONST_INT_halfPropHeight;
+            var x = u.RoomPos.HAxis - CONST_INT_halfPropWidth;
+            var y = u.RoomPos.VAxis - CONST_INT_halfPropHeight;
 
             if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
             else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
@@ -455,20 +455,20 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
             var hasAnimatedProp = false;
             var hasHeadProp = false;
 
-            var assetSpecs = u.UserRec.PropSpec?.ToList() ?? [];
+            var assetSpecs = u.PropSpec?.ToList() ?? [];
             if (assetSpecs.Count > 0)
                 foreach (var assetSpec in assetSpecs)
                 {
                     var asset = AssetsManager.Current.GetAsset(this, assetSpec);
                     if (asset == null) continue;
 
-                    hasPalindromeProp |= asset.AssetRec.IsPalindrome;
-                    hasAnimatedProp |= asset.AssetRec.IsAnimate;
-                    hasHeadProp |= asset.AssetRec.IsHead;
+                    hasPalindromeProp |= asset.IsPalindrome;
+                    hasAnimatedProp |= asset.IsAnimate;
+                    hasHeadProp |= asset.IsHead;
 
                     if (asset.Image == null) continue;
 
-                    if (asset.AssetRec.IsAnimate)
+                    if (asset.IsAnimate)
                         animatedProps.Add(asset);
                     else
                         stillProps.Add(asset);
@@ -477,8 +477,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
             if (!hasHeadProp)
             {
                 var index = (uint)0;
-                index += (uint)(u.UserRec.FaceNbr % DesktopConstants.MaxNbrFaces);
-                index += (uint)(u.UserRec.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
+                index += (uint)(u.FaceNbr % DesktopConstants.MaxNbrFaces);
+                index += (uint)(u.ColorNbr % DesktopConstants.MaxNbrColors) << 8;
                 var smileyFace = AssetsManager.Current.SmileyFaces[index];
 
                 g.DrawImage(
@@ -498,7 +498,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
                 {
                     var imgAttributes = (ImageAttributes?)null;
 
-                    if (prop.AssetRec.IsGhost)
+                    if (prop.IsGhost)
                     {
                         var matrix = new ColorMatrix
                         {
@@ -540,18 +540,18 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
         foreach (var u in users)
         {
-            if (u.UserRec.UserId < 1 ||
-                u.UserRec.RoomPos == null) continue;
+            if (u.UserId < 1 ||
+                u.RoomPos == null) continue;
 
-            var colour = DesktopConstants.NbrToColor(u.UserRec.ColorNbr);
+            var colour = DesktopConstants.NbrToColor(u.ColorNbr);
             using (var colourBrush = new SolidBrush(colour))
             {
-                var textSize = TextRenderer.MeasureText(u.UserRec.Name, font);
+                var textSize = TextRenderer.MeasureText(u.Name, font);
                 var halfNameTagWidth = textSize.Width / 2;
                 var halfNameTagHeight = textSize.Height / 2;
 
-                var x = u.UserRec.RoomPos.HAxis - halfNameTagWidth - padding * 2;
-                var y = u.UserRec.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
+                var x = u.RoomPos.HAxis - halfNameTagWidth - padding * 2;
+                var y = u.RoomPos.VAxis + halfNameTagHeight * 3 - padding * 2;
 
                 if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
                 else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = ScreenWidth + CONST_INT_halfPropWidth;
@@ -571,7 +571,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
                         textSize.Height + padding));
 
                 g.DrawString(
-                    u.UserRec.Name,
+                    u.Name,
                     font,
                     colourBrush,
                     x, y);
@@ -590,7 +590,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
     private void ScreenLayer_SpotBorder(Graphics g)
     {
         var spots = RoomInfo?.HotSpots
-            ?.Where(h => (h.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame)
+            ?.Where(h => (h.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame)
             ?.ToList() ?? [];
         if (spots.Count > 0)
         {
@@ -622,7 +622,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
         foreach (var u in users)
         {
-            if (u.UserRec.RoomPos == null) continue;
+            if (u.RoomPos == null) continue;
 
             if (u.Extended["MessageQueue"] is not DisposableQueue<MsgBubble> queue) continue;
 
@@ -650,8 +650,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
             var loc = msg.Origin;
 
-            var x = UserDesc.UserRec.RoomPos.HAxis;
-            var y = UserDesc.UserRec.RoomPos.VAxis;
+            var x = UserDesc.RoomPos.HAxis;
+            var y = UserDesc.RoomPos.VAxis;
 
             if (x < -CONST_INT_halfPropWidth) x = -CONST_INT_halfPropWidth;
             else if (x > ScreenWidth + CONST_INT_halfPropWidth) x = (short)(ScreenWidth + CONST_INT_halfPropWidth);
@@ -1072,7 +1072,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
             case IptEventTypes.RoomLoad:
                 History.RegisterHistory(
                     $"{ServerName} - {RoomInfo.Name}",
-                    $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomInfo.RoomID}");
+                    $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomID}");
 
                 RefreshRibbon();
 

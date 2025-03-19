@@ -1,11 +1,5 @@
 ﻿namespace Lib.Core.Entities.Shared.Rooms;
 
-public partial class DrawCmdDesc
+public partial class DrawCmdDesc : DrawCmdRec
 {
-    public DrawCmdRec DrawCmdInfo;
-
-    public DrawCmdDesc()
-    {
-        DrawCmdInfo = new DrawCmdRec();
-    }
 }

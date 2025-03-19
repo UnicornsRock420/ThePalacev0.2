@@ -1,27 +1,27 @@
 ﻿using System.Drawing;
-using Lib.Core.Entities.Core;
 using Lib.Core.Entities.Network.Shared.Network;
 using Lib.Core.Enums;
+using Lib.Core.Exts;
 using Lib.Core.Interfaces.Data;
 using AttributeExts = Lib.Core.Exts.AttributeExts;
 using Point = Lib.Core.Entities.Shared.Types.Point;
 
 namespace Lib.Core.Entities.Shared.Rooms;
 
-public partial class DrawCmdDesc : RawStream, IStructSerializer
+public partial class DrawCmdDesc : IStructSerializer
 {
     private static readonly int CONST_INT_SIZEOF_MSG_Header = AttributeExts.GetByteSize<MSG_Header>();
     private static readonly int CONST_INT_SIZEOF_POINT = AttributeExts.GetByteSize<Point>();
 
     public void Deserialize(Stream reader, SerializerOptions opts = SerializerOptions.None)
     {
-        DrawCmdInfo.NextOfst = reader.ReadInt16();
-        DrawCmdInfo.Reserved = reader.ReadInt16();
-        DrawCmdInfo.DrawCmd = reader.ReadInt16();
-        DrawCmdInfo.CmdLength = reader.ReadUInt16();
-        DrawCmdInfo.DataOfst = reader.ReadInt16();
+        NextOfst = reader.ReadInt16();
+        Reserved = reader.ReadInt16();
+        DrawCmd = reader.ReadInt16();
+        CmdLength = reader.ReadUInt16();
+        DataOfst = reader.ReadInt16();
 
-        reader.Position = DrawCmdInfo.DataOfst + CONST_INT_SIZEOF_MSG_Header;
+        reader.Position = DataOfst + CONST_INT_SIZEOF_MSG_Header;
 
         switch (Type)
         {
@@ -41,7 +41,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
 
                 Points = [];
                 while (Points.Count < nbrPoints &&
-                       Length >= CONST_INT_SIZEOF_POINT)
+                       reader.Length >= CONST_INT_SIZEOF_POINT)
                 {
                     vAxis = reader.ReadInt16();
                     hAxis = reader.ReadInt16();
@@ -82,7 +82,7 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
                 var hAxis = reader.ReadInt16();
                 Pos = new Point(hAxis, vAxis);
 
-                Text = ReadPString(128, 1);
+                Text = reader.ReadPString(128, 1);
 
                 throw new NotImplementedException(nameof(DrawCmdTypes.DC_Text));
             }
@@ -111,11 +111,12 @@ public partial class DrawCmdDesc : RawStream, IStructSerializer
 
     public void Serialize(Stream writer, SerializerOptions opts = SerializerOptions.None)
     {
-        writer.WriteInt16(DrawCmdInfo.NextOfst);
-        writer.WriteInt16(DrawCmdInfo.Reserved);
-        writer.WriteInt16(DrawCmdInfo.DrawCmd);
-        writer.WriteUInt16(DrawCmdInfo.CmdLength);
-        writer.WriteInt16(DrawCmdInfo.DataOfst);
-        writer.Write(Data, 0, DrawCmdInfo.CmdLength);
+        writer.WriteInt16(NextOfst);
+        writer.WriteInt16(Reserved);
+        writer.WriteInt16(DrawCmd);
+        writer.WriteUInt16((ushort)(Data?.Length ?? 0));
+        writer.WriteInt16(DataOfst);
+        if ((Data?.Length ?? 0) > 0)
+            writer.Write(Data, 0, Data.Length);
     }
 }

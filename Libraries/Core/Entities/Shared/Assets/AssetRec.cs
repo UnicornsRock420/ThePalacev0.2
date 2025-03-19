@@ -13,14 +13,13 @@ namespace Lib.Core.Entities.Shared.Assets;
 public partial class AssetRec : IStruct
 {
     public LegacyAssetTypes Type;
-
-    public AssetDescRec AssetDesc = new();
     public AssetSpec AssetSpec = new();
-
-    public uint16 BlockNbr;
-    public sint32 BlockOffset;
     public uint32 BlockSize;
+    public sint32 BlockOffset;
+    public uint16 BlockNbr;
     public uint16 NbrBlocks;
+    public AssetDescRec AssetDesc = new();
+    public byte[]? Data;
 
     public string? Md5 => Data?.ComputeMd5();
 

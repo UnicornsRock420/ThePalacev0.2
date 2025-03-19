@@ -42,7 +42,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     {
         using (var @lock = LockContext.GetLock(Assets))
         {
-            Current.Assets.TryAdd(assetRec.AssetRec.AssetSpec.Id, assetRec);
+            Current.Assets.TryAdd(assetRec.AssetSpec.Id, assetRec);
         }
     }
 
@@ -59,8 +59,8 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
             sessions
                 ?.Where(s => (s?.Users?.Count ?? 0) > 0)
                 ?.SelectMany(s => s.Users.Values
-                    ?.Where(u => (u?.UserDesc?.UserRec?.PropSpec?.Length ?? 0) > 0)
-                    ?.Select(u => u.UserDesc.UserRec.PropSpec
+                    ?.Where(u => (u?.UserDesc?.PropSpec?.Length ?? 0) > 0)
+                    ?.Select(u => u.UserDesc.PropSpec
                         ?.Where(p => p?.Id != 0)
                         ?.Select(p => p.Id)))
                 ?.Concat(sessions
@@ -74,7 +74,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 ?.ToList();
 
             var iQuery = Current.Assets.Values
-                .Select(a => a.AssetRec.AssetSpec.Id)
+                .Select(a => a.AssetSpec.Id)
                 .AsQueryable();
 
             if (propIDs.Length > 0)

@@ -131,7 +131,7 @@ public class PatStream : StreamBase
                     case "ENDROOM":
                         if (!insideHotspot) insideRoom = false;
 
-                        if (workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
+                        if (workingRoom.RoomID != NULL_ROOMREC.RoomID)
                         {
                             rooms.Add(workingRoom);
                             workingRoom = NULL_ROOMREC;
@@ -145,13 +145,13 @@ public class PatStream : StreamBase
                             workingHotspot = new HotspotDesc();
                             workingScript = new StringBuilder();
 
-                            workingHotspot.SpotInfo.Type = HotspotTypes.HS_Door;
+                            workingHotspot.Type = HotspotTypes.HS_Door;
                         }
 
                         break;
                     case "ENDDOOR":
                         if (insideRoom && insideHotspot && workingRoom.HotSpots != null &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             insideHotspot = false;
 
@@ -168,14 +168,14 @@ public class PatStream : StreamBase
                             workingHotspot = new HotspotDesc();
                             workingScript = new StringBuilder();
 
-                            workingHotspot.SpotInfo.Type = HotspotTypes.HS_Normal;
+                            workingHotspot.Type = HotspotTypes.HS_Normal;
                         }
 
                         break;
                     case "ENDSPOT":
                     case "ENDHOTSPOT":
                         if (insideRoom && insideHotspot && workingRoom.HotSpots != null &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             insideHotspot = false;
 
@@ -191,13 +191,13 @@ public class PatStream : StreamBase
                             workingHotspot = new HotspotDesc();
                             workingScript = new StringBuilder();
 
-                            workingHotspot.SpotInfo.Type = HotspotTypes.HS_Bolt;
+                            workingHotspot.Type = HotspotTypes.HS_Bolt;
                         }
 
                         break;
                     case "ENDBOLT":
                         if (insideRoom && insideHotspot && workingRoom.HotSpots != null &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             insideHotspot = false;
 
@@ -213,13 +213,13 @@ public class PatStream : StreamBase
                             workingHotspot = new HotspotDesc();
                             workingScript = new StringBuilder();
 
-                            workingHotspot.SpotInfo.Type = HotspotTypes.HS_NavArea;
+                            workingHotspot.Type = HotspotTypes.HS_NavArea;
                         }
 
                         break;
                     case "ENDNAVAREA":
                         if (insideRoom && insideHotspot && workingRoom.HotSpots != null &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             insideHotspot = false;
 
@@ -276,7 +276,7 @@ public class PatStream : StreamBase
                         break;
                     case "ENDSCRIPT":
                         if (insideRoom && insideHotspot && insideScript &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID &&
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID &&
                             workingScript != null)
                         {
                             insideScript = false;
@@ -288,7 +288,7 @@ public class PatStream : StreamBase
                         break;
                     case "PICTS":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             insidePicts = true;
                             workingHotspot.States = [];
@@ -305,10 +305,10 @@ public class PatStream : StreamBase
                         if (insidePicture && workingPicture.PicID != NULL_PICTUREREC.PicID)
                             workingPicture.PicID = tokens[1].TryParse<short>();
                         else if (insideHotspot &&
-                                 workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.HotspotID = tokens[1].TryParse<short>();
-                        else if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomID = tokens[1].TryParse<short>();
+                                 workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.HotspotID = tokens[1].TryParse<short>();
+                        else if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomID = tokens[1].TryParse<short>();
 
                         break;
                     case "NAME":
@@ -317,33 +317,33 @@ public class PatStream : StreamBase
                         if (insidePicture && workingPicture.PicID != NULL_PICTUREREC.PicID)
                             workingPicture.Name = value;
                         else if (insideHotspot &&
-                                 workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                                 workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                             workingHotspot.Name = value;
-                        else if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
+                        else if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             workingRoom.Name = value;
 
                         break;
                     case "ARTIST":
                         if (tokens.Length < 2) break;
 
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             workingRoom.Artist = value;
 
                         break;
                     case "PICT":
                         if (tokens.Length < 2) break;
 
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             workingRoom.Picture = value;
 
                         break;
                     case "LOCKED":
                         if (tokens.Length < 2) break;
 
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID &&
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID &&
                             !string.IsNullOrWhiteSpace(value))
                         {
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.AuthorLocked;
+                            workingRoom.RoomFlags |= RoomFlags.AuthorLocked;
                             workingRoom.Password = value.GetBytes().ReadCString().GetBytes().DecryptString();
                         }
 
@@ -351,134 +351,134 @@ public class PatStream : StreamBase
                     case "MAXMEMBERS":
                         if (tokens.Length < 2) break;
 
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
                             workingRoom.MaxOccupancy = tokens[1].TryParse<short>();
 
                         break;
                     case "FACES":
                         if (tokens.Length < 2) break;
 
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.FacesID = tokens[1].TryParse<short>();
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.FacesID = tokens[1].TryParse<short>();
 
                         break;
                     case "DROPZONE":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.DropZone;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.DropZone;
 
                         break;
                     case "NOLOOSEPROPS":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.RF_NoLooseProps;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.RF_NoLooseProps;
 
                         break;
                     case "PRIVATE":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.Private;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.Private;
 
                         break;
                     case "NOPAINTING":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.NoPainting;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.NoPainting;
 
                         break;
                     case "NOCYBORGS":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.CyborgFreeZone;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.CyborgFreeZone;
 
                         break;
                     case "HIDDEN":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.Hidden;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.Hidden;
 
                         break;
                     case "NOGUESTS":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.NoGuests;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.NoGuests;
 
                         break;
                     case "WIZARDSONLY":
                     case "OPERATORSONLY":
-                        if (insideRoom && workingRoom.RoomInfo.RoomID != NULL_ROOMREC.RoomInfo.RoomID)
-                            workingRoom.RoomInfo.RoomFlags |= RoomFlags.WizardsOnly;
+                        if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
+                            workingRoom.RoomFlags |= RoomFlags.WizardsOnly;
 
                         break;
                     case "LOCKABLE":
                     case "SHUTABLE":
-                        if (insideRoom && insideHotspot) workingHotspot.SpotInfo.Type |= HotspotTypes.HS_LockableDoor;
+                        if (insideRoom && insideHotspot) workingHotspot.Type |= HotspotTypes.HS_LockableDoor;
 
                         break;
                     case "DRAGGABLE":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Draggable;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Draggable;
 
                         break;
                     case "FORBIDDEN":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Forbidden;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Forbidden;
 
                         break;
                     case "MANDATORY":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Mandatory;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Mandatory;
 
                         break;
                     case "LANDINGPAD":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_LandingPad;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_LandingPad;
 
                         break;
                     case "DONTMOVEHERE":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_DontMoveHere;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_DontMoveHere;
 
                         break;
                     case "INVISIBLE":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Invisible;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Invisible;
 
                         break;
                     case "SHOWNAME":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_ShowName;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_ShowName;
 
                         break;
                     case "SHOWFRAME":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_ShowFrame;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_ShowFrame;
 
                         break;
                     case "SHADOW":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Shadow;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Shadow;
 
                         break;
                     case "FILL":
                         if (insideRoom && insideHotspot &&
-                            workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Flags |= HotspotFlags.HS_Fill;
+                            workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Flags |= HotspotFlags.HS_Fill;
 
                         break;
                     case "DEST":
                         if (tokens.Length < 2) break;
 
-                        if (insideHotspot && workingHotspot.SpotInfo.Dest != null)
-                            workingHotspot.SpotInfo.Dest = tokens[1].TryParse<short>();
+                        if (insideHotspot && workingHotspot.Dest != null)
+                            workingHotspot.Dest = tokens[1].TryParse<short>();
 
                         break;
                     case "OUTLINE":
                         if (tokens.Length < 3) break;
 
-                        if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
+                        if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
                         {
                             workingHotspot.Vortexes = [];
 
@@ -501,8 +501,8 @@ public class PatStream : StreamBase
                         var h = coords[0].TryParse<short>();
                         var v = coords[1].TryParse<short>();
 
-                        if (insideHotspot && workingHotspot.SpotInfo.HotspotID != NULL_HOTSPOTREC.SpotInfo.HotspotID)
-                            workingHotspot.SpotInfo.Loc = new Point(h, v);
+                        if (insideHotspot && workingHotspot.HotspotID != NULL_HOTSPOTREC.HotspotID)
+                            workingHotspot.Loc = new Point(h, v);
                         else if (insideProp && workingLooseProp.AssetSpec.Id != NULL_LOOSEPROPREC.AssetSpec.Id)
                             workingLooseProp.Loc = new Point(h, v);
                     }
@@ -539,14 +539,11 @@ public class PatStream : StreamBase
 
                                 workingHotspot.States.Add(new HotspotStateDesc
                                 {
-                                    StateInfo = new HotspotStateRec
+                                    PictID = state[0].TryParse<short>(),
+                                    PicLoc = new Point
                                     {
-                                        PictID = state[0].TryParse<short>(),
-                                        PicLoc = new Point
-                                        {
-                                            HAxis = state[1].TryParse<short>(),
-                                            VAxis = state[2].TryParse<short>()
-                                        }
+                                        HAxis = state[1].TryParse<short>(),
+                                        VAxis = state[2].TryParse<short>()
                                     }
                                 });
                             }
@@ -565,13 +562,13 @@ public class PatStream : StreamBase
             if (printHeader)
             {
                 var entrance = rooms
-                    .Where(r => RoomFlags.DropZone.IsSet(r.RoomInfo.RoomFlags))
-                    .OrderBy(r => r.RoomInfo.RoomID)
+                    .Where(r => RoomFlags.DropZone.IsSet(r.RoomFlags))
+                    .OrderBy(r => r.RoomID)
                     .FirstOrDefault();
 
-                if (entrance.RoomInfo.RoomID > 0)
+                if (entrance.RoomID > 0)
                 {
-                    writer.WriteLine($"ENTRANCE {entrance.RoomInfo.RoomID}");
+                    writer.WriteLine($"ENTRANCE {entrance.RoomID}");
                     writer.WriteLine();
                 }
             }
@@ -586,25 +583,25 @@ public class PatStream : StreamBase
                         writer.WriteLine(
                             $"\tLOCKED \"{r.Password.ToString().EncryptString().WritePalaceEscapedString()}\"");
 
-                    writer.WriteLine($"\tID {r.RoomInfo.RoomID}");
+                    writer.WriteLine($"\tID {r.RoomID}");
 
                     if (r.MaxOccupancy > 0) writer.WriteLine($"\tMAXMEMBERS {r.MaxOccupancy}");
 
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone)
+                    if ((r.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone)
                         writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone)
+                    if ((r.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone)
                         writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden)
+                    if ((r.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden)
                         writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests)
+                    if ((r.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests)
                         writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps)
+                    if ((r.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps)
                         writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting)
+                    if ((r.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting)
                         writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.Private) == RoomFlags.Private)
+                    if ((r.RoomFlags & RoomFlags.Private) == RoomFlags.Private)
                         writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
-                    if ((r.RoomInfo.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly)
+                    if ((r.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly)
                         writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
 
                     writer.WriteLine($"\tNAME \"{r.Name}\"");
@@ -638,40 +635,40 @@ public class PatStream : StreamBase
                     if (r.HotSpots != null && r.HotSpots?.Count > 0)
                         foreach (var hotspot in r.HotSpots)
                         {
-                            writer.WriteLine($"\t{hotspot.SpotInfo.Type.GetDescription()}");
+                            writer.WriteLine($"\t{hotspot.Type.GetDescription()}");
 
-                            if (hotspot.SpotInfo.Type == HotspotTypes.HS_LockableDoor ||
-                                hotspot.SpotInfo.Type == HotspotTypes.HS_ShutableDoor) writer.WriteLine("\t\tLOCKABLE");
+                            if (hotspot.Type == HotspotTypes.HS_LockableDoor ||
+                                hotspot.Type == HotspotTypes.HS_ShutableDoor) writer.WriteLine("\t\tLOCKABLE");
 
-                            writer.WriteLine($"\t\tID {hotspot.SpotInfo.HotspotID}");
+                            writer.WriteLine($"\t\tID {hotspot.HotspotID}");
 
-                            if (hotspot.SpotInfo.Dest != 0) writer.WriteLine($"\t\tDEST {hotspot.SpotInfo.Dest}");
+                            if (hotspot.Dest != 0) writer.WriteLine($"\t\tDEST {hotspot.Dest}");
 
                             if (!string.IsNullOrWhiteSpace(hotspot.Name))
                                 writer.WriteLine($"\t\tID \"{hotspot.Name}\"");
 
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere)
+                            if ((hotspot.Flags & HotspotFlags.HS_DontMoveHere) == HotspotFlags.HS_DontMoveHere)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_DONTMOVEHERE);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable)
+                            if ((hotspot.Flags & HotspotFlags.HS_Draggable) == HotspotFlags.HS_Draggable)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_DRAGGABLE);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill)
+                            if ((hotspot.Flags & HotspotFlags.HS_Fill) == HotspotFlags.HS_Fill)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_FILL);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden)
+                            if ((hotspot.Flags & HotspotFlags.HS_Forbidden) == HotspotFlags.HS_Forbidden)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_FORBIDDEN);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible)
+                            if ((hotspot.Flags & HotspotFlags.HS_Invisible) == HotspotFlags.HS_Invisible)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_INVISIBLE);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad)
+                            if ((hotspot.Flags & HotspotFlags.HS_LandingPad) == HotspotFlags.HS_LandingPad)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_LANDINGPAD);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory)
+                            if ((hotspot.Flags & HotspotFlags.HS_Mandatory) == HotspotFlags.HS_Mandatory)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_MANDATORY);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow)
+                            if ((hotspot.Flags & HotspotFlags.HS_Shadow) == HotspotFlags.HS_Shadow)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_SHADOW);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame)
+                            if ((hotspot.Flags & HotspotFlags.HS_ShowFrame) == HotspotFlags.HS_ShowFrame)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWFRAME);
-                            if ((hotspot.SpotInfo.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
+                            if ((hotspot.Flags & HotspotFlags.HS_ShowName) == HotspotFlags.HS_ShowName)
                                 writer.WriteLine(CONST_HOTSPOTFLAGS_SHOWNAME);
 
-                            if (hotspot.SpotInfo.NbrPts > 0 && hotspot.Vortexes?.Count > 0)
+                            if (hotspot.NbrPts > 0 && hotspot.Vortexes?.Count > 0)
                             {
                                 writer.Write("\t\tOUTLINE");
 
@@ -681,7 +678,7 @@ public class PatStream : StreamBase
                                 writer.WriteLine();
                             }
 
-                            writer.WriteLine($"\t\tLOC {hotspot.SpotInfo.Loc.HAxis},{hotspot.SpotInfo.Loc.VAxis}");
+                            writer.WriteLine($"\t\tLOC {hotspot.Loc.HAxis},{hotspot.Loc.VAxis}");
 
                             if (hotspot.States?.Count > 0)
                             {
@@ -689,7 +686,7 @@ public class PatStream : StreamBase
 
                                 foreach (var state in hotspot.States)
                                     writer.WriteLine(
-                                        $"\t\t\t{state.StateInfo.PictID},{state.StateInfo.PicLoc.HAxis},{state.StateInfo.PicLoc.VAxis}");
+                                        $"\t\t\t{state.PictID},{state.PicLoc.HAxis},{state.PicLoc.VAxis}");
 
                                 writer.WriteLine("\t\tENDPICTS");
                             }
@@ -703,7 +700,7 @@ public class PatStream : StreamBase
                                 writer.WriteLine("\t\t\tENDSCRIPT");
                             }
 
-                            writer.WriteLine($"\tEND{hotspot.SpotInfo.Type.GetDescription()}");
+                            writer.WriteLine($"\tEND{hotspot.Type.GetDescription()}");
                         }
 
                     writer.WriteLine("ENDROOM");

@@ -7,9 +7,10 @@ namespace Lib.Core.Entities.Shared.Rooms;
 [ByteSize(10)]
 public class DrawCmdRec
 {
-    public uint16 CmdLength;
-    public sint16 DataOfst;
-    public sint16 DrawCmd;
     public sint16 NextOfst;
     public sint16 Reserved;
+    public sint16 DrawCmd;
+    public uint16 CmdLength;
+    public sint16 DataOfst;
+    public byte[]? Data;
 }

@@ -501,7 +501,7 @@ public class IptscraeEngine : Mod.Scripting.Iptscrae.Helpers.IptscraeEngine
 
                     iptTracking.Stack.Push(new IptVariable(
                         IptVariableTypes.Integer,
-                        sessionState.UserDesc?.UserRec?.PropSpec?.Length ?? 0));
+                        sessionState.UserDesc?.PropSpec?.Length ?? 0));
                 }));
 
         #endregion End Prop Commands

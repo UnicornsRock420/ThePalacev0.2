@@ -1,40 +1,32 @@
-﻿using System.Runtime.Serialization;
-using Lib.Core.Attributes.Strings;
+﻿using Lib.Core.Attributes.Strings;
 using Lib.Core.Entities.Core;
+using Lib.Core.Enums;
 using Lib.Core.Interfaces.Data;
+using RoomID = short;
 using sint16 = short;
+using sint32 = int;
 using uint8 = byte;
 
 namespace Lib.Core.Entities.Shared.Rooms;
 
 public partial class RoomDesc : RawStream, IStruct
 {
-    [IgnoreDataMember] public string? Artist;
-
-    [IgnoreDataMember] public List<DrawCmdDesc>? DrawCmds;
-
-    [IgnoreDataMember] public List<HotspotDesc>? HotSpots;
-
-    [IgnoreDataMember] public DateTime? LastModified;
-
-    [IgnoreDataMember] public List<LoosePropRec>? LooseProps;
-
-    [IgnoreDataMember] public sint16 MaxOccupancy;
-
-    [IgnoreDataMember] public string? Name;
-
-    [IgnoreDataMember] [EncryptedString()] public string? Password;
-
-    [IgnoreDataMember] public string? Picture;
-
-    [IgnoreDataMember] public List<PictureRec>? Pictures;
-
-    public RoomRec RoomInfo;
+    public RoomID RoomID;
+    public RoomFlags RoomFlags;
+    public string? Name;
+    [EncryptedString(1, 128)] public string? Password;
+    public string? Artist;
+    public string? Picture;
+    public sint32 FacesID;
+    public DateTime? LastModified;
+    public sint16 MaxOccupancy;
+    public List<PictureRec>? Pictures;
+    public List<HotspotDesc>? HotSpots;
+    public List<DrawCmdDesc>? DrawCmds;
+    public List<LoosePropRec>? LooseProps;
 
     public RoomDesc()
     {
-        RoomInfo = new RoomRec();
-
         HotSpots = [];
         Pictures = [];
         DrawCmds = [];
@@ -43,8 +35,6 @@ public partial class RoomDesc : RawStream, IStruct
 
     public RoomDesc(RoomRec room)
     {
-        RoomInfo = room;
-
         HotSpots = [];
         Pictures = [];
         DrawCmds = [];
@@ -53,8 +43,6 @@ public partial class RoomDesc : RawStream, IStruct
 
     public RoomDesc(uint8[]? data = null) : base(data)
     {
-        RoomInfo = new RoomRec();
-
         HotSpots = [];
         Pictures = [];
         DrawCmds = [];
