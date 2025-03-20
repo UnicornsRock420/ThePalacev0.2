@@ -4,15 +4,14 @@ using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
 using Lib.Logging.Entities;
 using Mod.Scripting.Iptscrae.Enums;
-using ThePalace.Client.Desktop.Entities.Core;
 
 namespace ThePalace.Client.Desktop.Factories;
 
-public class ScriptEvents : SingletonDisposable<ScriptEvents>
+public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
 {
     private static readonly IReadOnlyList<IptEventTypes> _eventTypes = Enum.GetValues<IptEventTypes>().ToList();
-
     private ConcurrentDictionary<IptEventTypes, List<EventHandler>> _events = new();
+    private bool IsDisposed;
 
     public ScriptEvents()
     {
@@ -25,9 +24,11 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
+
+        IsDisposed = true;
 
         foreach (var @event in _events.Values)
             try
@@ -41,14 +42,17 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
         _events.Clear();
         _events = null;
 
-        base.Dispose();
-
         GC.SuppressFinalize(this);
     }
 
-    public void Invoke(IptEventTypes eventType, IUserSessionState sessionState, IProtocol packet,
+    public void Invoke(
+        IptEventTypes eventType,
+        IUserSessionState sessionState,
+        IProtocol packet,
         object scriptState = null)
     {
+        if (IsDisposed) return;
+
         var scriptEvent = new ScriptEvent
         {
             EventType = (int)eventType,
@@ -66,18 +70,37 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
                 LoggerHub.Current.Error(ex);
 
                 if (eventType != IptEventTypes.UnhandledError)
-                    Invoke(IptEventTypes.UnhandledError, sessionState, packet, sessionState.ScriptTag);
+                    Invoke(
+                        IptEventTypes.UnhandledError,
+                        sessionState,
+                        packet,
+                        sessionState.ScriptTag);
             }
     }
 
-    public void RegisterEvent(IptEventTypes eventType, EventHandler handler)
+    public void RegisterEvent(
+        IptEventTypes eventType,
+        EventHandler handler)
     {
+        if (IsDisposed) return;
+
         if (handler != null)
             _events[eventType].Add(handler);
     }
 
-    public void UnregisterEvent(IptEventTypes eventType, EventHandler handler)
+    public void UnregisterEvent(
+        IptEventTypes eventType,
+        EventHandler handler)
     {
+        if (IsDisposed) return;
+
         _events[eventType].Remove(handler);
+    }
+
+    public void ClearEvents(IptEventTypes eventType)
+    {
+        if (IsDisposed) return;
+
+        _events[eventType].Clear();
     }
 }

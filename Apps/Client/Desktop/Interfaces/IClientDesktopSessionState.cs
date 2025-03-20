@@ -6,7 +6,6 @@ using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;
-using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 

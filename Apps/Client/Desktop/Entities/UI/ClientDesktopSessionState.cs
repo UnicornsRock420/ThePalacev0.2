@@ -25,7 +25,6 @@ using Lib.Network.Interfaces;
 using Mod.Scripting.Iptscrae.Attributes;
 using Mod.Scripting.Iptscrae.Entities;
 using Mod.Scripting.Iptscrae.Enums;
-using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
@@ -178,12 +177,12 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
         .Where(v => !new[] { LayerScreenTypes.Base, LayerScreenTypes.DimRoom }.Contains(v))
         .ToArray();
 
-    private static readonly IReadOnlyList<IptEventTypes> CONST_uiRefreshEvents = Enum.GetValues<IptEventTypes>()
+    private static readonly IReadOnlyList<IptEventTypes> CONST_EventTypes_UiRefresh = Enum.GetValues<IptEventTypes>()
         .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
         .ToList()
         .AsReadOnly();
 
-    private static readonly IReadOnlyDictionary<IptEventTypes[], LayerScreenTypes[]> CONST_EventLayerMappings =
+    private static readonly IReadOnlyDictionary<IptEventTypes[], LayerScreenTypes[]> CONST_Event_LayerScreen_Types_Mappings =
         new Dictionary<IptEventTypes[], LayerScreenTypes[]>
         {
             { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [LayerScreenTypes.Base] },
@@ -1049,7 +1048,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
     {
         var screenLayers =
             (from layer
-                    in CONST_EventLayerMappings
+                    in CONST_Event_LayerScreen_Types_Mappings
                 where layer.Key.Contains(scriptEvent.EventType)
                 select layer.Value)
             .FirstOrDefault();
@@ -1057,7 +1056,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
         if (screenLayers.Contains(LayerScreenTypes.Base))
             RefreshScreen(LayerScreenTypes.Base);
 
-        if (CONST_uiRefreshEvents.Contains(scriptEvent.EventType))
+        if (CONST_EventTypes_UiRefresh.Contains(scriptEvent.EventType))
         {
             RefreshUI();
             RefreshRibbon();

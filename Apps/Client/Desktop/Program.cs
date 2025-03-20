@@ -403,7 +403,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (IsDisposed) return;
 
-        CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
+        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
 
         if (UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon)
         {
@@ -427,7 +427,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     #region Properties
 
-    private static readonly IReadOnlyList<IptEventTypes> CONST_eventTypes = Enum.GetValues<IptEventTypes>()
+    private static readonly IReadOnlyList<IptEventTypes> CONST_EventTypes_ScreenRefresh = Enum.GetValues<IptEventTypes>()
         .Where(v => v.GetType()
             ?.GetField(v.ToString())
             ?.GetCustomAttributes<ScreenRefreshAttribute>()
@@ -481,7 +481,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (IsDisposed) return;
 
-        CONST_eventTypes.ToList().ForEach(t => ScriptEvents.Current.RegisterEvent(t, RefreshScreen));
+        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEvents.Current.RegisterEvent(t, RefreshScreen));
 
         ApiManager.Current.RegisterApi(nameof(ShowConnectionForm), ShowConnectionForm);
         ApiManager.Current.RegisterApi(nameof(toolStripDropdownlist_Click), toolStripDropdownlist_Click);
