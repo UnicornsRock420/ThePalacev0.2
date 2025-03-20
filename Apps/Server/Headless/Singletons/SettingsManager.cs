@@ -1,11 +1,10 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Windows.Forms;
 using Lib.Logging.Entities;
 using Microsoft.Extensions.Configuration;
 
-namespace Lib.Settings.Singletons;
+namespace ThePalace.Server.Headless.Singletons;
 
 public class SettingsManager : SingletonDisposable<SettingsManager>
 {
@@ -28,65 +27,6 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         GC.SuppressFinalize(this);
     }
 
-    private static readonly Keys[] _keyModifiers =
-    [
-        Keys.Control,
-        Keys.Shift,
-        Keys.Alt,
-        Keys.LWin,
-        Keys.RWin
-    ];
-
-    private static readonly Keys[] _keyMappableCharacters =
-    [
-        Keys.D0,
-        Keys.D1,
-        Keys.D2,
-        Keys.D3,
-        Keys.D4,
-        Keys.D5,
-        Keys.D6,
-        Keys.D7,
-        Keys.D8,
-        Keys.D9,
-        Keys.NumPad0,
-        Keys.NumPad1,
-        Keys.NumPad2,
-        Keys.NumPad3,
-        Keys.NumPad4,
-        Keys.NumPad5,
-        Keys.NumPad6,
-        Keys.NumPad7,
-        Keys.NumPad8,
-        Keys.NumPad9,
-        Keys.A,
-        Keys.B,
-        Keys.C,
-        Keys.D,
-        Keys.E,
-        Keys.F,
-        Keys.G,
-        Keys.H,
-        Keys.I,
-        Keys.J,
-        Keys.K,
-        Keys.L,
-        Keys.M,
-        Keys.N,
-        Keys.O,
-        Keys.P,
-        Keys.Q,
-        Keys.R,
-        Keys.S,
-        Keys.T,
-        Keys.U,
-        Keys.V,
-        Keys.W,
-        Keys.X,
-        Keys.Y,
-        Keys.Z,
-    ];
-
     private IConfiguration _configuration;
 
     public void Build()
@@ -95,7 +35,7 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         {
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(@"Config\AppSettings.json")
-                .AddJsonFile(@"Config\UserSettings.json")
+                .AddJsonFile(@"Config\ServerSettings.json")
                 .Build();
         }
         catch (Exception ex)

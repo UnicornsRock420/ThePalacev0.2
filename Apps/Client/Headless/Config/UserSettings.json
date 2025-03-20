@@ -1,0 +1,38 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Trace",
+      "System": "Information",
+      "Microsoft": "None"
+    }
+  },
+  "UserProfiles": [
+    {
+      "Name": "Janus",
+      "Version": "PC4237",
+      "RegCode": "CANADA",
+      "PuidCode": "ZCANADA"
+    }
+  ],
+  "Scripting": {
+    "Iptscrae": {
+      "Cyborgs": {
+        "Enabled": true
+      }
+    },
+    "JavaScript": {
+      "Cyborgs": {
+        "Enabled": false
+      }
+    },
+    "Python": {
+      "Cyborgs": {
+        "Enabled": false
+      }
+    }
+  },
+  "ConnectionStrings": {
+    "Driver": "SQLite",
+    "LoggingDB": "Data Source=Logging.db;Version=3;"
+  }
+}
