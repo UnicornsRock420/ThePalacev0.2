@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Lib.Core.Entities.Scripting;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
 using Lib.Logging.Entities;
@@ -50,7 +51,7 @@ public class ScriptEvents : SingletonDisposable<ScriptEvents>
     {
         var scriptEvent = new ScriptEvent
         {
-            EventType = eventType,
+            EventType = (int)eventType,
             Msg = packet,
             ScriptTag = scriptState
         };

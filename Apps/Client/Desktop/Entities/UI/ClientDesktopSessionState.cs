@@ -8,8 +8,10 @@ using Lib.Common.Client.Constants;
 using Lib.Common.Desktop.Constants;
 using Lib.Common.Desktop.Entities.Ribbon;
 using Lib.Common.Desktop.Interfaces;
+using Lib.Common.Desktop.Singletons;
 using Lib.Common.Factories.Core;
 using Lib.Core.Constants;
+using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.ServerInfo;
 using Lib.Core.Entities.Shared.Types;
@@ -30,7 +32,6 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Client.Desktop.Singletons;
 using Point = System.Drawing.Point;
 using RegexConstants = Lib.Common.Constants.RegexConstants;
 using RoomID = short;
@@ -1069,7 +1070,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
         switch (scriptEvent.EventType)
         {
-            case IptEventTypes.RoomLoad:
+            case (int)IptEventTypes.RoomLoad:
                 History.RegisterHistory(
                     $"{ServerName} - {RoomInfo.Name}",
                     $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomID}");

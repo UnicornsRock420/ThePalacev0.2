@@ -2,6 +2,7 @@
 using Lib.Common.Client.Interfaces;
 using Lib.Common.Desktop.Entities.Ribbon;
 using Lib.Common.Desktop.Interfaces;
+using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;

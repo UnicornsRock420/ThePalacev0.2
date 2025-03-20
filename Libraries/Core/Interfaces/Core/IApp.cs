@@ -6,6 +6,8 @@ namespace Lib.Core.Interfaces.Core;
 
 public interface IApp
 {
+    bool IsServer { get; }
+    
     SessionManager SessionManager => SessionManager.Current;
     IReadOnlyDictionary<ThreadQueues, IJob> Jobs { get; }
 

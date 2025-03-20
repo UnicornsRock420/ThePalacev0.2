@@ -30,10 +30,4 @@
       <ProjectReference Include="..\Logging\Lib.Logging.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Reference Include="System.Windows.Forms">
-        <HintPath>C:\Program Files\dotnet\shared\Microsoft.WindowsDesktop.App\9.0.2\System.Windows.Forms.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>

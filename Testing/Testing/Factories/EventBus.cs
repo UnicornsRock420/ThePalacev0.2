@@ -1,7 +1,7 @@
 ﻿using Lib.Common.Client.Entities.Business.ServerInfo;
-using Lib.Common.Client.Entities.Business.Users;
 using Lib.Common.Helpers;
 using Lib.Common.Server.Entities.Business.Auth;
+using Lib.Common.Server.Entities.Business.Users;
 using Lib.Core.Entities.EventsBus.EventArgs;
 using Lib.Core.Interfaces.EventsBus;
 using ThePalace.Testing.Data;

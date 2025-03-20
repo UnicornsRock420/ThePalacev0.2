@@ -21,6 +21,7 @@ using Lib.Core.Entities.Network.Shared.Assets;
 using Lib.Core.Entities.Network.Shared.Communications;
 using Lib.Core.Entities.Network.Shared.Network;
 using Lib.Core.Entities.Network.Shared.Users;
+using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Entities.Threading;
 using Lib.Core.Exts;
@@ -40,7 +41,6 @@ using ThePalace.Client.Desktop.Enums;
 using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
-using ThePalace.Client.Desktop.Singletons;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
@@ -437,6 +437,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     protected readonly ContextMenuStrip _contextMenu = new();
 
+    public bool IsServer => SettingsManager.Current.IsServer = false;
     public IClientDesktopSessionState SessionState { get; protected set; }
 
     protected ConcurrentDictionary<ThreadQueues, IJob> _jobs = new();
