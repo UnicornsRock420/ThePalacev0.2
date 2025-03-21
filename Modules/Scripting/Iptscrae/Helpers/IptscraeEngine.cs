@@ -4,6 +4,7 @@ using Lib.Common.Factories.Core;
 using Lib.Common.Helpers;
 using Lib.Core.Entities.Network.Client.Network;
 using Lib.Core.Entities.Shared.Users;
+using Lib.Core.Enums;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.Core;
 using Lib.Logging.Entities;
@@ -25,8 +26,8 @@ public class IptscraeEngine
     protected const string CONST_IptEngineName = "IptscraeEngine";
     protected const string CONST_ClientType = "IptscraeEngine";
 
-    protected static readonly IReadOnlyDictionary<string, IptEventTypes> EventTypes =
-        Enum.GetValues<IptEventTypes>()
+    protected static readonly IReadOnlyDictionary<string, ScriptEventTypes> EventTypes =
+        Enum.GetValues<ScriptEventTypes>()
             .ToDictionary(v => v.ToString().ToUpperInvariant(), v => v);
 
     protected static readonly ConcurrentDictionary<string, object> IptCommands =

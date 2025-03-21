@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Lib.Settings.Singletons
 {
-    public class SettingsManager : SingletonDisposable<SettingsManager>
+    public class SettingsManager : Singleton<SettingsManager>
     {
         public SettingsManager()
         {
@@ -41,15 +41,16 @@ namespace Lib.Settings.Singletons
             Dispose();
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
             if (IsDisposed) return;
 
-            base.Dispose();
+            IsDisposed = true;
 
             GC.SuppressFinalize(this);
         }
 
+        private bool IsDisposed { get; set; }
         private IConfigurationBuilder _configurationBuilder;
         private IConfiguration _configuration;
 

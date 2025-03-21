@@ -5,7 +5,7 @@ using uint8 = byte;
 
 namespace Lib.Core.Entities.Core;
 
-public class RawStream : EventArgs, IDisposable, IData, IStruct
+public class RawStream : System.EventArgs, IDisposable, IData, IStruct
 {
     [Flags]
     public enum RawStreamOptions : uint

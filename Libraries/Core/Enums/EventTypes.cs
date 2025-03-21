@@ -1,4 +1,4 @@
-﻿using Lib.Common.Attributes;
+﻿using Lib.Common.Attributes.Core;
 using Lib.Core.Attributes.Serialization;
 
 namespace Lib.Core.Enums;

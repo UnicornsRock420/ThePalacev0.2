@@ -1,6 +1,6 @@
 ﻿using uint32 = uint;
 
-namespace Lib.Common.Attributes;
+namespace Lib.Common.Attributes.Core;
 
 public class MnemonicAttribute(
     string mnemonic) : Attribute

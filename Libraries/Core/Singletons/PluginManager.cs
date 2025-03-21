@@ -4,8 +4,9 @@ using Lib.Core.Entities.Core;
 
 namespace Lib.Core.Singletons;
 
-public class PluginManager : SingletonDisposable<PluginManager>
+public class PluginManager : Singleton<PluginManager>
 {
+    private bool IsDisposed { get; set; }
     private readonly PluginState _pluginContext = new();
     private ConcurrentDictionary<Guid, Assembly> _plugins = new();
     public IReadOnlyDictionary<Guid, Assembly> Plugins => _plugins.AsReadOnly();
@@ -15,11 +16,11 @@ public class PluginManager : SingletonDisposable<PluginManager>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
-        base.Dispose();
+        IsDisposed = true;
 
         try
         {

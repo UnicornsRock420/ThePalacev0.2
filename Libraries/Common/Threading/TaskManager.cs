@@ -28,6 +28,8 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public override void Dispose()
     {
+        if (IsDisposed) return;
+
         if (!_globalToken.IsCancellationRequested)
         {
             try
@@ -83,7 +85,8 @@ public class TaskManager : SingletonDisposable<TaskManager>
     public IJob CreateJob(Action<ConcurrentQueue<ICmd>> cmd, IJobState? jobState = null,
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
     {
-        if (_globalToken.IsCancellationRequested) return null;
+        if (IsDisposed ||
+            _globalToken.IsCancellationRequested) return null;
 
         sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
@@ -107,7 +110,8 @@ public class TaskManager : SingletonDisposable<TaskManager>
         RunOptions opts = RunOptions.UseSleepInterval, TimeSpan? sleepInterval = null, ITimer? timer = null)
         where TCmd : class, ICmd
     {
-        if (_globalToken.IsCancellationRequested) return null;
+        if (IsDisposed ||
+            _globalToken.IsCancellationRequested) return null;
 
         sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);
 
@@ -146,7 +150,8 @@ public class TaskManager : SingletonDisposable<TaskManager>
 
     public void Fork(IJob<ICmd> parent, int threadCount = 1, RunOptions opts = RunOptions.RunNow)
     {
-        if (_globalToken.IsCancellationRequested ||
+        if (IsDisposed ||
+            _globalToken.IsCancellationRequested ||
             threadCount < 1 ||
             !Jobs.ContainsKey(parent.Id)) return;
 
@@ -213,6 +218,9 @@ public class TaskManager : SingletonDisposable<TaskManager>
         CancellationToken? token = null,
         params IDisposable[] resources)
     {
+        if (IsDisposed ||
+            _globalToken.IsCancellationRequested) return;
+
         if ((resources?.Length ?? 0) > 0) _managedResources.AddRange(resources);
 
         sleepInterval ??= TimeSpan.FromMilliseconds(CONST_defaultSleepInterval);

@@ -3,8 +3,9 @@ using Lib.Core.Interfaces.Core;
 
 namespace Lib.Core.Singletons;
 
-public class SessionManager : SingletonDisposable<SessionManager>
+public class SessionManager : Singleton<SessionManager>
 {
+    private bool IsDisposed { get; set; }
     private readonly ConcurrentDictionary<Guid, ISessionState> _sessions = new();
     public IReadOnlyDictionary<Guid, ISessionState> Sessions => _sessions.AsReadOnly();
 
@@ -13,13 +14,15 @@ public class SessionManager : SingletonDisposable<SessionManager>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
+        IsDisposed = true;
+
         _sessions?.Clear();
 
-        base.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     public TSessionState? CreateSession<TSessionState, TApp>(TApp app)
@@ -27,7 +30,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
         where TApp : IApp
     {
         if (IsDisposed) return default(TSessionState);
-        
+
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 
         return (TSessionState)CreateSession(typeof(TSessionState), app);
@@ -36,7 +39,7 @@ public class SessionManager : SingletonDisposable<SessionManager>
     public object? CreateSession(Type type, IApp app)
     {
         if (IsDisposed) return null;
-        
+
         ArgumentNullException.ThrowIfNull(type, nameof(type));
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 

@@ -2,7 +2,7 @@
 using Lib.Core.Interfaces.Network;
 using Lib.Network.Interfaces;
 
-namespace Lib.Core.Entities.EventsBus.EventArgs;
+namespace Lib.Core.Entities.EventArgs;
 
 public class ProtocolEventParams : EventParams
 {

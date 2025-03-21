@@ -2,11 +2,11 @@
 using Lib.Common.Helpers;
 using Lib.Common.Server.Entities.Business.Auth;
 using Lib.Common.Server.Entities.Business.Users;
-using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Interfaces.EventsBus;
 using ThePalace.Testing.Data;
 
-namespace ThePalace.Testing.Factories;
+namespace ThePalace.Testing.Singletons;
 
 [TestClass]
 public class EventBus
@@ -44,7 +44,7 @@ public class EventBus
     {
         var srcMsg = IStruct.MSG_LISTOFALLROOMS;
 
-        var boType = CONST_EventBus.GetType(srcMsg);
+        var boType = Lib.Core.Singletons.EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,
@@ -63,7 +63,7 @@ public class EventBus
     {
         var srcMsg = IStruct.MSG_LOGON;
 
-        var boType = CONST_EventBus.GetType(srcMsg);
+        var boType = Lib.Core.Singletons.EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,
@@ -82,7 +82,7 @@ public class EventBus
     {
         var srcMsg = IStruct.MSG_USERDESC;
 
-        var boType = CONST_EventBus.GetType(srcMsg);
+        var boType = Lib.Core.Singletons.EventBus.GetType(srcMsg);
         CONST_EventBus.Publish(
             null,
             boType,

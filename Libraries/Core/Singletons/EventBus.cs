@@ -5,6 +5,7 @@ namespace Lib.Core.Singletons;
 
 public class EventBus : Singleton<EventBus>, IEventsBus
 {
+    private bool IsDisposed { get; set; }
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
     private readonly ConcurrentDictionary<string, List<IEventHandler>> _handlersDictionary = new();
@@ -16,17 +17,21 @@ public class EventBus : Singleton<EventBus>, IEventsBus
 
     public void Dispose()
     {
+        if (IsDisposed) return;
+
+        IsDisposed = true;
+        
         _handlersDictionary?.Clear();
 
         GC.SuppressFinalize(this);
     }
 
-    public Type? GetType(IEventParams @params)
+    public static Type? GetType(IEventParams @params)
     {
         return GetType(@params.GetType());
     }
 
-    public Type? GetType(Type type)
+    public static Type? GetType(Type type)
     {
         return AppDomain.CurrentDomain
             .GetAssemblies()
@@ -46,16 +51,22 @@ public class EventBus : Singleton<EventBus>, IEventsBus
 
     public void Subscribe(params IEventHandler[] handlers)
     {
+        if (IsDisposed) return;
+
         handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe(IEnumerable<IEventHandler> handlers)
     {
+        if (IsDisposed) return;
+
         handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe(IEventHandler handler)
     {
+        if (IsDisposed) return;
+
         var eventType = handler.GetType();
         if (eventType == null) return;
 
@@ -75,18 +86,24 @@ public class EventBus : Singleton<EventBus>, IEventsBus
     public void Subscribe<TEventParams>(params IEventHandler<TEventParams>[] handlers)
         where TEventParams : IEventParams
     {
+        if (IsDisposed) return;
+
         handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe<TEventParams>(IEnumerable<IEventHandler<TEventParams>> handlers)
         where TEventParams : IEventParams
     {
+        if (IsDisposed) return;
+
         handlers?.ToList()?.ForEach(h => Subscribe(h));
     }
 
     public void Subscribe<TEventParams>(IEventHandler<TEventParams> handler)
         where TEventParams : IEventParams
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventParams);
         if (eventType == null) return;
 
@@ -100,6 +117,8 @@ public class EventBus : Singleton<EventBus>, IEventsBus
         where TEventParams : IEventParams
         where TEventHandler : IEventHandler<TEventParams>, new()
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventParams);
         if (eventType == null) return;
 
@@ -114,16 +133,22 @@ public class EventBus : Singleton<EventBus>, IEventsBus
 
     public void Subscribe(params Type[] eventTypes)
     {
+        if (IsDisposed) return;
+
         eventTypes?.ToList()?.ForEach(t => Subscribe(t));
     }
 
     public void Subscribe(IEnumerable<Type> eventTypes)
     {
+        if (IsDisposed) return;
+
         eventTypes?.ToList()?.ForEach(t => Subscribe(t));
     }
 
     public void Subscribe(Type eventType)
     {
+        if (IsDisposed) return;
+
         if (eventType == null) return;
 
         var _eventType = eventType;
@@ -154,6 +179,8 @@ public class EventBus : Singleton<EventBus>, IEventsBus
 
     public async Task Publish(object? sender, IEventParams @event)
     {
+        if (IsDisposed) return;
+
         var eventType = @event.GetType();
         if (eventType == null) return;
 
@@ -163,6 +190,8 @@ public class EventBus : Singleton<EventBus>, IEventsBus
     public async Task Publish<TEventType, TEventParams>(object? sender, TEventParams @event)
         where TEventParams : IEventParams
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventType);
         if (eventType == null) return;
 
@@ -172,6 +201,8 @@ public class EventBus : Singleton<EventBus>, IEventsBus
     public async Task Publish<TEventParams>(object? sender, TEventParams @event)
         where TEventParams : IEventParams
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventParams);
         if (eventType == null) return;
 
@@ -180,6 +211,8 @@ public class EventBus : Singleton<EventBus>, IEventsBus
 
     public async Task Publish(object? sender, Type eventType, IEventParams @event)
     {
+        if (IsDisposed) return;
+
         ArgumentNullException.ThrowIfNull(eventType, nameof(eventType));
 
         var _eventType = eventType;
@@ -211,9 +244,10 @@ public class EventBus : Singleton<EventBus>, IEventsBus
     }
 }
 
-public class EventBus<TEventParams> : SingletonDisposable<EventBus<TEventParams>>, IEventsBus<TEventParams>
+public class EventBus<TEventParams> : Singleton<EventBus<TEventParams>>, IEventsBus<TEventParams>
     where TEventParams : IEventParams
 {
+    private bool IsDisposed { get; set; }
     private static readonly Type CONST_TYPE_IEventHandler = typeof(IEventHandler);
 
     private readonly ConcurrentDictionary<string, List<IEventHandler<TEventParams>>> _handlersDictionary = new();
@@ -223,15 +257,21 @@ public class EventBus<TEventParams> : SingletonDisposable<EventBus<TEventParams>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
+        if (IsDisposed) return;
+        
+        IsDisposed = true;
+        
         _handlersDictionary?.Clear();
-
-        base.Dispose();
+        
+        GC.SuppressFinalize(this);
     }
 
     public Type? GetType(TEventParams @params)
     {
+        if (IsDisposed) return null;
+
         var paramsType = @params.GetType();
 
         return AppDomain.CurrentDomain
@@ -252,6 +292,8 @@ public class EventBus<TEventParams> : SingletonDisposable<EventBus<TEventParams>
 
     public void Subscribe(IEventHandler<TEventParams> handler)
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventParams);
         if (eventType == null) return;
 
@@ -263,6 +305,8 @@ public class EventBus<TEventParams> : SingletonDisposable<EventBus<TEventParams>
 
     public async Task Publish(object? sender, TEventParams @event)
     {
+        if (IsDisposed) return;
+
         var eventType = typeof(TEventParams);
         if (eventType == null) return;
 

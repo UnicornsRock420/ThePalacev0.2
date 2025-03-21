@@ -10,12 +10,13 @@ using UserID = int;
 
 namespace Lib.Network.Factories;
 
-public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDisposable
+public class ConnectionManager : Singleton<ConnectionManager>, IDisposable
 {
     private const UserID CONST_INT_MaxCounterLimit = 9999;
 
-    private volatile ConcurrentDictionary<UserID, IConnectionState<Socket>> _connectionStates = new();
+    private bool IsDisposed { get; set; }
     private UserID _idCounter = 0;
+    private volatile ConcurrentDictionary<UserID, IConnectionState<Socket>> _connectionStates = new();
     public IReadOnlyDictionary<UserID, IConnectionState<Socket>> ConnectionStates => _connectionStates.AsReadOnly();
 
     public UserID GetNextId(UserID counterLimit = CONST_INT_MaxCounterLimit)
@@ -26,7 +27,7 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
         return ++_idCounter;
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
@@ -40,8 +41,6 @@ public class ConnectionManager : SingletonDisposable<ConnectionManager>, IDispos
 
             _connectionStates = null;
         }
-
-        base.Dispose();
 
         GC.SuppressFinalize(this);
     }

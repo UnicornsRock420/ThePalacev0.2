@@ -18,7 +18,7 @@ using Lib.Core.Singletons;
 using ThePalace.Client.Desktop.Interfaces;
 using AssetDesc = ThePalace.Client.Desktop.Entities.Shared.Assets.AssetDesc;
 
-namespace ThePalace.Client.Desktop.Factories;
+namespace ThePalace.Client.Desktop.Singletons;
 
 public class AssetsManager : SingletonDisposable<AssetsManager>
 {

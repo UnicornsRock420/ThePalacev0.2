@@ -1,6 +1,6 @@
 ﻿using Lib.Common.Constants;
 
-namespace Lib.Common.Attributes;
+namespace Lib.Common.Attributes.Core;
 
 public class VersionAttribute : Attribute
 {

@@ -1,6 +1,6 @@
-﻿using Lib.Common.Attributes;
+﻿using Lib.Common.Attributes.Core;
 using Lib.Core.Attributes.Auth;
-using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Interfaces.Network;
 using HotSpotID = short;
 

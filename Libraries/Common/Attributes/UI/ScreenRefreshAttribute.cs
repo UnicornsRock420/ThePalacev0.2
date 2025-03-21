@@ -1,4 +1,4 @@
-﻿namespace Mod.Scripting.Iptscrae.Attributes;
+﻿namespace Lib.Common.Attributes.UI;
 
 public class ScreenRefreshAttribute : Attribute
 {

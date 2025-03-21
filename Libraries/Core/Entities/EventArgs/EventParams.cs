@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using Lib.Core.Interfaces.EventsBus;
 
-namespace Lib.Core.Entities.EventsBus;
+namespace Lib.Core.Entities.EventArgs;
 
 public class EventParams : System.EventArgs, IEventParams
 {

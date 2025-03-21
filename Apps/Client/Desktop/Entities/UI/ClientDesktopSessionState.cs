@@ -4,6 +4,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Net.Sockets;
 using System.Reflection;
+using Lib.Common.Attributes.UI;
 using Lib.Common.Client.Constants;
 using Lib.Common.Desktop.Constants;
 using Lib.Common.Desktop.Entities.Ribbon;
@@ -19,18 +20,18 @@ using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Enums;
 using Lib.Core.Helpers.Core;
 using Lib.Core.Interfaces.Core;
+using Lib.Core.Singletons;
 using Lib.Logging.Entities;
 using Lib.Network.Factories;
 using Lib.Network.Interfaces;
-using Mod.Scripting.Iptscrae.Attributes;
 using Mod.Scripting.Iptscrae.Entities;
 using Mod.Scripting.Iptscrae.Enums;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.Shared.Assets;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Client.Desktop.Singletons;
 using Point = System.Drawing.Point;
 using RegexConstants = Lib.Common.Constants.RegexConstants;
 using RoomID = short;
@@ -177,44 +178,44 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
         .Where(v => !new[] { LayerScreenTypes.Base, LayerScreenTypes.DimRoom }.Contains(v))
         .ToArray();
 
-    private static readonly IReadOnlyList<IptEventTypes> CONST_EventTypes_UiRefresh = Enum.GetValues<IptEventTypes>()
+    private static readonly IReadOnlyList<ScriptEventTypes> CONST_EventTypes_UiRefresh = Enum.GetValues<ScriptEventTypes>()
         .Where(v => v.GetType()?.GetField(v.ToString())?.GetCustomAttributes<UIRefreshAttribute>()?.Any() ?? false)
         .ToList()
         .AsReadOnly();
 
-    private static readonly IReadOnlyDictionary<IptEventTypes[], LayerScreenTypes[]> CONST_Event_LayerScreen_Types_Mappings =
-        new Dictionary<IptEventTypes[], LayerScreenTypes[]>
+    private static readonly IReadOnlyDictionary<ScriptEventTypes[], LayerScreenTypes[]> CONST_Event_LayerScreen_Types_Mappings =
+        new Dictionary<ScriptEventTypes[], LayerScreenTypes[]>
         {
-            { [IptEventTypes.MsgHttpServer, IptEventTypes.RoomLoad], [LayerScreenTypes.Base] },
-            { [IptEventTypes.InChat], [LayerScreenTypes.Messages] },
-            { [IptEventTypes.NameChange], [LayerScreenTypes.UserNametag] },
-            { [IptEventTypes.FaceChange, IptEventTypes.MsgUserProp], [LayerScreenTypes.UserProp] },
+            { [ScriptEventTypes.MsgHttpServer, ScriptEventTypes.RoomLoad], [LayerScreenTypes.Base] },
+            { [ScriptEventTypes.InChat], [LayerScreenTypes.Messages] },
+            { [ScriptEventTypes.NameChange], [LayerScreenTypes.UserNametag] },
+            { [ScriptEventTypes.FaceChange, ScriptEventTypes.MsgUserProp], [LayerScreenTypes.UserProp] },
             {
-                [IptEventTypes.LoosePropAdded, IptEventTypes.LoosePropDeleted, IptEventTypes.LoosePropMoved],
+                [ScriptEventTypes.LoosePropAdded, ScriptEventTypes.LoosePropDeleted, ScriptEventTypes.LoosePropMoved],
                 [LayerScreenTypes.LooseProp]
             },
             {
                 [
-                    IptEventTypes.Lock, IptEventTypes.MsgPictDel, IptEventTypes.MsgPictMove, IptEventTypes.MsgPictMove,
-                    IptEventTypes.MsgPictNew, IptEventTypes.StateChange, IptEventTypes.UnLock
+                    ScriptEventTypes.Lock, ScriptEventTypes.MsgPictDel, ScriptEventTypes.MsgPictMove, ScriptEventTypes.MsgPictMove,
+                    ScriptEventTypes.MsgPictNew, ScriptEventTypes.StateChange, ScriptEventTypes.UnLock
                 ],
                 [LayerScreenTypes.SpotImage]
             },
             {
                 [
-                    IptEventTypes.ColorChange, IptEventTypes.MsgUserDesc, IptEventTypes.MsgUserList,
-                    IptEventTypes.MsgUserLog, IptEventTypes.UserEnter
+                    ScriptEventTypes.ColorChange, ScriptEventTypes.MsgUserDesc, ScriptEventTypes.MsgUserList,
+                    ScriptEventTypes.MsgUserLog, ScriptEventTypes.UserEnter
                 ],
                 [LayerScreenTypes.UserProp, LayerScreenTypes.UserNametag]
             },
-            { [IptEventTypes.MsgAssetSend], [LayerScreenTypes.UserProp, LayerScreenTypes.LooseProp] },
+            { [ScriptEventTypes.MsgAssetSend], [LayerScreenTypes.UserProp, LayerScreenTypes.LooseProp] },
             {
-                [IptEventTypes.SignOn, IptEventTypes.UserLeave, IptEventTypes.UserMove],
+                [ScriptEventTypes.SignOn, ScriptEventTypes.UserLeave, ScriptEventTypes.UserMove],
                 [LayerScreenTypes.UserProp, LayerScreenTypes.UserNametag, LayerScreenTypes.Messages]
             },
-            { [IptEventTypes.MsgDraw], [LayerScreenTypes.BottomPaint, LayerScreenTypes.TopPaint] },
+            { [ScriptEventTypes.MsgDraw], [LayerScreenTypes.BottomPaint, LayerScreenTypes.TopPaint] },
             {
-                [IptEventTypes.MsgSpotDel, IptEventTypes.MsgSpotMove, IptEventTypes.MsgSpotNew],
+                [ScriptEventTypes.MsgSpotDel, ScriptEventTypes.MsgSpotMove, ScriptEventTypes.MsgSpotNew],
                 [LayerScreenTypes.SpotBorder, LayerScreenTypes.SpotNametag, LayerScreenTypes.SpotImage]
             }
         }.AsReadOnly();
@@ -1069,15 +1070,15 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
         switch (scriptEvent.EventType)
         {
-            case (int)IptEventTypes.RoomLoad:
+            case (int)ScriptEventTypes.RoomLoad:
                 History.RegisterHistory(
                     $"{ServerName} - {RoomInfo.Name}",
                     $"palace://{ConnectionState.HostAddr.Address}:{ConnectionState.HostAddr.Port}/{RoomInfo.RoomID}");
 
                 RefreshRibbon();
 
-                ScriptEvents.Current.Invoke(IptEventTypes.RoomReady, this, null, ScriptTag);
-                ScriptEvents.Current.Invoke(IptEventTypes.Enter, this, null, ScriptTag);
+                ScriptEventBus.Current.Invoke(ScriptEventTypes.RoomReady, this, null, ScriptTag);
+                ScriptEventBus.Current.Invoke(ScriptEventTypes.Enter, this, null, ScriptTag);
 
                 break;
         }

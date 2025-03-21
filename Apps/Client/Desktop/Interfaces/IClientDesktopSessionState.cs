@@ -7,7 +7,7 @@ using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Client.Desktop.Factories;
+using ThePalace.Client.Desktop.Singletons;
 
 namespace ThePalace.Client.Desktop.Interfaces;
 

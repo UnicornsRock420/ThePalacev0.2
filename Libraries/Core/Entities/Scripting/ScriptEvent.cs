@@ -2,7 +2,7 @@
 
 namespace Lib.Core.Entities.Scripting;
 
-public class ScriptEvent : EventArgs
+public class ScriptEvent : System.EventArgs
 {
     public int EventType { get; set; }
     public IProtocol Msg { get; set; }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
-using Lib.Common.Attributes;
-using Lib.Core.Entities.EventsBus;
+using Lib.Common.Attributes.Core;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Interfaces.Data;
 using Lib.Core.Interfaces.Network;

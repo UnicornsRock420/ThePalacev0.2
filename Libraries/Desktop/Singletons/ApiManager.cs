@@ -3,8 +3,9 @@ using Lib.Common.Desktop.Entities.Core;
 
 namespace Lib.Common.Desktop.Singletons;
 
-public class ApiManager : SingletonDisposable<ApiManager>
+public class ApiManager : Singleton<ApiManager>, IDisposable
 {
+    private bool IsDisposed { get; set; }
     private ConcurrentDictionary<string, ApiBinding> _apiBindings = new();
     public IReadOnlyDictionary<string, ApiBinding> ApiBindings => _apiBindings;
 
@@ -13,11 +14,11 @@ public class ApiManager : SingletonDisposable<ApiManager>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
-        base.Dispose();
+        IsDisposed = true;
 
         _apiBindings.Clear();
         _apiBindings = null;

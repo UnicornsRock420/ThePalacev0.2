@@ -1,25 +1,25 @@
 ﻿using System.Collections.Concurrent;
 using Lib.Core.Entities.Scripting;
+using Lib.Core.Enums;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
 using Lib.Logging.Entities;
-using Mod.Scripting.Iptscrae.Enums;
 
-namespace ThePalace.Client.Desktop.Factories;
+namespace Lib.Core.Singletons;
 
-public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
+public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
 {
-    private static readonly IReadOnlyList<IptEventTypes> _eventTypes = Enum.GetValues<IptEventTypes>().ToList();
-    private ConcurrentDictionary<IptEventTypes, List<EventHandler>> _events = new();
-    private bool IsDisposed;
+    private bool IsDisposed { get; set; }
+    private static readonly IReadOnlyList<ScriptEventTypes> _eventTypes = Enum.GetValues<ScriptEventTypes>().ToList();
+    private ConcurrentDictionary<ScriptEventTypes, List<EventHandler>> _events = new();
 
-    public ScriptEvents()
+    public ScriptEventBus()
     {
         foreach (var type in _eventTypes)
             _events[type] = [];
     }
 
-    ~ScriptEvents()
+    ~ScriptEventBus()
     {
         Dispose();
     }
@@ -46,7 +46,7 @@ public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
     }
 
     public void Invoke(
-        IptEventTypes eventType,
+        ScriptEventTypes eventType,
         IUserSessionState sessionState,
         IProtocol packet,
         object scriptState = null)
@@ -69,9 +69,9 @@ public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
             {
                 LoggerHub.Current.Error(ex);
 
-                if (eventType != IptEventTypes.UnhandledError)
+                if (eventType != ScriptEventTypes.UnhandledError)
                     Invoke(
-                        IptEventTypes.UnhandledError,
+                        ScriptEventTypes.UnhandledError,
                         sessionState,
                         packet,
                         sessionState.ScriptTag);
@@ -79,7 +79,7 @@ public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
     }
 
     public void RegisterEvent(
-        IptEventTypes eventType,
+        ScriptEventTypes eventType,
         EventHandler handler)
     {
         if (IsDisposed) return;
@@ -89,7 +89,7 @@ public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
     }
 
     public void UnregisterEvent(
-        IptEventTypes eventType,
+        ScriptEventTypes eventType,
         EventHandler handler)
     {
         if (IsDisposed) return;
@@ -97,7 +97,7 @@ public class ScriptEvents : Singleton<ScriptEvents>, IDisposable
         _events[eventType].Remove(handler);
     }
 
-    public void ClearEvents(IptEventTypes eventType)
+    public void ClearEvents(ScriptEventTypes eventType)
     {
         if (IsDisposed) return;
 

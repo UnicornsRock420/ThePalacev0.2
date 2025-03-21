@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net.Sockets;
 using System.Reflection;
+using Lib.Common.Attributes.UI;
 using Lib.Common.Constants;
 using Lib.Common.Desktop.Constants;
 using Lib.Common.Desktop.Entities.UI;
@@ -13,7 +14,7 @@ using Lib.Common.Helpers;
 using Lib.Common.Interfaces.Threading;
 using Lib.Common.Threading;
 using Lib.Core.Constants;
-using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Network.Client.Network;
 using Lib.Core.Entities.Network.Client.Rooms;
 using Lib.Core.Entities.Network.Client.Users;
@@ -24,6 +25,7 @@ using Lib.Core.Entities.Network.Shared.Users;
 using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Entities.Threading;
+using Lib.Core.Enums;
 using Lib.Core.Exts;
 using Lib.Core.Helpers.Network;
 using Lib.Core.Interfaces.EventsBus;
@@ -31,16 +33,14 @@ using Lib.Core.Interfaces.Network;
 using Lib.Core.Singletons;
 using Lib.Logging.Entities;
 using Mod.Media.SoundPlayer.Singletons;
-using Mod.Scripting.Iptscrae.Attributes;
 using Mod.Scripting.Iptscrae.Entities;
-using Mod.Scripting.Iptscrae.Enums;
 using ThePalace.Client.Desktop.Entities.Core;
 using ThePalace.Client.Desktop.Entities.Ribbon;
 using ThePalace.Client.Desktop.Entities.UI;
 using ThePalace.Client.Desktop.Enums;
-using ThePalace.Client.Desktop.Factories;
 using ThePalace.Client.Desktop.Helpers;
 using ThePalace.Client.Desktop.Interfaces;
+using ThePalace.Client.Desktop.Singletons;
 using AssetID = int;
 using Connection = ThePalace.Client.Desktop.Forms.Connection;
 using HotspotID = short;
@@ -281,7 +281,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                 {
                                     try
                                     {
-                                        var boType = EventBus.Current.GetType(msgType);
+                                        var boType = EventBus.GetType(msgType);
                                         if (boType == null) throw new InvalidDataException(nameof(msgType));
 
                                         EventBus.Current.Publish(
@@ -403,7 +403,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (IsDisposed) return;
 
-        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEvents.Current.UnregisterEvent(t, RefreshScreen));
+        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEventBus.Current.UnregisterEvent(t, RefreshScreen));
 
         if (UIControls.GetValue(nameof(NotifyIcon)) is NotifyIcon trayIcon)
         {
@@ -427,7 +427,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
     #region Properties
 
-    private static readonly IReadOnlyList<IptEventTypes> CONST_EventTypes_ScreenRefresh = Enum.GetValues<IptEventTypes>()
+    private static readonly IReadOnlyList<ScriptEventTypes> CONST_EventTypes_ScreenRefresh = Enum.GetValues<ScriptEventTypes>()
         .Where(v => v.GetType()
             ?.GetField(v.ToString())
             ?.GetCustomAttributes<ScreenRefreshAttribute>()
@@ -481,7 +481,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (IsDisposed) return;
 
-        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEvents.Current.RegisterEvent(t, RefreshScreen));
+        CONST_EventTypes_ScreenRefresh.ToList().ForEach(t => ScriptEventBus.Current.RegisterEvent(t, RefreshScreen));
 
         ApiManager.Current.RegisterApi(nameof(ShowConnectionForm), ShowConnectionForm);
         ApiManager.Current.RegisterApi(nameof(toolStripDropdownlist_Click), toolStripDropdownlist_Click);
@@ -560,37 +560,37 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseMove, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseMove, SessionState, null, SessionState.ScriptTag);
         };
         form.MouseUp += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseUp, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseUp, SessionState, null, SessionState.ScriptTag);
         };
         form.MouseDown += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDown, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDown, SessionState, null, SessionState.ScriptTag);
         };
         form.DragEnter += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.DragLeave += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.DragOver += (sender, e) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEvents.Current.Invoke(IptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
         };
         form.Resize += (sender, e) =>
         {
@@ -1039,7 +1039,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         return;
                     }
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyUp, SessionState, null, SessionState.ScriptTag);
+                    ScriptEventBus.Current.Invoke(ScriptEventTypes.KeyUp, SessionState, null, SessionState.ScriptTag);
 
                     if (e.KeyCode == Keys.Enter)
                     {
@@ -1090,8 +1090,8 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     Text = text
                                 };
 
-                                ScriptEvents.Current.Invoke(IptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptTag);
-                                ScriptEvents.Current.Invoke(IptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptTag);
+                                ScriptEventBus.Current.Invoke(ScriptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptTag);
+                                ScriptEventBus.Current.Invoke(ScriptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptTag);
 
                                 if (SessionState.ScriptTag is not IptTracking iptTracking) return;
 
@@ -1119,7 +1119,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                     if (!SessionState?.ConnectionState?.IsConnected() ?? false) return;
 
-                    ScriptEvents.Current.Invoke(IptEventTypes.KeyDown, SessionState, null, SessionState.ScriptTag);
+                    ScriptEventBus.Current.Invoke(ScriptEventTypes.KeyDown, SessionState, null, SessionState.ScriptTag);
                 };
 
                 RegisterControl(nameof(txtInput), txtInput);

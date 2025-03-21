@@ -1,6 +1,6 @@
-﻿using Lib.Common.Attributes;
+﻿using Lib.Common.Attributes.Core;
 using Lib.Common.Client.Interfaces;
-using Lib.Core.Entities.EventsBus.EventArgs;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Network.Server.Network;
 using Lib.Core.Exts;
 using Lib.Core.Interfaces.EventsBus;

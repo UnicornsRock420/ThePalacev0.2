@@ -1,6 +1,6 @@
-﻿using Lib.Common.Attributes;
+﻿using Lib.Common.Attributes.Core;
 using Lib.Core.Attributes.Serialization;
-using Lib.Core.Entities.EventsBus;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Enums;
 using Lib.Core.Interfaces.Data;

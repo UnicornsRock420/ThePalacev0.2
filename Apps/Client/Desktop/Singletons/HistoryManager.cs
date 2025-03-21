@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using ThePalace.Client.Desktop.Entities.UI;
 
-namespace ThePalace.Client.Desktop.Factories;
+namespace ThePalace.Client.Desktop.Singletons;
 
-public class HistoryManager : SingletonDisposable<HistoryManager>
+public class HistoryManager : Singleton<HistoryManager>
 {
+    private bool IsDisposed { get; set; }
     private ConcurrentDictionary<DateTime, HistoryRecord> _history = new();
 
     public DateTime? Position;
@@ -15,14 +16,14 @@ public class HistoryManager : SingletonDisposable<HistoryManager>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
+        IsDisposed = true;
+
         _history?.Clear();
         _history = null;
-
-        base.Dispose();
 
         GC.SuppressFinalize(this);
     }

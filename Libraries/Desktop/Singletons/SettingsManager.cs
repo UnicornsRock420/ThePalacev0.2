@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace Lib.Common.Desktop.Singletons;
 
-public class SettingsManager : SingletonDisposable<SettingsManager>
+public class SettingsManager : Singleton<SettingsManager>
 {
     public SettingsManager()
     {
@@ -41,11 +41,11 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         Dispose();
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         if (IsDisposed) return;
 
-        base.Dispose();
+        IsDisposed = true;
 
         GC.SuppressFinalize(this);
     }
@@ -109,6 +109,7 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
         Keys.Z,
     ];
 
+    private bool IsDisposed { get; set; }
     private IConfigurationBuilder _configurationBuilder;
     private IConfiguration _configuration;
 
@@ -116,6 +117,8 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
 
     public void Build()
     {
+        if (IsDisposed) return;
+
         try
         {
             _configuration = new ConfigurationBuilder()
@@ -131,11 +134,15 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
 
     public void Save()
     {
+        if (IsDisposed) return;
+
         // TODO: Save Settings
     }
 
     public T Get<T>(string xPath)
     {
+        if (IsDisposed) return default(T);
+
         try
         {
             return _configuration
@@ -151,6 +158,8 @@ public class SettingsManager : SingletonDisposable<SettingsManager>
 
     public bool Set<T>(string fPath, string xPath, object value)
     {
+        if (IsDisposed) return false;
+
         try
         {
             var json = File.ReadAllText(fPath);

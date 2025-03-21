@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using Lib.Core.Enums;
 using Mod.Scripting.Iptscrae.Enums;
 using Timer = System.Timers.Timer;
 
@@ -7,12 +8,13 @@ namespace Mod.Scripting.Iptscrae.Entities;
 
 using IptAlarms = List<IptAlarm>;
 using IptAtomList = List<IptVariable>;
-using IptEvents = ConcurrentDictionary<IptEventTypes, List<IptVariable>>;
+using IptEvents = ConcurrentDictionary<ScriptEventTypes, List<IptVariable>>;
 using IptVariables = ConcurrentDictionary<string, IptMetaVariable>;
 
 public class IptTracking : IDisposable
 {
     ~IptTracking() => Dispose();
+
     public void Dispose()
     {
         _timer?.Dispose();
@@ -36,6 +38,7 @@ public class IptTracking : IDisposable
     }
 
     private Timer _timer = null;
+
     public Timer Timer => _timer ??= new()
     {
         Interval = IptAlarm.TicksToMs<double>(1),
