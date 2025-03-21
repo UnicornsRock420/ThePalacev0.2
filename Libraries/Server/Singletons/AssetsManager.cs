@@ -36,7 +36,6 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
     }
 
     public DisposableDictionary<int, AssetDesc> Assets { get; private set; } = new();
-    public List<AssetSpec[]> Macros { get; private set; } = [];
 
     public void RegisterAsset(AssetDesc assetRec)
     {

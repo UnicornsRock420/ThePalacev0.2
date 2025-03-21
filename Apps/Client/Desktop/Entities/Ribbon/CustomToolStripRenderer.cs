@@ -2,7 +2,7 @@
 using ThePalace.Client.Desktop.Interfaces;
 using Timer = System.Timers.Timer;
 
-namespace ThePalace.Client.Desktop.Entities.Core;
+namespace ThePalace.Client.Desktop.Entities.Ribbon;
 
 public class CustomToolStripRenderer : ToolStripProfessionalRenderer
 {
