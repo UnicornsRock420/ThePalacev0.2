@@ -5,14 +5,14 @@ using Lib.Core.Interfaces.Network;
 
 namespace Lib.Core.Helpers.Network;
 
-public static class AsyncPalaceSocket
+public static class PalaceSocketExts
 {
     public static void Send<TSessionState, TProtocol>(this TSessionState sessionState, int refNum, TProtocol msgObj, bool directAccess = false)
         where TSessionState : class, IUserSessionState
         where TProtocol : class, IProtocol
     {
-        ArgumentNullException.ThrowIfNull(sessionState, nameof(AsyncPalaceSocket) + "." + nameof(Send) + "." + nameof(sessionState));
-        ArgumentNullException.ThrowIfNull(msgObj, nameof(AsyncPalaceSocket) + "." + nameof(Send) + "." + nameof(msgObj));
+        ArgumentNullException.ThrowIfNull(sessionState, nameof(PalaceSocketExts) + "." + nameof(Send) + "." + nameof(sessionState));
+        ArgumentNullException.ThrowIfNull(msgObj, nameof(PalaceSocketExts) + "." + nameof(Send) + "." + nameof(msgObj));
 
         using (var ms = new MemoryStream())
         {
@@ -37,8 +37,8 @@ public static class AsyncPalaceSocket
     public static void Send<TSessionState>(this TSessionState sessionState, byte[] data, bool directAccess = false)
         where TSessionState : class, IUserSessionState
     {
-        ArgumentNullException.ThrowIfNull(sessionState, nameof(AsyncPalaceSocket) + "." + nameof(Send) + "." + nameof(sessionState));
-        ArgumentNullException.ThrowIfNull(data, nameof(AsyncPalaceSocket) + "." + nameof(Send) + "." + nameof(data));
+        ArgumentNullException.ThrowIfNull(sessionState, nameof(PalaceSocketExts) + "." + nameof(Send) + "." + nameof(sessionState));
+        ArgumentNullException.ThrowIfNull(data, nameof(PalaceSocketExts) + "." + nameof(Send) + "." + nameof(data));
 
         sessionState.ConnectionState.Send(
             data,
