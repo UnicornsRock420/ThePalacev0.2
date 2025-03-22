@@ -74,14 +74,15 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     {
         if (IsDisposed) return;
 
-        var app = GetForm<FormBase>();
+        var app = GetForm<FormBase>("IApp");
 
         if (sender is not FormBase _sender ||
             !UnregisterForm(_sender)) return;
 
         FormClosed?.Invoke(_sender, e);
 
-        if (sender == app)
+        if (app == sender ||
+            app == null)
         {
             TCF._TryDispose(
                     app,
@@ -151,7 +152,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
         var form = new T
         {
-            Name = $"{CONST_TypeFullName}_{Guid.NewGuid()}",
+            Name = cfg.Name ?? $"{CONST_TypeFullName}_{Guid.NewGuid()}",
             AutoScaleDimensions = cfg.AutoScaleDimensions,
             AutoScaleMode = cfg.AutoScaleMode,
             StartPosition = cfg.StartPosition
@@ -181,7 +182,8 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
     {
         if (IsDisposed) return null;
 
-        if (name == null) return null;
+        if (name == null)
+            return _forms.Values.OfType<T>().FirstOrDefault();
         if (_forms.TryGetValue(name, out var value)) return value as T;
         return null;
     }

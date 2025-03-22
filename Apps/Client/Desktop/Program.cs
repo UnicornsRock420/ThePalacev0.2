@@ -138,41 +138,47 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                         async () =>
                         {
-                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
-
-                            while (!cancellationToken.IsCancellationRequested)
+                            try
                             {
-                                if (q.TryDequeue(out var cmd))
-                                    switch ((NetworkCommandTypes)cmd.Flags)
-                                    {
-                                        case NetworkCommandTypes.CONNECT:
-                                            var url = cmd.Values[0] as string;
-                                            if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
+                                var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                                while (!cancellationToken.IsCancellationRequested)
+                                {
+                                    if (q.TryDequeue(out var cmd))
+                                        switch ((NetworkCommandTypes)cmd.Flags)
+                                        {
+                                            case NetworkCommandTypes.CONNECT:
+                                                var url = cmd.Values[0] as string;
+                                                if (!RegexConstants.REGEX_PARSE_URL.IsMatch(url)) return;
 
-                                            var match = url.ParseUrl(
-                                                RegexConstants.ParseUrlOptions.IncludeBaseUrl |
-                                                RegexConstants.ParseUrlOptions.IncludePath |
-                                                RegexConstants.ParseUrlOptions.ModifierToLowerInvariant);
-                                            if (match.Count < 3 ||
-                                                match["Protocol"] != "palace") break;
+                                                var match = url.ParseUrl(
+                                                    RegexConstants.ParseUrlOptions.IncludeBaseUrl |
+                                                    RegexConstants.ParseUrlOptions.IncludePath |
+                                                    RegexConstants.ParseUrlOptions.ModifierToLowerInvariant);
+                                                if (match.Count < 3 ||
+                                                    match["Protocol"] != "palace") break;
 
-                                            var hostname = match["Hostname"];
-                                            var port = Convert.ToInt32(match["Port"]);
+                                                var hostname = match["Hostname"];
+                                                var port = Convert.ToInt32(match["Port"]);
 
-                                            Current.SessionState.ConnectionState.Connect(hostname, port);
-                                            return;
-                                        case NetworkCommandTypes.DISCONNECT:
-                                            Current.SessionState.ConnectionState.Disconnect();
-                                            return;
-                                        default:
-                                            return;
-                                    }
+                                                Current.SessionState.ConnectionState.Connect(hostname, port);
+                                                return;
+                                            case NetworkCommandTypes.DISCONNECT:
+                                                Current.SessionState.ConnectionState.Disconnect();
+                                                return;
+                                            default:
+                                                return;
+                                        }
 
-                                cancellationToken.Token.ThrowIfCancellationRequested();
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
 
-                                if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
-                                    q.IsEmpty)
-                                    await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                    if (!(Current?.SessionState?.ConnectionState?.IsConnected() ?? false) ||
+                                        q.IsEmpty)
+                                        await Task.Delay(RndGenerator.Next(75, 250), cancellationToken.Token);
+                                }
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                return;
                             }
                         },
 
@@ -182,24 +188,30 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
                         async () =>
                         {
-                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
-
-                            while (!cancellationToken.IsCancellationRequested)
+                            try
                             {
-                                if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) < 1)
+                                var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                                while (!cancellationToken.IsCancellationRequested)
                                 {
-                                    await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
+                                    if ((Current?.SessionState?.ConnectionState?.BytesSend?.Length ?? 0) < 1)
+                                    {
+                                        await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
 
-                                    continue;
+                                        continue;
+                                    }
+
+                                    var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
+                                    if ((msgBytes?.Length ?? 0) > 0)
+                                        Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
+
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                    await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
                                 }
-
-                                var msgBytes = Current?.SessionState?.ConnectionState?.BytesSend.Dequeue();
-                                if ((msgBytes?.Length ?? 0) > 0)
-                                    Current.SessionState.ConnectionState.Send(msgBytes, directAccess: true);
-
-                                cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                return;
                             }
                         },
 
@@ -214,105 +226,112 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                 ?.SelectMany(t => t.GetTypes()
                                     .Where(t => t.Name.StartsWith("MSG_"))) ?? [];
 
-                            var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
                             var msgHeader = new MSG_Header();
 
                             var eventType = (string?)null;
                             var msgObj = (IProtocol?)null;
                             var msgType = (Type?)null;
 
-                            while (!cancellationToken.IsCancellationRequested)
+                            try
                             {
-                                if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) < 1)
+                                var cancellationToken = jobs[ThreadQueues.Network].TokenSource;
+                                while (!cancellationToken.IsCancellationRequested)
                                 {
-                                    await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
-
-                                    continue;
-                                }
-
-                                if (msgHeader.EventType == 0 &&
-                                    eventType == null &&
-                                    msgType == null)
-                                {
-                                    try
+                                    if ((Current?.SessionState?.ConnectionState?.BytesReceived?.Length ?? 0) < 1)
                                     {
-                                        var msgHeaderBuffer = new byte[12];
-                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
-                                        if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
+                                        await Task.Delay(RndGenerator.Next(250, 450), cancellationToken.Token);
 
-                                        using (var ms = new MemoryStream(msgHeaderBuffer))
+                                        continue;
+                                    }
+
+                                    if (msgHeader.EventType == 0 &&
+                                        eventType == null &&
+                                        msgType == null)
+                                    {
+                                        try
                                         {
-                                            ms.PalaceDeserialize(msgHeader, CONST_TYPE_MSG_Header);
-                                        }
+                                            var msgHeaderBuffer = new byte[12];
+                                            var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgHeaderBuffer, 0, msgHeaderBuffer.Length);
+                                            if (bytesRead < msgHeaderBuffer.Length) throw new SocketException(-1, nameof(msgHeaderBuffer));
 
-                                        eventType = msgHeader.EventType.ToString()?.Trim() ?? string.Empty;
-                                        if (msgHeader.EventType == 0 ||
-                                            string.IsNullOrWhiteSpace(eventType)) throw new InvalidDataException(nameof(eventType));
-
-                                        msgType = msgTypes.FirstOrDefault(t => t.Name == eventType);
-                                        if (msgType == null) throw new InvalidDataException(nameof(msgType));
-                                    }
-                                    catch
-                                    {
-                                        Current?.SessionState?.ConnectionState?.Disconnect();
-                                    }
-                                }
-
-                                if (msgType != null &&
-                                    msgObj == null &&
-                                    msgHeader.Length > 0 &&
-                                    Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length)
-                                {
-                                    var msgBuffer = new byte[msgHeader.Length];
-                                    var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgBuffer, 0, msgBuffer.Length);
-                                    if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
-
-                                    msgObj = (IProtocol?)msgType.GetInstance();
-                                    if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
-
-                                    using (var ms = new MemoryStream(msgBuffer))
-                                    {
-                                        ms.PalaceDeserialize(msgObj, msgType);
-                                    }
-                                }
-
-                                if (msgHeader.EventType != 0 &&
-                                    msgType != null)
-                                {
-                                    try
-                                    {
-                                        var boType = EventBus.GetType(msgType);
-                                        if (boType == null) throw new InvalidDataException(nameof(msgType));
-
-                                        EventBus.Current.Publish(
-                                            Current.SessionState,
-                                            boType,
-                                            new ProtocolEventParams
+                                            using (var ms = new MemoryStream(msgHeaderBuffer))
                                             {
-                                                SourceID = Current?.SessionState?.UserId ?? 0,
-                                                RefNum = msgHeader.RefNum,
-                                                Request = msgObj
-                                            });
-                                    }
-                                    catch
-                                    {
-                                        Current?.SessionState?.ConnectionState?.Disconnect();
-                                    }
-                                    finally
-                                    {
-                                        msgHeader.EventType = 0;
-                                        msgHeader.Length = 0;
-                                        msgHeader.RefNum = 0;
+                                                ms.PalaceDeserialize(msgHeader, CONST_TYPE_MSG_Header);
+                                            }
 
-                                        eventType = null;
-                                        msgType = null;
-                                        msgObj = null;
+                                            eventType = msgHeader.EventType.ToString()?.Trim() ?? string.Empty;
+                                            if (msgHeader.EventType == 0 ||
+                                                string.IsNullOrWhiteSpace(eventType)) throw new InvalidDataException(nameof(eventType));
+
+                                            msgType = msgTypes.FirstOrDefault(t => t.Name == eventType);
+                                            if (msgType == null) throw new InvalidDataException(nameof(msgType));
+                                        }
+                                        catch
+                                        {
+                                            Current?.SessionState?.ConnectionState?.Disconnect();
+                                        }
                                     }
+
+                                    if (msgType != null &&
+                                        msgObj == null &&
+                                        msgHeader.Length > 0 &&
+                                        Current?.SessionState?.ConnectionState?.BytesReceived.Length >= msgHeader.Length)
+                                    {
+                                        var msgBuffer = new byte[msgHeader.Length];
+                                        var bytesRead = Current?.SessionState?.ConnectionState?.BytesReceived?.Read(msgBuffer, 0, msgBuffer.Length);
+                                        if (bytesRead < msgHeader.Length) throw new SocketException(-1, nameof(msgBuffer));
+
+                                        msgObj = (IProtocol?)msgType.GetInstance();
+                                        if (msgObj == null) throw new OutOfMemoryException(nameof(IProtocol));
+
+                                        using (var ms = new MemoryStream(msgBuffer))
+                                        {
+                                            ms.PalaceDeserialize(msgObj, msgType);
+                                        }
+                                    }
+
+                                    if (msgHeader.EventType != 0 &&
+                                        msgType != null)
+                                    {
+                                        try
+                                        {
+                                            var boType = EventBus.GetType(msgType);
+                                            if (boType == null) throw new InvalidDataException(nameof(msgType));
+
+                                            EventBus.Current.Publish(
+                                                Current.SessionState,
+                                                boType,
+                                                new ProtocolEventParams
+                                                {
+                                                    SourceID = Current?.SessionState?.UserId ?? 0,
+                                                    RefNum = msgHeader.RefNum,
+                                                    Request = msgObj
+                                                });
+                                        }
+                                        catch
+                                        {
+                                            Current?.SessionState?.ConnectionState?.Disconnect();
+                                        }
+                                        finally
+                                        {
+                                            msgHeader.EventType = 0;
+                                            msgHeader.Length = 0;
+                                            msgHeader.RefNum = 0;
+
+                                            eventType = null;
+                                            msgType = null;
+                                            msgObj = null;
+                                        }
+                                    }
+
+                                    cancellationToken.Token.ThrowIfCancellationRequested();
+
+                                    await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
                                 }
-
-                                cancellationToken.Token.ThrowIfCancellationRequested();
-
-                                await Task.Delay(RndGenerator.Next(35, 75), cancellationToken.Token);
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                return;
                             }
                         }
 
@@ -541,6 +560,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
         var form = FormsManager.Current.CreateForm<FormDialog>(new FormCfg
         {
+            Name = "IApp",
             Load = (sender, e) => _jobs[ThreadQueues.GUI].Run(),
             WindowState = FormWindowState.Minimized,
             AutoScaleMode = AutoScaleMode.Font,
@@ -550,11 +570,10 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         });
         if (form == null) return;
 
-        RegisterForm(nameof(Program), form);
-
         form.SessionState = SessionState;
-        form.FormClosed += (sender, e) =>
-            UnregisterForm(nameof(Program), sender as FormBase);
+        //form.FormClosed += (sender, e) =>
+        //{
+        //};
 
         form.MouseMove += (sender, e) =>
         {

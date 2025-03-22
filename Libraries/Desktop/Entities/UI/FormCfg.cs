@@ -2,15 +2,16 @@
 
 public class FormCfg : ControlCfg
 {
-    public EventHandler Activated;
-    public SizeF AutoScaleDimensions;
-    public AutoScaleMode AutoScaleMode;
-    public bool Focus;
-    public FormClosedEventHandler FormClosed;
-    public EventHandler GotFocus;
-    public EventHandler Load;
-    public MouseEventHandler MouseMove;
-    public EventHandler Shown;
-    public FormStartPosition StartPosition;
-    public FormWindowState WindowState;
+    public string Name { get; set; }
+    public EventHandler Activated { get; set; }
+    public SizeF AutoScaleDimensions { get; set; }
+    public AutoScaleMode AutoScaleMode { get; set; }
+    public bool Focus { get; set; }
+    public FormClosedEventHandler FormClosed { get; set; }
+    public EventHandler GotFocus { get; set; }
+    public EventHandler Load { get; set; }
+    public MouseEventHandler MouseMove { get; set; }
+    public EventHandler Shown { get; set; }
+    public FormStartPosition StartPosition { get; set; }
+    public FormWindowState WindowState { get; set; }
 }

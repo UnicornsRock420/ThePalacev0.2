@@ -922,10 +922,10 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
             var isConnected = ConnectionState.IsConnected();
             if (!isConnected)
             {
-                foreach (var layer in _layerTypes)
+                foreach (var layer in _layerTypes
+                             .Where(l => l != LayerScreenTypes.Base)
+                             .ToList())
                 {
-                    if (layer == LayerScreenTypes.Base) continue;
-
                     _uiLayers[layer].Unload();
                 }
 
