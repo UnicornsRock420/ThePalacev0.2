@@ -16,12 +16,10 @@ public class BO_XWHISPER : IEventHandler<MSG_XWHISPER>
             @event is not ProtocolEventParams { Request: MSG_XWHISPER inboundPacket } @params) return null;
 
         LoggerHub.Current.Debug(nameof(BO_XWHISPER) + $"[{@params.SourceID}]: {@params.RefNum}");
+
+        LoggerHub.Current.Debug(nameof(BO_XWHISPER) + $"[{inboundPacket.TargetID}]: {inboundPacket.Text}");
         
-        // sessionState.Send(
-        //     sessionState.UserId,
-        //     new MSG_
-        //     {
-        //     });
+        // TODO
 
         throw new NotImplementedException(nameof(BO_XWHISPER));
 

@@ -1,9 +1,9 @@
 ﻿using Lib.Common.Attributes.Core;
-using Lib.Common.Client.Interfaces;
 using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Network.Shared.Assets;
 using Lib.Core.Interfaces.EventsBus;
 using Lib.Logging.Entities;
+using ThePalace.Client.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.Business.Assets;
 
@@ -12,7 +12,7 @@ public class BO_ASSETQUERY : IEventHandler<MSG_ASSETQUERY>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IClientSessionState sessionState ||
+        if (sender is not IClientDesktopSessionState sessionState ||
             @event is not ProtocolEventParams { Request: MSG_ASSETQUERY inboundPacket } @params ||
             inboundPacket.AssetSpec.Id == 0) return null;
 

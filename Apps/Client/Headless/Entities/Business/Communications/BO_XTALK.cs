@@ -18,12 +18,10 @@ public class BO_XTALK : IEventHandler<MSG_XTALK>
             @event is not ProtocolEventParams { Request: MSG_XTALK inboundPacket } @params) return null;
 
         LoggerHub.Current.Debug(nameof(BO_XTALK) + $"[{@params.SourceID}]: {@params.RefNum}");
+
+        LoggerHub.Current.Debug(nameof(BO_XTALK) + $"{inboundPacket.Text}");
         
-        // sessionState.Send(
-        //     sessionState.UserId,
-        //     new MSG_
-        //     {
-        //     });
+        // TODO
 
         throw new NotImplementedException(nameof(BO_XTALK));
 

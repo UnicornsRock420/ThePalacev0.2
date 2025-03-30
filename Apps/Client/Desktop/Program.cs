@@ -22,7 +22,6 @@ using Lib.Core.Entities.Network.Shared.Assets;
 using Lib.Core.Entities.Network.Shared.Communications;
 using Lib.Core.Entities.Network.Shared.Network;
 using Lib.Core.Entities.Network.Shared.Users;
-using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Entities.Threading;
 using Lib.Core.Enums;
 using Lib.Core.Exts;
@@ -702,8 +701,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                             case MouseButtons.Left:
                                 SessionState.UserDesc.RoomPos = point;
 
-                                var user = (UserDesc?)null;
-                                user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
+                                var user = SessionState.RoomUsers.GetValueLocked(SessionState.UserId);
                                 if (user != null)
                                 {
                                     user.RoomPos = point;

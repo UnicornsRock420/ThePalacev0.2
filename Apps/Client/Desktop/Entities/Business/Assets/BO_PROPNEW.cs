@@ -1,10 +1,11 @@
 ﻿using Lib.Common.Attributes.Core;
-using Lib.Common.Client.Interfaces;
 using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Network.Shared.Assets;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Interfaces.EventsBus;
 using Lib.Logging.Entities;
+using ThePalace.Client.Desktop.Enums;
+using ThePalace.Client.Desktop.Interfaces;
 
 namespace ThePalace.Client.Desktop.Entities.Business.Assets;
 
@@ -13,7 +14,7 @@ public class BO_PROPNEW : IEventHandler<MSG_PROPNEW>
 {
     public async Task<object?> Handle(object? sender, IEventParams @event)
     {
-        if (sender is not IClientSessionState sessionState ||
+        if (sender is not IClientDesktopSessionState sessionState ||
             @event is not ProtocolEventParams { Request: MSG_PROPNEW inboundPacket } @params ||
             inboundPacket.PropSpec.Id == 0) return null;
 
@@ -24,6 +25,8 @@ public class BO_PROPNEW : IEventHandler<MSG_PROPNEW>
             AssetSpec = inboundPacket.PropSpec,
             Loc = inboundPacket.Pos,
         });
+
+        sessionState.RefreshScreen(LayerScreenTypes.LooseProp);
 
         return null;
     }

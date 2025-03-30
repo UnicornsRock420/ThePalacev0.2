@@ -5,7 +5,7 @@ using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.EventsBus;
 using Lib.Logging.Entities;
 
-namespace ThePalace.Client.Desktop.Entities.Business.Communications;
+namespace ThePalace.Client.Headless.Entities.Business.Communications;
 
 [Mnemonic("whis")]
 public class BO_WHISPER : IEventHandler<MSG_WHISPER>
@@ -16,12 +16,10 @@ public class BO_WHISPER : IEventHandler<MSG_WHISPER>
             @event is not ProtocolEventParams { Request: MSG_WHISPER inboundPacket } @params) return null;
 
         LoggerHub.Current.Debug(nameof(BO_WHISPER) + $"[{@params.SourceID}]: {@params.RefNum}");
+
+        LoggerHub.Current.Debug(nameof(BO_WHISPER) + $"[{inboundPacket.TargetID}]: {inboundPacket.Text}");
         
-        // sessionState.Send(
-        //     sessionState.UserId,
-        //     new MSG_
-        //     {
-        //     });
+        // TODO
 
         throw new NotImplementedException(nameof(BO_WHISPER));
 
