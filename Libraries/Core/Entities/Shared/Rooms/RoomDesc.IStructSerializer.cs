@@ -29,7 +29,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
 
         try
         {
-            RoomFlags = (RoomFlags)ReadInt32();
+            Flags = (RoomFlags)ReadInt32();
             FacesID = ReadInt32();
             RoomID = ReadInt16();
             roomNameOfst = ReadInt16();
@@ -460,7 +460,7 @@ public partial class RoomDesc : IDisposable, IStructSerializer
             {
                 var lenVars = (short)_blobData.Count;
 
-                WriteInt32((int)RoomFlags); // Room Flags
+                WriteInt32((int)Flags); // Room Flags
                 WriteInt32(FacesID); // Default Face ID
                 WriteInt16(RoomID); // The Rooms ID
                 WriteInt16(roomNameOfst); // Room Name

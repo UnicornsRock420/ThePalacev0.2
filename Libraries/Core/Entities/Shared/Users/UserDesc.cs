@@ -14,6 +14,34 @@ public partial class UserDesc : UserRec, IDisposable, IStruct
         Extended = new ConcurrentDictionary<string, object>();
     }
 
+    public UserDesc(UserRec rec) : this()
+    {
+        UserId = rec.UserId;
+        RoomPos = rec.RoomPos;
+        PropSpec = rec.PropSpec;
+        RoomID = rec.RoomID;
+        FaceNbr = rec.FaceNbr;
+        ColorNbr = rec.ColorNbr;
+        AwayFlag = rec.AwayFlag;
+        OpenToMsgs = rec.OpenToMsgs;
+        NbrProps = rec.NbrProps;
+        Name = rec.Name;
+    }
+
+    public UserDesc(UserDesc desc) : this()
+    {
+        UserId = desc.UserId;
+        RoomPos = desc.RoomPos;
+        PropSpec = desc.PropSpec;
+        RoomID = desc.RoomID;
+        FaceNbr = desc.FaceNbr;
+        ColorNbr = desc.ColorNbr;
+        AwayFlag = desc.AwayFlag;
+        OpenToMsgs = desc.OpenToMsgs;
+        NbrProps = desc.NbrProps;
+        Name = desc.Name;
+    }
+
     public void Dispose()
     {
         Extended

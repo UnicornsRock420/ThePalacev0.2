@@ -2,7 +2,7 @@
 using Lib.Common.Client.Interfaces;
 using Lib.Common.Desktop.Entities.Ribbon;
 using Lib.Common.Desktop.Interfaces;
-using Lib.Core.Entities.Scripting;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.Types;
 using Lib.Core.Entities.Shared.Users;
@@ -27,5 +27,5 @@ public interface IClientDesktopSessionState : IClientSessionState, IDesktopSessi
     void LayerOpacity(float opacity, params LayerScreenTypes[] layers);
     void RefreshScreen(params LayerScreenTypes[] layers);
     void RefreshUI();
-    void RefreshScriptEvent(ScriptEvent scriptEvent);
+    void RefreshScriptEvent(ScriptEventParams scriptEventParams);
 }

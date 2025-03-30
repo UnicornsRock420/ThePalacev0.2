@@ -15,7 +15,7 @@ public class FormsManager : SingletonDisposableApplicationContext<FormsManager>,
 
     public FormsManager()
     {
-        ThreadExit += (sender, e) => Dispose();
+        ThreadExit += (sender, args) => Dispose();
     }
 
     ~FormsManager()

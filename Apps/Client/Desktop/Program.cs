@@ -22,7 +22,6 @@ using Lib.Core.Entities.Network.Shared.Assets;
 using Lib.Core.Entities.Network.Shared.Communications;
 using Lib.Core.Entities.Network.Shared.Network;
 using Lib.Core.Entities.Network.Shared.Users;
-using Lib.Core.Entities.Scripting;
 using Lib.Core.Entities.Shared.Users;
 using Lib.Core.Entities.Threading;
 using Lib.Core.Enums;
@@ -478,7 +477,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
     {
         if (sender is not IClientDesktopSessionState sessionState) return;
 
-        if (e is not ScriptEvent scriptEvent) return;
+        if (e is not ScriptEventParams scriptEvent) return;
 
         ((Job<ActionCmd>)_jobs[ThreadQueues.GUI]).Enqueue(new ActionCmd
         {
@@ -486,7 +485,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             {
                 if (a[0] is not IClientDesktopSessionState sessionState) return null;
 
-                if (a[1] is not ScriptEvent scriptEvent) return null;
+                if (a[1] is not ScriptEventParams scriptEvent) return null;
 
                 sessionState.RefreshScriptEvent(scriptEvent);
 
@@ -546,7 +545,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                     };
                     RegisterControl(nameof(NotifyIcon), trayIcon);
 
-                    trayIcon.ContextMenuStrip.Items.Add("Exit", null, (sender, e) => TaskManager.Current.Dispose());
+                    trayIcon.ContextMenuStrip.Items.Add("Exit", null, (sender, args) => TaskManager.Current.Dispose());
 
                     return null;
                 },
@@ -561,7 +560,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         var form = FormsManager.Current.CreateForm<FormDialog>(new FormCfg
         {
             Name = "IApp",
-            Load = (sender, e) => _jobs[ThreadQueues.GUI].Run(),
+            Load = (sender, args) => _jobs[ThreadQueues.GUI].Run(),
             WindowState = FormWindowState.Minimized,
             AutoScaleMode = AutoScaleMode.Font,
             AutoScaleDimensions = new SizeF(7F, 15F),
@@ -571,47 +570,47 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
         if (form == null) return;
 
         form.SessionState = SessionState;
-        //form.FormClosed += (sender, e) =>
+        //form.FormClosed += (sender, args) =>
         //{
         //};
 
-        form.MouseMove += (sender, e) =>
+        form.MouseMove += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseMove, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseMove, SessionState.ScriptTag, eventArgs: args);
         };
-        form.MouseUp += (sender, e) =>
+        form.MouseUp += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseUp, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseUp, SessionState.ScriptTag, eventArgs: args);
         };
-        form.MouseDown += (sender, e) =>
+        form.MouseDown += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDown, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseDown, SessionState.ScriptTag, eventArgs: args);
         };
-        form.DragEnter += (sender, e) =>
+        form.DragEnter += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseDrag, SessionState.ScriptTag, eventArgs: args);
         };
-        form.DragLeave += (sender, e) =>
+        form.DragLeave += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseDrag, SessionState.ScriptTag, eventArgs: args);
         };
-        form.DragOver += (sender, e) =>
+        form.DragOver += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
-            ScriptEventBus.Current.Invoke(ScriptEventTypes.MouseDrag, SessionState, null, SessionState.ScriptTag);
+            ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.MouseDrag, SessionState.ScriptTag, eventArgs: args);
         };
-        form.Resize += (sender, e) =>
+        form.Resize += (sender, args) =>
         {
             SessionState.LastActivity = DateTime.UtcNow;
 
@@ -688,7 +687,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
             if (imgScreen != null)
             {
-                imgScreen.MouseClick += (sender, e) =>
+                imgScreen.MouseClick += (sender, args) =>
                 {
                     if (!SessionState.ConnectionState.IsConnected())
                     {
@@ -696,9 +695,9 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                     }
                     else
                     {
-                        var point = new Lib.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                        var point = new Lib.Core.Entities.Shared.Types.Point((short)args.Y, (short)args.X);
 
-                        switch (e.Button)
+                        switch (args.Button)
                         {
                             case MouseButtons.Left:
                                 SessionState.UserDesc.RoomPos = point;
@@ -718,11 +717,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                         LayerScreenTypes.UserNametag,
                                         LayerScreenTypes.Messages);
 
-                                    SessionState.Send<IClientDesktopSessionState, MSG_USERMOVE>(
+                                    SessionState.Send(
                                         SessionState.UserId,
                                         new MSG_USERMOVE
                                         {
-                                            Pos = point
+                                            RoomPos = point
                                         });
                                 }
 
@@ -949,13 +948,13 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         }
                     }
                 };
-                imgScreen.MouseMove += (sender, e) =>
+                imgScreen.MouseMove += (sender, args) =>
                 {
                     imgScreen.Cursor = Cursors.Default;
 
                     if (!SessionState.ConnectionState.IsConnected()) return;
 
-                    var point = new Lib.Core.Entities.Shared.Types.Point((short)e.Y, (short)e.X);
+                    var point = new Lib.Core.Entities.Shared.Types.Point((short)args.Y, (short)args.X);
 
                     if ((SessionState.RoomUsers?.Count ?? 0) > 0)
                         foreach (var roomUser in SessionState.RoomUsers.Values)
@@ -1038,15 +1037,15 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
 
             if (txtInput != null)
             {
-                txtInput.LostFocus += (sender, e) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.LightGray); };
-                txtInput.GotFocus += (sender, e) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.White); };
-                txtInput.KeyUp += (sender, e) =>
+                txtInput.LostFocus += (sender, args) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.LightGray); };
+                txtInput.GotFocus += (sender, args) => { txtInput.BackColor = Color.FromKnownColor(KnownColor.White); };
+                txtInput.KeyUp += (sender, args) =>
                 {
                     SessionState.LastActivity = DateTime.UtcNow;
 
-                    if (e.KeyCode == Keys.Tab)
+                    if (args.KeyCode == Keys.Tab)
                     {
-                        e.Handled = true;
+                        args.Handled = true;
 
                         txtInput.Text = string.Empty;
                     }
@@ -1058,11 +1057,11 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         return;
                     }
 
-                    ScriptEventBus.Current.Invoke(ScriptEventTypes.KeyUp, SessionState, null, SessionState.ScriptTag);
+                    ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.KeyUp, SessionState.ScriptTag, eventArgs: args);
 
-                    if (e.KeyCode == Keys.Enter)
+                    if (args.KeyCode == Keys.Enter)
                     {
-                        e.Handled = true;
+                        args.Handled = true;
 
                         var text = txtInput.Text?.Trim();
                         txtInput.Text = string.Empty;
@@ -1109,8 +1108,8 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     Text = text
                                 };
 
-                                ScriptEventBus.Current.Invoke(ScriptEventTypes.Chat, SessionState, xTalk, SessionState.ScriptTag);
-                                ScriptEventBus.Current.Invoke(ScriptEventTypes.OutChat, SessionState, xTalk, SessionState.ScriptTag);
+                                ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.Chat, SessionState.ScriptTag, xTalk);
+                                ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.OutChat, SessionState.ScriptTag, xTalk);
 
                                 if (SessionState.ScriptTag is not IptTracking iptTracking) return;
 
@@ -1118,27 +1117,27 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                                     xTalk.Text = variable.Variable.Value.ToString();
 
                                 if (!string.IsNullOrWhiteSpace(xTalk.Text))
-                                    SessionState.Send<IClientDesktopSessionState, MSG_XTALK>(
+                                    SessionState.Send(
                                         SessionState.UserId,
                                         xTalk);
                             }
                         }
                     }
                 };
-                txtInput.KeyDown += (sender, e) =>
+                txtInput.KeyDown += (sender, args) =>
                 {
                     SessionState.LastActivity = DateTime.UtcNow;
 
-                    if (e.KeyCode == Keys.Tab)
+                    if (args.KeyCode == Keys.Tab)
                     {
-                        e.Handled = true;
+                        args.Handled = true;
 
                         txtInput.Text = string.Empty;
                     }
 
                     if (!SessionState?.ConnectionState?.IsConnected() ?? false) return;
 
-                    ScriptEventBus.Current.Invoke(ScriptEventTypes.KeyDown, SessionState, null, SessionState.ScriptTag);
+                    ScriptEventBus.Current.Invoke(SessionState, (short)ScriptEventTypes.KeyDown, SessionState.ScriptTag, eventArgs: args);
                 };
 
                 RegisterControl(nameof(txtInput), txtInput);
@@ -1172,7 +1171,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
             if (connectionForm == null) return;
 
             connectionForm.SessionState = SessionState;
-            connectionForm.FormClosed += (sender, e) => { UnregisterForm(nameof(Connection), sender as FormBase); };
+            connectionForm.FormClosed += (sender, args) => { UnregisterForm(nameof(Connection), sender as FormBase); };
 
             if (connectionForm != null)
             {
@@ -1183,7 +1182,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         .Where(c => c.Name == "buttonDisconnect")
                         .FirstOrDefault() is Button buttonDisconnect)
                 {
-                    buttonDisconnect.Click += (sender, e) =>
+                    buttonDisconnect.Click += (sender, args) =>
                     {
                         if (SessionState.ConnectionState?.IsConnected() ?? false)
                             SessionState.ConnectionState.Disconnect();
@@ -1198,7 +1197,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         .Cast<Control>()
                         .Where(c => c.Name == "buttonConnect")
                         .FirstOrDefault() is Button buttonConnect)
-                    buttonConnect.Click += (sender, e) =>
+                    buttonConnect.Click += (sender, args) =>
                     {
                         var connectionForm = GetForm(nameof(Connection));
                         if (connectionForm != null)
@@ -1272,7 +1271,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         .Cast<Control>()
                         .Where(c => c.Name == "buttonCancel")
                         .FirstOrDefault() is Button buttonCancel)
-                    buttonCancel.Click += (sender, e) =>
+                    buttonCancel.Click += (sender, args) =>
                     {
                         var connectionForm = GetForm(nameof(Connection));
                         connectionForm?.Close();
@@ -1379,7 +1378,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                             SessionState.ConnectionState?.HostAddr?.Address.ToString() == hostname &&
                             SessionState.ConnectionState.HostAddr.Port == port &&
                             roomID != 0)
-                            SessionState.Send<IClientDesktopSessionState, MSG_ROOMGOTO>(
+                            SessionState.Send(
                                 SessionState.UserId,
                                 new MSG_ROOMGOTO
                                 {
@@ -1449,7 +1448,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send<IClientDesktopSessionState, MSG_WHISPER>(
+                    SessionState.Send(
                         SessionState.UserId,
                         new MSG_WHISPER
                         {
@@ -1463,7 +1462,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                 {
                     var value = (UserID)values[1];
 
-                    SessionState.Send<IClientDesktopSessionState, MSG_KILLUSER>(
+                    SessionState.Send(
                         SessionState.UserId,
                         new MSG_KILLUSER
                         {
@@ -1554,7 +1553,7 @@ public class Program : SingletonDisposable<Program>, IDesktopApp
                         SessionState.UserId,
                         new MSG_USERMOVE
                         {
-                            Pos = value
+                            RoomPos = value
                         });
                 }
             }

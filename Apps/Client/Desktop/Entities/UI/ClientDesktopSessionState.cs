@@ -12,7 +12,7 @@ using Lib.Common.Desktop.Interfaces;
 using Lib.Common.Desktop.Singletons;
 using Lib.Common.Factories.Core;
 using Lib.Core.Constants;
-using Lib.Core.Entities.Scripting;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Entities.Shared.Rooms;
 using Lib.Core.Entities.Shared.ServerInfo;
 using Lib.Core.Entities.Shared.Types;
@@ -1045,19 +1045,19 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
         }
     }
 
-    public void RefreshScriptEvent(ScriptEvent scriptEvent)
+    public void RefreshScriptEvent(ScriptEventParams scriptEventParams)
     {
         var screenLayers =
             (from layer
                     in CONST_Event_LayerScreen_Types_Mappings
-                where layer.Key.Contains(scriptEvent.EventType)
+                where layer.Key.Contains(scriptEventParams.EventType)
                 select layer.Value)
             .FirstOrDefault();
 
         if (screenLayers.Contains(LayerScreenTypes.Base))
             RefreshScreen(LayerScreenTypes.Base);
 
-        if (CONST_EventTypes_UiRefresh.Contains(scriptEvent.EventType))
+        if (CONST_EventTypes_UiRefresh.Contains(scriptEventParams.EventType))
         {
             RefreshUI();
             RefreshRibbon();
@@ -1068,7 +1068,7 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
                 ? screenLayers
                 : CONST_allLayers);
 
-        switch (scriptEvent.EventType)
+        switch (scriptEventParams.EventType)
         {
             case (int)ScriptEventTypes.RoomLoad:
                 History.RegisterHistory(
@@ -1077,8 +1077,8 @@ public class ClientDesktopSessionState : Disposable, IClientDesktopSessionState
 
                 RefreshRibbon();
 
-                ScriptEventBus.Current.Invoke(ScriptEventTypes.RoomReady, this, null, ScriptTag);
-                ScriptEventBus.Current.Invoke(ScriptEventTypes.Enter, this, null, ScriptTag);
+                ScriptEventBus.Current.Invoke(this, (short)ScriptEventTypes.RoomReady, ScriptTag);
+                ScriptEventBus.Current.Invoke(this, (short)ScriptEventTypes.Enter, ScriptTag);
 
                 break;
         }

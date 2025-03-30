@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using Lib.Core.Entities.Scripting;
+using Lib.Core.Entities.EventArgs;
 using Lib.Core.Enums;
 using Lib.Core.Interfaces.Core;
 using Lib.Core.Interfaces.Network;
@@ -11,12 +11,12 @@ public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
 {
     private bool IsDisposed { get; set; }
     private static readonly IReadOnlyList<ScriptEventTypes> _eventTypes = Enum.GetValues<ScriptEventTypes>().ToList();
-    private ConcurrentDictionary<ScriptEventTypes, List<EventHandler>> _events = new();
+    private ConcurrentDictionary<short, List<EventHandler>> _events = new();
 
     public ScriptEventBus()
     {
         foreach (var type in _eventTypes)
-            _events[type] = [];
+            _events[(short)type] = [];
     }
 
     ~ScriptEventBus()
@@ -46,21 +46,23 @@ public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
     }
 
     public void Invoke(
-        ScriptEventTypes eventType,
         IUserSessionState sessionState,
-        IProtocol packet,
-        object scriptState = null)
+        short eventType,
+        object? scriptTag = null,
+        IProtocol? packet = null,
+        EventArgs eventArgs = null)
     {
         if (IsDisposed) return;
 
-        var scriptEvent = new ScriptEvent
+        var scriptEvent = new ScriptEventParams
         {
-            EventType = (int)eventType,
+            EventType = eventType,
+            ScriptTag = scriptTag,
+            EventArgs = eventArgs,
             Msg = packet,
-            ScriptTag = scriptState
         };
 
-        foreach (var handler in _events[eventType])
+        foreach (var handler in _events[(short)eventType])
             try
             {
                 handler(sessionState, scriptEvent);
@@ -69,12 +71,12 @@ public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
             {
                 LoggerHub.Current.Error(ex);
 
-                if (eventType != ScriptEventTypes.UnhandledError)
+                if (eventType != (short)ScriptEventTypes.UnhandledError)
                     Invoke(
-                        ScriptEventTypes.UnhandledError,
                         sessionState,
-                        packet,
-                        sessionState.ScriptTag);
+                        (short)ScriptEventTypes.UnhandledError,
+                        sessionState.ScriptTag,
+                        packet);
             }
     }
 
@@ -85,7 +87,7 @@ public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
         if (IsDisposed) return;
 
         if (handler != null)
-            _events[eventType].Add(handler);
+            _events[(short)eventType].Add(handler);
     }
 
     public void UnregisterEvent(
@@ -94,13 +96,13 @@ public class ScriptEventBus : Singleton<ScriptEventBus>, IDisposable
     {
         if (IsDisposed) return;
 
-        _events[eventType].Remove(handler);
+        _events[(short)eventType].Remove(handler);
     }
 
     public void ClearEvents(ScriptEventTypes eventType)
     {
         if (IsDisposed) return;
 
-        _events[eventType].Clear();
+        _events[(short)eventType].Clear();
     }
 }

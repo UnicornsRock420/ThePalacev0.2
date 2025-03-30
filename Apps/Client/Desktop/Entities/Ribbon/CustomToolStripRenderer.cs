@@ -14,7 +14,7 @@ public class CustomToolStripRenderer : ToolStripProfessionalRenderer
 
     protected CustomToolStripRenderer()
     {
-        _timer.Elapsed += (sender, e) =>
+        _timer.Elapsed += (sender, args) =>
         {
             if (_item1 != null)
                 try

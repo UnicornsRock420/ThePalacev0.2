@@ -8,63 +8,63 @@ public partial class RoomDesc
     [IgnoreDataMember]
     public bool IsAuthorLocked
     {
-        get => RoomFlags.AuthorLocked.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.AuthorLocked.SetBit(RoomFlags, value);
+        get => RoomFlags.AuthorLocked.IsSet(Flags);
+        set => Flags = RoomFlags.AuthorLocked.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsPrivate
     {
-        get => RoomFlags.Private.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.Private.SetBit(RoomFlags, value);
+        get => RoomFlags.Private.IsSet(Flags);
+        set => Flags = RoomFlags.Private.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsNoPainting
     {
-        get => RoomFlags.NoPainting.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.NoPainting.SetBit(RoomFlags, value);
+        get => RoomFlags.NoPainting.IsSet(Flags);
+        set => Flags = RoomFlags.NoPainting.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsClosed
     {
-        get => RoomFlags.Closed.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.Closed.SetBit(RoomFlags, value);
+        get => RoomFlags.Closed.IsSet(Flags);
+        set => Flags = RoomFlags.Closed.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsCyborgFreeZone
     {
-        get => RoomFlags.CyborgFreeZone.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.CyborgFreeZone.SetBit(RoomFlags, value);
+        get => RoomFlags.CyborgFreeZone.IsSet(Flags);
+        set => Flags = RoomFlags.CyborgFreeZone.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsHidden
     {
-        get => RoomFlags.Hidden.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.Hidden.SetBit(RoomFlags, value);
+        get => RoomFlags.Hidden.IsSet(Flags);
+        set => Flags = RoomFlags.Hidden.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsNoGuests
     {
-        get => RoomFlags.NoGuests.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.NoGuests.SetBit(RoomFlags, value);
+        get => RoomFlags.NoGuests.IsSet(Flags);
+        set => Flags = RoomFlags.NoGuests.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsWizardsOnly
     {
-        get => RoomFlags.WizardsOnly.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.WizardsOnly.SetBit(RoomFlags, value);
+        get => RoomFlags.WizardsOnly.IsSet(Flags);
+        set => Flags = RoomFlags.WizardsOnly.SetBit(Flags, value);
     }
 
     [IgnoreDataMember]
     public bool IsDropZone
     {
-        get => RoomFlags.DropZone.IsSet(RoomFlags);
-        set => RoomFlags = RoomFlags.DropZone.SetBit(RoomFlags, value);
+        get => RoomFlags.DropZone.IsSet(Flags);
+        set => Flags = RoomFlags.DropZone.SetBit(Flags, value);
     }
 }

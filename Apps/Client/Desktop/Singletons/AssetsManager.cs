@@ -70,7 +70,7 @@ public class AssetsManager : SingletonDisposable<AssetsManager>
                 sessionState.UserId,
                 new MSG_USERPROP
                 {
-                    AssetSpec = list
+                    PropSpec = list
                         .Take(9)
                         .ToArray(),
                 });

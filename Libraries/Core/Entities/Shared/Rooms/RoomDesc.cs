@@ -12,7 +12,7 @@ namespace Lib.Core.Entities.Shared.Rooms;
 public partial class RoomDesc : RawStream, IStruct
 {
     public RoomID RoomID;
-    public RoomFlags RoomFlags;
+    public RoomFlags Flags;
     public string? Name;
     [EncryptedString(1, 128)] public string? Password;
     public string? Artist;

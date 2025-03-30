@@ -343,7 +343,7 @@ public class PatStream : StreamBase
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID &&
                             !string.IsNullOrWhiteSpace(value))
                         {
-                            workingRoom.RoomFlags |= RoomFlags.AuthorLocked;
+                            workingRoom.Flags |= RoomFlags.AuthorLocked;
                             workingRoom.Password = value.GetBytes().ReadCString().GetBytes().DecryptString();
                         }
 
@@ -364,43 +364,43 @@ public class PatStream : StreamBase
                         break;
                     case "DROPZONE":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.DropZone;
+                            workingRoom.Flags |= RoomFlags.DropZone;
 
                         break;
                     case "NOLOOSEPROPS":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.RF_NoLooseProps;
+                            workingRoom.Flags |= RoomFlags.RF_NoLooseProps;
 
                         break;
                     case "PRIVATE":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.Private;
+                            workingRoom.Flags |= RoomFlags.Private;
 
                         break;
                     case "NOPAINTING":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.NoPainting;
+                            workingRoom.Flags |= RoomFlags.NoPainting;
 
                         break;
                     case "NOCYBORGS":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.CyborgFreeZone;
+                            workingRoom.Flags |= RoomFlags.CyborgFreeZone;
 
                         break;
                     case "HIDDEN":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.Hidden;
+                            workingRoom.Flags |= RoomFlags.Hidden;
 
                         break;
                     case "NOGUESTS":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.NoGuests;
+                            workingRoom.Flags |= RoomFlags.NoGuests;
 
                         break;
                     case "WIZARDSONLY":
                     case "OPERATORSONLY":
                         if (insideRoom && workingRoom.RoomID != NULL_ROOMREC.RoomID)
-                            workingRoom.RoomFlags |= RoomFlags.WizardsOnly;
+                            workingRoom.Flags |= RoomFlags.WizardsOnly;
 
                         break;
                     case "LOCKABLE":
@@ -562,7 +562,7 @@ public class PatStream : StreamBase
             if (printHeader)
             {
                 var entrance = rooms
-                    .Where(r => RoomFlags.DropZone.IsSet(r.RoomFlags))
+                    .Where(r => RoomFlags.DropZone.IsSet(r.Flags))
                     .OrderBy(r => r.RoomID)
                     .FirstOrDefault();
 
@@ -587,21 +587,21 @@ public class PatStream : StreamBase
 
                     if (r.MaxOccupancy > 0) writer.WriteLine($"\tMAXMEMBERS {r.MaxOccupancy}");
 
-                    if ((r.RoomFlags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone)
+                    if ((r.Flags & RoomFlags.CyborgFreeZone) == RoomFlags.CyborgFreeZone)
                         writer.WriteLine(CONST_ROOMFLAGS_NOCYBORGS);
-                    if ((r.RoomFlags & RoomFlags.DropZone) == RoomFlags.DropZone)
+                    if ((r.Flags & RoomFlags.DropZone) == RoomFlags.DropZone)
                         writer.WriteLine(CONST_ROOMFLAGS_DROPZONE);
-                    if ((r.RoomFlags & RoomFlags.Hidden) == RoomFlags.Hidden)
+                    if ((r.Flags & RoomFlags.Hidden) == RoomFlags.Hidden)
                         writer.WriteLine(CONST_ROOMFLAGS_HIDDEN);
-                    if ((r.RoomFlags & RoomFlags.NoGuests) == RoomFlags.NoGuests)
+                    if ((r.Flags & RoomFlags.NoGuests) == RoomFlags.NoGuests)
                         writer.WriteLine(CONST_ROOMFLAGS_NOGUESTS);
-                    if ((r.RoomFlags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps)
+                    if ((r.Flags & RoomFlags.RF_NoLooseProps) == RoomFlags.RF_NoLooseProps)
                         writer.WriteLine(CONST_ROOMFLAGS_NOLOOSEPROPS);
-                    if ((r.RoomFlags & RoomFlags.NoPainting) == RoomFlags.NoPainting)
+                    if ((r.Flags & RoomFlags.NoPainting) == RoomFlags.NoPainting)
                         writer.WriteLine(CONST_ROOMFLAGS_NOPAINTING);
-                    if ((r.RoomFlags & RoomFlags.Private) == RoomFlags.Private)
+                    if ((r.Flags & RoomFlags.Private) == RoomFlags.Private)
                         writer.WriteLine(CONST_ROOMFLAGS_PRIVATE);
-                    if ((r.RoomFlags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly)
+                    if ((r.Flags & RoomFlags.WizardsOnly) == RoomFlags.WizardsOnly)
                         writer.WriteLine(CONST_ROOMFLAGS_OPERATORSONLY);
 
                     writer.WriteLine($"\tNAME \"{r.Name}\"");

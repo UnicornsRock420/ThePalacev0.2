@@ -1,11 +1,11 @@
-﻿using Lib.Core.Enums;
-using Lib.Core.Interfaces.Network;
+﻿using Lib.Core.Interfaces.Network;
 
 namespace Lib.Core.Entities.EventArgs;
 
 public class ScriptEventParams : EventParams
 {
-    public ScriptEventTypes EventType;
-    public IProtocol Msg;
-    public object ScriptState;
+    public int EventType;
+    public object ScriptTag;
+    public System.EventArgs EventArgs;
+    public IProtocol? Msg;
 }
